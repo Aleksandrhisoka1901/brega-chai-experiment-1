@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brega Chai — дизайн-референс главной</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%2352634b'/%3E%3Cpath d='M9 19c5-1 10-5 14-11 0 9-4 15-12 15' fill='none' stroke='%23f4e9d2' stroke-width='2'/%3E%3C/svg%3E"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600&family=Prata&display=swap');
+
+      :root {
+        color-scheme: light;
+        font-family: Manrope, sans-serif;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: #181812;
+      }
+
+      button,
+      a {
+        font: inherit;
+      }
+
+      .switcher {
+        position: fixed;
+        z-index: 50;
+        right: 20px;
+        bottom: 20px;
+        display: flex;
+        gap: 4px;
+        padding: 5px;
+        border: 1px solid rgb(255 255 255 / 16%);
+        border-radius: 999px;
+        background: rgb(22 22 17 / 88%);
+        box-shadow: 0 12px 40px rgb(0 0 0 / 25%);
+        backdrop-filter: blur(14px);
+      }
+
+      .switcher button {
+        min-height: 40px;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 999px;
+        color: #dedbcf;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .switcher button[aria-pressed='true'] {
+        color: #181812;
+        background: #f3f0e6;
+      }
+
+      .direction[hidden] {
+        display: none;
+      }
+
+      /* Shared product illustration */
+      .tea-art {
+        position: relative;
+        min-height: 360px;
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .tea-art::before {
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        content: '';
+        background:
+          radial-gradient(circle at 69% 25%, rgb(255 255 255 / 20%), transparent 22%),
+          linear-gradient(145deg, var(--art-a), var(--art-b));
+      }
+
+      .tea-art::after {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        content: '';
+        opacity: 0.22;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+      }
+
+      .tea-art .table {
+        position: absolute;
+        right: -10%;
+        bottom: -19%;
+        width: 90%;
+        height: 48%;
+        border-radius: 50%;
+        background: var(--table);
+        transform: rotate(-5deg);
+        box-shadow: 0 -2px 0 rgb(255 255 255 / 12%);
+      }
+
+      .tea-art .cup {
+        position: absolute;
+        right: 20%;
+        bottom: 20%;
+        width: 31%;
+        aspect-ratio: 1.6;
+        border-radius: 10% 10% 47% 47%;
+        background: linear-gradient(100deg, #c3bba6, #f0eadb 42%, #a79c84);
+        box-shadow: 0 28px 35px rgb(0 0 0 / 22%);
+      }
+
+      .tea-art .cup::before {
+        position: absolute;
+        top: -11%;
+        left: 2%;
+        width: 96%;
+        height: 24%;
+        border-radius: 50%;
+        content: '';
+        background: #6f7d3f;
+        box-shadow:
+          inset 0 0 0 8px #d9d2c0,
+          inset 0 0 18px 10px rgb(20 30 9 / 35%);
+      }
+
+      .tea-art .tin {
+        position: absolute;
+        right: 53%;
+        bottom: 19%;
+        width: 18%;
+        height: 45%;
+        border-radius: 5px 5px 14px 14px;
+        background: linear-gradient(100deg, #a38e62, #e2d6ba 38%, #968057);
+        box-shadow: 0 28px 40px rgb(0 0 0 / 25%);
+      }
+
+      .tea-art .tin::before {
+        position: absolute;
+        top: 20%;
+        left: 13%;
+        width: 74%;
+        height: 53%;
+        border: 1px solid rgb(60 45 24 / 58%);
+        content: '焙';
+        color: #493c27;
+        font: 44px/1.1 Prata, serif;
+        text-align: center;
+        background: #c7b179;
+      }
+
+      .tea-art .branch {
+        position: absolute;
+        top: 20%;
+        left: 3%;
+        width: 50%;
+        height: 2px;
+        background: #4c472d;
+        transform: rotate(29deg);
+        transform-origin: left;
+      }
+
+      .tea-art .branch::before,
+      .tea-art .branch::after {
+        position: absolute;
+        width: 48px;
+        height: 17px;
+        border-radius: 100% 0 100% 0;
+        content: '';
+        background: #59603a;
+        transform: rotate(-38deg);
+      }
+
+      .tea-art .branch::before {
+        left: 32%;
+        bottom: 0;
+      }
+
+      .tea-art .branch::after {
+        left: 60%;
+        top: 0;
+        transform: rotate(145deg);
+      }
+
+      /* Direction A */
+      .a {
+        --ink: #24251e;
+        --paper: #efede4;
+        --line: #bbb9ac;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: Manrope, sans-serif;
+      }
+
+      .a-header {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        height: 76px;
+        padding: 0 3.4vw;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .a-logo {
+        color: inherit;
+        font: 500 25px/1 Cormorant Garamond, serif;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+      }
+
+      .a-nav {
+        display: flex;
+        gap: 34px;
+      }
+
+      .a-nav a,
+      .a-cart {
+        color: inherit;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .a-cart {
+        justify-self: end;
+        border: 0;
+        background: transparent;
+      }
+
+      .a-hero {
+        display: grid;
+        grid-template-columns: 42% 58%;
+        min-height: calc(100vh - 76px);
+      }
+
+      .a-hero-copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: clamp(44px, 7vw, 110px) 5vw 42px;
+        background: #afb094;
+      }
+
+      .a-kicker,
+      .a-index {
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .a h1 {
+        max-width: 670px;
+        margin: 0;
+        font: 400 clamp(62px, 7.3vw, 128px) / 0.82 Cormorant Garamond, serif;
+        letter-spacing: -0.045em;
+      }
+
+      .a-intro {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 36px;
+        align-items: end;
+        max-width: 570px;
+      }
+
+      .a-intro p {
+        margin: 0;
+        font: 400 16px/1.65 Cormorant Garamond, serif;
+      }
+
+      .a-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 180px;
+        padding: 12px 0;
+        border-bottom: 1px solid currentcolor;
+        color: inherit;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .a-hero-art {
+        --art-a: #414638;
+        --art-b: #81806b;
+        --table: #c6bda8;
+      }
+
+      .a-manifesto {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.05fr);
+        gap: 8vw;
+        padding: 150px 5vw 170px;
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .a-manifesto::before {
+        position: absolute;
+        top: -90px;
+        left: -45px;
+        color: rgb(36 37 30 / 6%);
+        content: '01';
+        font: 280px/1 Cormorant Garamond, serif;
+        pointer-events: none;
+      }
+
+      .a-manifesto-title {
+        position: relative;
+      }
+
+      .a-manifesto-title .a-index {
+        display: block;
+        margin-bottom: 38px;
+      }
+
+      .a-manifesto h2 {
+        margin: 0;
+        font: 400 clamp(45px, 5.2vw, 88px) / 0.98 Cormorant Garamond, serif;
+        letter-spacing: -0.025em;
+      }
+
+      .a-manifesto-copy {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 45px;
+        align-content: end;
+      }
+
+      .a-manifesto p {
+        margin: 0;
+        font: 15px/1.75 Cormorant Garamond, serif;
+      }
+
+      .a-section {
+        padding: 110px 3.4vw 130px;
+      }
+
+      .a-section-head {
+        display: grid;
+        grid-template-columns: 18% 1fr auto;
+        align-items: baseline;
+        margin-bottom: 54px;
+      }
+
+      .a-section h2 {
+        margin: 0;
+        font: 400 clamp(55px, 6vw, 92px) / 1 Cormorant Garamond, serif;
+      }
+
+      .a-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+      }
+
+      .a-card {
+        color: inherit;
+        background: var(--paper);
+        text-decoration: none;
+      }
+
+      .a-card-art {
+        min-height: 370px;
+        background:
+          radial-gradient(circle at 50% 58%, transparent 0 16%, rgb(0 0 0 / 11%) 17% 18%, transparent 19%),
+          linear-gradient(145deg, var(--card-a), var(--card-b));
+      }
+
+      .a-card-art::before {
+        display: block;
+        width: 36%;
+        height: 51%;
+        margin: auto;
+        border-radius: 48% 48% 13% 13%;
+        content: '';
+        background: var(--object);
+        box-shadow: 0 25px 30px rgb(0 0 0 / 18%);
+        transform: translateY(42%);
+      }
+
+      .a-card-copy {
+        min-height: 175px;
+        padding: 23px 25px 30px;
+        border-top: 1px solid var(--line);
+      }
+
+      .a-card-no {
+        float: right;
+        color: #77786d;
+        font-size: 10px;
+      }
+
+      .a-card h3 {
+        margin: 0 0 10px;
+        font: 400 29px/1 Cormorant Garamond, serif;
+      }
+
+      .a-card p {
+        max-width: 235px;
+        margin: 0;
+        color: #626358;
+        font: 13px/1.55 Cormorant Garamond, serif;
+      }
+
+      .a-products {
+        background: #d7cfbe;
+      }
+
+      .a-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        min-height: 290px;
+        padding: 70px 3.4vw;
+        color: #e3e0d4;
+        background: #272820;
+      }
+
+      .a-footer strong {
+        font: 400 42px/1 Cormorant Garamond, serif;
+      }
+
+      .a-footer small {
+        align-self: end;
+        color: #9b9b91;
+        line-height: 1.8;
+      }
+
+      /* Direction B */
+      .b {
+        --cream: #f4e9d2;
+        --red: #943b2b;
+        --brown: #3a2318;
+        --green: #52634b;
+        color: var(--brown);
+        background: var(--cream);
+        font-family: Manrope, sans-serif;
+      }
+
+      .b-header {
+        position: absolute;
+        z-index: 4;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 28px 4vw;
+        color: #f8efd9;
+      }
+
+      .b-logo {
+        color: inherit;
+        font: 28px/1 Prata, serif;
+        text-decoration: none;
+      }
+
+      .b-nav {
+        display: flex;
+        gap: 38px;
+      }
+
+      .b-nav a,
+      .b-cart {
+        color: inherit;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .b-cart {
+        border: 1px solid rgb(255 255 255 / 55%);
+        border-radius: 999px;
+        padding: 10px 16px;
+        background: transparent;
+      }
+
+      .b-hero {
+        position: relative;
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        overflow: hidden;
+        color: #f7edda;
+        background:
+          linear-gradient(rgb(36 28 17 / 18%), rgb(36 28 17 / 32%)),
+          radial-gradient(circle at 78% 40%, #8e8665, transparent 33%),
+          linear-gradient(130deg, #2f4036 0 42%, #8f6346 100%);
+      }
+
+      .b-hero::after {
+        position: absolute;
+        inset: 0;
+        content: '';
+        opacity: 0.24;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+        mix-blend-mode: overlay;
+      }
+
+      .b-sun {
+        position: absolute;
+        top: 19%;
+        right: 14%;
+        width: min(29vw, 430px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #d4a96c;
+        box-shadow: 0 0 70px rgb(226 179 112 / 35%);
+      }
+
+      .b-hero-vessel {
+        position: absolute;
+        right: 12%;
+        bottom: -5%;
+        width: min(33vw, 500px);
+        height: 58%;
+        border-radius: 46% 46% 8% 8%;
+        background: linear-gradient(90deg, #6b391f, #be7250 45%, #5f301d);
+        box-shadow: -30px 40px 80px rgb(20 12 7 / 35%);
+        transform: rotate(5deg);
+      }
+
+      .b-hero-vessel::after {
+        position: absolute;
+        top: 24%;
+        left: 19%;
+        display: grid;
+        width: 62%;
+        aspect-ratio: 1;
+        place-items: center;
+        border: 1px solid #d6af71;
+        border-radius: 50%;
+        content: '茶';
+        color: #e1c38d;
+        font: 84px/1 Prata, serif;
+      }
+
+      .b-hero-copy {
+        position: relative;
+        z-index: 2;
+        width: 92%;
+        padding-top: 80px;
+      }
+
+      .b-eyebrow {
+        display: block;
+        margin-bottom: 30px;
+        font-size: 10px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+      }
+
+      .b h1 {
+        max-width: 850px;
+        margin: 0;
+        font: 400 clamp(68px, 10vw, 164px) / 0.82 Cormorant Garamond, serif;
+        letter-spacing: -0.055em;
+      }
+
+      .b-hero-copy p {
+        max-width: 350px;
+        margin: 45px 0 0 10vw;
+        font: 17px/1.55 Cormorant Garamond, serif;
+      }
+
+      .b-stamp {
+        position: absolute;
+        z-index: 3;
+        right: 5%;
+        bottom: 5%;
+        display: grid;
+        width: 102px;
+        aspect-ratio: 1;
+        place-items: center;
+        border: 1px solid currentcolor;
+        border-radius: 50%;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-align: center;
+        text-transform: uppercase;
+        transform: rotate(11deg);
+      }
+
+      .b-manifesto {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 8vw;
+        padding: 150px 7vw;
+        overflow: hidden;
+      }
+
+      .b-manifesto::before {
+        position: absolute;
+        top: -90px;
+        left: -60px;
+        color: rgb(148 59 43 / 10%);
+        content: '01';
+        font: 280px/1 Prata, serif;
+      }
+
+      .b-manifesto h2 {
+        position: relative;
+        margin: 0;
+        font: 400 clamp(48px, 6vw, 96px) / 0.97 Cormorant Garamond, serif;
+      }
+
+      .b-manifesto-copy {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 45px;
+        align-content: end;
+      }
+
+      .b-manifesto p {
+        margin: 0;
+        font: 16px/1.7 Cormorant Garamond, serif;
+      }
+
+      .b-rituals {
+        padding: 90px 0 130px;
+        color: #f2e8d5;
+        background: var(--green);
+      }
+
+      .b-section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        padding: 0 6vw 55px;
+      }
+
+      .b-section-head h2 {
+        margin: 0;
+        font: 400 clamp(62px, 8vw, 120px) / 0.8 Cormorant Garamond, serif;
+      }
+
+      .b-section-head p {
+        max-width: 290px;
+        margin: 0;
+        font: 15px/1.6 Cormorant Garamond, serif;
+      }
+
+      .b-cards {
+        display: grid;
+        grid-auto-columns: minmax(270px, 30vw);
+        grid-auto-flow: column;
+        gap: 18px;
+        overflow-x: auto;
+        padding: 0 6vw 25px;
+        scroll-snap-type: x mandatory;
+      }
+
+      .b-card {
+        position: relative;
+        min-height: 570px;
+        overflow: hidden;
+        color: #fbefdb;
+        background: var(--card);
+        scroll-snap-align: start;
+        text-decoration: none;
+      }
+
+      .b-card::before {
+        position: absolute;
+        top: 14%;
+        left: 50%;
+        width: 46%;
+        height: 49%;
+        border-radius: 45% 45% 11% 11%;
+        content: '';
+        background: var(--object);
+        box-shadow: 0 30px 50px rgb(38 20 10 / 32%);
+        transform: translateX(-50%) rotate(var(--rotate));
+      }
+
+      .b-card::after {
+        position: absolute;
+        right: -17%;
+        bottom: -7%;
+        width: 70%;
+        aspect-ratio: 1;
+        border: 1px solid rgb(255 255 255 / 25%);
+        border-radius: 50%;
+        content: '';
+      }
+
+      .b-card-copy {
+        position: absolute;
+        z-index: 2;
+        right: 30px;
+        bottom: 28px;
+        left: 30px;
+      }
+
+      .b-card-copy small {
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .b-card h3 {
+        max-width: 300px;
+        margin: 10px 0 0;
+        font: 400 clamp(34px, 4vw, 58px) / 0.94 Cormorant Garamond, serif;
+      }
+
+      .b-products {
+        padding: 130px 6vw 150px;
+      }
+
+      .b-products-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8vw;
+        margin-bottom: 70px;
+      }
+
+      .b-products h2 {
+        margin: 0;
+        color: var(--red);
+        font: 400 clamp(68px, 9vw, 134px) / 0.8 Cormorant Garamond, serif;
+      }
+
+      .b-products-top p {
+        align-self: end;
+        max-width: 410px;
+        margin: 0;
+        font: 17px/1.65 Cormorant Garamond, serif;
+      }
+
+      .b-product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px 18px;
+      }
+
+      .b-product {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .b-product-art {
+        position: relative;
+        aspect-ratio: 0.78;
+        overflow: hidden;
+        background: var(--card);
+      }
+
+      .b-product-art::before {
+        position: absolute;
+        top: 22%;
+        left: 50%;
+        width: 42%;
+        height: 51%;
+        border-radius: 10px;
+        content: '';
+        background: var(--object);
+        box-shadow: 0 28px 36px rgb(50 27 15 / 22%);
+        transform: translateX(-50%) rotate(var(--rotate));
+      }
+
+      .b-product h3 {
+        margin: 16px 0 3px;
+        font: 400 27px/1 Cormorant Garamond, serif;
+      }
+
+      .b-product span {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+      }
+
+      .b-all {
+        display: inline-flex;
+        gap: 40px;
+        align-items: center;
+        margin-top: 55px;
+        color: var(--red);
+        font-size: 11px;
+        letter-spacing: 0.13em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .b-all::after {
+        width: 120px;
+        height: 1px;
+        content: '';
+        background: currentcolor;
+      }
+
+      .b-footer {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr;
+        min-height: 320px;
+        padding: 75px 6vw;
+        color: #f5e9d2;
+        background: var(--red);
+      }
+
+      .b-footer strong {
+        font: 400 clamp(42px, 5vw, 72px) / 1 Cormorant Garamond, serif;
+      }
+
+      .b-footer a {
+        color: inherit;
+      }
+
+      .b-footer small {
+        align-self: end;
+        line-height: 1.8;
+      }
+
+      @media (max-width: 850px) {
+        .a-header,
+        .b-header {
+          grid-template-columns: 1fr auto;
+          padding-inline: 20px;
+        }
+
+        .a-nav,
+        .b-nav {
+          display: none;
+        }
+
+        .a-hero,
+        .a-manifesto,
+        .b-manifesto {
+          grid-template-columns: 1fr;
+        }
+
+        .a-hero-copy {
+          min-height: 70vh;
+        }
+
+        .a-hero-art {
+          min-height: 56vh;
+        }
+
+        .a-intro,
+        .a-manifesto-copy,
+        .b-manifesto-copy {
+          grid-template-columns: 1fr;
+        }
+
+        .a-manifesto {
+          gap: 50px;
+          padding-block: 100px;
+        }
+
+        .a-section-head {
+          grid-template-columns: 1fr auto;
+          gap: 20px;
+        }
+
+        .a-section-head .a-index {
+          display: none;
+        }
+
+        .a-grid,
+        .b-product-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .a-footer,
+        .b-footer {
+          grid-template-columns: 1fr;
+          gap: 45px;
+        }
+
+        .b-hero-vessel {
+          right: -10%;
+          width: 56vw;
+          opacity: 0.78;
+        }
+
+        .b-hero-copy p {
+          margin-left: 0;
+        }
+
+        .b-section-head,
+        .b-products-top {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 35px;
+        }
+
+        .b-cards {
+          grid-auto-columns: 78vw;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .switcher {
+          right: 10px;
+          bottom: 10px;
+          left: 10px;
+          justify-content: stretch;
+        }
+
+        .switcher button {
+          flex: 1;
+          padding-inline: 8px;
+          font-size: 12px;
+        }
+
+        .a h1,
+        .b h1 {
+          font-size: 64px;
+        }
+
+        .a-grid,
+        .b-product-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .a-section {
+          padding-inline: 20px;
+        }
+
+        .a-card-art {
+          min-height: 430px;
+        }
+
+        .b-stamp {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="switcher" aria-label="Выбор дизайн-направления">
+      <button type="button" data-target="direction-a" aria-pressed="true">A · Тихая книга</button>
+      <button type="button" data-target="direction-b" aria-pressed="false">B · Живой ритуал</button>
+    </div>
+
+    <main>
+      <article class="direction a" id="direction-a">
+        <header class="a-header">
+          <a class="a-logo" href="#">Brega Chai</a>
+          <nav class="a-nav" aria-label="Основная навигация">
+            <a href="#a-about">О проекте</a>
+            <a href="#a-rituals">Ритуалы</a>
+            <a href="#a-products">Сорта</a>
+          </nav>
+          <button class="a-cart" type="button">Корзина · 0</button>
+        </header>
+
+        <section class="a-hero">
+          <div class="a-hero-copy">
+            <span class="a-kicker">Чай как личная практика</span>
+            <h1>У времени есть вкус.</h1>
+            <div class="a-intro">
+              <p>
+                Небольшая коллекция чая и предметов для тех моментов, когда спешить больше
+                некуда.
+              </p>
+              <a class="a-link" href="#a-rituals">Открыть ритуалы <span>↘</span></a>
+            </div>
+          </div>
+          <div class="tea-art a-hero-art" role="img" aria-label="Чайная банка и чаша">
+            <span class="branch"></span><span class="table"></span><span class="tin"></span
+            ><span class="cup"></span>
+          </div>
+        </section>
+
+        <section class="a-manifesto" id="a-about">
+          <div class="a-manifesto-title">
+            <span class="a-index">Глава 01 · О проекте</span>
+            <h2>Вещи обретают смысл, когда становятся частью привычки.</h2>
+          </div>
+          <div class="a-manifesto-copy">
+            <p>
+              Мы собираем чай, посуду и простые инструкции в цельные сценарии — для утра,
+              разговора, одиночества или подарка.
+            </p>
+            <p>
+              Ассортимент короткий намеренно. Здесь не нужно сравнивать десятки почти
+              одинаковых позиций.
+            </p>
+          </div>
+        </section>
+
+        <section class="a-section" id="a-rituals">
+          <div class="a-section-head">
+            <span class="a-index">Глава 02</span>
+            <h2>Ритуалы</h2>
+            <a class="a-link" href="#">Листать <span>← &nbsp; →</span></a>
+          </div>
+          <div class="a-grid">
+            <a class="a-card" href="#">
+              <div class="a-card-art" style="--card-a: #bfc1a6; --card-b: #838b6e; --object: #61482f"></div>
+              <div class="a-card-copy"><span class="a-card-no">01</span><h3>Утро без слов</h3><p>Светлый чай, тонкая керамика и десять минут тишины.</p></div>
+            </a>
+            <a class="a-card" href="#">
+              <div class="a-card-art" style="--card-a: #b97d62; --card-b: #6f3f2d; --object: #ded1b4"></div>
+              <div class="a-card-copy"><span class="a-card-no">02</span><h3>После дождя</h3><p>Глубокий аромат прогретого листа и влажного дерева.</p></div>
+            </a>
+            <a class="a-card" href="#">
+              <div class="a-card-art" style="--card-a: #ac9b74; --card-b: #655b43; --object: #34463b"></div>
+              <div class="a-card-copy"><span class="a-card-no">03</span><h3>Долгий вечер</h3><p>Набор для медленного разговора и второго пролива.</p></div>
+            </a>
+            <a class="a-card" href="#">
+              <div class="a-card-art" style="--card-a: #c5bca9; --card-b: #8f8474; --object: #8f3f2d"></div>
+              <div class="a-card-copy"><span class="a-card-no">04</span><h3>Тёплый свет</h3><p>Мягкий красный чай и маленькая чашка ручной работы.</p></div>
+            </a>
+          </div>
+        </section>
+
+        <section class="a-section a-products" id="a-products">
+          <div class="a-section-head">
+            <span class="a-index">Глава 03</span>
+            <h2>Сорта</h2>
+            <a class="a-link" href="#">Смотреть все <span>↗</span></a>
+          </div>
+          <div class="a-grid">
+            <a class="a-card" href="#"><div class="a-card-art" style="--card-a:#d8d0ba;--card-b:#aba083;--object:#51604d"></div><div class="a-card-copy"><h3>Лунцзин</h3><p>Ореховый, ясный, весенний.</p></div></a>
+            <a class="a-card" href="#"><div class="a-card-art" style="--card-a:#c6a689;--card-b:#8e654b;--object:#d9cba8"></div><div class="a-card-copy"><h3>Дянь Хун</h3><p>Мёд, дерево и сухие фрукты.</p></div></a>
+            <a class="a-card" href="#"><div class="a-card-art" style="--card-a:#b7b39d;--card-b:#777964;--object:#6d3e2d"></div><div class="a-card-copy"><h3>Габа</h3><p>Тёплый и округлый вечерний вкус.</p></div></a>
+            <a class="a-card" href="#"><div class="a-card-art" style="--card-a:#d7cbb3;--card-b:#9e8b6e;--object:#2f4437"></div><div class="a-card-copy"><h3>Сенча</h3><p>Свежая зелень и морской воздух.</p></div></a>
+          </div>
+        </section>
+
+        <footer class="a-footer">
+          <strong>Brega Chai</strong>
+          <div>hello@brega.chai<br />Telegram ↗</div>
+          <small>Политика конфиденциальности<br />Доставка и возврат<br />© 2026</small>
+        </footer>
+      </article>
+
+      <article class="direction b" id="direction-b" hidden>
+        <header class="b-header">
+          <a class="b-logo" href="#">Brega Chai</a>
+          <nav class="b-nav" aria-label="Основная навигация">
+            <a href="#b-about">История</a><a href="#b-rituals">Ритуалы</a><a href="#b-products">Сорта</a>
+          </nav>
+          <button class="b-cart" type="button">Корзина &nbsp; 0</button>
+        </header>
+
+        <section class="b-hero">
+          <span class="b-sun"></span><span class="b-hero-vessel"></span>
+          <div class="b-hero-copy">
+            <span class="b-eyebrow">Чайная мастерская · Москва</span>
+            <h1>Завари<br /><em>момент.</em></h1>
+            <p>Наборы для маленьких ежедневных церемоний — без правил, но с вниманием.</p>
+          </div>
+          <span class="b-stamp">Листайте<br />медленнее<br />↓</span>
+        </section>
+
+        <section class="b-manifesto" id="b-about">
+          <h2>Вещи обретают смысл, когда становятся частью привычки.</h2>
+          <div class="b-manifesto-copy">
+            <p>Мы собираем чай, посуду и простые инструкции в цельные сценарии — для утра, разговора, одиночества или подарка.</p>
+            <p>Ассортимент короткий намеренно. Здесь не нужно сравнивать десятки почти одинаковых позиций.</p>
+          </div>
+        </section>
+
+        <section class="b-rituals" id="b-rituals">
+          <div class="b-section-head">
+            <h2>Ритуалы</h2>
+            <p>Готовые истории, в которых уже есть всё необходимое для первого пролива.</p>
+          </div>
+          <div class="b-cards">
+            <a class="b-card" href="#" style="--card:#a55138;--object:#d9c48f;--rotate:-4deg"><div class="b-card-copy"><small>Ритуал № 01</small><h3>Красное солнце</h3></div></a>
+            <a class="b-card" href="#" style="--card:#374b40;--object:#b0744d;--rotate:3deg"><div class="b-card-copy"><small>Ритуал № 02</small><h3>Тихий сад</h3></div></a>
+            <a class="b-card" href="#" style="--card:#b98c5e;--object:#5c3827;--rotate:-2deg"><div class="b-card-copy"><small>Ритуал № 03</small><h3>После полудня</h3></div></a>
+            <a class="b-card" href="#" style="--card:#6e4939;--object:#d7b06f;--rotate:5deg"><div class="b-card-copy"><small>Ритуал № 04</small><h3>Домой затемно</h3></div></a>
+          </div>
+        </section>
+
+        <section class="b-products" id="b-products">
+          <div class="b-products-top">
+            <h2>Сорта</h2>
+            <p>Чай без сложной классификации. Четыре характера — от свежего и прозрачного до густого, тёплого и древесного.</p>
+          </div>
+          <div class="b-product-grid">
+            <a class="b-product" href="#"><div class="b-product-art" style="--card:#d6b56f;--object:#445341;--rotate:-3deg"></div><h3>Сенча</h3><span>1 240 ₽ · 50 г</span></a>
+            <a class="b-product" href="#"><div class="b-product-art" style="--card:#9b4431;--object:#e2c78c;--rotate:2deg"></div><h3>Дянь Хун</h3><span>980 ₽ · 50 г</span></a>
+            <a class="b-product" href="#"><div class="b-product-art" style="--card:#52624c;--object:#b56445;--rotate:-4deg"></div><h3>Лунцзин</h3><span>1 450 ₽ · 50 г</span></a>
+            <a class="b-product" href="#"><div class="b-product-art" style="--card:#b77b55;--object:#46584c;--rotate:3deg"></div><h3>Габа</h3><span>1 180 ₽ · 50 г</span></a>
+          </div>
+          <a class="b-all" href="#">Все сорта</a>
+        </section>
+
+        <footer class="b-footer">
+          <strong>Brega<br />Chai</strong>
+          <div>Пишите нам<br /><a href="#">Telegram ↗</a><br /><a href="#">hello@brega.chai</a></div>
+          <small>Политика конфиденциальности<br />Доставка и возврат<br />Москва · © 2026</small>
+        </footer>
+      </article>
+    </main>
+
+    <script>
+      const controls = document.querySelectorAll('.switcher button');
+      const directions = document.querySelectorAll('.direction');
+
+      controls.forEach((control) => {
+        control.addEventListener('click', () => {
+          controls.forEach((item) => item.setAttribute('aria-pressed', String(item === control)));
+          directions.forEach((direction) => {
+            direction.hidden = direction.id !== control.dataset.target;
+          });
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        });
+      });
+    </script>
+  </body>
+</html>
