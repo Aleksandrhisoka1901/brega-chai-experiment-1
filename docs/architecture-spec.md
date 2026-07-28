@@ -753,6 +753,8 @@ Budgets:
 
 Ветка `main` защищена: прямые push запрещены, изменения попадают только через merge request. Обязательный approval не требуется, merge разрешён только при успешном pipeline.
 
+Merge request запускает полный проверочный pipeline:
+
 1. install с immutable lockfile;
 2. format check;
 3. lint;
@@ -760,9 +762,19 @@ Budgets:
 5. unit tests;
 6. Strapi schema/build;
 7. Next.js production build;
-8. integration tests;
-9. Playwright smoke/a11y на собранных containers;
-10. container vulnerability scan — если доступен в GitLab.
+8. Playwright smoke/a11y;
+9. сборка web/CMS images;
+10. container smoke;
+11. container vulnerability scan — когда будет подключён.
+
+После merge ветка `main` повторяет только быстрые проверки итогового
+merge-коммита: format, lint, typecheck, unit и production build. E2E, сборка
+images и container smoke здесь не повторяются.
+
+Protected-тег `release-{semver}` запускает полный pipeline заново, публикует
+images tagged commit и только после всех зелёных проверок допускает deploy.
+Обычные теги pipeline не создают. Scheduled pipeline с `TLS_RENEWAL=true`
+запускает только renewal job.
 
 ### 21.2. Deploy
 
