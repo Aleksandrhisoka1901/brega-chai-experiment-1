@@ -27,7 +27,7 @@ type StoredOrderRow = {
   orderNumber: string;
   idempotencyKey: string;
   requestFingerprint: string;
-  status: StoredOrder["status"];
+  orderStatus: StoredOrder["status"];
   customerName: string;
   customerPhone: string;
   customerEmail?: string | null;
@@ -51,7 +51,7 @@ const mapStoredOrder = (row: StoredOrderRow): StoredOrder => ({
   orderNumber: row.orderNumber,
   idempotencyKey: row.idempotencyKey,
   requestFingerprint: row.requestFingerprint,
-  status: row.status,
+  status: row.orderStatus,
   customer: {
     name: row.customerName,
     phone: row.customerPhone,
@@ -139,7 +139,7 @@ function createPersistence(strapi: any): OrderPersistence {
                   orderNumber: createOrderNumber(),
                   idempotencyKey: draft.idempotencyKey,
                   requestFingerprint: draft.requestFingerprint,
-                  status: "new",
+                  orderStatus: "new",
                   customerName: draft.customer.name,
                   customerPhone: draft.customer.phone,
                   customerEmail: draft.customer.email,
@@ -202,7 +202,7 @@ function createStatusPersistence(strapi: any): OrderStatusPersistence {
             async updateStatus(id, status, statusHistory) {
               const row = await strapi.db.query(ORDER_UID).update({
                 where: { documentId: id },
-                data: { status, statusHistory },
+                data: { orderStatus: status, statusHistory },
                 transacting: trx,
               });
               return row ? mapStoredOrder(row as StoredOrderRow) : null;

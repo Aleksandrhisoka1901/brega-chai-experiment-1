@@ -28,7 +28,7 @@
       "private": true,
       "configurable": false
     },
-    "status": {
+    "orderStatus": {
       "type": "enumeration",
       "enum": ["new", "confirmed", "completed", "cancelled"],
       "required": true,

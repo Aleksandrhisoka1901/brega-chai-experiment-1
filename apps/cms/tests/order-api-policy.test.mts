@@ -11,7 +11,8 @@ test("order has a unique private idempotency key and immutable snapshots", async
   );
 
   assert.equal(schema.options.draftAndPublish, false);
-  assert.deepEqual(schema.attributes.status.enum, [
+  assert.equal(schema.attributes.status, undefined);
+  assert.deepEqual(schema.attributes.orderStatus.enum, [
     "new",
     "confirmed",
     "completed",

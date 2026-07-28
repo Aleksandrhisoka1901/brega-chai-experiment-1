@@ -356,6 +356,8 @@ Slug продукта создаётся один раз до сохранени
 - закрыт от Public role;
 - создаётся только доверенным server-to-server запросом;
 - содержит immutable line snapshots;
+- хранит бизнес-статус в `orderStatus`, поскольку `status` зарезервирован
+  Strapi Document Service для draft/published;
 - status изменяется по разрешённым переходам;
 - технические external IDs не редактируются контент-редактором.
 

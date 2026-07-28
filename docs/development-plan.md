@@ -69,13 +69,13 @@
 - PostgreSQL transaction, row locks и idempotency;
 - атомарное списание stock;
 - допустимые переходы заказа и однократный возврат stock при отмене;
+- изменение статуса из Strapi Content Manager только через транзакционный
+  `transitionStatus`;
 - PostgreSQL integration harness;
 - полный browser flow через настоящий Next BFF.
 
 Осталось:
 
-- подключить изменение статуса из Strapi Admin к транзакционному
-  `transitionStatus`, исключив прямой обход stock policy;
 - проверить локальный end-to-end Next BFF → настоящий Strapi → PostgreSQL с
   реальным scoped API token;
 - включить PostgreSQL integration harness в обязательный CI pipeline.
@@ -84,6 +84,8 @@
 
 ### 1. Order status lifecycle
 
+Статус: готово.
+
 - зафиксировать поведение изменения статуса из Strapi Admin;
 - направлять переходы только через `transitionStatus`;
 - запретить обход через прямой Content Manager update;
@@ -91,8 +93,9 @@
 - проверить `new/confirmed → cancelled`;
 - доказать повторное отсутствие возврата stock.
 
-Критерий завершения: integration-тест через реальный Strapi API/Admin boundary
-подтверждает атомарный переход и изменение stock.
+Критерий завершения выполнен: проверка через реальный локальный Strapi Content
+Manager подтвердила `new → confirmed → cancelled`, изменение stock и отсутствие
+повторного возврата.
 
 ### 2. Cache revalidation
 
@@ -176,10 +179,9 @@ sanitization tests остаются зелёными.
 
 ## Следующие merge requests
 
-1. `order-status-lifecycle`;
-2. `cache-revalidation`;
-3. `cms-content-rendering`;
-4. `real-order-integration`;
-5. `release-hardening`;
-6. `production-content`;
-7. `release-{semver}` после появления VPS.
+1. `cache-revalidation`;
+2. `cms-content-rendering`;
+3. `real-order-integration`;
+4. `release-hardening`;
+5. `production-content`;
+6. `release-{semver}` после появления VPS.
