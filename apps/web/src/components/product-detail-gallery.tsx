@@ -48,6 +48,7 @@ export function ProductDetailGallery({
                 fill
                 sizes="(max-width: 767px) 72px, 88px"
                 src={image.url}
+                unoptimized
               />
             </button>
           ))}
@@ -62,6 +63,7 @@ export function ProductDetailGallery({
           priority
           sizes="(max-width: 767px) 100vw, 52vw"
           src={selectedImage.url}
+          unoptimized
           width={selectedImage.width}
         />
       </div>

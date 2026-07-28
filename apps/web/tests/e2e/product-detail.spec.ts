@@ -9,6 +9,9 @@ test("published product has a vertical keyboard-operable gallery @smoke", async 
   await expect(
     page.getByRole("heading", { level: 1, name: "Да Хун Пао" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Как раскрывается чай" }),
+  ).toBeVisible();
 
   const gallery = page.getByRole("group", { name: "Изображения товара" });
   const firstThumbnail = gallery.getByRole("button").first();

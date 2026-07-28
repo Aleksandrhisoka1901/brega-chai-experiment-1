@@ -23,7 +23,8 @@
     },
     "intro": {
       "type": "blocks",
-      "required": true
+      "required": true,
+      "description": "Keep the introduction concise, using short paragraphs and only the headings, lists, links, or images that help readers scan it. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
     },
     "image": {
       "type": "component",

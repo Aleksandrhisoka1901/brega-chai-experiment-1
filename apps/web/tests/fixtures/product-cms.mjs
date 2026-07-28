@@ -18,6 +18,17 @@ function product(slug, stock) {
     stock,
     cardExcerpt: "Минеральный утёсный улун.",
     story: "Чай для долгого тихого вечера.",
+    articleContent: [
+      {
+        type: "heading",
+        level: 1,
+        children: [{ type: "text", text: "Как раскрывается чай" }],
+      },
+      {
+        type: "paragraph",
+        children: [{ type: "text", text: "Заваривайте короткими проливами." }],
+      },
+    ],
     mainImage: {
       alt: "Пачка чая",
       image: {
@@ -156,6 +167,33 @@ const cms = createServer((request, response) => {
             cart: "Корзина",
           },
           legalDetails: "ИП Иванов\nИНН 123456789012",
+        },
+      }),
+    );
+    return;
+  }
+
+  if (url.pathname === "/api/products-page") {
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(
+      JSON.stringify({
+        data: {
+          title: "Чай, выбранный для внимания",
+          intro: [
+            {
+              type: "paragraph",
+              children: [
+                {
+                  type: "text",
+                  text: "Небольшая коллекция без спешки и рейтингов.",
+                },
+              ],
+            },
+          ],
+          seo: {
+            title: "Сорта чая — Brega Chai",
+            description: "Все сорта чая Brega Chai.",
+          },
         },
       }),
     );

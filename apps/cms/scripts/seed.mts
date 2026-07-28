@@ -52,6 +52,45 @@ const products = [
     sortOrder: 20,
     cardExcerpt: "Минеральный утёсный улун с тёплым древесным ароматом.",
     story: "Выразительный чай для нескольких коротких проливов.",
+    articleContent: [
+      {
+        type: "heading",
+        level: 1,
+        children: [{ type: "text", text: "Как раскрывается чай" }],
+      },
+      {
+        type: "paragraph",
+        children: [
+          {
+            type: "text",
+            text: "Первые проливы дают тёплый древесный аромат, затем проявляются минеральность и мягкая фруктовая сладость.",
+          },
+        ],
+      },
+      {
+        type: "list",
+        format: "unordered",
+        children: [
+          {
+            type: "list-item",
+            children: [{ type: "text", text: "Вода около 95 °C" }],
+          },
+          {
+            type: "list-item",
+            children: [{ type: "text", text: "Короткие проливы" }],
+          },
+        ],
+      },
+      {
+        type: "quote",
+        children: [
+          {
+            type: "text",
+            text: "Не торопитесь увеличивать время: чай раскрывается постепенно.",
+          },
+        ],
+      },
+    ],
     imageAsset: "tea-leaves.png",
   },
   {

@@ -95,7 +95,8 @@
     },
     "articleContent": {
       "type": "blocks",
-      "required": false
+      "required": false,
+      "description": "Recommended structure: a concise introduction followed by short sections with descriptive headings, paragraphs, lists, links, or images as useful. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
     },
     "seoTitle": {
       "type": "string",

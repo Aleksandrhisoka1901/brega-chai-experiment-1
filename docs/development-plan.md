@@ -28,7 +28,7 @@
 - backup/restore scripts и rollback application images;
 - дизайн-система, showcase и Lucide icons.
 
-### Content MVP — в основном готово
+### Content MVP — код готов
 
 - CMS client, строгие Zod mappers и controlled unavailable states;
 - CMS-driven главная: hero, «О проекте», «Ритуалы», «Сорта»;
@@ -42,13 +42,14 @@
 - metadata, canonical, sitemap, robots;
 - Organization, WebSite, Product, Offer и Breadcrumb JSON-LD;
 - route/global errors с `noindex`;
+- CMS-driven intro `/products`;
+- безопасный Strapi Blocks renderer для intro и статьи товара;
+- H1 из rich content рендерится как H2;
+- подписанный webhook Strapi → Next.js для точечной revalidation;
 - axe и E2E основных страниц.
 
 Осталось:
 
-- получать intro `/products` из `ProductsPage`, а не из статического JSX;
-- отрисовать и санитизировать Strapi Blocks товара;
-- добавить защищённый webhook Strapi → Next.js для точечной revalidation;
 - загрузить реальные юридические PDF и включить ссылки;
 - провести итоговую visual QA с production-контентом.
 
@@ -133,6 +134,8 @@ Strapi Content Manager доставляет подписанное событи�
 
 ### 3. ProductsPage и rich content
 
+Статус: готово.
+
 - перенести intro каталога в `ProductsPage`;
 - добавить Blocks renderer с разрешёнными frontend-компонентами;
 - заменять H1 из rich content на H2;
@@ -142,6 +145,12 @@ Strapi Content Manager доставляет подписанное событи�
 
 Критерий завершения: редактор меняет контент без правки frontend, а axe и
 sanitization tests остаются зелёными.
+
+Критерии выполнены: `/products` получает title, Blocks intro, SEO и опциональное
+изображение из `ProductsPage`; статья товара использует общий allowlisted
+renderer. Пустые, неизвестные и исполняемые nodes отбрасываются, небезопасные
+ссылки становятся обычным текстом, а CMS H1 нормализуется в H2. Fixture-тесты
+покрывают rich content, короткие и длинные анонсы и отсутствие изображения.
 
 ### 4. Real commerce integration
 
