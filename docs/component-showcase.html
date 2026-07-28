@@ -18,6 +18,8 @@
       h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: var(--tracking-display); }
       h1 { font-size: var(--type-heading-1); line-height: var(--leading-display); }
       h2 { margin-top: var(--space-section); font-size: var(--type-heading-2); }
+      .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-6); margin-top: var(--space-section); }
+      .section-head h2 { margin: 0; }
       .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--space-6); align-items: start; }
       .stack { display: grid; gap: var(--space-4); align-content: start; }
       button, .button { display: inline-flex; min-height: var(--control-height); align-items: center; justify-content: center; gap: .625rem; padding: .75rem 1.25rem; border: 1px solid var(--text-primary); color: var(--surface-page); background: var(--text-primary); font: 600 .75rem/1 var(--font-interface); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: color var(--motion-base), background-color var(--motion-base), border-color var(--motion-base), transform var(--motion-fast); }
@@ -49,6 +51,35 @@
       .quantity button { min-width: var(--control-hit); padding: 0; border: 0; color: inherit; background: transparent; }
       .quantity button:hover:not(:disabled) { color: inherit; background: var(--action-ghost-hover); }
       .quantity output { display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+      .product-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin-top: var(--space-12); border: 1px solid var(--border-default); background: var(--border-default); }
+      .product-card { position: relative; display: grid; min-width: 0; grid-template-rows: auto 1fr; color: inherit; background: var(--surface-page); text-decoration: none; }
+      .product-media { position: relative; aspect-ratio: var(--card-media-ratio); overflow: hidden; background: var(--card-surface, var(--surface-subtle)); transition: background-color var(--motion-slow); }
+      .product-object { position: absolute; top: 22%; left: 26%; width: 48%; height: 58%; border: 1px solid rgb(36 37 30 / 16%); background: var(--card-object, var(--surface-editorial)); box-shadow: 0 1.5rem 2rem rgb(36 37 30 / 12%); transform: rotate(var(--card-rotate, -2deg)); transition: transform var(--motion-slow) var(--ease-editorial); }
+      .product-object::before { position: absolute; inset: 12% 14% auto; height: 24%; border-bottom: 1px solid rgb(239 237 228 / 45%); color: var(--surface-page); content: 'BREGA'; font: 500 .625rem/1 var(--font-interface); letter-spacing: .18em; text-align: center; }
+      .product-card:hover .product-media { background: var(--card-hover, var(--action-subtle-hover)); }
+      .product-card:hover .product-object { transform: rotate(var(--card-rotate, -2deg)) scale(1.025); }
+      .product-copy { display: grid; min-height: 10.5rem; align-content: start; padding: var(--space-6); }
+      .product-kicker { margin: 0 0 var(--space-2); color: var(--text-muted); font: .625rem/1.4 var(--font-interface); letter-spacing: .14em; text-transform: uppercase; }
+      .product-title { margin: 0; font: 400 1.75rem/1 var(--font-display); letter-spacing: -.025em; }
+      .product-excerpt { display: -webkit-box; margin: var(--space-3) 0 0; overflow: hidden; color: var(--text-muted); font: 1rem/1.4 var(--font-display); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+      .product-price { margin-top: auto; padding-top: var(--space-4); font-size: .75rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+      .product-status { margin-top: auto; padding-top: var(--space-4); color: var(--status-warning); font-size: .6875rem; letter-spacing: .08em; text-transform: uppercase; }
+      .product-placeholder { position: absolute; inset: 0; display: grid; place-content: center; gap: var(--space-2); padding: var(--space-6); text-align: center; }
+      .product-placeholder strong { font: 500 1.5rem/1 var(--font-display); letter-spacing: .08em; }
+      .product-placeholder span { color: var(--text-muted); font-size: .6875rem; letter-spacing: .08em; text-transform: uppercase; }
+      .gallery-demo { display: grid; grid-template-columns: minmax(0, 36rem) minmax(18rem, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; margin-top: var(--space-12); }
+      .gallery-media { display: grid; grid-template-areas: 'thumbs stage'; grid-template-columns: 5rem minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+      .gallery-stage { position: relative; grid-area: stage; aspect-ratio: var(--gallery-media-ratio); overflow: hidden; background: var(--gallery-surface, var(--surface-subtle)); transition: background-color var(--motion-base); }
+      .gallery-stage::before { position: absolute; top: 18%; left: 28%; width: 44%; height: 64%; border: 1px solid rgb(36 37 30 / 15%); background: var(--gallery-object, var(--surface-editorial)); box-shadow: 0 2rem 3rem rgb(36 37 30 / 14%); content: ''; transform: rotate(var(--gallery-rotate, -2deg)); transition: background-color var(--motion-base), transform var(--motion-base); }
+      .gallery-panel { display: grid; gap: var(--space-8); }
+      .gallery-panel h3 { margin: 0; font: 400 var(--type-heading-3)/var(--leading-heading) var(--font-display); }
+      .gallery-panel p { max-width: 34ch; margin: 0; color: var(--text-muted); font-family: var(--font-display); font-size: 1.125rem; }
+      .gallery-thumbs { display: grid; grid-area: thumbs; grid-template-columns: 1fr; gap: var(--space-3); }
+      .gallery-thumb { min-width: 0; aspect-ratio: var(--gallery-thumb-ratio); padding: 0; border-color: var(--border-default); color: inherit; background: var(--thumb-surface); }
+      .gallery-thumb::before { width: 34%; height: 58%; background: var(--thumb-object); content: ''; transform: rotate(var(--thumb-rotate)); }
+      .gallery-thumb::before { display: block; border: 1px solid rgb(36 37 30 / 14%); }
+      .gallery-thumb:hover:not(:disabled) { color: inherit; background: var(--thumb-surface); border-color: var(--text-muted); }
+      .gallery-thumb[aria-pressed='true'] { border: 2px solid var(--text-primary); }
       .skeleton { height: 8rem; background: linear-gradient(90deg, var(--skeleton-base), var(--skeleton-highlight), var(--skeleton-base)); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
       .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
       @keyframes shimmer { to { background-position: -200% 0; } }
@@ -67,7 +98,8 @@
       .cart-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 1.125rem; }
       .cart-note { max-width: 34ch; margin: 0; color: var(--text-muted); font-size: .8125rem; }
       .cart-summary > button { width: 100%; }
-      @media (max-width: 47.999rem) { .drawer { width: 100dvw; height: 100dvh; } }
+      @media (max-width: 63.999rem) { .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 47.999rem) { .drawer { width: 100dvw; height: 100dvh; } .product-grid { display: flex; margin-inline: calc(-1 * var(--page-gutter)); padding-inline: var(--page-gutter); overflow-x: auto; border: 0; scroll-snap-type: inline proximity; } .product-card { min-width: min(78vw, 19rem); border: 1px solid var(--border-default); scroll-snap-align: start; } .gallery-demo { grid-template-columns: 1fr; } .gallery-media { grid-template-areas: 'stage' 'thumbs'; grid-template-columns: 1fr; } .gallery-thumbs { grid-template-columns: repeat(3, 1fr); } }
     </style>
   </head>
   <body>
@@ -75,6 +107,45 @@
     <header><span>Brega Chai</span><a href="./design-reference.html">Композиционный референс</a></header>
     <main id="main" tabindex="-1">
       <h1>Состояния системы</h1>
+      <section>
+        <div class="section-head"><h2>Товарные карточки</h2></div>
+        <div class="product-grid">
+          <a class="product-card" href="#ritual-morning" style="--card-surface:#c9c3ad;--card-hover:#d1cbb8;--card-object:#4b5745;--card-rotate:-3deg">
+            <div class="product-media"><span class="product-object" aria-hidden="true"></span></div>
+            <div class="product-copy"><p class="product-kicker">Ритуал № 01</p><h3 class="product-title">Тихое утро</h3><p class="product-excerpt">Зелёный чай, чаша и короткая инструкция для первого пролива.</p></div>
+          </a>
+          <a class="product-card" href="#sencha" style="--card-surface:#d8c69f;--card-hover:#ded0ae;--card-object:#6f4938;--card-rotate:2deg">
+            <div class="product-media"><span class="product-object" aria-hidden="true"></span></div>
+            <div class="product-copy"><p class="product-kicker">Сорт · Япония</p><h3 class="product-title">Сенча «Тихий берег»</h3><p class="product-excerpt">Свежий, прозрачный и травянистый чай на каждый день.</p><span class="product-price">1 490 ₽ · 50 г</span></div>
+          </a>
+          <a class="product-card" href="#gaba" style="--card-surface:#aeb29c;--card-hover:#b8bba8;--card-object:#9d513d;--card-rotate:-1deg">
+            <div class="product-media"><span class="product-object" aria-hidden="true"></span></div>
+            <div class="product-copy"><p class="product-kicker">Сорт · Тайвань</p><h3 class="product-title">Габа «Тёплый лес»</h3><p class="product-excerpt">Мягкий древесный профиль с долгим тёплым послевкусием.</p><span class="product-status">Нет в наличии</span></div>
+          </a>
+          <a class="product-card" href="#new-tea">
+            <div class="product-media"><span class="product-placeholder"><strong>Brega Chai</strong><span>Изображение готовится</span></span></div>
+            <div class="product-copy"><p class="product-kicker">Сорт · Китай</p><h3 class="product-title">Новый урожай</h3><p class="product-excerpt">Пример карточки с отсутствующим изображением.</p><span class="product-price">1 280 ₽ · 50 г</span></div>
+          </a>
+        </div>
+      </section>
+      <section>
+        <h2>Товарная галерея</h2>
+        <div class="gallery-demo">
+          <div class="gallery-media">
+            <div class="gallery-thumbs" aria-label="Изображения товара">
+              <button class="gallery-thumb" type="button" aria-label="Упаковка" aria-pressed="true" style="--thumb-surface:#d8c69f;--thumb-object:#6f4938;--thumb-rotate:2deg" data-surface="#d8c69f" data-object="#6f4938" data-rotate="2deg" data-label="Упаковка сенчи на тёплом фоне"></button>
+              <button class="gallery-thumb" type="button" aria-label="Чайный лист" aria-pressed="false" style="--thumb-surface:#aeb29c;--thumb-object:#4b5745;--thumb-rotate:-4deg" data-surface="#aeb29c" data-object="#4b5745" data-rotate="-4deg" data-label="Чайный лист на шалфейном фоне"></button>
+              <button class="gallery-thumb" type="button" aria-label="Чаша" aria-pressed="false" style="--thumb-surface:#c9b6a1;--thumb-object:#d9d1bf;--thumb-rotate:5deg" data-surface="#c9b6a1" data-object="#d9d1bf" data-rotate="5deg" data-label="Светлая чайная чаша"></button>
+            </div>
+            <div class="gallery-stage" id="gallery-stage" role="img" aria-label="Упаковка сенчи на тёплом фоне" style="--gallery-surface:#d8c69f;--gallery-object:#6f4938;--gallery-rotate:2deg"></div>
+          </div>
+          <div class="gallery-panel">
+            <p class="product-kicker">Галерея · 1 из 3</p>
+            <h3>Сенча «Тихий берег»</h3>
+            <p>Явное переключение кадров по клику или с клавиатуры. Hover только обозначает доступное действие.</p>
+          </div>
+        </div>
+      </section>
       <section>
         <h2>Кнопки и количество</h2>
         <div class="grid">
@@ -168,6 +239,17 @@
         button.setAttribute('aria-busy', 'true');
         button.disabled = true;
         setTimeout(() => { button.removeAttribute('aria-busy'); button.disabled = false; }, 1600);
+      });
+      const galleryStage = document.querySelector('#gallery-stage');
+      document.querySelectorAll('.gallery-thumb').forEach((thumbnail, index, thumbnails) => {
+        thumbnail.addEventListener('click', () => {
+          thumbnails.forEach((item) => item.setAttribute('aria-pressed', String(item === thumbnail)));
+          galleryStage.style.setProperty('--gallery-surface', thumbnail.dataset.surface);
+          galleryStage.style.setProperty('--gallery-object', thumbnail.dataset.object);
+          galleryStage.style.setProperty('--gallery-rotate', thumbnail.dataset.rotate);
+          galleryStage.setAttribute('aria-label', thumbnail.dataset.label);
+          document.querySelector('.gallery-panel .product-kicker').textContent = `Галерея · ${index + 1} из ${thumbnails.length}`;
+        });
       });
     </script>
   </body>
