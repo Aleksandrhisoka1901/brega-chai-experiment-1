@@ -1,10 +1,17 @@
 import { stat } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { compileStrapi, createStrapi } from "@strapi/strapi";
+import {
+  assertSeedAllowed,
+  planSeed,
+  PUBLIC_STOREFRONT_ACTIONS,
+} from "./seed-helpers.ts";
 
-import { assertSeedAllowed, planSeed } from "./seed-helpers.ts";
+const require = createRequire(import.meta.url);
+const { compileStrapi, createStrapi } =
+  require("@strapi/strapi") as typeof import("@strapi/strapi");
 
 const currentDirectory = fileURLToPath(new URL(".", import.meta.url));
 const assetsDirectory = resolve(currentDirectory, "seed-assets");
@@ -104,9 +111,9 @@ async function uploadSeedAsset(
         },
       },
       files: {
-        path,
-        name,
-        type: "image/png",
+        filepath: path,
+        originalFilename: name,
+        mimetype: "image/png",
         size: fileStats.size,
       },
     });
@@ -134,6 +141,30 @@ async function upsertSingle(
   }
 
   await strapi.documents(uid).create({ data, status: "published" });
+}
+
+async function grantPublicStorefrontRead(
+  strapi: Awaited<ReturnType<typeof createStrapi>>,
+) {
+  const role = await strapi.db.query("plugin::users-permissions.role").findOne({
+    where: { type: "public" },
+    populate: ["permissions"],
+  });
+
+  if (!role) {
+    throw new Error("Public role was not found");
+  }
+
+  const existingActions = new Set(
+    role.permissions.map((permission: { action: string }) => permission.action),
+  );
+  const permissions = strapi.db.query("plugin::users-permissions.permission");
+
+  for (const action of PUBLIC_STOREFRONT_ACTIONS) {
+    if (!existingActions.has(action)) {
+      await permissions.create({ data: { action, role: role.id } });
+    }
+  }
 }
 
 async function run() {
@@ -263,6 +294,8 @@ async function run() {
         });
       }
     }
+
+    await grantPublicStorefrontRead(strapi);
   } finally {
     await strapi.destroy();
   }

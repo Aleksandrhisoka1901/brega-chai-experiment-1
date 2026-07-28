@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { assertSeedAllowed, planSeed } from "../scripts/seed-helpers.ts";
+import {
+  assertSeedAllowed,
+  planSeed,
+  PUBLIC_STOREFRONT_ACTIONS,
+} from "../scripts/seed-helpers.ts";
 
 test("first seed creates fixtures and the next seed updates the same documents", () => {
   const desired = [
@@ -81,5 +85,19 @@ test("seed permits only known local database host and name combinations", () => 
         DATABASE_NAME: "brega_chai_production",
       }),
     /database "brega_chai_production"/,
+  );
+});
+
+test("seed exposes only read actions required by the storefront", () => {
+  assert.deepEqual(PUBLIC_STOREFRONT_ACTIONS, [
+    "api::global-setting.global-setting.find",
+    "api::home-page.home-page.find",
+    "api::product.product.find",
+    "api::product.product.findOne",
+    "api::products-page.products-page.find",
+  ]);
+  assert.equal(
+    PUBLIC_STOREFRONT_ACTIONS.some((action) => action.includes("order")),
+    false,
   );
 });

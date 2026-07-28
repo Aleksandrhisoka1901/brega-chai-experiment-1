@@ -1086,6 +1086,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@brega-chai/cms@workspace:apps/cms"
   dependencies:
+    "@brega-chai/contracts": "workspace:*"
     "@strapi/plugin-color-picker": "npm:5.45.0"
     "@strapi/plugin-users-permissions": "npm:5.45.0"
     "@strapi/provider-upload-aws-s3": "npm:5.45.0"
@@ -1139,6 +1140,7 @@ __metadata:
     react: "npm:19.1.1"
     react-dom: "npm:19.1.1"
     react-hook-form: "npm:7.62.0"
+    server-only: "npm:0.0.1"
     typescript: "npm:5.9.2"
     zod: "npm:4.1.11"
   languageName: unknown
@@ -16930,6 +16932,13 @@ __metadata:
   dependencies:
     type-fest: "npm:^0.20.2"
   checksum: 10c0/8cfd89f43ca93e283c5f1d16178a536bdfac9bc6029f4a9df988610cc399bc4f2478d1f10ce40b9dff66b863a5158a19b438fbec929045c96d92174f6bca1e88
+  languageName: node
+  linkType: hard
+
+"server-only@npm:0.0.1":
+  version: 0.0.1
+  resolution: "server-only@npm:0.0.1"
+  checksum: 10c0/4704f0ef85da0be981af6d4ed8e739d39bcfd265b9c246a684060acda5642d0fdc6daffc2308e71e2682c5f508090978802eae0a77623c9b90a49f9ae68048d6
   languageName: node
   linkType: hard
 

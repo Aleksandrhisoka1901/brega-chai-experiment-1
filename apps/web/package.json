@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "yarn workspace @brega-chai/contracts build && next dev",
     "lint": "eslint src",
     "start": "node scripts/start-standalone.mjs",
     "test": "node --experimental-strip-types --test",
     "test:e2e": "playwright test",
+    "test:e2e:server": "yarn workspace @brega-chai/contracts build && next build && node scripts/start-standalone.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-hook-form": "7.62.0",
+    "server-only": "0.0.1",
     "zod": "4.1.11"
   },
   "devDependencies": {

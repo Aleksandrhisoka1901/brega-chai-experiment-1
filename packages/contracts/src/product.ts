@@ -9,7 +9,10 @@ export const productSummarySchema = z.object({
   title: z.string().min(1),
   packageLabel: z.string().min(1),
   priceRubles: z.number().int().positive(),
+  excerpt: z.string().min(1),
+  inStock: z.boolean(),
   imageUrl: z.url().optional(),
+  imageAlt: z.string().min(1).optional(),
 });
 
 export type ProductType = z.infer<typeof productTypeSchema>;

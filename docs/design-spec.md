@@ -100,7 +100,7 @@ Brega Chai — **тихое редакционное издание с комм�
 | `--color-sage` | `#AFB094` | текстовая половина hero |
 | `--color-rule` | `#BBB9AC` | линии, границы, разделители |
 | `--color-ink-muted` | `#626358` | вторичный текст |
-| `--color-ink-soft` | `#77786D` | нумерация и подписи |
+| `--color-ink-soft` | `#696A60` | нумерация и подписи |
 | `--color-footer` | `#272820` | фон footer |
 | `--color-footer-text` | `#E3E0D4` | основной текст footer |
 | `--color-footer-muted` | `#9B9B91` | служебный текст footer |
