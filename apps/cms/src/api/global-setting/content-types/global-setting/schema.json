@@ -34,7 +34,8 @@
     },
     "defaultProductStory": {
       "type": "blocks",
-      "required": true
+      "required": true,
+      "description": "Recommended structure: a concise opening followed by short, clearly headed sections, paragraphs, lists, links, or images as useful. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
     },
     "navigation": {
       "type": "component",

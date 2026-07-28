@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  normalizeStrapiBlocks,
+  type RichContentBlock,
+} from "../../components/rich-content/model.ts";
+
 import { CmsValidationError } from "./errors.ts";
 
 const mediaSchema = z.object({
@@ -25,6 +30,7 @@ const productDetailRecordSchema = z.object({
   stock: z.number().int().nonnegative(),
   cardExcerpt: z.string().min(1),
   story: z.string().min(1),
+  articleContent: z.array(z.unknown()).nullable().optional(),
   mainImage: imageWithAltSchema.nullable().optional(),
   gallery: z.array(imageWithAltSchema).optional().default([]),
 });
@@ -53,6 +59,7 @@ export type ProductDetail = {
   inStock: boolean;
   excerpt: string;
   story: string;
+  articleContent?: RichContentBlock[];
   images: ProductDetailImage[];
 };
 
@@ -104,6 +111,7 @@ export function mapProductDetailPayload(
     inStock: record.stock > 0,
     excerpt: record.cardExcerpt,
     story: record.story,
+    articleContent: normalizeStrapiBlocks(record.articleContent, publicBase),
     images,
   };
 }

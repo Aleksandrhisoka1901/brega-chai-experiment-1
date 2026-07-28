@@ -25,6 +25,7 @@ export async function getProductBySlug(
     "fields[7]": "stock",
     "fields[8]": "cardExcerpt",
     "fields[9]": "story",
+    "fields[10]": "articleContent",
     "populate[mainImage][populate][image][fields][0]": "url",
     "populate[mainImage][populate][image][fields][1]": "width",
     "populate[mainImage][populate][image][fields][2]": "height",

@@ -194,13 +194,56 @@ a {
   line-height: 0.95;
 }
 
-.catalog-intro > p:last-child {
+.catalog-intro__text {
   grid-column: 8 / 12;
   margin: 3rem 0 0;
   max-width: 34rem;
   font-family: var(--font-display);
   font-size: var(--type-body-editorial);
   line-height: 1.65;
+}
+
+.catalog-intro__text :is(p, ul, ol, blockquote, figure, hr) {
+  margin: 0;
+}
+
+.catalog-intro__text > :not(:first-child) {
+  margin-top: 1em;
+}
+
+.catalog-intro__text :is(h2, h3, h4) {
+  margin: 1.5em 0 0.6em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.catalog-intro__text :is(ul, ol) {
+  padding-left: 1.5em;
+}
+
+.catalog-intro__text img {
+  max-width: 100%;
+  height: auto;
+}
+
+.catalog-intro__text :is(p, li, a) {
+  overflow-wrap: anywhere;
+}
+
+.catalog-intro__state {
+  grid-column: 4 / 12;
+}
+
+.catalog-intro__state h1 {
+  max-width: none;
+}
+
+.catalog-intro__image {
+  grid-column: 1 / 7;
+  width: 100%;
+  height: auto;
+  margin-top: 3rem;
 }
 
 .catalog-section {
@@ -457,7 +500,7 @@ a {
     grid-column: 5 / 13;
   }
 
-  .catalog-intro > p:last-child {
+  .catalog-intro__text {
     grid-column: 5 / 12;
   }
 }
@@ -486,7 +529,7 @@ a {
     margin-top: 3rem;
   }
 
-  .catalog-intro > p:last-child {
+  .catalog-intro__text {
     margin-top: 2rem;
   }
 

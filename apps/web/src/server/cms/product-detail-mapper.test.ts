@@ -55,6 +55,7 @@ test("maps the product detail and keeps main image before gallery images", () =>
     inStock: true,
     excerpt: "Минеральный утёсный улун.",
     story: "Чай для долгого тихого вечера.",
+    articleContent: [],
     images: [
       {
         url: "http://localhost:9000/storefront/main.png",
@@ -118,6 +119,63 @@ test("rejects gallery media without a usage-specific alt", () => {
                 },
               ],
             },
+          ],
+        },
+        "http://localhost:9000",
+      ),
+    CmsValidationError,
+  );
+});
+
+test("normalizes optional article blocks at the CMS boundary", () => {
+  const product = mapProductDetailPayload(
+    {
+      data: [
+        {
+          ...productRecord,
+          articleContent: [
+            {
+              type: "heading",
+              level: 1,
+              children: [{ type: "text", text: "Как заваривать" }],
+            },
+            {
+              type: "paragraph",
+              children: [
+                {
+                  type: "link",
+                  url: "javascript:alert(1)",
+                  children: [{ type: "text", text: "Безопасный текст" }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    "http://localhost:9000",
+  );
+
+  assert.deepEqual(product?.articleContent, [
+    {
+      type: "heading",
+      level: 2,
+      children: [{ type: "text", text: "Как заваривать" }],
+    },
+    {
+      type: "paragraph",
+      children: [{ type: "text", text: "Безопасный текст" }],
+    },
+  ]);
+});
+
+test("rejects a non-array article payload", () => {
+  assert.throws(
+    () =>
+      mapProductDetailPayload(
+        {
+          data: [
+            { ...productRecord, articleContent: "<script>alert(1)</script>" },
           ],
         },
         "http://localhost:9000",

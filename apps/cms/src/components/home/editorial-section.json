@@ -7,7 +7,8 @@
   "attributes": {
     "text": {
       "type": "blocks",
-      "required": true
+      "required": true,
+      "description": "Keep this section concise, with a short heading and focused paragraphs, lists, links, or images as useful. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
     },
     "image": {
       "type": "component",

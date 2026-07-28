@@ -2,6 +2,7 @@ import type { ProductDetail as ProductDetailData } from "@/server/cms/product-de
 
 import { ProductDetailGallery } from "./product-detail-gallery";
 import { ProductDetailPurchase } from "./product-detail-purchase";
+import { RichContent } from "./rich-content/rich-content";
 import styles from "./product-detail.module.css";
 
 const priceFormatter = new Intl.NumberFormat("ru-RU", {
@@ -57,6 +58,11 @@ export function ProductDetail({ product }: { product: ProductDetailData }) {
           </div>
         </div>
       </div>
+      {product.articleContent && product.articleContent.length > 0 ? (
+        <div className={styles.articleContent}>
+          <RichContent content={product.articleContent} />
+        </div>
+      ) : null}
     </article>
   );
 }
