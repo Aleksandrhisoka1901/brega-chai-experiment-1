@@ -79,13 +79,15 @@
 | Orchestration | Turborepo | dev/build/test/typecheck pipelines |
 | Frontend | Next.js App Router + React + TypeScript | storefront и BFF |
 | UI behavior | Radix Primitives; Radix Themes выборочно | dialog/drawer, accessible primitives |
+| Icons | `lucide-react` | единый tree-shakeable набор интерфейсных SVG-иконок |
 | Styling | CSS Modules + global design tokens | кастомная журнальная стилистика |
 | CMS | Strapi 5 | товары, страницы, SEO, заказы |
 | Database | PostgreSQL 16+ | Strapi content и orders |
 | Validation | Zod | формы, API payload, env |
 | Forms | React Hook Form + Zod resolver | checkout |
+| Phone | libphonenumber-js | parse и E.164 normalization |
 | Cart state | небольшой внешний store с persisted adapter либо `useSyncExternalStore` | клиентская корзина |
-| Rich content | Strapi Blocks или Markdown после UX-прототипа редактора | статьи товара |
+| Rich content | стандартный Strapi Blocks | статьи товара |
 | E2E | Playwright + axe-core | критические сценарии |
 | Unit tests | Node test runner или Vitest | domain и mapper tests |
 | Containers | Docker Compose local; отдельные production images | воспроизводимый deploy |
@@ -355,8 +357,8 @@ Client Components только для:
 - enum `type`;
 - цена — integer в копейках;
 - валюта — ISO 4217;
-- статусы публикации и доступности разделены;
-- delivery dimensions обязательны до включения автоматического расчёта СДЭК.
+- `stock` — integer `≥ 0`, доступность вычисляется как `stock > 0`;
+- статусы публикации и активности разделены.
 
 `order`:
 
@@ -383,7 +385,6 @@ Client Components только для:
 - `home.catalog-preview`;
 - `product.gallery-image`;
 - `commerce.order-line`;
-- `commerce.delivery-snapshot`;
 - `commerce.customer`;
 
 ### 10.4. Lifecycle и policy
@@ -454,12 +455,14 @@ Radix Dialog является основой drawer-поведения:
 3. проверяет idempotency key;
 4. получает продукты из Strapi по стабильным ID;
 5. проверяет publication/availability;
-6. берёт цены только с сервера;
-7. повторно рассчитывает доставку;
-8. формирует order snapshot;
+6. проверяет `1 ≤ quantity ≤ min(5, stock)`;
+7. берёт цены только с сервера;
+8. атомарно списывает остаток и создаёт immutable order snapshot;
 9. создаёт заказ через приватный Strapi endpoint;
-10. инициирует оплату или возвращает подтверждение — зависит от принятой модели;
+10. возвращает подтверждение заказа-заявки;
 11. отправляет уведомление асинхронно после надёжного создания.
+
+Корзина не резервирует stock. Переход заказа в `cancelled` один раз возвращает списанное количество; операция защищена от повторного применения.
 
 ### 12.2. Идемпотентность
 
@@ -485,63 +488,36 @@ Radix Dialog является основой drawer-поведения:
 Переходы задаются state machine/domain policy, а не произвольной строкой:
 
 ```text
-new ─► confirmed ─► assembling ─► shipped ─► completed
- │         │             │
- └─────────┴─────────────┴────► cancelled
-
-payment_pending ─► confirmed
-       │
-       └────────► payment_failed
+new ─► confirmed ─► completed
+ │         │
+ └─────────┴────────────► cancelled
 ```
 
-Точный граф зависит от модели оплаты.
+Онлайн-оплата в MVP отсутствует.
 
 ## 13. Интеграции
 
-### 13.1. Adapter interfaces
+### 13.1. Граница MVP
 
-Commerce-код зависит от интерфейсов, а не SDK:
+MVP не интегрируется со СДЭК и платёжным провайдером. Checkout принимает единый адрес, показывает только стоимость товаров и сообщает, что доставку и оплату подтвердит менеджер.
+
+Единственная внешняя граница MVP:
 
 ```ts
-interface DeliveryProvider {
-  searchLocations(query: string): Promise<Location[]>;
-  getPickupPoints(locationCode: string): Promise<PickupPoint[]>;
-  quote(input: DeliveryQuoteInput): Promise<DeliveryQuote[]>;
-}
-
-interface PaymentProvider {
-  createPayment(input: PaymentInput): Promise<PaymentSession>;
-  verifyWebhook(request: Request): Promise<PaymentEvent>;
-}
-
 interface OrderNotifier {
   orderCreated(order: OrderSnapshot): Promise<void>;
 }
 ```
 
-Это позволяет сначала использовать manual delivery/payment, затем подключить СДЭК или провайдера оплаты без переписывания checkout.
+Будущие delivery/payment adapters добавляются отдельными ADR и не усложняют текущий order contract заранее.
 
-### 13.2. СДЭК
+### 13.2. Будущая доставка
 
-- SDK/API вызывается только сервером;
-- результаты поиска населённых пунктов и ПВЗ имеют короткий cache;
-- quote не кэшируется надолго;
-- timeout, retry только для безопасных idempotent GET;
-- circuit breaker не обязателен в MVP, но ошибки отделяются от внутренних;
-- при недоступности СДЭК пользователь не получает ложную стоимость;
-- адрес/ПВЗ сохраняется snapshot, а не только внешним ID.
+СДЭК не входит в MVP. При последующем подключении SDK/API вызывается только сервером, а адрес сохраняется snapshot.
 
-### 13.3. Оплата
+### 13.3. Будущая оплата
 
-Архитектура резервирует payment adapter и webhook route, но реализация не входит до выбора юридической модели и провайдера.
-
-Webhook:
-
-- проверяет подпись по raw body;
-- идемпотентен по event ID;
-- не доверяет status из redirect пользователя;
-- меняет заказ только разрешённым переходом;
-- отвечает быстро, вторичные уведомления выполняет после фиксации статуса.
+Payment adapter и webhook route не создаются до отдельного решения о юридической модели и провайдере.
 
 ## 14. SEO-архитектура
 
@@ -604,23 +580,20 @@ Next.js `sitemap.ts`:
 - hero получает `priority` только если действительно LCP;
 - изображения ниже fold lazy по умолчанию;
 - alt обязателен для содержательных media fields;
-- focal point реализуется отдельным компонентом/полем, если подтвердится дизайном.
+- focal point реализуется отдельным компонентом/полем;
+- upload изображений ограничен `12MB`; рекомендации размеров находятся в description конкретного media field;
+- alt хранится рядом с конкретным использованием media.
 
 Для production рекомендуется S3-совместимое хранилище. Локальный upload volume допустим только с backup и single-instance CMS.
 
 ### 15.2. Rich content
 
-Решение принимается после короткого UX-прототипа в Strapi:
+Используется стандартный Strapi Blocks без кастомизации toolbar и без публикационных ошибок за структуру. Renderer:
 
-- **Strapi Blocks:** лучший редакторский UX и структурированный render;
-- **Markdown:** проще перенос и git-friendly fixtures, но загрузка/позиционирование медиа менее удобно.
-
-Любой renderer:
-
-- имеет allowlist элементов;
 - не рендерит raw HTML по умолчанию;
 - нормализует внешние ссылки;
-- сохраняет heading hierarchy;
+- рендерит content `h1` как `h2`;
+- отбрасывает пустые блоки;
 - требует alt;
 - покрыт fixture-тестами.
 
@@ -628,7 +601,7 @@ Next.js `sitemap.ts`:
 
 ### 16.1. Secrets
 
-- Strapi token, webhook secret, DB password, CDEK/payment credentials — server-only;
+- Strapi token, webhook secret и DB password — server-only;
 - env валидируется при старте;
 - `NEXT_PUBLIC_*` используется только для действительно публичных значений;
 - секреты не попадают в Docker image, git или browser runtime config.
@@ -667,7 +640,8 @@ Next.js `sitemap.ts`:
 
 - WCAG 2.2 AA как acceptance target;
 - Radix решает механику focus, но не освобождает от проверки разметки и контраста;
-- цветовые поля CMS валидируются/предупреждают о контрасте;
+- системная палитра соответствует WCAG 2.2 AA;
+- произвольные пары Hero и «О проекте» не валидируются и являются редакторским исключением;
 - все действия доступны с клавиатуры;
 - carousel не перехватывает вертикальную прокрутку;
 - drawer и checkout объявляют изменения через live region;
@@ -748,7 +722,6 @@ Provider выбирается перед production.
 - unavailable/unpublished product;
 - changed price;
 - CDEK adapter contract с mock server;
-- payment webhook idempotency;
 - CMS unavailable behavior.
 
 ### 20.3. E2E
@@ -758,7 +731,7 @@ Provider выбирается перед production.
 - сохранение корзины после reload;
 - price changed;
 - товар снят с продажи;
-- СДЭК недоступен;
+- остаток меньше количества в корзине;
 - double submit;
 - keyboard-only;
 - mobile swipe/drawer;
@@ -827,24 +800,20 @@ Web может обращаться к CMS по private network URL. Browser med
 2. `ADR-002-next-rendering-and-cache`;
 3. `ADR-003-strapi-content-and-order-model`;
 4. `ADR-004-radix-primitives-vs-themes`;
-5. `ADR-005-rich-content-format`;
+5. `ADR-005-strapi-blocks-rendering`;
 6. `ADR-006-cart-persistence`;
-7. `ADR-007-checkout-payment-model`;
-8. `ADR-008-delivery-integration-scope`;
+7. `ADR-007-order-request-model`;
+8. `ADR-008-stock-transactions`;
 9. `ADR-009-media-storage`;
 10. `ADR-010-production-hosting`.
 
 ## 24. Решения, блокирующие финализацию архитектуры
 
-1. Онлайн-оплата или заказ-заявка.
-2. Юридический статус и требования к чеку.
-3. Объём СДЭК: quote, ПВЗ, shipment creation, tracking.
-4. Наличие и модель складских остатков.
-5. Production hosting и число экземпляров web/CMS.
-6. Объектное хранилище или persistent local media.
-7. Strapi Blocks или Markdown.
-8. Канал уведомлений о заказе.
-9. Политика хранения персональных данных.
+1. Юридический статус и требования к чеку.
+2. Production hosting и число экземпляров web/CMS.
+3. Объектное хранилище или persistent local media.
+4. Канал уведомлений о заказе.
+5. Политика хранения персональных данных.
 
 Эти вопросы не блокируют scaffold, контентную модель страниц и UI storefront. Они блокируют окончательный контракт order/payment/delivery и production topology.
 
@@ -857,7 +826,7 @@ Web может обращаться к CMS по private network URL. Browser med
 5. Реализовать CMS client, mappers, cache tags и webhook revalidation.
 6. Собрать статический storefront и SEO.
 7. Добавить локальную корзину.
-8. После решения открытых вопросов подключить checkout adapters.
+8. Реализовать заказ-заявку и атомарное изменение stock без delivery/payment adapters.
 9. Закрыть E2E, accessibility, performance и deploy.
 
 ## 26. Итоговая оценка стека

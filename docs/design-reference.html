@@ -6,8 +6,9 @@
     <title>Brega Chai — дизайн-референс главной</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%2352634b'/%3E%3Cpath d='M9 19c5-1 10-5 14-11 0 9-4 15-12 15' fill='none' stroke='%23f4e9d2' stroke-width='2'/%3E%3C/svg%3E"
+      href="./favicon.svg"
     />
+    <link rel="stylesheet" href="./design-tokens.css" />
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600&family=Prata&display=swap');
 
@@ -23,6 +24,21 @@
 
       html {
         scroll-behavior: smooth;
+      }
+
+      .skip-link {
+        position: fixed;
+        z-index: var(--layer-skip-link);
+        top: 0;
+        left: 20px;
+        padding: 12px 16px;
+        color: var(--text-inverse);
+        background: var(--surface-inverse);
+        transform: translateY(-120%);
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
       }
 
       body {
@@ -195,12 +211,12 @@
 
       /* Direction A */
       .a {
-        --ink: #24251e;
-        --paper: #efede4;
-        --line: #bbb9ac;
+        --ink: var(--text-primary);
+        --paper: var(--surface-page);
+        --line: var(--border-default);
         color: var(--ink);
         background: var(--paper);
-        font-family: Manrope, sans-serif;
+        font-family: var(--font-interface);
       }
 
       .a-header {
@@ -250,7 +266,7 @@
         flex-direction: column;
         justify-content: space-between;
         padding: clamp(44px, 7vw, 110px) 5vw 42px;
-        background: #afb094;
+        background: var(--surface-editorial);
       }
 
       .a-kicker,
@@ -404,7 +420,7 @@
 
       .a-card-no {
         float: right;
-        color: #77786d;
+        color: var(--text-soft);
         font-size: 10px;
       }
 
@@ -416,12 +432,12 @@
       .a-card p {
         max-width: 235px;
         margin: 0;
-        color: #626358;
+        color: var(--text-muted);
         font: 13px/1.55 Cormorant Garamond, serif;
       }
 
       .a-products {
-        background: #d7cfbe;
+        background: var(--surface-subtle);
       }
 
       .a-footer {
@@ -429,8 +445,8 @@
         grid-template-columns: 1fr 1fr 1fr;
         min-height: 290px;
         padding: 70px 3.4vw;
-        color: #e3e0d4;
-        background: #272820;
+        color: var(--text-inverse);
+        background: var(--surface-inverse);
       }
 
       .a-footer strong {
@@ -439,7 +455,7 @@
 
       .a-footer small {
         align-self: end;
-        color: #9b9b91;
+        color: var(--primitive-footer-muted);
         line-height: 1.8;
       }
 
@@ -953,12 +969,13 @@
     </style>
   </head>
   <body>
+    <a class="skip-link" href="#reference-main">Перейти к содержимому</a>
     <div class="switcher" aria-label="Выбор дизайн-направления">
       <button type="button" data-target="direction-a" aria-pressed="true">A · Тихая книга</button>
       <button type="button" data-target="direction-b" aria-pressed="false">B · Живой ритуал</button>
     </div>
 
-    <main>
+    <main id="reference-main" tabindex="-1">
       <article class="direction a" id="direction-a">
         <header class="a-header">
           <a class="a-logo" href="#">Brega Chai</a>

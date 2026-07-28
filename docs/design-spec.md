@@ -1,6 +1,6 @@
 # Brega Chai — дизайн-спецификация
 
-Статус: базовое визуальное направление
+Статус: исполнимый визуальный контракт
 
 Визуальная основа: вариант A «Тихая книга» с обновлённым блоком-манифестом
 
@@ -117,19 +117,7 @@ Brega Chai — **тихое редакционное издание с комм�
 
 ### 4.3. Секционные цвета
 
-CMS может позволять выбирать фон секции только из утверждённого набора:
-
-- Paper;
-- Warm Paper;
-- Sage;
-- Dark Ink.
-
-Произвольный color picker из первоначального ТЗ для production не рекомендуется. Если он сохраняется, CMS должна:
-
-- предупреждать о недостаточном контрасте;
-- автоматически выбирать допустимый цвет текста;
-- показывать preview;
-- запрещать публикацию недоступной комбинации.
+Системные варианты Paper, Warm Paper, Sage и Dark Ink задают исходную проверенную палитру. Только Hero и «О проекте» дополнительно имеют два независимых Strapi color picker: фон и текст. Значения непрозрачные, пользовательские пары не проверяются и не корректируются.
 
 ### 4.4. Дополнительные природные оттенки
 
@@ -608,10 +596,15 @@ Select города/ПВЗ:
 
 ## 13. Иконки и декоративные элементы
 
-- единый линейный набор;
-- stroke ориентировочно 1–1.5 px;
+- базовый интерфейсный набор — [Lucide Icons](https://lucide.dev/icons/), в React используется пакет `lucide-react`;
+- иконки импортируются напрямую по имени, без импорта всей библиотеки;
+- базовый размер `24px`, large `28px`; stroke по умолчанию `1.5px`;
+- цвет наследуется через `currentColor`;
+- произвольное смешивание Lucide с другими UI-наборами запрещено;
 - rounded ends допустимы, но без «дружелюбной SaaS»-пластики;
 - иконки используются только при функциональной необходимости;
+- icon-only control обязательно имеет accessible name; декоративная иконка скрывается через `aria-hidden`;
+- кастомные SVG допустимы только для wordmark, брендовых знаков и иллюстративной графики, отсутствующей в Lucide;
 - декоративные японские иероглифы запрещены без реального смыслового и культурного основания;
 - допустимы номера глав, линии, стрелки и небольшие типографические знаки.
 
@@ -632,10 +625,10 @@ Select города/ПВЗ:
 
 | Token | Значение | Применение |
 | --- | --- | --- |
-| `motion-fast` | 160–200 ms | focus/hover |
-| `motion-base` | 280–360 ms | карточка, dropdown |
-| `motion-slow` | 500–700 ms | drawer, gallery transition |
-| `ease-editorial` | cubic-bezier около `(0.22, 1, 0.36, 1)` | основные переходы |
+| `motion-fast` | 120 ms | pressed, focus, смена цвета |
+| `motion-base` | 240 ms | hover, gallery crossfade |
+| `motion-slow` | 360 ms | drawer, dialog |
+| `ease-editorial` | `cubic-bezier(0.22, 1, 0.36, 1)` | основные переходы |
 
 ### 14.3. Допустимые приёмы
 
@@ -686,6 +679,7 @@ Select города/ПВЗ:
 
 - целевой уровень WCAG 2.2 AA;
 - контраст проверяется для всех утверждённых пар;
+- произвольные пары Hero и «О проекте» являются явным исключением и не проверяются;
 - muted-текст не используется для критической информации;
 - размер 10 px допустим только для вторичных labels с достаточным контрастом;
 - focus-visible является частью дизайна;
@@ -693,7 +687,7 @@ Select города/ПВЗ:
 - ошибки не обозначаются только цветом;
 - underline у текстовых ссылок сохраняется либо появляется при hover/focus, если контекст ссылки неочевиден;
 - увеличение текста до 200% не ломает покупку;
-- media alt редактируется в CMS;
+- media alt хранится рядом с конкретным использованием изображения;
 - декоративные номера и зерно скрыты от accessibility tree.
 
 ## 17. Ограничения CMS
@@ -721,15 +715,16 @@ CMS должна показывать счётчик и preview, а не про�
 
 - обязательный alt;
 - рекомендованные размеры и aspect ratio в help text;
-- focal point либо отдельные desktop/mobile assets для hero;
+- focal point для hero; отдельный mobile crop необязателен;
 - запрет SVG upload для непроверенных редакторов;
-- разумный лимит размера файла.
+- единый максимальный размер файла `12MB`;
+- размеры и aspect ratio указываются как рекомендации в description поля и не блокируют публикацию.
 
 ### 17.3. Стилизация
 
 Редактор выбирает:
 
-- утверждённый фон;
+- произвольные непрозрачные `backgroundColor` и `textColor` формата `#RRGGBB` только для Hero и «О проекте»;
 - одну из утверждённых split-пропорций;
 - размер вертикального воздуха `S/M/L/XL`;
 - наличие изображения;
@@ -745,54 +740,120 @@ CMS должна показывать счётчик и preview, а не про�
 - случайным выравниванием каждого элемента;
 - raw CSS.
 
+Оба цветовых поля независимы: `null` наследует системное значение компонента. Автоподбор, проверка контраста, предупреждения и frontend fallback не применяются. Hero CTA использует `textColor` через `currentColor`.
+
 ## 18. Design tokens
 
-Рекомендуемый начальный контракт:
+Нормативный машинно-читаемый контракт расположен в [`design-tokens.css`](./design-tokens.css). HTML-референсы обязаны подключать этот файл.
 
-```css
-:root {
-  --color-ink: #24251e;
-  --color-paper: #efede4;
-  --color-paper-warm: #d7cfbe;
-  --color-sage: #afb094;
-  --color-rule: #bbb9ac;
-  --color-ink-muted: #626358;
-  --color-ink-soft: #77786d;
-  --color-footer: #272820;
-  --color-footer-text: #e3e0d4;
-  --color-footer-muted: #9b9b91;
+Три уровня:
 
-  --font-display: 'Brega Display', serif;
-  --font-interface: 'Brega Sans', sans-serif;
+1. primitive — конкретные значения;
+2. semantic — назначение;
+3. component — уникальные параметры отдельного компонента.
 
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-28: 7rem;
-  --space-36: 9rem;
-  --space-44: 11rem;
+Компоненты используют semantic/component tokens, а не primitive напрямую. Production-пара шрифтов: Cormorant Garamond `400/500` и variable Manrope `400–700`, self-hosted WOFF2 с кириллицей и файлами лицензий.
 
-  --page-gutter: clamp(1.25rem, 3.4vw, 4rem);
-  --rule-width: 1px;
-  --radius-control: 2px;
-  --focus-width: 2px;
+Breakpoints: `768`, `1024`, `1440px`. QA-viewports `320`, `390`, `1024`, `1920px` не являются дополнительными breakpoints. Fluid typography интерполируется между `320` и `1440px`. Page shell — максимум `1600px`, обычный content — `1440px`, длинный текст — `68ch`.
 
-  --motion-fast: 180ms;
-  --motion-base: 320ms;
-  --motion-slow: 600ms;
-  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
-}
-```
+Базовые интервалы дискретны; крупный section spacing fluid. Минимальная интерактивная область `44×44px`, стандартный control `48px`, крупный CTA/checkout input `52px`. Заметные скругления запрещены. Тени разрешены только drawer/dialog/popover.
 
-Имена production-шрифтов уточняются после выбора файлов.
+## 19. Component states
 
-## 19. Использование Radix
+Для каждого компонента фиксируются применимые состояния; остальные отмечаются `N/A`.
+
+| Компонент | Состояния и правила |
+| --- | --- |
+| Button | default, hover, focus-visible, pressed, disabled, loading; loading сохраняет текст/ширину и добавляет spinner |
+| Link | default, hover, focus-visible, pressed; disabled-link запрещён |
+| Product card | одна ссылка на всю карточку; без вложенных действий |
+| Quantity | диапазон `1–5` и остаток; при `1` minus disabled, удаление отдельное |
+| Field/checkbox | default, focus-visible, valid, error, disabled, loading где применимо |
+| Gallery | выбранная thumbnail обозначена визуально и семантически; смена только click/Enter/Space |
+| Carousel | конечная, без loop/autoplay; controls disabled на границах |
+| Cart/checkout | loading, empty, changed price, insufficient stock, unavailable, submit error, success |
+
+Focus ring двухцветный: внутренняя линия Paper `2px`, внешняя Ink `2px`; только `:focus-visible`. Disabled использует отдельные tokens, не общую opacity.
+
+Button variants: primary, secondary и ghost. Ghost используется для малозаметных icon-only действий, включая закрытие drawer; его hit area остаётся не меньше `44×44px`, а визуальная иконка использует large icon token.
+
+## 20. Commerce interaction
+
+- Listing cards не показывают quantity.
+- Внутренняя страница товара показывает quantity до добавления.
+- CTA добавляет выбранное количество и открывает drawer.
+- После добавления quantity `−/+` блокируются, CTA становится active secondary «В корзине».
+- Повторный CTA открывает drawer и не меняет количество.
+- В корзине количество меняется до `min(5, stock)`.
+- При `stock = 0` карточка остаётся видимой, CTA disabled с текстом «Нет в наличии», quantity скрыт.
+- Если остаток корзины уменьшился, checkout блокируется до ручного исправления; позиция не удаляется автоматически.
+
+## 21. Forms and feedback
+
+- Видимый label обязателен; placeholder является только примером.
+- Только необязательные поля получают суффикс «(необязательно)».
+- Ошибка впервые появляется после blur, затем обновляется при вводе.
+- Submit показывает summary и переводит фокус на первую ошибку.
+- Async button сохраняет текст, добавляет spinner, получает `aria-busy` и блокирует повтор.
+- Телефон: `type=tel`, `inputmode=tel`, `autocomplete=tel`, paste разрешён.
+- Checkout: имя, телефон, необязательный email, единый адрес доставки, необязательный комментарий, обязательные согласия.
+- Стоимость доставки не отображается как `0 ₽`; менеджер подтверждает её отдельно.
+- Toast в MVP отсутствует. Используются inline alert `info/success/warning/error` и скрытый polite live region.
+- Checkout draft хранится в `sessionStorage`; согласие не восстанавливается.
+
+Success заказа содержит номер, резюме и дальнейшие шаги. Cart и draft очищаются только после подтверждённого ответа сервера.
+
+## 22. Interactive panels
+
+Карусель «Ритуалы»:
+
+- показывает четыре карточки на широком desktop;
+- прокручивается на одну карточку;
+- использует `scroll-snap-type: inline proximity`;
+- не перехватывает клавиши-стрелки;
+- сохраняет фокус на нажатом control;
+- после control action объявляет «Показаны товары X–Y из N».
+
+Галерея использует контейнер `4:5`, thumbnails `1:1` и crossfade `240ms`; при reduced motion смена мгновенная.
+
+Cart/checkout — modal drawer: `460px` desktop, весь `100dvw × 100dvh` mobile. Фон блокируется, focus trapped, Escape/backdrop/close закрывают панель, фокус возвращается trigger. Переход к checkout заменяет содержимое drawer, возвращает scroll вверх и фокусирует заголовок.
+
+## 23. Media matrix
+
+| Слот | Контракт | Загрузка |
+| --- | --- | --- |
+| Hero | одна фотография + focal point; mobile crop опционален; рекомендация 2400×1600 | priority |
+| Product card | `4:5`, рекомендация 1600×2000, cover + focal point | lazy |
+| Product gallery | main `4:5`, thumbnail `1:1`, contain по умолчанию | mixed |
+| Rich content | выходит из text measure до media width | lazy |
+| OG | `1200×630`, safe area | server |
+
+Разрешены JPEG, PNG, WebP; SVG запрещён. Browser pipeline отдаёт WebP/AVIF. Placeholder товара — Paper Warm, тонкая рамка, wordmark и «Изображение готовится».
+
+## 24. Rich content
+
+Используется стандартный Strapi Blocks без ограничений toolbar и публикационных ошибок. Description поля объясняет рекомендуемую структуру. Frontend:
+
+- рендерит `h1` как `h2`;
+- оформляет `h2–h4`, paragraph, list, quote, link, media, caption и divider;
+- отбрасывает пустые блоки;
+- не применяет автотипограф;
+- разрешает `hyphens: auto` только длинным русским абзацам;
+- переносит URL через `overflow-wrap: anywhere`.
+
+Таблицы являются будущим форматом: на mobile они прокручиваются в собственном контейнере и не входят в обязательный MVP-showcase.
+
+## 25. Design QA
+
+- Visual regression: `390`, `768`, `1440px`.
+- Layout smoke: `320`, `1024`, `1920px`.
+- Две последние стабильные версии Chrome, Safari, Firefox, Edge; реальный iOS Safari smoke.
+- Фиксированный seed с normal/min/max/missing content.
+- Axe-core не заменяет keyboard-only, focus, reflow и VoiceOver smoke.
+- Общий горизонтальный scroll запрещён при `320 CSS px`; карусель и будущие таблицы прокручиваются локально.
+- Budgets: fonts `300KB`, Hero `350KB` desktop/`220KB` mobile, card image `160KB`, LCP ≤ `2.5s`, INP ≤ `200ms`, CLS ≤ `0.1`.
+
+## 26. Использование Radix
 
 Radix отвечает за механику и accessibility, но не определяет внешний вид сайта.
 
@@ -816,7 +877,7 @@ Radix отвечает за механику и accessibility, но не опр�
 - dashboard-плотность;
 - готовые shadows.
 
-## 20. Запрещённые ecommerce-паттерны
+## 27. Запрещённые ecommerce-паттерны
 
 - карточки с rounded corners и floating shadow;
 - сетка с множеством бейджей;
@@ -835,7 +896,7 @@ Radix отвечает за механику и accessibility, но не опр�
 - stock-photo lifestyle без связи с продуктом;
 - «премиальность» через чёрно-золотую палитру.
 
-## 21. Проверка новых экранов
+## 28. Проверка новых экранов
 
 Перед приёмкой каждый экран проверяется вопросами:
 
@@ -850,7 +911,7 @@ Radix отвечает за механику и accessibility, но не опр�
 9. Не нарушена ли утверждённая палитра?
 10. Соответствует ли длина контента предусмотренной композиции?
 
-## 22. Артефакты, необходимые до production
+## 29. Артефакты, необходимые до production
 
 1. Финальный wordmark/логотип.
 2. Утверждённые и лицензированные display/interface fonts.
@@ -876,7 +937,7 @@ Radix отвечает за механику и accessibility, но не опр�
 7. Проверенные контрастные пары.
 8. Реальные контентные fixtures на предельной длине.
 
-## 23. Зафиксированное направление
+## 30. Зафиксированное направление
 
 Основой всего проекта является вариант A «Тихая книга»:
 
