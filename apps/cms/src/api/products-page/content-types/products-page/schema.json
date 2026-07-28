@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "products_pages",
+  "info": {
+    "singularName": "products-page",
+    "pluralName": "products-pages",
+    "displayName": "Products page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "intro": {
+      "type": "blocks",
+      "required": true
+    },
+    "image": {
+      "type": "component",
+      "component": "shared.image-with-alt",
+      "repeatable": false,
+      "required": false
+    }
+  }
+}

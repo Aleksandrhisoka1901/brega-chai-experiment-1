@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_home_catalog_previews",
+  "info": {
+    "displayName": "Catalog preview",
+    "description": "Keep headings and short announcements concise; length guidance is editorial, not a validation error."
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "subtitle": {
+      "type": "text",
+      "required": false
+    }
+  }
+}

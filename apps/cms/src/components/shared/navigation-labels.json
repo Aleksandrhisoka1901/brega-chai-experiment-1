@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_shared_navigation_labels",
+  "info": {
+    "displayName": "Navigation labels"
+  },
+  "attributes": {
+    "about": {
+      "type": "string",
+      "required": true
+    },
+    "rituals": {
+      "type": "string",
+      "required": true
+    },
+    "products": {
+      "type": "string",
+      "required": true
+    },
+    "cart": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

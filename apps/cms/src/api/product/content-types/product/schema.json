@@ -1,0 +1,115 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "seedKey": {
+      "type": "string",
+      "required": false,
+      "unique": true,
+      "private": true,
+      "configurable": false
+    },
+    "slug": {
+      "type": "uid",
+      "required": true,
+      "unique": true,
+      "minLength": 8,
+      "maxLength": 180
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["ritual", "product"],
+      "required": true
+    },
+    "originalTitle": {
+      "type": "string",
+      "required": false
+    },
+    "packageLabel": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "price": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["RUB"],
+      "required": true,
+      "default": "RUB"
+    },
+    "stock": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 0
+    },
+    "active": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "sortOrder": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 0
+    },
+    "mainImage": {
+      "type": "component",
+      "component": "shared.image-with-alt",
+      "repeatable": false,
+      "required": false
+    },
+    "gallery": {
+      "type": "component",
+      "component": "product.gallery-image",
+      "repeatable": true,
+      "required": false
+    },
+    "cardExcerpt": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "story": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "articleContent": {
+      "type": "blocks",
+      "required": false
+    },
+    "seoTitle": {
+      "type": "string",
+      "required": false
+    },
+    "seoDescription": {
+      "type": "text",
+      "required": false
+    },
+    "seoImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

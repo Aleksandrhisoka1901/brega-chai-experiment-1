@@ -1,0 +1,44 @@
+{
+  "kind": "singleType",
+  "collectionName": "home_pages",
+  "info": {
+    "singularName": "home-page",
+    "pluralName": "home-pages",
+    "displayName": "Home page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": true
+    },
+    "hero": {
+      "type": "component",
+      "component": "home.hero",
+      "repeatable": false,
+      "required": true
+    },
+    "about": {
+      "type": "component",
+      "component": "home.editorial-section",
+      "repeatable": false,
+      "required": true
+    },
+    "ritualsPreview": {
+      "type": "component",
+      "component": "home.catalog-preview",
+      "repeatable": false,
+      "required": true
+    },
+    "productsPreview": {
+      "type": "component",
+      "component": "home.catalog-preview",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}
