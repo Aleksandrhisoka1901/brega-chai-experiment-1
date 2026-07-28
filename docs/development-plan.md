@@ -99,14 +99,37 @@ Manager подтвердила `new → confirmed → cancelled`, изменен
 
 ### 2. Cache revalidation
 
-- `POST /api/revalidate` с проверкой подписи;
-- routing событий home/global/products;
-- invalidation только затронутых tags/path;
-- идемпотентная обработка повторного webhook;
-- тесты неверной подписи, неизвестного события и CMS outage.
+Статус: готово.
 
-Критерий завершения: публикация контента обновляет нужную страницу без полного
-deploy и не открывает публичный cache purge.
+- отправлять из Strapi `publish`, `update` и `unpublish` для storefront-контента;
+  сохранение draft не должно отправлять событие;
+- подписывать точное JSON-тело через HMAC-SHA256 и проверять подпись до разбора
+  payload;
+- строго проверять allowlisted envelope и ограничение размера body; cache
+  tags/paths определять только серверной матрицей;
+- дедуплицировать одинаковые события в bounded in-memory registry и отклонять
+  повтор ID с другим payload;
+- использовать короткий timeout и fail-safe обработку недоступности Next.js,
+  не откатывая публикацию в Strapi;
+- покрыть контракт и матрицу invalidation unit/integration-тестами.
+
+Acceptance criteria:
+
+1. Валидные события сбрасывают ровно tags/paths из architecture-spec; draft,
+   неизвестный event и переданные клиентом cache keys ничего не сбрасывают.
+2. Неверная подпись, изменённое тело, oversized body и malformed envelope
+   получают безопасный отказ без invalidation.
+3. Одинаковое событие даёт один логический эффект; повтор ID с другим payload
+   отклоняется.
+4. Недоступность Next.js не отменяет публикацию в Strapi; плановый TTL остаётся
+   страховкой для eventual refresh.
+5. Локальная проверка с реальными Strapi и Next.js подтверждает обновление
+   опубликованной страницы без deploy.
+
+Критерии выполнены: повторная публикация существующего товара через локальный
+Strapi Content Manager доставляет подписанное событие в Next.js и получает
+успешный ответ `/api/revalidate`; unit-тесты покрывают контракт, routing,
+дедупликацию, неверную подпись, oversized payload и outage.
 
 ### 3. ProductsPage и rich content
 

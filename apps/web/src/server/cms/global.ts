@@ -13,7 +13,7 @@ export async function getGlobalSettings(): Promise<GlobalSettings> {
     "populate[navigation]": "true",
   });
   const payload = await fetchCms(`/api/global-setting?${query}`, {
-    tags: ["global-settings"],
+    tags: ["global"],
   });
 
   return mapGlobalSettingsPayload(payload);

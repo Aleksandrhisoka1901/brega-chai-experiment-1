@@ -280,27 +280,59 @@ Client Components только для:
 - `global`;
 - `home`;
 - `products`;
-- `product:{documentId}`;
 - `product-slug:{type}:{slug}`.
 
 Каталог и продуктовые страницы допускают stale-while-revalidate. Checkout, quote и order creation всегда `no-store`.
 
 ### 9.2. Webhook Strapi
 
-После publish/update/unpublish Strapi вызывает:
+После publish, unpublish или изменения уже опубликованного storefront-контента
+Strapi вызывает:
 
 `POST /api/revalidate`
 
-Требования:
+Webhook подписывает точные JSON bytes через
+`X-Revalidation-Signature: sha256=<hex(HMAC-SHA256(secret, rawBody))>`. Подпись
+проверяется до JSON parse в постоянное время. Используется отдельный
+server-only secret; подпись, secret и payload не логируются.
 
-- HMAC или shared secret;
-- allowlist событий и content types;
-- постоянное время сравнения секрета;
-- rate limit;
-- логирование event ID без содержимого персональных данных;
-- идемпотентная обработка;
-- tag-based revalidation;
-- revalidation sitemap при изменении публикации.
+Строгий envelope:
+
+```json
+{
+  "id": "event-id",
+  "event": "product",
+  "action": "publish",
+  "occurredAt": "2026-07-29T12:00:00.000Z",
+  "product": {
+    "documentId": "string",
+    "type": "product",
+    "slug": "sencha"
+  }
+}
+```
+
+Разрешены `home`, `global`, `products`, `product` и действия `publish`,
+`update`, `unpublish`. Сохранение draft не отправляет событие. Для product
+обязательны `documentId`, `type` и `slug`; произвольные tags/paths и лишние поля
+не принимаются.
+
+| Event      | Tags                                     | Paths                                                |
+| ---------- | ---------------------------------------- | ---------------------------------------------------- |
+| `global`   | `global`                                 | публичный layout                                     |
+| `home`     | `home`                                   | `/`                                                  |
+| `products` | `products`                               | `/products`, `/sitemap.xml`                          |
+| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/products`, `/products/{slug}`, `/sitemap.xml` |
+
+Next.js хранит bounded in-memory registry `id → body digest`. Точный повтор
+возвращает успех без повторной invalidation, а тот же ID с другим payload
+отклоняется. После рестарта повторная invalidation допустима и безопасна.
+
+Недоступность webhook не откатывает публикацию в Strapi: sender использует
+короткий timeout, возвращает безопасный результат и пишет предупреждение без
+payload. Для MVP сохраняется дополнительный TTL cache refresh; durable queue и
+dead-letter добавляются только при появлении нескольких web instances или
+требования к гарантированной мгновенной доставке.
 
 Slug продукта создаётся один раз до сохранения и далее не изменяется, поэтому redirect registry в MVP не нужен.
 
@@ -310,6 +342,8 @@ Slug продукта создаётся один раз до сохранени
 - Первый запрос к незакэшированной странице при недоступной CMS получает корректную service-unavailable страницу с `noindex`.
 - Commerce endpoint при недоступности Strapi не принимает заказ «вслепую».
 - Ошибка CMS не маскируется как 404.
+- Недоступность Next.js webhook не блокирует редактора; storefront временно
+  использует старый кэш до следующего успешного webhook или TTL refresh.
 
 ## 10. Контентная модель Strapi
 
