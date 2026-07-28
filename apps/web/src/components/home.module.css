@@ -1,0 +1,265 @@
+.chapter,
+.sectionHeader > p {
+  font-size: var(--type-caption);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.hero {
+  min-height: calc(100svh - 4.75rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.hero[data-layout="40/60"] {
+  grid-template-columns: 2fr 3fr;
+}
+
+.hero[data-layout="100/0"] {
+  grid-template-columns: 1fr;
+}
+
+.heroCopy {
+  min-height: 42rem;
+  padding: clamp(4rem, 10vw, 9rem) var(--page-gutter);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.heroCopy h1,
+.sectionHeader h2,
+.about h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+.heroCopy h1 {
+  max-width: 9ch;
+  margin: 2rem 0;
+  font-size: clamp(4rem, 8vw, 8rem);
+  line-height: 0.86;
+}
+
+.heroCopy > p:not(.chapter) {
+  max-width: 32rem;
+  font-family: var(--font-display);
+  font-size: var(--type-body-editorial);
+  line-height: 1.6;
+}
+
+.heroCopy a {
+  width: fit-content;
+  margin-top: 2rem;
+  padding-block: 0.75rem;
+  text-underline-offset: 0.35rem;
+}
+
+.heroMedia,
+.cardMedia {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-subtle);
+}
+
+.heroMedia img,
+.cardMedia img {
+  object-fit: cover;
+}
+
+.about {
+  position: relative;
+  padding: clamp(5rem, 10vw, 10rem) var(--page-gutter);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.about[data-spacing="S"] {
+  padding-block: 3rem;
+}
+.about[data-spacing="M"] {
+  padding-block: 5rem;
+}
+.about[data-spacing="XL"] {
+  padding-block: 12rem;
+}
+
+.about > span {
+  position: absolute;
+  top: -0.35em;
+  left: -0.05em;
+  color: var(--text-soft);
+  opacity: 0.85;
+  font-family: var(--font-display);
+  font-size: clamp(12rem, 34vw, 32rem);
+  line-height: 0.7;
+}
+
+.about h2 {
+  position: relative;
+  max-width: 15ch;
+  margin: 3rem 0 0;
+  font-size: var(--type-heading-2);
+  line-height: 1;
+}
+
+.aboutCopy {
+  position: relative;
+  align-self: end;
+  columns: 2;
+  column-gap: 2rem;
+  font-family: var(--font-display);
+  font-size: var(--type-body-editorial);
+  line-height: 1.65;
+}
+
+.about > img {
+  grid-column: 2;
+  width: 100%;
+  height: auto;
+}
+
+.catalog {
+  padding: clamp(5rem, 10vw, 9rem) var(--page-gutter);
+  overflow: hidden;
+}
+
+.sectionHeader {
+  padding-bottom: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: end;
+  gap: 2rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: var(--type-heading-1);
+  line-height: 0.9;
+}
+
+.sectionHeader a {
+  justify-self: end;
+  text-underline-offset: 0.35rem;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.controls button {
+  width: 3rem;
+  height: 3rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ritualTrack,
+.productGrid {
+  display: grid;
+  grid-auto-columns: calc((100% - 3px) / 4);
+  grid-auto-flow: column;
+  gap: 1px;
+  overflow-x: auto;
+  background: var(--border-default);
+  border: 1px solid var(--border-default);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.ritualCard {
+  padding: 0 1rem 2rem;
+  display: block;
+  background: var(--surface-page);
+  scroll-snap-align: start;
+  text-decoration: none;
+}
+
+.cardMedia {
+  aspect-ratio: 4 / 5;
+  margin-inline: -1rem;
+}
+
+.ritualCard h3 {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: var(--type-heading-3);
+  font-weight: 400;
+}
+
+.ritualCard > p {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.productGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-flow: initial;
+  overflow: visible;
+}
+
+.productGrid :global(.product-card) {
+  padding-inline: 1rem;
+  background: var(--surface-page);
+  border-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .heroCopy {
+    min-height: 70svh;
+  }
+
+  .heroMedia {
+    min-height: 55svh;
+  }
+
+  .about {
+    display: block;
+  }
+
+  .aboutCopy {
+    margin-top: 4rem;
+    columns: initial;
+  }
+
+  .about > img {
+    margin-top: 3rem;
+  }
+
+  .sectionHeader {
+    display: block;
+  }
+
+  .sectionHeader > :last-child {
+    margin-top: 1.5rem;
+  }
+
+  .ritualTrack {
+    grid-auto-columns: 82%;
+  }
+
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    display: none;
+  }
+}

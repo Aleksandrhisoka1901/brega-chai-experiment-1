@@ -10,9 +10,11 @@
     "seed": "node --experimental-strip-types scripts/seed.mts",
     "start": "strapi start",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test tests/*.test.mts",
+    "test:integration:order": "node --experimental-strip-types --test tests/order-postgres.integration.mts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@brega-chai/contracts": "workspace:*",
     "@strapi/plugin-color-picker": "5.45.0",
     "@strapi/plugin-users-permissions": "5.45.0",
     "@strapi/provider-upload-aws-s3": "5.45.0",

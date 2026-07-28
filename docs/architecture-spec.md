@@ -45,16 +45,16 @@
 
 ### 2.2. Адаптируем
 
-| В `metal-constructions` | В Brega Chai |
-| --- | --- |
-| `packages/web`, `packages/admin`, `packages/lib` | `apps/web`, `apps/cms`, `packages/contracts`; UI остаётся внутри `apps/web` |
-| React Query гидратируется в публичный контент | Публичный контент читается в React Server Components; React Query не нужен по умолчанию |
-| Root layout `force-dynamic` | Статический/cache-first layout с tag-based revalidation |
-| Общая библиотека содержит UI и формы | Shared package хранит прежде всего схемы, DTO и чистые domain-функции |
-| Strapi sitemap plugin | Sitemap генерирует Next.js из опубликованных продуктов |
-| Lead endpoint | Order endpoint с повторной проверкой цен, идемпотентностью и адаптерами доставки/оплаты |
-| Privacy как HTML-страница | Юридические PDF версионируются в `apps/web/public/legal` |
-| Radix Themes задаёт большую часть оформления | Radix используется для поведения; editorial visual language задают CSS tokens и собственные компоненты |
+| В `metal-constructions`                          | В Brega Chai                                                                                           |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `packages/web`, `packages/admin`, `packages/lib` | `apps/web`, `apps/cms`, `packages/contracts`; UI остаётся внутри `apps/web`                            |
+| React Query гидратируется в публичный контент    | Публичный контент читается в React Server Components; React Query не нужен по умолчанию                |
+| Root layout `force-dynamic`                      | Статический/cache-first layout с tag-based revalidation                                                |
+| Общая библиотека содержит UI и формы             | Shared package хранит прежде всего схемы, DTO и чистые domain-функции                                  |
+| Strapi sitemap plugin                            | Sitemap генерирует Next.js из опубликованных продуктов                                                 |
+| Lead endpoint                                    | Order endpoint с повторной проверкой цен, идемпотентностью и адаптерами доставки/оплаты                |
+| Privacy как HTML-страница                        | Юридические PDF версионируются в `apps/web/public/legal`                                               |
+| Radix Themes задаёт большую часть оформления     | Radix используется для поведения; editorial visual language задают CSS tokens и собственные компоненты |
 
 ### 2.3. Не переносим
 
@@ -72,26 +72,26 @@
 
 Версии фиксируются при инициализации проекта после проверки совместимости. Не использовать плавающий `latest`.
 
-| Слой | Выбор | Назначение |
-| --- | --- | --- |
-| Runtime | Node.js 22 LTS | единый runtime web/CMS/tooling |
-| Package manager | Yarn 4.14.1 | workspaces, lockfile |
-| Orchestration | Turborepo | dev/build/test/typecheck pipelines |
-| Frontend | Next.js 15.5.21 App Router + React + TypeScript | storefront и BFF |
-| UI behavior | Radix Primitives | dialog/drawer, focus management и accessible primitives |
-| Icons | `lucide-react` | единый tree-shakeable набор интерфейсных SVG-иконок |
-| Styling | CSS Modules + global design tokens | кастомная журнальная стилистика |
-| CMS | Strapi 5.45.0 | товары, страницы, SEO, заказы |
-| CMS color field | `@strapi/plugin-color-picker` 5.45.0 | HEX color picker для Hero и «О проекте»; версия обновляется синхронно со Strapi |
-| Database | PostgreSQL 16 | Strapi content и orders; точный patch/image digest фиксируется при bootstrap |
-| Validation | Zod | формы, API payload, env |
-| Forms | React Hook Form + Zod resolver | checkout |
-| Phone | libphonenumber-js | parse и E.164 normalization |
-| Cart state | собственный store на `useSyncExternalStore` | клиентская корзина без отдельной state-библиотеки |
-| Rich content | стандартный Strapi Blocks | статьи товара |
-| E2E | Playwright + axe-core | критические сценарии |
-| Unit/integration tests | встроенный Node test runner | domain, mapper и service tests без отдельного test framework |
-| Containers | Docker Compose local; отдельные production images | воспроизводимый deploy |
+| Слой                   | Выбор                                             | Назначение                                                                      |
+| ---------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Runtime                | Node.js 22 LTS                                    | единый runtime web/CMS/tooling                                                  |
+| Package manager        | Yarn 4.14.1                                       | workspaces, lockfile                                                            |
+| Orchestration          | Turborepo                                         | dev/build/test/typecheck pipelines                                              |
+| Frontend               | Next.js 15.5.21 App Router + React + TypeScript   | storefront и BFF                                                                |
+| UI behavior            | Radix Primitives                                  | dialog/drawer, focus management и accessible primitives                         |
+| Icons                  | `lucide-react`                                    | единый tree-shakeable набор интерфейсных SVG-иконок                             |
+| Styling                | CSS Modules + global design tokens                | кастомная журнальная стилистика                                                 |
+| CMS                    | Strapi 5.45.0                                     | товары, страницы, SEO, заказы                                                   |
+| CMS color field        | `@strapi/plugin-color-picker` 5.45.0              | HEX color picker для Hero и «О проекте»; версия обновляется синхронно со Strapi |
+| Database               | PostgreSQL 16                                     | Strapi content и orders; точный patch/image digest фиксируется при bootstrap    |
+| Validation             | Zod                                               | формы, API payload, env                                                         |
+| Forms                  | React Hook Form + Zod resolver                    | checkout                                                                        |
+| Phone                  | libphonenumber-js                                 | parse и E.164 normalization                                                     |
+| Cart state             | собственный store на `useSyncExternalStore`       | клиентская корзина без отдельной state-библиотеки                               |
+| Rich content           | стандартный Strapi Blocks                         | статьи товара                                                                   |
+| E2E                    | Playwright + axe-core                             | критические сценарии                                                            |
+| Unit/integration tests | встроенный Node test runner                       | domain, mapper и service tests без отдельного test framework                    |
+| Containers             | Docker Compose local; отдельные production images | воспроизводимый deploy                                                          |
 
 ### 3.1. Radix Primitives
 
@@ -404,11 +404,11 @@ type Cart = {
   items: Array<{
     productId: string;
     slug: string;
-    type: 'ritual' | 'product';
+    type: "ritual" | "product";
     title: string;
     packageLabel: string;
     unitPriceSnapshot: number;
-    currency: 'RUB';
+    currency: "RUB";
     image: { url: string; alt: string };
     quantity: number;
   }>;
@@ -646,13 +646,13 @@ Next.js `sitemap.ts`:
 
 Budgets:
 
-| Метрика | Цель |
-| --- | --- |
-| LCP p75 mobile | ≤ 2,5 с |
-| INP p75 | ≤ 200 мс |
-| CLS p75 | ≤ 0,1 |
+| Метрика           | Цель                                                    |
+| ----------------- | ------------------------------------------------------- |
+| LCP p75 mobile    | ≤ 2,5 с                                                 |
+| INP p75           | ≤ 200 мс                                                |
+| CLS p75           | ≤ 0,1                                                   |
 | Initial client JS | фиксируется после прототипа; regression gate обязателен |
-| Hero image | отдельный art-direction budget |
+| Hero image        | отдельный art-direction budget                          |
 
 Меры:
 
@@ -691,6 +691,22 @@ Budgets:
 Внешний monitoring-провайдер в MVP не подключается.
 
 ## 20. Тестовая стратегия
+
+### 20.0. Обязательный процесс
+
+Разработка ведётся по specification-driven development и TDD:
+
+1. До реализации требование и acceptance criteria фиксируются в соответствующей
+   спецификации. Для локального технического решения достаточно ADR, если оно не
+   меняет продуктовый или визуальный контракт.
+2. Рабочий цикл изменения — `red → green → refactor`: сначала падающий тест,
+   затем минимальная реализация, затем рефакторинг на зелёной suite.
+3. Исправление дефекта начинается с regression-теста, воспроизводящего дефект.
+4. В MR описание и сценарий проверки ссылаются на затронутый контракт.
+
+Исследовательский spike может временно обходиться без TDD, но его код не
+мерджится в `main`: решение либо удаляется, либо переписывается через обычный
+цикл `red → green → refactor`.
 
 ### 20.1. Unit
 

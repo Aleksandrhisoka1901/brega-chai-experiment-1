@@ -531,6 +531,70 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
+  collectionName: "orders";
+  info: {
+    displayName: "Order";
+    pluralName: "orders";
+    singularName: "order";
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    comment: Schema.Attribute.Text & Schema.Attribute.Private;
+    consents: Schema.Attribute.JSON &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.Enumeration<["RUB"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"RUB">;
+    customerEmail: Schema.Attribute.Email & Schema.Attribute.Private;
+    customerName: Schema.Attribute.String & Schema.Attribute.Required;
+    customerPhone: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    deliveryAddress: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    idempotencyKey: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.Unique;
+    lines: Schema.Attribute.JSON & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<"oneToMany", "api::order.order"> &
+      Schema.Attribute.Private;
+    orderNumber: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    publishedAt: Schema.Attribute.DateTime;
+    requestFingerprint: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    status: Schema.Attribute.Enumeration<
+      ["new", "confirmed", "completed", "cancelled"]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"new">;
+    statusHistory: Schema.Attribute.JSON & Schema.Attribute.Required;
+    totalRubles: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   collectionName: "products";
   info: {
@@ -1178,6 +1242,7 @@ declare module "@strapi/strapi" {
       "admin::user": AdminUser;
       "api::global-setting.global-setting": ApiGlobalSettingGlobalSetting;
       "api::home-page.home-page": ApiHomePageHomePage;
+      "api::order.order": ApiOrderOrder;
       "api::product.product": ApiProductProduct;
       "api::products-page.products-page": ApiProductsPageProductsPage;
       "plugin::content-releases.release": PluginContentReleasesRelease;

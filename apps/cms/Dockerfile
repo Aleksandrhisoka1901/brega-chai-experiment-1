@@ -19,7 +19,8 @@ CMD ["yarn", "workspace", "@brega-chai/cms", "develop"]
 FROM dependencies AS build
 COPY . .
 ENV NODE_ENV=production
-RUN yarn workspace @brega-chai/cms build
+RUN yarn workspace @brega-chai/contracts build \
+  && yarn workspace @brega-chai/cms build
 
 FROM dependencies AS production-dependencies
 RUN yarn workspaces focus @brega-chai/cms --production
@@ -33,6 +34,7 @@ COPY --chown=node:node apps/cms/package.json apps/cms/package.json
 COPY --chown=node:node apps/cms/tsconfig.json apps/cms/tsconfig.json
 COPY --chown=node:node --from=production-dependencies /workspace/node_modules ./node_modules
 COPY --chown=node:node --from=production-dependencies /workspace/apps/cms/node_modules ./apps/cms/node_modules
+COPY --chown=node:node --from=build /workspace/packages/contracts ./packages/contracts
 COPY --chown=node:node --from=build /workspace/apps/cms/config ./apps/cms/config
 COPY --chown=node:node --from=build /workspace/apps/cms/src ./apps/cms/src
 COPY --chown=node:node --from=build /workspace/apps/cms/dist ./apps/cms/dist

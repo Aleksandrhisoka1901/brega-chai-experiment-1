@@ -1,0 +1,86 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "orderNumber": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "private": true,
+      "configurable": false
+    },
+    "requestFingerprint": {
+      "type": "string",
+      "required": true,
+      "private": true,
+      "configurable": false
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["new", "confirmed", "completed", "cancelled"],
+      "required": true,
+      "default": "new"
+    },
+    "customerName": {
+      "type": "string",
+      "required": true
+    },
+    "customerPhone": {
+      "type": "string",
+      "required": true,
+      "private": true
+    },
+    "customerEmail": {
+      "type": "email",
+      "required": false,
+      "private": true
+    },
+    "deliveryAddress": {
+      "type": "text",
+      "required": true,
+      "private": true
+    },
+    "comment": {
+      "type": "text",
+      "required": false,
+      "private": true
+    },
+    "consents": {
+      "type": "json",
+      "required": true,
+      "private": true
+    },
+    "lines": {
+      "type": "json",
+      "required": true
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["RUB"],
+      "required": true,
+      "default": "RUB"
+    },
+    "totalRubles": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "statusHistory": {
+      "type": "json",
+      "required": true
+    }
+  }
+}
