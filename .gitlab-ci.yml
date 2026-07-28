@@ -23,20 +23,34 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_TAG
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_TAG =~ /^release-(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $TLS_RENEWAL == "true"
+
+.fast-pipeline:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG =~ /^release-(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/
+
+.full-pipeline:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG =~ /^release-(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/
 
 format:
+  extends: .fast-pipeline
   stage: quality
   script:
     - yarn format:check
 
 lint:
+  extends: .fast-pipeline
   stage: quality
   script:
     - yarn lint
 
 typecheck:
+  extends: .fast-pipeline
   stage: quality
   script:
     - yarn typecheck
@@ -52,11 +66,13 @@ validate:release:
     - git merge-base --is-ancestor "$CI_COMMIT_SHA" "origin/$CI_DEFAULT_BRANCH"
 
 unit:
+  extends: .fast-pipeline
   stage: test
   script:
     - yarn test
 
 build:
+  extends: .fast-pipeline
   stage: build
   script:
     - yarn build
@@ -67,6 +83,7 @@ build:
       - apps/cms/dist/
 
 e2e:a11y:
+  extends: .full-pipeline
   stage: e2e
   image: mcr.microsoft.com/playwright:v1.55.1-noble
   needs:
@@ -84,6 +101,7 @@ e2e:a11y:
       - apps/web/test-results/
 
 .container-image:
+  extends: .full-pipeline
   stage: image
   image: docker:27.5.1-cli-alpine3.21
   services:
@@ -114,6 +132,7 @@ image:cms:
     - docker push "$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA"
 
 container:smoke:
+  extends: .full-pipeline
   stage: smoke
   image: docker:27.5.1-cli-alpine3.21
   services:
