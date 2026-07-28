@@ -1,0 +1,235 @@
+stages:
+  - quality
+  - test
+  - build
+  - e2e
+  - image
+  - smoke
+  - deploy
+
+default:
+  image: node:22.18.0-alpine3.22
+  before_script:
+    - corepack enable
+    - yarn install --immutable
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - .yarn/cache/
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+
+format:
+  stage: quality
+  script:
+    - yarn format:check
+
+lint:
+  stage: quality
+  script:
+    - yarn lint
+
+typecheck:
+  stage: quality
+  script:
+    - yarn typecheck
+
+validate:release:
+  stage: quality
+  image: alpine/git:2.49.1
+  before_script: []
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^release-(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/
+  script:
+    - git fetch origin "$CI_DEFAULT_BRANCH" --depth 1
+    - git merge-base --is-ancestor "$CI_COMMIT_SHA" "origin/$CI_DEFAULT_BRANCH"
+
+unit:
+  stage: test
+  script:
+    - yarn test
+
+build:
+  stage: build
+  script:
+    - yarn build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - apps/web/.next/
+      - apps/cms/dist/
+
+e2e:a11y:
+  stage: e2e
+  image: mcr.microsoft.com/playwright:v1.55.1-noble
+  needs:
+    - job: build
+      artifacts: true
+  script:
+    - corepack enable
+    - yarn install --immutable
+    - yarn test:e2e
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - apps/web/playwright-report/
+      - apps/web/test-results/
+
+.container-image:
+  stage: image
+  image: docker:27.5.1-cli-alpine3.21
+  services:
+    - name: docker:27.5.1-dind-alpine3.21
+      alias: docker
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  needs:
+    - format
+    - lint
+    - typecheck
+    - unit
+    - build
+    - e2e:a11y
+
+image:web:
+  extends: .container-image
+  script:
+    - docker build --target production -f apps/web/Dockerfile -t "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA"
+
+image:cms:
+  extends: .container-image
+  script:
+    - docker build --target production -f apps/cms/Dockerfile -t "$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA"
+
+container:smoke:
+  stage: smoke
+  image: docker:27.5.1-cli-alpine3.21
+  services:
+    - name: docker:27.5.1-dind-alpine3.21
+      alias: docker
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs:
+    - image:web
+    - image:cms
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - |
+      set -eu
+      cleanup() {
+        docker rm -f smoke-web smoke-cms smoke-postgres >/dev/null 2>&1 || true
+        docker network rm brega-smoke >/dev/null 2>&1 || true
+      }
+      trap cleanup EXIT INT TERM
+      docker network create brega-smoke
+      docker run -d --name smoke-postgres --network brega-smoke \
+        -e POSTGRES_DB=brega \
+        -e POSTGRES_USER=brega \
+        -e POSTGRES_PASSWORD=ci-only-password \
+        postgres:16.10-alpine3.22
+      attempt=0
+      until docker exec smoke-postgres pg_isready -U brega -d brega; do
+        attempt=$((attempt + 1))
+        test "$attempt" -lt 30
+        sleep 2
+      done
+      docker run -d --name smoke-cms --network brega-smoke \
+        -e NODE_ENV=production \
+        -e HOST=0.0.0.0 \
+        -e PORT=1337 \
+        -e DATABASE_CLIENT=postgres \
+        -e DATABASE_HOST=smoke-postgres \
+        -e DATABASE_PORT=5432 \
+        -e DATABASE_NAME=brega \
+        -e DATABASE_USERNAME=brega \
+        -e DATABASE_PASSWORD=ci-only-password \
+        -e APP_KEYS=ci-app-key-1,ci-app-key-2,ci-app-key-3,ci-app-key-4 \
+        -e API_TOKEN_SALT=ci-api-token-salt \
+        -e ADMIN_JWT_SECRET=ci-admin-jwt-secret \
+        -e TRANSFER_TOKEN_SALT=ci-transfer-token-salt \
+        -e JWT_SECRET=ci-jwt-secret \
+        -e ENCRYPTION_KEY=ci-encryption-key \
+        "$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA"
+      docker run -d --name smoke-web --network brega-smoke \
+        "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA"
+      attempt=0
+      until docker exec smoke-cms node -e \
+        "fetch('http://127.0.0.1:1337/admin').then(r=>{if(!r.ok&&r.status!==302)process.exit(1)}).catch(()=>process.exit(1))"; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 45 ]; then
+          docker logs smoke-cms
+          exit 1
+        fi
+        sleep 2
+      done
+      attempt=0
+      until docker exec smoke-web node -e \
+        "fetch('http://127.0.0.1:3000').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 30 ]; then
+          docker logs smoke-web
+          exit 1
+        fi
+        sleep 2
+      done
+
+deploy:production:
+  stage: deploy
+  image: alpine:3.22.1
+  before_script:
+    - apk add --no-cache openssh-client
+    - test -f "$DEPLOY_SSH_PRIVATE_KEY"
+    - test -n "$DEPLOY_KNOWN_HOSTS"
+    - test -n "$DEPLOY_HOST"
+    - test -n "$DEPLOY_USER"
+    - test -n "$DEPLOY_PATH"
+    - test -n "$SMOKE_URL"
+    - install -m 600 "$DEPLOY_SSH_PRIVATE_KEY" /tmp/deploy_key
+    - install -m 700 -d ~/.ssh
+    - printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+  needs:
+    - validate:release
+    - e2e:a11y
+    - container:smoke
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^release-(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/
+  environment:
+    name: production
+  script:
+    - ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p '$DEPLOY_PATH'"
+    - tar -czf /tmp/deploy-config.tar.gz docker-compose.yml docker-compose.production.yml docker-compose.tls.yml infra scripts
+    - scp -i /tmp/deploy_key /tmp/deploy-config.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy-config.tar.gz"
+    - ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && tar -xzf deploy-config.tar.gz && rm deploy-config.tar.gz"
+    - printf '%s' "$CI_REGISTRY_PASSWORD" | ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "docker login -u '$CI_REGISTRY_USER' --password-stdin '$CI_REGISTRY'"
+    - ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && WEB_IMAGE='$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA' CMS_IMAGE='$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA' SMOKE_URL='$SMOKE_URL' ./scripts/deploy.sh"
+
+tls:renew:
+  stage: deploy
+  image: alpine:3.22.1
+  before_script:
+    - apk add --no-cache openssh-client
+    - test -f "$DEPLOY_SSH_PRIVATE_KEY"
+    - test -n "$DEPLOY_KNOWN_HOSTS"
+    - test -n "$DEPLOY_HOST"
+    - test -n "$DEPLOY_USER"
+    - test -n "$DEPLOY_PATH"
+    - install -m 600 "$DEPLOY_SSH_PRIVATE_KEY" /tmp/deploy_key
+    - install -m 700 -d ~/.ssh
+    - printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $TLS_RENEWAL == "true"
+  script:
+    - ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && ./scripts/tls-renew.sh"

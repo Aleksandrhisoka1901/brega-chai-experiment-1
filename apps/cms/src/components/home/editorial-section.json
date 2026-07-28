@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_home_editorial_sections",
+  "info": {
+    "displayName": "Editorial section",
+    "description": "About section with optional image and custom colors"
+  },
+  "attributes": {
+    "text": {
+      "type": "blocks",
+      "required": true
+    },
+    "image": {
+      "type": "component",
+      "component": "shared.image-with-alt",
+      "repeatable": false,
+      "required": false
+    },
+    "backgroundColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "textColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "spacing": {
+      "type": "enumeration",
+      "enum": ["S", "M", "L", "XL"],
+      "required": true,
+      "default": "L"
+    }
+  }
+}
