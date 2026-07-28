@@ -571,15 +571,15 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     orderNumber: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    publishedAt: Schema.Attribute.DateTime;
-    requestFingerprint: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Private;
-    status: Schema.Attribute.Enumeration<
+    orderStatus: Schema.Attribute.Enumeration<
       ["new", "confirmed", "completed", "cancelled"]
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"new">;
+    publishedAt: Schema.Attribute.DateTime;
+    requestFingerprint: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
     statusHistory: Schema.Attribute.JSON & Schema.Attribute.Required;
     totalRubles: Schema.Attribute.Integer &
       Schema.Attribute.Required &
