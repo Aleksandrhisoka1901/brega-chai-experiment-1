@@ -168,6 +168,39 @@ renderer. Пустые, неизвестные и исполняемые nodes �
 заказ через Next BFF и Strapi и проверяет фактическое изменение stock в
 PostgreSQL. Критерий выполнен.
 
+### 5. UI и layout remediation
+
+Статус: запланировано до release hardening.
+
+- собрать и зафиксировать замечания по каждой готовой странице и общим
+  компонентам;
+- проверить главную, каталог, карточку товара, корзину и checkout на desktop,
+  tablet и mobile;
+- отдельно проверить сетки, вертикальный ритм, ширины контейнеров, типографику,
+  изображения, переполнение контента и sticky/fixed элементы;
+- сгруппировать исправления в небольшие проверяемые срезы: общая layout-система,
+  storefront-страницы и commerce UI;
+- для каждого дефекта сначала зафиксировать ожидаемое поведение в spec или
+  visual reference, затем добавить подходящую regression-проверку;
+- обновить showcase, если исправление меняет общий компонент или design token;
+- после исправлений провести повторную визуальную приёмку всех целевых
+  viewport.
+
+Acceptance criteria:
+
+1. Все согласованные замечания имеют статус и привязку к странице, компоненту
+   или общему layout-правилу.
+2. Страницы соответствуют утверждённым design reference на согласованных
+   viewport без горизонтального overflow, случайных скачков сетки и наложения
+   интерактивных элементов.
+3. Общие визуальные правила исправлены в design system, а не продублированы
+   локальными обходами на страницах.
+4. Для стабильных layout-инвариантов добавлены component/E2E assertions; для
+   ключевых экранов сохранены согласованные visual regression snapshots.
+5. Keyboard, axe и reduced-motion проверки затронутых сценариев остаются
+   зелёными.
+6. Итоговая ручная visual QA подтверждена до начала release hardening.
+
 ## Hardening и выпуск
 
 ### Качество
@@ -217,9 +250,9 @@ PostgreSQL. Критерий выполнен.
 
 ## Следующие merge requests
 
-1. `cache-revalidation`;
-2. `cms-content-rendering`;
-3. `real-order-integration`;
+1. `ui-layout-foundation`;
+2. `ui-storefront-remediation`;
+3. `ui-commerce-remediation`;
 4. `release-hardening`;
 5. `production-content`;
 6. `release-{semver}` после появления VPS.
