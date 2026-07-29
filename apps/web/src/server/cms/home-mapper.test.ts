@@ -68,6 +68,8 @@ test("100/0 hero ignores an image and optional CTA", () => {
               children: [{ type: "text", text: "О проекте." }],
             },
           ],
+          backgroundColor: null,
+          textColor: null,
           spacing: "M",
         },
         ritualsPreview: { title: "Ритуалы" },
@@ -79,4 +81,6 @@ test("100/0 hero ignores an image and optional CTA", () => {
 
   assert.equal(home.hero.image, undefined);
   assert.equal(home.hero.cta, undefined);
+  assert.equal(home.about.backgroundColor, undefined);
+  assert.equal(home.about.textColor, undefined);
 });

@@ -8,6 +8,7 @@
     "dev": "strapi develop",
     "lint": "tsc --noEmit",
     "seed": "node --experimental-strip-types scripts/seed.mts",
+    "setup:order-token": "node --experimental-strip-types scripts/setup-order-api-token.mts",
     "start": "strapi start",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test tests/*.test.mts",
     "test:integration:order": "node --experimental-strip-types --test tests/order-postgres.integration.mts",

@@ -71,6 +71,83 @@ unit:
   script:
     - yarn test
 
+integration:commerce:
+  extends: .full-pipeline
+  stage: test
+  image: node:22.18.0-bookworm-slim
+  services:
+    - name: postgres:16.10-alpine3.22
+      alias: postgres
+  variables:
+    POSTGRES_DB: brega_chai_test
+    POSTGRES_USER: brega
+    POSTGRES_PASSWORD: ci-only-password
+    DATABASE_HOST: postgres
+    DATABASE_PORT: "5432"
+    DATABASE_NAME: brega_chai_test
+    DATABASE_USERNAME: brega
+    DATABASE_PASSWORD: ci-only-password
+    ORDER_PG_TEST_ALLOW: isolated-schema
+    ORDER_PG_TEST_URL: postgres://brega:ci-only-password@postgres:5432/brega_chai_test
+    APP_KEYS: ci-app-key-1,ci-app-key-2,ci-app-key-3,ci-app-key-4
+    API_TOKEN_SALT: ci-api-token-salt
+    ADMIN_JWT_SECRET: ci-admin-jwt-secret
+    TRANSFER_TOKEN_SALT: ci-transfer-token-salt
+    JWT_SECRET: ci-jwt-secret
+    ENCRYPTION_KEY: ci-encryption-key
+    SEED_ALLOWED: "true"
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends curl postgresql-client
+    - corepack enable
+    - yarn install --immutable
+    - mkdir -p apps/cms/public/uploads
+  script:
+    - yarn workspace @brega-chai/contracts build
+    - yarn workspace @brega-chai/cms test:integration:order
+    - |
+      set -eu
+      cleanup() {
+        test -z "${web_pid:-}" || kill "$web_pid" >/dev/null 2>&1 || true
+        test -z "${cms_pid:-}" || kill "$cms_pid" >/dev/null 2>&1 || true
+      }
+      trap cleanup EXIT INT TERM
+
+      yarn workspace @brega-chai/cms seed
+      ORDER_API_TOKEN_OUTPUT_FILE=/tmp/order-api-token \
+        yarn workspace @brega-chai/cms setup:order-token >/tmp/token-setup.log
+      test -s /tmp/order-api-token
+
+      yarn workspace @brega-chai/cms develop >/tmp/cms.log 2>&1 &
+      cms_pid=$!
+      attempt=0
+      until curl -fsS http://127.0.0.1:1337/admin >/dev/null; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 60 ]; then
+          cat /tmp/cms.log
+          exit 1
+        fi
+        sleep 2
+      done
+
+      CHECKOUT_FORM_SECRET=ci-checkout-form-secret \
+      STRAPI_ORDER_TOKEN="$(cat /tmp/order-api-token)" \
+      CMS_INTERNAL_URL=http://127.0.0.1:1337 \
+        yarn workspace @brega-chai/web dev >/tmp/web.log 2>&1 &
+      web_pid=$!
+      attempt=0
+      until curl -fsS http://127.0.0.1:3000/api/checkout/orders >/dev/null; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 60 ]; then
+          cat /tmp/web.log
+          exit 1
+        fi
+        sleep 2
+      done
+
+      ORDER_HTTP_TEST_ALLOW=seeded-local-database \
+      ORDER_HTTP_TEST_WEB_URL=http://127.0.0.1:3000 \
+        yarn workspace @brega-chai/web test:integration:order
+
 build:
   extends: .fast-pipeline
   stage: build
@@ -116,6 +193,7 @@ e2e:a11y:
     - lint
     - typecheck
     - unit
+    - integration:commerce
     - build
     - e2e:a11y
 

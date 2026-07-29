@@ -101,7 +101,8 @@ export async function handleCreateOrder(
       );
     }
 
-    const result = orderResultSchema.safeParse(await upstream.json());
+    const envelope = (await upstream.json()) as { data?: unknown };
+    const result = orderResultSchema.safeParse(envelope.data);
     if (!result.success) {
       return safeError(
         503,

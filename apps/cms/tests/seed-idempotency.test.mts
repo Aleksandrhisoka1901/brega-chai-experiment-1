@@ -66,6 +66,14 @@ test("seed permits only known local database host and name combinations", () => 
       DATABASE_NAME: "brega_chai",
     }),
   );
+  assert.doesNotThrow(() =>
+    assertSeedAllowed({
+      SEED_ALLOWED: "true",
+      NODE_ENV: "test",
+      DATABASE_HOST: "postgres",
+      DATABASE_NAME: "brega_chai_test",
+    }),
+  );
   assert.throws(
     () =>
       assertSeedAllowed({

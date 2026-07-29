@@ -34,22 +34,24 @@ test("forwards strict order with scoped token and idempotency header", async () 
         forwarded = request;
         return Response.json(
           {
-            orderId: "order-1",
-            status: "new",
-            currency: "RUB",
-            lines: [
-              {
-                productId: "product-1",
-                slug: "tea-a1b2c3",
-                title: "Tea",
-                packageLabel: "50 г",
-                unitPriceRubles: 1200,
-                quantity: 2,
-                lineTotalRubles: 2400,
-                currency: "RUB",
-              },
-            ],
-            totalRubles: 2400,
+            data: {
+              orderId: "order-1",
+              status: "new",
+              currency: "RUB",
+              lines: [
+                {
+                  productId: "product-1",
+                  slug: "tea-a1b2c3",
+                  title: "Tea",
+                  packageLabel: "50 г",
+                  unitPriceRubles: 1200,
+                  quantity: 2,
+                  lineTotalRubles: 2400,
+                  currency: "RUB",
+                },
+              ],
+              totalRubles: 2400,
+            },
           },
           { status: 201 },
         );

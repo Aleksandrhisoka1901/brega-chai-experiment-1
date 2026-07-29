@@ -73,13 +73,12 @@
 - изменение статуса из Strapi Content Manager только через транзакционный
   `transitionStatus`;
 - PostgreSQL integration harness;
-- полный browser flow через настоящий Next BFF.
-
-Осталось:
-
-- проверить локальный end-to-end Next BFF → настоящий Strapi → PostgreSQL с
-  реальным scoped API token;
-- включить PostgreSQL integration harness в обязательный CI pipeline.
+- browser flow через настоящий Next BFF с mocked Strapi upstream;
+- scoped Strapi API token с единственным permission
+  `api::order.order.create`;
+- локальный и обязательный CI flow Next BFF → настоящий Strapi → PostgreSQL;
+- проверка success, insufficient stock, double submit, rollback и фактического
+  изменения stock.
 
 ## Ближайшие срезы
 
@@ -154,13 +153,20 @@ renderer. Пустые, неизвестные и исполняемые nodes �
 
 ### 4. Real commerce integration
 
-- создать scoped Strapi API token для локального/test окружения;
-- пройти Next BFF → Strapi → PostgreSQL без mocked upstream;
-- проверить success, insufficient stock, double submit и rollback;
-- добавить этот container scenario в CI.
+Статус: готово.
+
+- scoped token создаётся повторяемой local/test командой и ограничен только
+  созданием заказа;
+- `integration:commerce` запускает PostgreSQL harness, настоящий Strapi и Next
+  BFF без mocked upstream;
+- HTTP-сценарий проверяет success, insufficient stock, double submit,
+  сохранённый заказ и фактическое списание stock;
+- rollback и конкурентная идемпотентность остаются покрыты прямым PostgreSQL
+  harness.
 
 Критерий завершения: минимум один обязательный CI-сценарий создаёт реальный
-заказ и проверяет фактическое изменение stock.
+заказ через Next BFF и Strapi и проверяет фактическое изменение stock в
+PostgreSQL. Критерий выполнен.
 
 ## Hardening и выпуск
 
