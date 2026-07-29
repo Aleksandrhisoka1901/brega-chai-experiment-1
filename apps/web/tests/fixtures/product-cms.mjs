@@ -107,14 +107,16 @@ const cms = createServer((request, response) => {
         response.writeHead(201, { "Content-Type": "application/json" });
         response.end(
           JSON.stringify({
-            orderId: "E2E-0001",
-            status: "new",
-            currency: "RUB",
-            lines,
-            totalRubles: lines.reduce(
-              (total, line) => total + line.lineTotalRubles,
-              0,
-            ),
+            data: {
+              orderId: "E2E-0001",
+              status: "new",
+              currency: "RUB",
+              lines,
+              totalRubles: lines.reduce(
+                (total, line) => total + line.lineTotalRubles,
+                0,
+              ),
+            },
           }),
         );
       };

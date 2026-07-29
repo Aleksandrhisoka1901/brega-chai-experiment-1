@@ -12,6 +12,8 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
+      CHECKOUT_FORM_SECRET: ${CHECKOUT_FORM_SECRET:-}
+      STRAPI_ORDER_TOKEN: ${STRAPI_ORDER_TOKEN:-}
     ports:
       - "3000:3000"
     volumes:

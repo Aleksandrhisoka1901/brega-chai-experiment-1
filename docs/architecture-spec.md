@@ -779,7 +779,12 @@ Budgets:
 - metadata/canonical/JSON-LD assertions;
 - 404 и service unavailable.
 
-Не тестировать критический checkout только через mocked browser state: минимум один CI-сценарий должен проходить через реальные test containers Strapi/PostgreSQL.
+Не тестировать критический checkout только через mocked browser state. Обязательный
+MR/release job `integration:commerce` сначала проверяет транзакционный order
+service на реальном PostgreSQL container, затем поднимает настоящий Strapi и
+Next BFF и выполняет HTTP-сценарий без mocked upstream. Сценарий создаёт заказ,
+повторяет запрос с тем же idempotency key, проверяет сохранённую запись и
+изменение stock непосредственно в PostgreSQL, а также отказ при нулевом остатке.
 
 ## 21. CI/CD
 
@@ -794,16 +799,17 @@ Merge request запускает полный проверочный pipeline:
 3. lint;
 4. typecheck;
 5. unit tests;
-6. Strapi schema/build;
-7. Next.js production build;
-8. Playwright smoke/a11y;
-9. сборка web/CMS images;
-10. container smoke;
-11. container vulnerability scan — когда будет подключён.
+6. PostgreSQL harness и полный HTTP order flow в `integration:commerce`;
+7. Strapi schema/build;
+8. Next.js production build;
+9. Playwright smoke/a11y;
+10. сборка web/CMS images;
+11. container smoke;
+12. container vulnerability scan — когда будет подключён.
 
 После merge ветка `main` повторяет только быстрые проверки итогового
 merge-коммита: format, lint, typecheck, unit и production build. E2E, сборка
-images и container smoke здесь не повторяются.
+images, PostgreSQL integration и container smoke здесь не повторяются.
 
 Protected-тег `release-{semver}` запускает полный pipeline заново, публикует
 images tagged commit и только после всех зелёных проверок допускает deploy.
