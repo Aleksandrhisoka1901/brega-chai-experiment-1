@@ -5,7 +5,7 @@ import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { CheckoutSettings } from "../../../server/cms/global-mapper";
 
 import { IconButton } from "../../../components/icon-button";
@@ -56,6 +56,7 @@ export function CartDrawer({
   const drawer = useCartDrawer();
   const totalQuantity = getCartQuantity(cart);
   const [view, setView] = useState<"cart" | "checkout">("cart");
+  const clearCartAfterCloseRef = useRef(false);
 
   return (
     <Dialog.Root
@@ -72,6 +73,11 @@ export function CartDrawer({
           className={styles.drawer}
           data-cart-drawer
           onCloseAutoFocus={(event) => {
+            setView("cart");
+            if (clearCartAfterCloseRef.current) {
+              clearCartAfterCloseRef.current = false;
+              cartStore.clear();
+            }
             const trigger = cartDrawerStore.getTrigger();
             if (trigger) {
               event.preventDefault();
@@ -108,6 +114,10 @@ export function CartDrawer({
               cart={cart}
               checkoutSettings={checkoutSettings}
               onBack={() => setView("cart")}
+              onComplete={cartDrawerStore.close}
+              onOrderAccepted={() => {
+                clearCartAfterCloseRef.current = true;
+              }}
             />
           ) : cart.items.length === 0 ? (
             <div className={styles.empty}>

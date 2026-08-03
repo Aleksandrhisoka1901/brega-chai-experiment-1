@@ -1,10 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  calculateDiscountedTotalRubles,
-  checkoutFieldLimits,
-} from "@brega-chai/contracts";
+import { checkoutFieldLimits } from "@brega-chai/contracts";
 import { AlertCircle, ArrowLeft, LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -14,11 +11,11 @@ import { AutoResizeTextarea } from "../../components/auto-resize-textarea";
 import { ScrollArea } from "../../components/scroll-area";
 import { bindShortRussianWords } from "../../lib/typography";
 import { getCartSubtotal } from "../cart/model";
-import { cartStore } from "../cart/use-cart";
 import type { Cart } from "../cart/types";
 import { createFetchCheckoutClient, type CheckoutClient } from "./client";
 import { createBrowserCheckoutDraftPersistence } from "./draft";
 import { PhoneInput } from "./phone-input";
+import { getCheckoutPricing } from "./pricing";
 import {
   checkoutSchema,
   type CheckoutField,
@@ -48,11 +45,15 @@ export function CheckoutPanel({
   cart,
   checkoutSettings,
   onBack,
+  onComplete,
+  onOrderAccepted,
   client,
 }: {
   cart: Cart;
   checkoutSettings: CheckoutSettings;
   onBack(): void;
+  onComplete(): void;
+  onOrderAccepted(): void;
   client?: CheckoutClient;
 }) {
   const checkoutClient = useMemo(
@@ -114,9 +115,10 @@ export function CheckoutPanel({
 
   const deliveryMethod = watch("deliveryMethod");
   const standardTotal = getCartSubtotal(cart);
-  const discountedTotal = calculateDiscountedTotalRubles(
+  const pricing = getCheckoutPricing(
     standardTotal,
-    deliveryMethod === "pickup" ? checkoutSettings.pickupDiscountPercent : 0,
+    deliveryMethod,
+    checkoutSettings.pickupDiscountPercent,
   );
 
   if (result?.type === "success") {
@@ -130,7 +132,7 @@ export function CheckoutPanel({
             <small>Сохраните его для обращения к менеджеру</small>
           </div>
           <p>{bindShortRussianWords(result.message)}</p>
-          <button onClick={onBack} type="button">
+          <button onClick={onComplete} type="button">
             Вернуться к покупкам
           </button>
         </div>
@@ -156,7 +158,7 @@ export function CheckoutPanel({
               });
               if (response.ok) {
                 draft.clear();
-                cartStore.clear();
+                onOrderAccepted();
                 setResult({
                   type: "success",
                   message: response.message,
@@ -211,9 +213,9 @@ export function CheckoutPanel({
                 />
                 <span>
                   <strong>Самовывоз</strong>
-                  <small>
-                    Скидка {checkoutSettings.pickupDiscountPercent}%
-                  </small>
+                  {pricing.hasDiscount ? (
+                    <small>Скидка {pricing.discountPercent}%</small>
+                  ) : null}
                 </span>
               </label>
               <label className={styles.methodOption}>
@@ -346,25 +348,31 @@ export function CheckoutPanel({
               шт.
             </span>
             <strong
-              className={
-                deliveryMethod === "pickup" ? styles.standardTotal : undefined
-              }
+              className={pricing.hasDiscount ? styles.standardTotal : undefined}
             >
               {priceFormatter.format(standardTotal)}
             </strong>
-            {deliveryMethod === "pickup" ? (
+            {pricing.hasDiscount ? (
               <>
                 <span>Со скидкой за самовывоз</span>
-                <strong>{priceFormatter.format(discountedTotal)}</strong>
+                <strong>
+                  {priceFormatter.format(pricing.discountedTotal)}
+                </strong>
               </>
             ) : null}
-            <p>
-              {bindShortRussianWords(
-                deliveryMethod === "pickup"
-                  ? `Скидка ${checkoutSettings.pickupDiscountPercent}% будет зафиксирована в заказе.`
-                  : "Стоимость доставки менеджер подтвердит отдельно.",
-              )}
-            </p>
+            {pricing.hasDiscount ? (
+              <p>
+                {bindShortRussianWords(
+                  `Скидка ${pricing.discountPercent}% будет зафиксирована в заказе.`,
+                )}
+              </p>
+            ) : deliveryMethod === "courier" ? (
+              <p>
+                {bindShortRussianWords(
+                  "Стоимость доставки менеджер подтвердит отдельно.",
+                )}
+              </p>
+            ) : null}
           </div>
         ) : null}
 

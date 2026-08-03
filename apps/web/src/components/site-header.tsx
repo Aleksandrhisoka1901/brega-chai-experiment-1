@@ -48,7 +48,7 @@ const defaultNavigation = {
 
 const defaultCheckoutSettings: CheckoutSettings = {
   pickupAddress: "г. Москва, ул. Чайная, д. 1. Ежедневно с 10:00 до 22:00.",
-  pickupDiscountPercent: 10,
+  pickupDiscountPercent: null,
   courierDeliveryNote: "Стоимость рассчитывается в день отправки, до 1000 руб.",
 };
 

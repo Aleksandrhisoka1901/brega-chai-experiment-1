@@ -8,11 +8,6 @@ const STATUS_PRESENTATION = {
   cancelled: { label: "Отменён", variant: "danger" },
 } as const;
 
-const CONSENT_LABELS = {
-  personalData: "Обработка персональных данных",
-  salesAndDelivery: "Условия продажи и доставки",
-} as const;
-
 const DELIVERY_METHOD_PRESENTATION = {
   pickup: { label: "Самовывоз", addressLabel: "Адрес самовывоза" },
   courier: { label: "Курьер", addressLabel: "Адрес доставки" },
@@ -47,10 +42,6 @@ export function getStatusConfirmation(status: OrderStatus) {
     description: `Статус заказа изменится на «${getStatusPresentation(status).label}».`,
     confirmLabel: label,
   };
-}
-
-export function getConsentLabel(key: keyof typeof CONSENT_LABELS) {
-  return CONSENT_LABELS[key];
 }
 
 export function getDeliveryMethodPresentation(method: DeliveryMethod) {

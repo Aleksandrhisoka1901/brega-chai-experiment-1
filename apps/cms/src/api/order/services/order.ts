@@ -360,9 +360,13 @@ export default factories.createCoreService(ORDER_UID, ({ strapi }) => ({
           "pickupDiscountPercent",
         ],
       });
+    const pickupDiscountPercent = settings?.pickupDiscountPercent;
     const checkoutSettings: OrderCheckoutSettings = {
       pickupAddress: String(settings?.pickupAddress ?? ""),
-      pickupDiscountPercent: Number(settings?.pickupDiscountPercent),
+      pickupDiscountPercent:
+        typeof pickupDiscountPercent === "number"
+          ? pickupDiscountPercent
+          : null,
     };
     const creation = await createOrderWithMeta(
       rawInput,

@@ -259,6 +259,20 @@ test("snapshots pickup address, discount and both server totals", async () => {
   assert.equal(stored?.discountedTotalRubles, 2880);
 });
 
+test("keeps the standard pickup total when no discount is configured", async () => {
+  const persistence = new MemoryPersistence();
+  const { deliveryAddress: _deliveryAddress, ...pickupRequest } = request;
+  const result = await createOrder(
+    { ...pickupRequest, deliveryMethod: "pickup" },
+    persistence,
+    { ...checkoutSettings, pickupDiscountPercent: null },
+  );
+
+  assert.equal(result.pickupDiscountPercent, 0);
+  assert.equal(result.totalRubles, 3200);
+  assert.equal(result.discountedTotalRubles, 3200);
+});
+
 test("requires a courier address and valid server checkout settings", async () => {
   const persistence = new MemoryPersistence();
   const { deliveryAddress: _deliveryAddress, ...missingAddress } = request;

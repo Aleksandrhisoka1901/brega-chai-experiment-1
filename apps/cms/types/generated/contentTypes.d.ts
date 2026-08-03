@@ -495,15 +495,13 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
         minLength: 1;
       }>;
     pickupDiscountPercent: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
         {
           max: 100;
           min: 0;
         },
         number
-      > &
-      Schema.Attribute.DefaultTo<10>;
+      >;
     publishedAt: Schema.Attribute.DateTime;
     sectionBreadcrumbs: Schema.Attribute.Component<
       "shared.section-breadcrumb",

@@ -38,10 +38,14 @@ export function buildOrderNotification(order: StoredOrder) {
   const addressLabel =
     order.deliveryMethod === "pickup" ? "Адрес самовывоза" : "Адрес доставки";
   const lines = formatLines(order);
-  const discountLine =
-    order.pickupDiscountPercent > 0
-      ? `Скидка за самовывоз: ${order.pickupDiscountPercent}%`
-      : "Скидка за самовывоз: 0%";
+  const hasPickupDiscount = order.pickupDiscountPercent > 0;
+  const totalLines = hasPickupDiscount
+    ? [
+        `Стандартная сумма: ${rubleFormatter.format(order.totalRubles)}`,
+        `Скидка за самовывоз: ${order.pickupDiscountPercent}%`,
+        `Сумма со скидкой: ${rubleFormatter.format(order.discountedTotalRubles)}`,
+      ]
+    : [`Сумма заказа: ${rubleFormatter.format(order.totalRubles)}`];
 
   const text = [
     `Новый заказ №${order.orderNumber}`,
@@ -55,9 +59,7 @@ export function buildOrderNotification(order: StoredOrder) {
     "Состав заказа:",
     ...lines.map((line) => `• ${line}`),
     "",
-    `Стандартная сумма: ${rubleFormatter.format(order.totalRubles)}`,
-    discountLine,
-    `Сумма со скидкой: ${rubleFormatter.format(order.discountedTotalRubles)}`,
+    ...totalLines,
   ].join("\n");
 
   const htmlLines = lines
@@ -73,9 +75,9 @@ export function buildOrderNotification(order: StoredOrder) {
       ? [`<p><strong>Комментарий:</strong> ${escapeHtml(order.comment)}</p>`]
       : []),
     `<h2>Состав заказа</h2><ul>${htmlLines}</ul>`,
-    `<p><strong>Стандартная сумма:</strong> ${escapeHtml(rubleFormatter.format(order.totalRubles))}<br>`,
-    `<strong>${escapeHtml(discountLine)}</strong><br>`,
-    `<strong>Сумма со скидкой:</strong> ${escapeHtml(rubleFormatter.format(order.discountedTotalRubles))}</p>`,
+    hasPickupDiscount
+      ? `<p><strong>Стандартная сумма:</strong> ${escapeHtml(rubleFormatter.format(order.totalRubles))}<br><strong>Скидка за самовывоз: ${order.pickupDiscountPercent}%</strong><br><strong>Сумма со скидкой:</strong> ${escapeHtml(rubleFormatter.format(order.discountedTotalRubles))}</p>`
+      : `<p><strong>Сумма заказа:</strong> ${escapeHtml(rubleFormatter.format(order.totalRubles))}</p>`,
   ].join("");
 
   return {
