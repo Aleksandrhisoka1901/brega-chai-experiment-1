@@ -1,8 +1,10 @@
 # Brega Tea — план разработки
 
-Статус: актуализирован после завершения основного storefront и commerce flow.
-Источники требований: `product-spec.md`, `design-spec.md` и
-`architecture-spec.md`.
+Статус: функциональный MVP завершён; активны только release hardening,
+production-контент и внешний release-readiness.
+Источники требований: `product-spec.md`, `design-spec.md`,
+`architecture-spec.md`, `checkout-update-spec.md`,
+`catalog-content-unification-spec.md` и `order-admin-spec.md`.
 
 ## Правила выполнения
 
@@ -28,13 +30,13 @@
 - backup/restore scripts и rollback application images;
 - дизайн-система, showcase и Lucide icons.
 
-### Content MVP — код готов
+### Content MVP — готово
 
 - CMS client, строгие Zod mappers и controlled unavailable states;
 - CMS-driven главная: hero, «О проекте», «Ритуалы», «Сорта»;
 - конечная карусель без autoplay;
-- каталог `/products`;
-- карточка товара и `/products/[slug]`;
+- каталог `/tovary`;
+- карточки товара `/tovary/[slug]` и набора `/nabory/[slug]`;
 - вертикальные thumbnails на desktop и горизонтальные на mobile;
 - keyboard gallery, quantity, availability и 404;
 - CMS-driven header/footer и navigation labels;
@@ -42,8 +44,8 @@
 - metadata, canonical, sitemap, robots;
 - Organization, WebSite, Product, Offer и Breadcrumb JSON-LD;
 - route/global errors с `noindex`;
-- CMS-driven intro `/products`;
-- безопасный Blocks-совместимый renderer для intro и статьи товара;
+- CMS-driven intro `/tovary`;
+- безопасный Blocks-совместимый renderer для статей товара;
 - H1 из rich content рендерится как H2;
 - подписанный webhook Strapi → Next.js для точечной revalidation;
 - axe и E2E основных страниц.
@@ -53,7 +55,7 @@
 - загрузить реальные юридические PDF и включить ссылки;
 - провести итоговую visual QA с production-контентом.
 
-### Commerce MVP — готов основной сценарий
+### Commerce MVP — готово
 
 - cart domain и versioned `localStorage`;
 - Radix cart drawer;
@@ -78,9 +80,11 @@
   `api::order.order.create`;
 - локальный и обязательный CI flow Next BFF → настоящий Strapi → PostgreSQL;
 - проверка success, insufficient stock, double submit, rollback и фактического
-  изменения stock.
+  изменения stock;
+- отдельный `order-admin` с list/detail, статусами и редактированием адреса,
+  состава заказа и комментария менеджера.
 
-## Ближайшие срезы
+## Завершённые функциональные срезы
 
 ### 0. Checkout, уведомления и ребрендинг по ТЗ 2
 
@@ -156,11 +160,11 @@ Strapi Content Manager доставляет подписанное событи�
 подключён в application bootstrap, а `fetchCms` использует tags и TTL `300s`,
 поэтому webhook даёт немедленное обновление, а TTL страхует потерянную доставку.
 
-### 3. ProductsPage и rich content
+### 3. ProductsPage и rich content товара
 
 Статус: готово.
 
-- перенести intro каталога в `ProductsPage`;
+- перенести простой многострочный intro каталога в `ProductsPage`;
 - добавить Blocks renderer с разрешёнными frontend-компонентами;
 - заменять H1 из rich content на H2;
 - экранировать/исключать исполняемый контент;
@@ -170,11 +174,12 @@ Strapi Content Manager доставляет подписанное событи�
 Критерий завершения: редактор меняет контент без правки frontend, а axe и
 sanitization tests остаются зелёными.
 
-Критерии выполнены: `/products` получает title, Blocks intro, SEO и опциональное
-изображение из `ProductsPage`; статья товара использует общий allowlisted
-renderer. Пустые, неизвестные и исполняемые nodes отбрасываются, небезопасные
-ссылки становятся обычным текстом, а CMS H1 нормализуется в H2. Fixture-тесты
-покрывают rich content, короткие и длинные анонсы и отсутствие изображения.
+Критерии выполнены: `/tovary` получает title, простой многострочный intro и SEO
+из `ProductsPage`; отдельного изображения у страницы каталога нет. Статьи
+товара используют общий allowlisted Blocks renderer. Пустые, неизвестные и
+исполняемые nodes отбрасываются, небезопасные ссылки становятся обычным текстом,
+а CMS H1 нормализуется в H2. Fixture-тесты покрывают rich content и короткие и
+длинные анонсы.
 
 ### 3.1. Несколько статей в нижней зоне товара
 
@@ -293,7 +298,7 @@ functional E2E, а ключевые экраны — Linux visual baselines.
 
 ### 6. Навигация, CMS и системные состояния
 
-Статус: запланировано следующим этапом до общего release hardening.
+Статус: реализовано; этап завершён до общего release hardening.
 
 #### Хлебные крошки
 
@@ -402,8 +407,8 @@ content types, компоненты, поля и редакторские descri
 
 Решение: внутренний Strapi 5 plugin `order-admin` с отдельными list/detail
 страницами. Существующий Content Manager не используется как рабочее место
-менеджера; commerce domain и `transitionStatus` остаются единственным источником
-бизнес-логики.
+менеджера; commerce domain остаётся единственным источником бизнес-логики
+переходов статуса, изменения stock и пересчёта заказа.
 
 План выполнения:
 
@@ -421,38 +426,49 @@ content types, компоненты, поля и редакторские descri
    - возвращать обновлённый detail DTO;
    - покрыть разрешённые, запрещённые и конкурентные переходы, а также
      однократный возврат stock.
-4. **Admin list UI**
+4. **Edit command**
+   - разрешить отдельным RBAC action изменение адреса, состава и комментария
+     менеджера только у заказов `new` и `confirmed`;
+   - пересчитывать суммы и корректировать stock транзакционно;
+   - сохранять snapshot-цены существующих позиций, а новые добавлять по текущей
+     цене;
+   - защищать конкурентное редактирование через `expectedUpdatedAt`.
+5. **Admin list UI**
    - добавить пункт «Заказы», таблицу, status/date filters, поиск, пагинацию и
      empty/error/loading states;
    - использовать Strapi Design System и русские подписи;
    - покрыть component/UI tests основных состояний.
-5. **Admin detail UI**
+6. **Admin detail UI**
    - собрать шапку, контакты, доставку, snapshot позиций, итог, согласия и
      timeline без сырого JSON;
    - скрыть технические поля и запретить create/delete/arbitrary update;
+   - добавить edit dialog с каталогом товаров, количеством, адресом,
+     manager comment и предварительным итогом;
    - добавить confirm dialog каждого перехода и pending/error/success
      состояния;
    - сохранять actor snapshot и показывать автора каждого изменения статуса.
-6. **RBAC, accessibility и regression**
-   - проверить read-only и transition роли;
+7. **RBAC, accessibility и regression**
+   - проверить независимые read, transition и edit роли;
    - пройти keyboard flow, focus return, live announcement и axe;
    - запустить CMS unit/typecheck/build, order integration и admin smoke.
-7. **Документация и handoff**
+8. **Документация и handoff**
    - описать назначение ролей и действия менеджера;
    - обновить architecture/development status;
    - приложить проверяемые acceptance results к MR.
 
-Каждый этап коммитится отдельным логическим срезом. Первый implementation MR не
-включает аналитику, уведомления, delivery/payment integrations или изменение
-order schema за пределами отдельно согласованной миграции.
+Order-admin срез не включает аналитику, delivery/payment integrations или
+повторную отправку уведомлений из плагина. Email о новом заказе реализован
+отдельным checkout-срезом.
 
 Критерии выполнены: локальный Strapi plugin предоставляет защищённые list/detail
-страницы, серверные фильтры и пагинацию, отдельные read/transition permissions,
-безопасные DTO и status actions через существующий transactional service.
-Карточка не допускает произвольного редактирования заказа и не показывает
-технические ключи. Unit suite, server/admin typecheck, production Admin build и
-authenticated Docker smoke зелёные; назначение прав и операционный сценарий
-описаны в `docs/order-admin-operations.md`.
+страницы, серверные фильтры и пагинацию, отдельные read/transition/edit
+permissions, безопасные DTO и команды через существующий transactional service.
+Карточка не допускает произвольного редактирования и не показывает технические
+ключи; узкий edit flow изменяет адрес, позиции и комментарий менеджера с
+автоматическим пересчётом сумм и stock. Unit suite, server/admin typecheck,
+production Admin build и authenticated Docker/Playwright smoke зелёные;
+назначение прав и операционный сценарий описаны в
+`docs/order-admin-operations.md`.
 
 #### Страницы и контракты ошибок
 
@@ -618,9 +634,9 @@ production RUM.
 
 Responsive image audit — реализован:
 
-- hero, about, каталог, preview-карточки, товарная галерея, изображение intro и
-  media внутри Better Blocks получают нативные `srcset`/`sizes` из Strapi
-  formats;
+- hero, preview-карточки, товарная галерея и media внутри Better Blocks получают
+  нативные `srcset`/`sizes` из Strapi formats; у «О проекте» и intro каталога
+  media-полей больше нет;
 - основная товарная галерея использует `large` как базовый источник, thumbnails
   — отдельный `thumbnail`, а карточки — `small`;
 - фактический выбор форматов проверен в HTML локального storefront;
@@ -652,20 +668,28 @@ Responsive image audit — реализован:
 - protected CI variables и Registry access;
 - первый production-тег `release-{semver}`.
 
+### Открытое продуктовое решение
+
+В `ТЗ_сайт_2.docx` запрошен базовый счётчик Яндекс Метрики, тогда как
+`product-spec.md` исключает продуктовую веб-аналитику из MVP. До release нужно
+явно выбрать одно из двух: отдельный небольшой MR с ID счётчика и согласованным
+privacy/consent-контрактом либо документированный перенос после запуска.
+
 ## Срез: сверка с исходным ТЗ
 
 - заменить автоматические home-выборки на упорядоченные relations
-  `featuredRituals`/`featuredProducts`;
+  `featuredNabory`/`featuredTovary`;
 - удалить `active` и `sortOrder`, оставить Draft & Publish единственной
   видимостью;
-- сортировать `/products` группами `stock > 0`/`stock = 0`, внутри по title;
+- сортировать `/tovary` группами `stock > 0`/`stock = 0`, внутри по title;
 - унифицировать media карточек на `4:5` и вывести subtitle секций;
 - подключить упаковку полной строкой, описание бутика, CMS logo и подпись
   «Telegram»;
 - подключить HomePage/global SEO fallback и brandName для Organization/WebSite
   JSON-LD;
 - убрать из требований лимит ритуалов и auto-URL-on-scroll;
-- унификацию терминов/маршрутов и production readiness оставить отложенными.
+- унифицировать термины и маршруты как `tovar | nabor`, `/tovary` и `/nabory`;
+- production readiness оставить отдельным внешним этапом.
 
 ## Текущие обязательные проверки
 
@@ -678,8 +702,9 @@ Responsive image audit — реализован:
 
 ## Следующие merge requests
 
-1. `ui-layout-foundation`, включая storefront и commerce remediation;
-2. `navigation-system-states`;
-3. `release-hardening`;
-4. `production-content`;
-5. `release-{semver}` после появления VPS.
+1. `release-hardening` — production-проверки безопасности, наблюдаемости и
+   эксплуатационных процедур;
+2. `production-content` — финальные тексты, изображения, реквизиты и юридические
+   PDF;
+3. `release-{semver}` — после появления VPS, настройки DNS/TLS/SMTP и зелёного
+   release checklist.

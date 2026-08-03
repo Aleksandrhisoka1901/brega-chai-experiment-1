@@ -1,6 +1,8 @@
 # План обновления дизайн-спецификации Brega Chai
 
-Статус: решения согласованы, готово к выполнению
+Статус: выполнено. Нормативный результат зафиксирован в `design-spec.md`,
+`design-tokens.css`, HTML-референсе и component showcase. Проверка финальных
+изображений и production RUM ведётся отдельно в `development-plan.md`.
 
 Основной документ: [design-spec.md](./design-spec.md)
 

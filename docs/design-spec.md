@@ -957,7 +957,7 @@ Radix отвечает за механику и accessibility, но не опр�
 4. Desktop/mobile hero crops.
 5. Figma-макеты ключевых страниц:
    - главная;
-   - `/products`;
+   - `/tovary`;
    - товар;
    - корзина;
    - checkout;

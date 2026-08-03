@@ -1,11 +1,14 @@
 # Brega Chai — техническая архитектурная спецификация
 
-Статус: утверждено для реализации
+Статус: основная архитектура реализована; production-readiness завершается по
+`development-plan.md`. Поздние уточнения checkout, каталога и управления
+заказами зафиксированы в соответствующих отдельных спецификациях.
 
 Связанный документ: [продуктовая спецификация](./product-spec.md)
 
 Референсная кодовая база: `~/Projects/external-projects/metal-constructions`
 Дата: 27 июля 2026
+Актуализировано: 3 августа 2026
 
 ## 1. Архитектурное решение
 
@@ -307,7 +310,7 @@ server-only secret; подпись, secret и payload не логируются.
   "occurredAt": "2026-07-29T12:00:00.000Z",
   "product": {
     "documentId": "string",
-    "type": "product",
+    "type": "tovar",
     "slug": "sencha"
   }
 }
@@ -318,12 +321,12 @@ server-only secret; подпись, secret и payload не логируются.
 обязательны `documentId`, `type` и `slug`; произвольные tags/paths и лишние поля
 не принимаются.
 
-| Event      | Tags                                     | Paths                                                |
-| ---------- | ---------------------------------------- | ---------------------------------------------------- |
-| `global`   | `global`                                 | публичный layout                                     |
-| `home`     | `home`                                   | `/`                                                  |
-| `products` | `products`                               | `/products`, `/sitemap.xml`                          |
-| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/products`, `/products/{slug}`, `/sitemap.xml` |
+| Event      | Tags                                     | Paths                                                                 |
+| ---------- | ---------------------------------------- | --------------------------------------------------------------------- |
+| `global`   | `global`                                 | публичный layout                                                      |
+| `home`     | `home`                                   | `/`                                                                   |
+| `products` | `products`                               | `/tovary`, `/sitemap.xml`                                             |
+| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/tovary/{slug}` или `/nabory/{slug}`, `/sitemap.xml` |
 
 Next.js хранит bounded in-memory registry `id → body digest`. Точный повтор
 возвращает успех без повторной invalidation, а тот же ID с другим payload
@@ -367,15 +370,17 @@ Slug продукта создаётся один раз до сохранени
 
 - SEO;
 - hero;
-- about;
-- rituals preview settings;
-- products preview settings;
-- две упорядоченные relations `featuredRituals` и `featuredProducts`.
+- текстовый about без media-поля;
+- nabory preview settings;
+- tovary preview settings;
+- две упорядоченные relations `featuredNabory` и `featuredTovary`.
 
 `products-page`:
 
 - SEO;
-- intro.
+- title, eyebrow и простой многострочный intro;
+- empty-state тексты;
+- media-поля отсутствуют.
 
 ### 10.2. Collection types
 
@@ -383,8 +388,10 @@ Slug продукта создаётся один раз до сохранени
 
 - поля из продуктовой спецификации;
 - `documentId` используется как внутренний стабильный ID;
-- уникальный неизменяемый `slug` формата `{transliterated-title}-{6-char-random-hex}`;
-- enum `type`;
+- `title` — техническое название, `displayName` — отображаемое;
+- уникальный неизменяемый `slug` строится из транслитерации `displayName`, а
+  коллизии получают последовательные суффиксы `-2`, `-3`, ...;
+- enum `type: nabor | tovar`;
 - цена — обязательный integer в рублях, `> 0`;
 - валюта — ISO 4217;
 - `stock` — integer `≥ 0`, доступность вычисляется как `stock > 0`;
@@ -396,7 +403,9 @@ Slug продукта создаётся один раз до сохранени
 
 - закрыт от Public role;
 - создаётся только доверенным server-to-server запросом;
-- содержит immutable line snapshots;
+- при создании содержит server-owned line snapshots; дальнейшее изменение
+  адреса, состава и manager comment возможно только через узкую транзакционную
+  команду `order-admin` с пересчётом сумм и stock;
 - хранит бизнес-статус в `orderStatus`, поскольку `status` зарезервирован
   Strapi Document Service для draft/published;
 - status изменяется по разрешённым переходам;
@@ -421,7 +430,7 @@ Slug продукта создаётся один раз до сохранени
 Organization/WebSite JSON-LD получают название из `GlobalSettings.brandName`.
 
 Главная запрашивает товары через relations `HomePage` и сохраняет их порядок.
-`/products` использует две published-only выборки (`stock > 0` и `stock = 0`),
+`/tovary` использует две published-only выборки (`stock > 0` и `stock = 0`),
 каждую с `title:asc`, после чего объединяет доступную группу с недоступной.
 
 ### 10.4. Lifecycle и policy
@@ -430,8 +439,8 @@ Strapi lifecycle не должен быть единственным место�
 
 В lifecycle допустимы:
 
-- генерация slug в `beforeCreate` из транслитерированного title и случайного шестизначного hex-суффикса;
-- повторная генерация при коллизии unique constraint;
+- генерация slug до создания из транслитерированного `displayName`;
+- разрешение коллизий последовательными числовыми суффиксами;
 - запрет ручного изменения slug после создания;
 - простые derived поля;
 - запрет очевидно невалидной публикации.
@@ -507,7 +516,8 @@ Radix Dialog является основой drawer-поведения:
 5. внутри той же transaction читает и блокирует строки продуктов по стабильным ID;
 6. проверяет publication/availability и `1 ≤ quantity ≤ min(5, stock)`;
 7. берёт цены только из заблокированных серверных записей;
-8. атомарно списывает остаток, создаёт immutable order snapshot и сохраняет заказ;
+8. атомарно списывает остаток, создаёт исходный server-owned order snapshot и
+   сохраняет заказ;
 9. фиксирует transaction и возвращает подтверждение заказа-заявки.
 
 Публичный результат содержит внутренний `orderId` для системной
@@ -519,7 +529,9 @@ Radix Dialog является основой drawer-поведения:
 Next.js не выполняет отдельное предварительное списание stock или создание заказа. Ошибка до commit откатывает и order, и stock.
 
 Корзина не резервирует stock. Переход заказа в `cancelled` один раз возвращает списанное количество; операция защищена от повторного применения.
-Внешние уведомления о новом заказе в MVP не отправляются: операционная работа ведётся в Strapi.
+После первого успешного создания CMS отправляет одно SMTP-уведомление на
+служебный `orderNotificationEmail`; ошибка транспорта не откатывает заказ и не
+попадает в публичный ответ.
 
 ### 12.2. Идемпотентность
 
@@ -575,7 +587,7 @@ Payment adapter и webhook route не создаются до отдельног
 ### 14.1. Metadata
 
 - root metadata defaults из `global-setting`;
-- `generateMetadata` на `/products` и product routes;
+- `generateMetadata` на `/tovary` и routes товаров/наборов;
 - canonical формируется одним helper из нормализованного base URL;
 - title/description имеют fallback;
 - share image преобразуется CMS media mapper;
@@ -586,9 +598,9 @@ Payment adapter и webhook route не создаются до отдельног
 Next.js `sitemap.ts`:
 
 - `/`;
-- `/products`;
-- все опубликованные `/products/[slug]`;
-- все опубликованные `/rituals/[slug]`;
+- `/tovary`;
+- все опубликованные `/tovary/[slug]`;
+- все опубликованные `/nabory/[slug]`;
 - `lastModified` из Strapi;
 - опциональные product images.
 

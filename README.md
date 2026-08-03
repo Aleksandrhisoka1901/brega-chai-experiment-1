@@ -5,8 +5,11 @@
 
 ## Статус
 
-Спецификации утверждены для реализации. Технический bootstrap завершён:
-монорепозиторий, локальная инфраструктура, CI и базовые приложения готовы.
+Функциональный MVP реализован: storefront, CMS-driven контент, каталог,
+корзина, checkout, email-уведомление о заказе и рабочее место менеджера в
+Strapi Admin покрыты автоматическими проверками. Текущий этап —
+`release-hardening` и подготовка production-контента; фактический выпуск ждёт
+VPS, DNS/TLS и production-настройки.
 
 ## Структура
 
@@ -78,6 +81,10 @@ yarn build
 - [Продуктовая спецификация](docs/product-spec.md)
 - [Архитектурная спецификация](docs/architecture-spec.md)
 - [Дизайн-спецификация](docs/design-spec.md)
+- [Унификация каталога и URL](docs/catalog-content-unification-spec.md)
+- [Checkout и уведомления](docs/checkout-update-spec.md)
+- [Управление заказами](docs/order-admin-spec.md)
+- [Операционная инструкция менеджера](docs/order-admin-operations.md)
 - [Design reference](docs/design-reference.html)
 - [Component showcase](docs/component-showcase.html)
 - [Architecture Decision Records](docs/adr/)
