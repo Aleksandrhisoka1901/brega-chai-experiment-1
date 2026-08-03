@@ -6,27 +6,59 @@ const port = Number(process.env.CMS_FIXTURE_PORT ?? 14338);
 let orderRequests = 0;
 
 function product(slug, stock) {
+  const title = stock > 0 ? "Да Хун Пао" : "Шу Пуэр";
   return {
     documentId: `document-${slug}`,
     slug,
-    type: "product",
-    title: stock > 0 ? "Да Хун Пао" : "Шу Пуэр",
-    originalTitle: stock > 0 ? "大红袍" : null,
-    packageLabel: "50 г",
+    type: "tovar",
+    breadcrumbLabel: null,
+    categoryLabel: "сорт чая",
+    title: `Сорт: ${title}`,
+    displayName: title,
+    originalTitle: stock > 0 ? "Большой красный халат" : null,
+    packageLabel: "Пакетик (50 г)",
     price: stock > 0 ? 1600 : 1200,
     currency: "RUB",
     stock,
     cardExcerpt: "Минеральный утёсный улун.",
     story: "Чай для долгого тихого вечера.",
-    articleContent: [
+    seo: {
+      title: `${title} — сорт чая Brega Tea`,
+      description: "Минеральный утёсный улун.",
+    },
+    articles: [
       {
-        type: "heading",
-        level: 1,
-        children: [{ type: "text", text: "Как раскрывается чай" }],
+        content: [
+          {
+            type: "heading",
+            level: 1,
+            children: [{ type: "text", text: "Как раскрывается чай" }],
+          },
+          {
+            type: "paragraph",
+            children: [
+              { type: "text", text: "Заваривайте короткими проливами." },
+            ],
+          },
+        ],
       },
       {
-        type: "paragraph",
-        children: [{ type: "text", text: "Заваривайте короткими проливами." }],
+        content: [
+          {
+            type: "heading",
+            level: 2,
+            children: [{ type: "text", text: "Хранение чая" }],
+          },
+          {
+            type: "paragraph",
+            children: [
+              {
+                type: "text",
+                text: "Храните чай вдали от света и сильных запахов.",
+              },
+            ],
+          },
+        ],
       },
     ],
     mainImage: {
@@ -64,6 +96,11 @@ const cms = createServer((request, response) => {
   const type = url.searchParams.get("filters[type][$eq]");
   const pageSize = url.searchParams.get("pagination[pageSize]");
 
+  if (url.pathname === "/api/health/readiness") {
+    response.writeHead(204).end();
+    return;
+  }
+
   if (url.pathname === "/__test/orders-count") {
     if (request.method === "DELETE") orderRequests = 0;
     response.writeHead(200, { "Content-Type": "application/json" });
@@ -98,23 +135,32 @@ const cms = createServer((request, response) => {
           productId: item.productId,
           slug: "published-product",
           title: "Да Хун Пао",
-          packageLabel: "50 г",
+          packageLabel: "Пакетик (50 г)",
           unitPriceRubles: 1600,
           quantity: item.quantity,
           lineTotalRubles: 1600 * item.quantity,
           currency: "RUB",
         }));
+        const totalRubles = lines.reduce(
+          (total, line) => total + line.lineTotalRubles,
+          0,
+        );
+        const pickupDiscountPercent =
+          order.deliveryMethod === "pickup" ? 10 : 0;
         response.writeHead(201, { "Content-Type": "application/json" });
         response.end(
           JSON.stringify({
             data: {
-              orderId: "E2E-0001",
+              orderId: "order-e2e-1",
+              orderNumber: "2607-0001",
               status: "new",
+              deliveryMethod: order.deliveryMethod,
+              pickupDiscountPercent,
               currency: "RUB",
               lines,
-              totalRubles: lines.reduce(
-                (total, line) => total + line.lineTotalRubles,
-                0,
+              totalRubles,
+              discountedTotalRubles: Math.round(
+                (totalRubles * (100 - pickupDiscountPercent)) / 100,
               ),
             },
           }),
@@ -133,21 +179,57 @@ const cms = createServer((request, response) => {
       JSON.stringify({
         data: {
           hero: {
-            title: "Чай как ежедневный ритуал",
-            text: "Спокойная чайная практика.",
-            layout: "100/0",
+            eyebrow: "Чай как личная практика",
+            title: "У времени есть вкус.",
+            text: "Небольшая коллекция чая и предметов для тех моментов, когда спешить больше некуда.",
+            layout: "40/60",
+            backgroundColor: null,
+            textColor: null,
+            cta: {
+              label: "К ритуалам",
+              url: "#nabory",
+            },
+            image: {
+              alt: "Чайная посуда",
+              image: {
+                url: png,
+                width: 800,
+                height: 1000,
+              },
+            },
           },
           about: {
-            text: [
-              {
-                type: "paragraph",
-                children: [{ type: "text", text: "Чай без спешки." }],
-              },
-            ],
+            eyebrow: "Глава 01 · О проекте",
+            title: "Вещи обретают смысл, когда становятся частью привычки.",
+            textBlock1:
+              "Мы собираем чай, посуду и простые инструкции в цельные сценарии — для утра, разговора, одиночества или подарка.",
+            textBlock2:
+              "Ассортимент короткий намеренно. Здесь не нужно сравнивать десятки почти одинаковых позиций.",
             spacing: "M",
           },
-          ritualsPreview: { title: "Ритуалы" },
-          productsPreview: { title: "Сорта" },
+          naboryPreview: {
+            eyebrow: "Глава 02",
+            title: "Ритуалы",
+            subtitle: "Готовые сценарии для чайной паузы.",
+          },
+          tovaryPreview: {
+            eyebrow: "Глава 03",
+            title: "Сорта",
+            subtitle: "Чай для знакомства и ежедневных церемоний.",
+            linkLabel: "Все сорта",
+          },
+          featuredNabory: [
+            { ...product("ritual-one", 12), type: "nabor" },
+            { ...product("ritual-two", 12), type: "nabor" },
+            { ...product("ritual-three", 12), type: "nabor" },
+            { ...product("ritual-four", 12), type: "nabor" },
+          ],
+          featuredTovary: [
+            product("published-product", 12),
+            product("green-tea", 0),
+            product("aged-tea", 12),
+            product("evening-tea", 12),
+          ],
         },
       }),
     );
@@ -159,16 +241,44 @@ const cms = createServer((request, response) => {
     response.end(
       JSON.stringify({
         data: {
-          brandName: "Brega Chai",
+          brandName: "Brega Tea",
+          pickupAddress:
+            "г. Москва, ул. Чайная, д. 1. Ежедневно с 10:00 до 22:00.",
+          pickupDiscountPercent: 10,
+          courierDeliveryNote:
+            "Стоимость рассчитывается в день отправки, до 1000 руб.",
           email: "hello@brega.test",
-          telegramUrl: "https://t.me/brega",
+          telegramUrl: "https://t.me/brega_chai",
           navigation: {
             about: "О проекте",
-            rituals: "Ритуалы",
-            products: "Сорта",
+            nabory: "Ритуалы",
+            tovary: "Сорта",
             cart: "Корзина",
           },
-          legalDetails: "ИП Иванов\nИНН 123456789012",
+          sectionBreadcrumbs: [
+            { route: "nabory", label: "Ритуалы" },
+            { route: "tovary", label: "Сорта" },
+          ],
+          storefrontTexts: {
+            imagePlaceholder: "Изображение готовится",
+            outOfStock: "Нет в наличии",
+          },
+          legalDetails: "ИП Иванов Иван. ИНН 123456789",
+          defaultProductStory: [
+            {
+              type: "paragraph",
+              children: [
+                {
+                  type: "text",
+                  text: "Каждый чай отобран для спокойного домашнего ритуала.",
+                },
+              ],
+            },
+          ],
+          defaultSeo: {
+            title: "Brega Tea",
+            description: "Чай и ритуалы Brega Tea",
+          },
         },
       }),
     );
@@ -180,21 +290,14 @@ const cms = createServer((request, response) => {
     response.end(
       JSON.stringify({
         data: {
-          title: "Чай, выбранный для внимания",
-          intro: [
-            {
-              type: "paragraph",
-              children: [
-                {
-                  type: "text",
-                  text: "Небольшая коллекция без спешки и рейтингов.",
-                },
-              ],
-            },
-          ],
+          eyebrow: "Глава 03",
+          title: "Сорта",
+          emptyStateText: "Сорта скоро появятся.",
+          emptyStateLinkLabel: "Вернуться на главную",
+          intro: "Небольшая коллекция без спешки и рейтингов.",
           seo: {
-            title: "Сорта чая — Brega Chai",
-            description: "Все сорта чая Brega Chai.",
+            title: "Сорта чая — Brega Tea",
+            description: "Все сорта чая Brega Tea.",
           },
         },
       }),
@@ -202,15 +305,88 @@ const cms = createServer((request, response) => {
     return;
   }
 
-  if (!slug && type === "ritual") {
+  if (!slug && type === "nabor") {
     response.writeHead(200, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({ data: [] }));
+    response.end(
+      JSON.stringify({
+        data: [
+          { ...product("ritual-one", 12), type: "nabor" },
+          { ...product("ritual-two", 12), type: "nabor" },
+          { ...product("ritual-three", 12), type: "nabor" },
+          { ...product("ritual-four", 12), type: "nabor" },
+        ],
+      }),
+    );
     return;
   }
 
-  if (!slug && type === "product" && pageSize === "4") {
+  if (!slug && type === "tovar" && pageSize === "4") {
     response.writeHead(200, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({ data: [product("published-product", 12)] }));
+    response.end(
+      JSON.stringify({
+        data: [
+          product("published-product", 12),
+          product("green-tea", 0),
+          product("aged-tea", 12),
+          product("evening-tea", 12),
+        ],
+      }),
+    );
+    return;
+  }
+
+  if (!slug && type === "tovar") {
+    const products = [
+      product("published-product", 12),
+      product("green-tea", 0),
+      product("aged-tea", 12),
+      product("evening-tea", 12),
+      product("white-tea", 12),
+      product("red-tea", 12),
+    ];
+    const availableOnly = url.searchParams.has("filters[stock][$gt]");
+    const unavailableOnly = url.searchParams.has("filters[stock][$eq]");
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(
+      JSON.stringify({
+        data: products.filter((entry) =>
+          availableOnly
+            ? entry.stock > 0
+            : unavailableOnly
+              ? entry.stock === 0
+              : true,
+        ),
+      }),
+    );
+    return;
+  }
+
+  if (slug && type === "nabor" && ["ritual-one", "ritual-two"].includes(slug)) {
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(
+      JSON.stringify({
+        data: [
+          {
+            ...product(slug, 6),
+            type: "nabor",
+            categoryLabel: "чайный ритуал",
+            title: `Ритуал: ${
+              slug === "ritual-one" ? "Утро без слов" : "После дождя"
+            }`,
+            displayName:
+              slug === "ritual-one" ? "Утро без слов" : "После дождя",
+            originalTitle: null,
+            packageLabel: "Набор",
+            seo: {
+              title: `${
+                slug === "ritual-one" ? "Утро без слов" : "После дождя"
+              } — чайный ритуал Brega Tea`,
+              description: "Чайный сценарий.",
+            },
+          },
+        ],
+      }),
+    );
     return;
   }
 

@@ -26,8 +26,8 @@ const validCart: Cart = {
   items: [
     {
       productId: "product-1",
-      slug: "tea-a1b2c3",
-      type: "product",
+      slug: "tea",
+      type: "tovar",
       title: "Tea",
       packageLabel: "50 г",
       unitPriceSnapshot: 1200,

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "products-page",
     "pluralName": "products-pages",
-    "displayName": "Products page"
+    "displayName": "Страница сортов",
+    "description": "Вступление и SEO каталога сортов"
   },
   "options": {
     "draftAndPublish": true
@@ -14,23 +15,33 @@
       "type": "component",
       "component": "shared.seo",
       "repeatable": false,
-      "required": true
+      "required": false
     },
     "title": {
       "type": "string",
       "required": true,
       "minLength": 1
     },
-    "intro": {
-      "type": "blocks",
+    "eyebrow": {
+      "type": "string",
       "required": true,
-      "description": "Keep the introduction concise, using short paragraphs and only the headings, lists, links, or images that help readers scan it. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
+      "minLength": 1
     },
-    "image": {
-      "type": "component",
-      "component": "shared.image-with-alt",
-      "repeatable": false,
-      "required": false
+    "emptyStateText": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "emptyStateLinkLabel": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "intro": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "description": "Обычный длинный текст без форматирования. Переносы строк сохраняются на витрине."
     }
   }
 }

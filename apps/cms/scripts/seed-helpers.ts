@@ -5,13 +5,20 @@ export interface SeedRecord {
 export interface ExistingSeedRecord {
   key: string;
   documentId: string;
+  slug?: string;
 }
 
 export interface SeedOperation<T extends SeedRecord> {
   type: "create" | "update";
   record: T;
   documentId?: string;
+  slug?: string;
 }
+
+type SeedArticleImage = {
+  type: "seed-image";
+  asset: string;
+};
 
 const ALLOWED_DATABASE_HOSTS = new Set([
   "localhost",
@@ -61,7 +68,75 @@ export function planSeed<T extends SeedRecord>(
     const match = existingByKey.get(record.key);
 
     return match
-      ? { type: "update", record, documentId: match.documentId }
+      ? {
+          type: "update",
+          record,
+          documentId: match.documentId,
+          ...(match.slug ? { slug: match.slug } : {}),
+        }
       : { type: "create", record };
+  });
+}
+
+export function resolveSeedArticleImages(
+  content: readonly unknown[],
+  images: ReadonlyMap<string, unknown>,
+): unknown[] {
+  return content.map((block) => {
+    if (
+      typeof block !== "object" ||
+      block === null ||
+      !("type" in block) ||
+      block.type !== "seed-image"
+    ) {
+      return block;
+    }
+
+    const reference = block as SeedArticleImage;
+    const image = images.get(reference.asset);
+    if (!image) {
+      throw new Error(
+        `Seed article image "${reference.asset}" was not uploaded`,
+      );
+    }
+
+    return {
+      type: "image",
+      image,
+      children: [{ type: "text", text: "" }],
+    };
+  });
+}
+
+export function alignBetterBlocksImages(
+  content: readonly unknown[],
+  imageAlign: "left" | "center" | "right",
+): unknown[] {
+  return content.map((block) => {
+    if (
+      typeof block !== "object" ||
+      block === null ||
+      !("type" in block) ||
+      block.type !== "image"
+    ) {
+      return block;
+    }
+
+    const image =
+      "image" in block &&
+      typeof block.image === "object" &&
+      block.image !== null
+        ? block.image
+        : null;
+    const caption =
+      image && "caption" in image && typeof image.caption === "string"
+        ? image.caption
+        : undefined;
+
+    return {
+      ...block,
+      imageAlign,
+      ...(caption ? { caption } : {}),
+    };
   });
 }

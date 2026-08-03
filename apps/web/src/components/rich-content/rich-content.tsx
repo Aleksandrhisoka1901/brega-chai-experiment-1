@@ -1,10 +1,24 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
+
+import { ResponsiveImage } from "@/components/responsive-image";
+import {
+  bindShortRussianWords,
+  bindTrailingShortRussianWord,
+} from "@/lib/typography";
 
 import type { RichContentBlock, RichInline, RichText } from "./model";
 
-function renderText(node: RichText, key: number): ReactNode {
-  let content: ReactNode = node.text;
+function renderText(
+  node: RichText,
+  key: number,
+  hasFollowingInline: boolean,
+): ReactNode {
+  let content: ReactNode = node.code
+    ? node.text
+    : bindShortRussianWords(node.text);
+  if (!node.code && hasFollowingInline) {
+    content = bindTrailingShortRussianWord(String(content));
+  }
   if (node.code) content = <code>{content}</code>;
   if (node.bold) content = <strong>{content}</strong>;
   if (node.italic) content = <em>{content}</em>;
@@ -15,7 +29,9 @@ function renderText(node: RichText, key: number): ReactNode {
 
 function renderInlines(nodes: RichInline[]): ReactNode[] {
   return nodes.map((node, index) => {
-    if (node.type === "text") return renderText(node, index);
+    if (node.type === "text") {
+      return renderText(node, index, index < nodes.length - 1);
+    }
 
     return (
       <a
@@ -57,16 +73,49 @@ function renderBlock(block: RichContentBlock, key: number): ReactNode {
       );
     case "image":
       return (
-        <figure key={key}>
-          <Image
+        <figure data-align={block.align} key={key}>
+          <ResponsiveImage
             alt={block.alt}
             height={block.height}
+            sizes="(max-width: 767px) 100vw, 72vw"
+            sources={block.sources}
             src={block.url}
-            unoptimized
             width={block.width}
           />
-          {block.caption ? <figcaption>{block.caption}</figcaption> : null}
+          {block.caption ? (
+            <figcaption>{bindShortRussianWords(block.caption)}</figcaption>
+          ) : null}
         </figure>
+      );
+    case "table":
+      return (
+        <div
+          aria-label="Таблица в статье"
+          data-rich-table-scroll
+          key={key}
+          role="region"
+          tabIndex={0}
+        >
+          <table>
+            <tbody>
+              {block.rows.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.cells.map((cell, cellIndex) => {
+                    const Cell = cell.header ? "th" : "td";
+                    return (
+                      <Cell
+                        key={cellIndex}
+                        {...(cell.header ? { scope: "col" as const } : {})}
+                      >
+                        {renderInlines(cell.children)}
+                      </Cell>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       );
     case "divider":
       return <hr key={key} />;

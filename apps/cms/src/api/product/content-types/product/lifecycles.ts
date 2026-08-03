@@ -1,11 +1,14 @@
-import { transliterate } from "transliteration";
-
-import { assertSlugImmutable, generateUniqueSlug } from "./slug.js";
+import {
+  assertSlugImmutable,
+  generateUniqueSlug,
+  shouldGenerateSlug,
+  transliterateCatalogTitle,
+} from "./slug.js";
 
 interface ProductEvent {
   params: {
     data: {
-      title?: string;
+      displayName?: string;
       slug?: string;
     };
     where?: Record<string, unknown>;
@@ -16,15 +19,15 @@ const productQuery = () => strapi.db.query("api::product.product");
 
 export default {
   async beforeCreate(event: ProductEvent) {
-    const title = event.params.data.title;
+    const title = event.params.data.displayName;
 
-    if (!title) {
+    if (!title || !shouldGenerateSlug(event.params.data.slug)) {
       return;
     }
 
     event.params.data.slug = await generateUniqueSlug({
       title,
-      transliterate,
+      transliterate: transliterateCatalogTitle,
       exists: async (slug) =>
         Boolean(
           await productQuery().findOne({ where: { slug }, select: ["id"] }),

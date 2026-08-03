@@ -17,7 +17,7 @@ const cartItemSchema = z
   .object({
     productId: z.string().min(1),
     slug: z.string().min(1),
-    type: z.enum(["ritual", "product"]),
+    type: z.enum(["nabor", "tovar"]),
     title: z.string().min(1),
     packageLabel: z.string().min(1),
     unitPriceSnapshot: z.number().int().positive(),

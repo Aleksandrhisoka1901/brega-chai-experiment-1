@@ -1,12 +1,16 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { Minus, Plus, ShoppingBag, X } from "lucide-react";
+import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import type { CheckoutSettings } from "../../../server/cms/global-mapper";
 
-import { CheckoutPanel } from "../../checkout/checkout-panel";
+import { IconButton } from "../../../components/icon-button";
+import { ScrollArea } from "../../../components/scroll-area";
+import { bindShortRussianWords } from "../../../lib/typography";
 import { getCartQuantity, getCartSubtotal } from "../model";
 import { cartStore } from "../use-cart";
 import { useCart } from "../use-cart";
@@ -28,7 +32,26 @@ const availabilityText = {
   unavailable: "Товар закончился. Удалите позицию вручную.",
 } as const;
 
-export function CartDrawer() {
+const CheckoutPanel = dynamic(
+  () =>
+    import("../../checkout/checkout-panel").then(
+      (module) => module.CheckoutPanel,
+    ),
+  {
+    loading: () => (
+      <p className={styles.checkoutLoading} role="status">
+        Загрузка формы…
+      </p>
+    ),
+    ssr: false,
+  },
+);
+
+export function CartDrawer({
+  checkoutSettings,
+}: {
+  checkoutSettings: CheckoutSettings;
+}) {
   const cart = useCart();
   const drawer = useCartDrawer();
   const totalQuantity = getCartQuantity(cart);
@@ -47,6 +70,7 @@ export function CartDrawer() {
         <Dialog.Content
           aria-describedby={undefined}
           className={styles.drawer}
+          data-cart-drawer
           onCloseAutoFocus={(event) => {
             const trigger = cartDrawerStore.getTrigger();
             if (trigger) {
@@ -58,7 +82,7 @@ export function CartDrawer() {
           <header className={styles.header}>
             <div>
               <p className={styles.eyebrow}>
-                {view === "cart" ? "Ваш выбор" : "Заказ-заявка"}
+                {view === "cart" ? "Ваш выбор" : "Новый заказ"}
               </p>
               <Dialog.Title className={styles.title}>
                 {view === "cart" ? "Корзина" : "Оформление"}
@@ -73,130 +97,141 @@ export function CartDrawer() {
               </span>
             ) : null}
             <Dialog.Close asChild>
-              <button
-                aria-label="Закрыть корзину"
-                className={styles.close}
-                type="button"
-              >
+              <IconButton aria-label="Закрыть корзину" size="l">
                 <X aria-hidden="true" />
-              </button>
+              </IconButton>
             </Dialog.Close>
           </header>
 
           {view === "checkout" ? (
-            <CheckoutPanel cart={cart} onBack={() => setView("cart")} />
+            <CheckoutPanel
+              cart={cart}
+              checkoutSettings={checkoutSettings}
+              onBack={() => setView("cart")}
+            />
           ) : cart.items.length === 0 ? (
             <div className={styles.empty}>
               <ShoppingBag aria-hidden="true" />
-              <p>Здесь пока ничего нет.</p>
+              <p>{bindShortRussianWords("Здесь пока ничего нет.")}</p>
               <span>
-                Начните с готового ритуала или выберите отдельный сорт.
+                {bindShortRussianWords(
+                  "Начните с готового ритуала или выберите отдельный сорт.",
+                )}
               </span>
               <nav aria-label="Перейти к каталогу">
                 <Dialog.Close asChild>
-                  <Link href="/#rituals">К ритуалам</Link>
+                  <Link href="/#nabory">К ритуалам</Link>
                 </Dialog.Close>
                 <Dialog.Close asChild>
-                  <Link href="/products">К сортам</Link>
+                  <Link href="/tovary">К сортам</Link>
                 </Dialog.Close>
               </nav>
             </div>
           ) : (
             <>
-              <ul className={styles.items}>
-                {cart.items.map((item) => {
-                  const currentStock = drawer.stockByProductId[item.productId];
-                  const availability = getCartItemAvailability(
-                    item,
-                    currentStock,
-                  );
-                  const controls = getQuantityControlState(item, currentStock);
+              <ScrollArea className={styles.itemsViewport}>
+                <ul className={styles.items}>
+                  {cart.items.map((item) => {
+                    const currentStock =
+                      drawer.stockByProductId[item.productId];
+                    const availability = getCartItemAvailability(
+                      item,
+                      currentStock,
+                    );
+                    const controls = getQuantityControlState(
+                      item,
+                      currentStock,
+                    );
 
-                  return (
-                    <li className={styles.item} key={item.productId}>
-                      <div className={styles.image}>
-                        <Image
-                          alt={item.image.alt}
-                          fill
-                          sizes="80px"
-                          src={item.image.url}
-                          unoptimized
-                        />
-                      </div>
-                      <div className={styles.itemBody}>
-                        <div className={styles.namePrice}>
-                          <div>
-                            <Link
-                              href={`/${item.type === "ritual" ? "rituals" : "products"}/${item.slug}`}
-                              onClick={cartDrawerStore.close}
-                            >
-                              {item.title}
-                            </Link>
-                            <p>{item.packageLabel}</p>
-                          </div>
-                          <strong>
-                            {priceFormatter.format(
-                              item.unitPriceSnapshot * item.quantity,
-                            )}
-                          </strong>
+                    return (
+                      <li className={styles.item} key={item.productId}>
+                        <div className={styles.image}>
+                          <Image
+                            alt={item.image.alt}
+                            fill
+                            sizes="80px"
+                            src={item.image.url}
+                            unoptimized
+                          />
                         </div>
-
-                        {availability === "insufficient" ||
-                        availability === "unavailable" ? (
-                          <p className={styles.warning} role="status">
-                            {availabilityText[availability]}
-                          </p>
-                        ) : null}
-
-                        <div className={styles.actions}>
-                          <div
-                            aria-label={`Количество ${item.title}`}
-                            className={styles.quantity}
-                            role="group"
-                          >
-                            <button
-                              aria-label={`Уменьшить количество ${item.title}`}
-                              disabled={!controls.canDecrease}
-                              onClick={() =>
-                                cartStore.updateQuantity(
-                                  item.productId,
-                                  item.quantity - 1,
-                                  currentStock ?? 5,
-                                )
-                              }
-                              type="button"
-                            >
-                              <Minus aria-hidden="true" />
-                            </button>
-                            <output aria-live="polite">{item.quantity}</output>
-                            <button
-                              aria-label={`Увеличить количество ${item.title}`}
-                              disabled={!controls.canIncrease}
-                              onClick={() =>
-                                cartStore.updateQuantity(
-                                  item.productId,
-                                  item.quantity + 1,
-                                  currentStock ?? 5,
-                                )
-                              }
-                              type="button"
-                            >
-                              <Plus aria-hidden="true" />
-                            </button>
+                        <div className={styles.itemBody}>
+                          <div className={styles.namePrice}>
+                            <div>
+                              <Link
+                                href={`/${item.type === "nabor" ? "nabory" : "tovary"}/${item.slug}`}
+                                onClick={cartDrawerStore.close}
+                              >
+                                {bindShortRussianWords(item.title)}
+                              </Link>
+                              <p>{bindShortRussianWords(item.packageLabel)}</p>
+                            </div>
+                            <strong>
+                              {priceFormatter.format(
+                                item.unitPriceSnapshot * item.quantity,
+                              )}
+                            </strong>
                           </div>
-                          <button
-                            className={styles.remove}
-                            onClick={() => cartStore.remove(item.productId)}
-                            type="button"
-                          >
-                            Удалить
-                          </button>
+
+                          {availability === "insufficient" ||
+                          availability === "unavailable" ? (
+                            <p className={styles.warning} role="status">
+                              {bindShortRussianWords(
+                                availabilityText[availability],
+                              )}
+                            </p>
+                          ) : null}
+
+                          <div className={styles.actions}>
+                            <div
+                              aria-label={`Количество ${item.title}`}
+                              className={styles.quantity}
+                              role="group"
+                            >
+                              <button
+                                aria-label={`Уменьшить количество ${item.title}`}
+                                disabled={!controls.canDecrease}
+                                onClick={() =>
+                                  cartStore.updateQuantity(
+                                    item.productId,
+                                    item.quantity - 1,
+                                    currentStock ?? 5,
+                                  )
+                                }
+                                type="button"
+                              >
+                                <Minus aria-hidden="true" />
+                              </button>
+                              <output aria-live="polite">
+                                {item.quantity}
+                              </output>
+                              <button
+                                aria-label={`Увеличить количество ${item.title}`}
+                                disabled={!controls.canIncrease}
+                                onClick={() =>
+                                  cartStore.updateQuantity(
+                                    item.productId,
+                                    item.quantity + 1,
+                                    currentStock ?? 5,
+                                  )
+                                }
+                                type="button"
+                              >
+                                <Plus aria-hidden="true" />
+                              </button>
+                            </div>
+                            <IconButton
+                              aria-label={`Удалить ${item.title} из корзины`}
+                              onClick={() => cartStore.remove(item.productId)}
+                            >
+                              <Trash2 aria-hidden="true" />
+                            </IconButton>
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </ScrollArea>
 
               <footer className={styles.summary}>
                 <div>
@@ -205,7 +240,11 @@ export function CartDrawer() {
                     {priceFormatter.format(getCartSubtotal(cart))}
                   </strong>
                 </div>
-                <p>Стоимость доставки будет рассчитана после заявки.</p>
+                <p>
+                  {bindShortRussianWords(
+                    "Стоимость доставки будет рассчитана после оформления.",
+                  )}
+                </p>
                 <button
                   className={styles.checkout}
                   disabled={cart.items.some((item) => {

@@ -8,6 +8,7 @@ const secret = "test-secret-with-enough-entropy";
 const order = {
   idempotencyKey: "550e8400-e29b-41d4-a716-446655440000",
   customer: { name: "Анна", phone: "+79991234567" },
+  deliveryMethod: "courier",
   deliveryAddress: "Москва, ул. Чайная, д. 1",
   consents: {
     personalData: { accepted: true, documentVersion: "2026-07-28" },
@@ -36,7 +37,10 @@ test("forwards strict order with scoped token and idempotency header", async () 
           {
             data: {
               orderId: "order-1",
+              orderNumber: "2607-0001",
               status: "new",
+              deliveryMethod: "courier",
+              pickupDiscountPercent: 0,
               currency: "RUB",
               lines: [
                 {
@@ -51,6 +55,7 @@ test("forwards strict order with scoped token and idempotency header", async () 
                 },
               ],
               totalRubles: 2400,
+              discountedTotalRubles: 2400,
             },
           },
           { status: 201 },

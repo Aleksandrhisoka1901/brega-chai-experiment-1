@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_images_with_alt",
   "info": {
-    "displayName": "Image with alt",
-    "description": "Upload an image and add a concise, meaningful alt description. Recommended image sizes are documented for editors; only file weight is enforced."
+    "displayName": "Изображение с alt",
+    "description": "Загрузите изображение и добавьте короткий содержательный alt. Размеры рекомендательные, ограничивается только вес файла."
   },
   "attributes": {
     "image": {

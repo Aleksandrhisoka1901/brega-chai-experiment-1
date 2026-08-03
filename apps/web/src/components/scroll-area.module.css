@@ -1,0 +1,5 @@
+.root {
+  overflow: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}

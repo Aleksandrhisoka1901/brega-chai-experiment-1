@@ -3,28 +3,19 @@ import test from "node:test";
 
 import { mapSitemapProductsPayload } from "./sitemap-mapper.ts";
 
-test("maps only active published products and rituals", () => {
+test("maps only published tovary and nabory", () => {
   const entries = mapSitemapProductsPayload({
     data: [
       {
-        slug: "green-tea-a1b2c3",
-        type: "product",
-        active: true,
+        slug: "green-tea",
+        type: "tovar",
         publishedAt: "2026-07-20T10:00:00.000Z",
         updatedAt: "2026-07-21T10:00:00.000Z",
       },
       {
-        slug: "draft-tea-a1b2c3",
-        type: "product",
-        active: true,
+        slug: "draft-tea",
+        type: "tovar",
         publishedAt: null,
-        updatedAt: "2026-07-21T10:00:00.000Z",
-      },
-      {
-        slug: "hidden-ritual-a1b2c3",
-        type: "ritual",
-        active: false,
-        publishedAt: "2026-07-20T10:00:00.000Z",
         updatedAt: "2026-07-21T10:00:00.000Z",
       },
     ],
@@ -32,8 +23,8 @@ test("maps only active published products and rituals", () => {
 
   assert.deepEqual(entries, [
     {
-      slug: "green-tea-a1b2c3",
-      type: "product",
+      slug: "green-tea",
+      type: "tovar",
       updatedAt: "2026-07-21T10:00:00.000Z",
     },
   ]);

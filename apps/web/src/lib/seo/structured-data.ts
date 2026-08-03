@@ -4,13 +4,22 @@ export function serializeJsonLd(data: unknown) {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
-export function productStructuredData(product: ProductDetail, url: string) {
+export function productStructuredData(
+  product: ProductDetail,
+  url: string,
+  brandName = "Brega Tea",
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
     description: product.excerpt,
+    category: product.categoryLabel,
     sku: product.id,
+    brand: {
+      "@type": "Brand",
+      name: brandName,
+    },
     ...(product.images[0] ? { image: product.images[0].url } : {}),
     offers: {
       "@type": "Offer",
@@ -39,20 +48,20 @@ export function breadcrumbStructuredData(
   };
 }
 
-export function organizationStructuredData(origin: string) {
+export function organizationStructuredData(origin: string, brandName: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Brega Chai",
+    name: brandName,
     url: origin,
   };
 }
 
-export function websiteStructuredData(origin: string) {
+export function websiteStructuredData(origin: string, brandName: string) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Brega Chai",
+    name: brandName,
     url: origin,
   };
 }

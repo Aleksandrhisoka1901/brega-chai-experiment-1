@@ -12,15 +12,18 @@
     "start": "strapi start",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test tests/*.test.mts",
     "test:integration:order": "node --experimental-strip-types --test tests/order-postgres.integration.mts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && yarn typecheck:order-admin",
+    "typecheck:order-admin": "tsc -p src/plugins/order-admin/admin/tsconfig.json --noEmit"
   },
   "dependencies": {
     "@brega-chai/contracts": "workspace:*",
-    "@strapi/plugin-color-picker": "5.45.0",
-    "@strapi/plugin-users-permissions": "5.45.0",
-    "@strapi/provider-upload-aws-s3": "5.45.0",
-    "@strapi/strapi": "5.45.0",
-    "@strapi/utils": "5.45.0",
+    "@k11k/strapi-plugin-better-blocks": "0.21.0",
+    "@strapi/plugin-color-picker": "5.45.1",
+    "@strapi/plugin-users-permissions": "5.45.1",
+    "@strapi/provider-email-nodemailer": "5.45.1",
+    "@strapi/provider-upload-aws-s3": "5.45.1",
+    "@strapi/strapi": "5.45.1",
+    "@strapi/utils": "5.45.1",
     "pg": "8.16.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -29,7 +32,7 @@
     "transliteration": "2.6.1"
   },
   "devDependencies": {
-    "@strapi/typescript-utils": "5.45.0",
+    "@strapi/typescript-utils": "5.45.1",
     "@types/node": "22.18.6",
     "@types/react": "18.3.24",
     "@types/react-dom": "18.3.7",

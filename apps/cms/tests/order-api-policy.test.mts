@@ -22,7 +22,15 @@ test("order has a unique private idempotency key and immutable snapshots", async
   assert.equal(schema.attributes.idempotencyKey.private, true);
   assert.equal(schema.attributes.requestFingerprint.private, true);
   assert.equal(schema.attributes.lines.type, "json");
+  assert.equal(schema.attributes.managerComment.type, "text");
+  assert.equal(schema.attributes.managerComment.private, true);
   assert.equal(schema.attributes.totalRubles.type, "integer");
+  assert.deepEqual(schema.attributes.deliveryMethod.enum, [
+    "pickup",
+    "courier",
+  ]);
+  assert.equal(schema.attributes.pickupDiscountPercent.type, "integer");
+  assert.equal(schema.attributes.discountedTotalRubles.type, "integer");
   assert.deepEqual(schema.attributes.currency.enum, ["RUB"]);
 });
 

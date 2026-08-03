@@ -1,8 +1,8 @@
 {
   "collectionName": "components_product_gallery_images",
   "info": {
-    "displayName": "Gallery image",
-    "description": "Every gallery image requires meaningful alt text. Image dimensions are recommendations; only file weight is enforced."
+    "displayName": "Изображение галереи",
+    "description": "Для каждого изображения нужен содержательный alt. Размеры рекомендательные, ограничивается только вес файла."
   },
   "attributes": {
     "image": {

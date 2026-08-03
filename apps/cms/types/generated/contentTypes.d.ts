@@ -443,8 +443,8 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
   collectionName: "global_settings";
   info: {
-    description: "Storefront-wide content and defaults";
-    displayName: "Global settings";
+    description: "\u041E\u0431\u0449\u0438\u0435 \u0434\u0430\u043D\u043D\u044B\u0435, \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F \u0438 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F \u0441\u0430\u0439\u0442\u0430 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E";
+    displayName: "\u041E\u0431\u0449\u0438\u0435 \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438";
     pluralName: "global-settings";
     singularName: "global-setting";
   };
@@ -453,6 +453,11 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
   };
   attributes: {
     brandName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    courierDeliveryNote: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
@@ -481,7 +486,34 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
     logo: Schema.Attribute.Media<"images">;
     navigation: Schema.Attribute.Component<"shared.navigation-labels", false> &
       Schema.Attribute.Required;
+    orderNotificationEmail: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    pickupAddress: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    pickupDiscountPercent: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 100;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<10>;
     publishedAt: Schema.Attribute.DateTime;
+    sectionBreadcrumbs: Schema.Attribute.Component<
+      "shared.section-breadcrumb",
+      true
+    >;
+    storefrontTexts: Schema.Attribute.Component<
+      "shared.storefront-texts",
+      false
+    > &
+      Schema.Attribute.Required;
     telegramUrl: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -497,7 +529,8 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
 export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   collectionName: "home_pages";
   info: {
-    displayName: "Home page";
+    description: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u044B\u0435 \u0431\u043B\u043E\u043A\u0438 \u0433\u043B\u0430\u0432\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B";
+    displayName: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430";
     pluralName: "home-pages";
     singularName: "home-page";
   };
@@ -510,6 +543,14 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
       Schema.Attribute.Private;
+    featuredNabory: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::product.product"
+    >;
+    featuredTovary: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::product.product"
+    >;
     hero: Schema.Attribute.Component<"home.hero", false> &
       Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -518,12 +559,11 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
       "api::home-page.home-page"
     > &
       Schema.Attribute.Private;
-    productsPreview: Schema.Attribute.Component<"home.catalog-preview", false> &
+    naboryPreview: Schema.Attribute.Component<"home.rituals-preview", false> &
       Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    ritualsPreview: Schema.Attribute.Component<"home.catalog-preview", false> &
-      Schema.Attribute.Required;
-    seo: Schema.Attribute.Component<"shared.seo", false> &
+    seo: Schema.Attribute.Component<"shared.seo", false>;
+    tovaryPreview: Schema.Attribute.Component<"home.catalog-preview", false> &
       Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
@@ -534,7 +574,8 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
 export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
   collectionName: "orders";
   info: {
-    displayName: "Order";
+    description: "\u0417\u0430\u043A\u0430\u0437 \u043F\u043E\u043A\u0443\u043F\u0430\u0442\u0435\u043B\u044F \u0438 \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u0435\u0433\u043E \u043E\u0431\u0440\u0430\u0431\u043E\u0442\u043A\u0438";
+    displayName: "\u0417\u0430\u043A\u0430\u0437";
     pluralName: "orders";
     singularName: "order";
   };
@@ -560,6 +601,15 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     deliveryAddress: Schema.Attribute.Text &
       Schema.Attribute.Required &
       Schema.Attribute.Private;
+    deliveryMethod: Schema.Attribute.Enumeration<["pickup", "courier"]> &
+      Schema.Attribute.DefaultTo<"courier">;
+    discountedTotalRubles: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
     idempotencyKey: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Private &
@@ -568,6 +618,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<"oneToMany", "api::order.order"> &
       Schema.Attribute.Private;
+    managerComment: Schema.Attribute.Text & Schema.Attribute.Private;
     orderNumber: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
@@ -576,6 +627,15 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"new">;
+    pickupDiscountPercent: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 100;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
     requestFingerprint: Schema.Attribute.String &
       Schema.Attribute.Required &
@@ -598,7 +658,8 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
 export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   collectionName: "products";
   info: {
-    displayName: "Product";
+    description: "\u0422\u043E\u0432\u0430\u0440 \u0438\u043B\u0438 \u0433\u043E\u0442\u043E\u0432\u044B\u0439 \u043D\u0430\u0431\u043E\u0440 \u0442\u043E\u0432\u0430\u0440\u043E\u0432";
+    displayName: "\u0422\u043E\u0432\u0430\u0440";
     pluralName: "products";
     singularName: "product";
   };
@@ -606,21 +667,25 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    active: Schema.Attribute.Boolean &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<true>;
-    articleContent: Schema.Attribute.Blocks;
+    articles: Schema.Attribute.Component<"product.article", true>;
+    breadcrumbLabel: Schema.Attribute.String;
     cardExcerpt: Schema.Attribute.Text &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
+    categoryLabel: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
       Schema.Attribute.Private;
     currency: Schema.Attribute.Enumeration<["RUB"]> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"RUB">;
+    displayName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
     gallery: Schema.Attribute.Component<"product.gallery-image", true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -647,25 +712,14 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     seedKey: Schema.Attribute.String &
       Schema.Attribute.Private &
       Schema.Attribute.Unique;
-    seoDescription: Schema.Attribute.Text;
-    seoImage: Schema.Attribute.Media<"images">;
-    seoTitle: Schema.Attribute.String;
-    slug: Schema.Attribute.UID &
+    seo: Schema.Attribute.Component<"shared.seo", false>;
+    slug: Schema.Attribute.UID<"displayName"> &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 180;
-        minLength: 8;
+        minLength: 1;
       }>;
-    sortOrder: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          min: 0;
-        },
-        number
-      > &
-      Schema.Attribute.DefaultTo<0>;
     stock: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -685,7 +739,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
-    type: Schema.Attribute.Enumeration<["ritual", "product"]> &
+    type: Schema.Attribute.Enumeration<["nabor", "tovar"]> &
       Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
@@ -696,7 +750,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
 export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
   collectionName: "products_pages";
   info: {
-    displayName: "Products page";
+    description: "\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0441\u043E\u0440\u0442\u043E\u0432";
+    displayName: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0441\u043E\u0440\u0442\u043E\u0432";
     pluralName: "products-pages";
     singularName: "products-page";
   };
@@ -707,8 +762,26 @@ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
       Schema.Attribute.Private;
-    image: Schema.Attribute.Component<"shared.image-with-alt", false>;
-    intro: Schema.Attribute.Blocks & Schema.Attribute.Required;
+    emptyStateLinkLabel: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    emptyStateText: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    eyebrow: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       "oneToMany",
@@ -716,8 +789,7 @@ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    seo: Schema.Attribute.Component<"shared.seo", false> &
-      Schema.Attribute.Required;
+    seo: Schema.Attribute.Component<"shared.seo", false>;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{

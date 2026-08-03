@@ -7,9 +7,11 @@ const schemaPaths = [
   "src/api/products-page/content-types/products-page/schema.json",
   "src/api/global-setting/content-types/global-setting/schema.json",
   "src/components/home/editorial-section.json",
+  "src/components/product/article.json",
 ];
 
 type Attribute = {
+  customField?: unknown;
   description?: unknown;
   type?: unknown;
 };
@@ -28,7 +30,11 @@ test("every Blocks field gives editors rendering guidance", async () => {
     await Promise.all(
       schemaPaths.map(async (path) =>
         Object.entries(await attributes(path))
-          .filter(([, attribute]) => attribute.type === "blocks")
+          .filter(
+            ([, attribute]) =>
+              attribute.type === "blocks" ||
+              attribute.customField === "plugin::better-blocks.better-blocks",
+          )
           .map(([name, attribute]) => ({
             attribute,
             field: `${path}#${name}`,
@@ -55,7 +61,7 @@ test("every Blocks field gives editors rendering guidance", async () => {
     );
     assert.match(
       description,
-      /unsupported.+(?:executable|script).+not rendered/i,
+      /(?:unsupported.+(?:executable|script).+not rendered|неподдерживаемое.+(?:исполняемое|скрипт).+не выводится)/i,
       `${field} must explain that unsafe or unsupported content is omitted`,
     );
   }

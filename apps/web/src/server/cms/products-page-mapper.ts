@@ -1,50 +1,40 @@
 import type { ProductSummary } from "@brega-chai/contracts";
 import { z } from "zod";
 
-import {
-  normalizeStrapiBlocks,
-  type RichContentBlock,
-} from "../../components/rich-content/model.ts";
-
 import { CmsValidationError } from "./errors.ts";
 
 const nonEmptyString = z.string().trim().min(1);
-const mediaSchema = z.object({
-  url: nonEmptyString,
-  width: z.number().int().positive(),
-  height: z.number().int().positive(),
-});
-const imageSchema = z.object({
-  alt: nonEmptyString,
-  image: mediaSchema,
-});
 const seoSchema = z.object({
   title: nonEmptyString,
   description: nonEmptyString,
+  image: z
+    .object({
+      url: nonEmptyString,
+    })
+    .nullable()
+    .optional(),
 });
 const responseSchema = z.object({
   data: z.object({
+    eyebrow: nonEmptyString,
     title: nonEmptyString,
-    intro: z.array(z.unknown()).min(1),
-    image: imageSchema.nullable().optional(),
-    seo: seoSchema,
+    emptyStateText: nonEmptyString,
+    emptyStateLinkLabel: nonEmptyString,
+    intro: nonEmptyString,
+    seo: seoSchema.nullable().optional(),
   }),
 });
 
-export type ProductsPageImage = {
-  url: string;
-  alt: string;
-  width: number;
-  height: number;
-};
-
 export type ProductsPageContent = {
+  eyebrow: string;
   title: string;
-  intro: RichContentBlock[];
-  image?: ProductsPageImage;
-  seo: {
+  emptyStateText: string;
+  emptyStateLinkLabel: string;
+  intro: string;
+  seo?: {
     title: string;
     description: string;
+    imageUrl?: string;
   };
 };
 
@@ -66,28 +56,26 @@ export function mapProductsPagePayload(
   const parsed = responseSchema.safeParse(payload);
   if (!parsed.success) throw new CmsValidationError(parsed.error.message);
 
-  const { title, intro, image, seo } = parsed.data.data;
-  const normalizedIntro = normalizeStrapiBlocks(intro, publicBase);
-  if (normalizedIntro.length === 0) {
-    throw new CmsValidationError(
-      "ProductsPage intro does not contain renderable Blocks content",
-    );
-  }
+  const { eyebrow, title, emptyStateText, emptyStateLinkLabel, intro, seo } =
+    parsed.data.data;
 
   return {
+    eyebrow,
     title,
-    intro: normalizedIntro,
-    ...(image
+    emptyStateText,
+    emptyStateLinkLabel,
+    intro,
+    ...(seo
       ? {
-          image: {
-            url: mediaUrl(image.image.url, publicBase),
-            alt: image.alt,
-            width: image.image.width,
-            height: image.image.height,
+          seo: {
+            title: seo.title,
+            description: seo.description,
+            ...(seo.image
+              ? { imageUrl: mediaUrl(seo.image.url, publicBase) }
+              : {}),
           },
         }
       : {}),
-    seo,
   };
 }
 
@@ -106,14 +94,14 @@ export function mapProductsPageLoadResults(
 export function productsPageRequest() {
   const query = new URLSearchParams({
     status: "published",
-    "fields[0]": "title",
-    "fields[1]": "intro",
+    "fields[0]": "eyebrow",
+    "fields[1]": "title",
+    "fields[2]": "emptyStateText",
+    "fields[3]": "emptyStateLinkLabel",
+    "fields[4]": "intro",
     "populate[seo][fields][0]": "title",
     "populate[seo][fields][1]": "description",
-    "populate[image][fields][0]": "alt",
-    "populate[image][populate][image][fields][0]": "url",
-    "populate[image][populate][image][fields][1]": "width",
-    "populate[image][populate][image][fields][2]": "height",
+    "populate[seo][populate][image][fields][0]": "url",
   });
 
   return {

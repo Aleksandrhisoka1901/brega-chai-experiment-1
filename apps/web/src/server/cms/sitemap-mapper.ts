@@ -6,8 +6,7 @@ const responseSchema = z.object({
   data: z.array(
     z.object({
       slug: z.string().min(1),
-      type: z.enum(["product", "ritual"]),
-      active: z.boolean(),
+      type: z.enum(["tovar", "nabor"]),
       publishedAt: z.iso.datetime().nullable(),
       updatedAt: z.iso.datetime(),
     }),
@@ -16,7 +15,7 @@ const responseSchema = z.object({
 
 export type SitemapProduct = {
   slug: string;
-  type: "product" | "ritual";
+  type: "tovar" | "nabor";
   updatedAt: string;
 };
 
@@ -25,6 +24,6 @@ export function mapSitemapProductsPayload(payload: unknown): SitemapProduct[] {
   if (!parsed.success) throw new CmsValidationError(parsed.error.message);
 
   return parsed.data.data
-    .filter((product) => product.active && product.publishedAt)
+    .filter((product) => product.publishedAt)
     .map(({ slug, type, updatedAt }) => ({ slug, type, updatedAt }));
 }

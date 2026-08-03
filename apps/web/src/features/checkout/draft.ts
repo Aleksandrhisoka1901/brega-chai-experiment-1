@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { deliveryMethodSchema } from "@brega-chai/contracts";
 
 import type { CheckoutFormValues } from "./validation.ts";
 
@@ -7,6 +8,7 @@ export const CHECKOUT_DRAFT_KEY = "brega-chai:checkout-draft:v1";
 const draftSchema = z
   .object({
     name: z.string().optional(),
+    deliveryMethod: deliveryMethodSchema.optional(),
     phone: z.string().optional(),
     email: z.string().optional(),
     deliveryAddress: z.string().optional(),
@@ -39,6 +41,7 @@ export function createCheckoutDraftPersistence(storage?: SessionStorageLike) {
     save(values: CheckoutFormValues) {
       const draft: CheckoutDraft = {
         name: values.name,
+        deliveryMethod: values.deliveryMethod,
         phone: values.phone,
         email: values.email,
         deliveryAddress: values.deliveryAddress,

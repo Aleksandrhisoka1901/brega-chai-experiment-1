@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  alignBetterBlocksImages,
   assertSeedAllowed,
   planSeed,
   PUBLIC_STOREFRONT_ACTIONS,
+  resolveSeedArticleImages,
 } from "../scripts/seed-helpers.ts";
 
 test("first seed creates fixtures and the next seed updates the same documents", () => {
@@ -20,17 +22,26 @@ test("first seed creates fixtures and the next seed updates the same documents",
   );
 
   const secondRun = planSeed(desired, [
-    { key: "tea-one", documentId: "doc-one" },
-    { key: "tea-two", documentId: "doc-two" },
+    { key: "tea-one", documentId: "doc-one", slug: "tea-one-a1b2c3" },
+    { key: "tea-two", documentId: "doc-two", slug: "tea-two-d4e5f6" },
   ]);
   assert.deepEqual(
     secondRun.map((operation) => ({
       type: operation.type,
       documentId: operation.documentId,
+      slug: operation.slug,
     })),
     [
-      { type: "update", documentId: "doc-one" },
-      { type: "update", documentId: "doc-two" },
+      {
+        type: "update",
+        documentId: "doc-one",
+        slug: "tea-one-a1b2c3",
+      },
+      {
+        type: "update",
+        documentId: "doc-two",
+        slug: "tea-two-d4e5f6",
+      },
     ],
   );
 });
@@ -108,4 +119,76 @@ test("seed exposes only read actions required by the storefront", () => {
     PUBLIC_STOREFRONT_ACTIONS.some((action) => action.includes("order")),
     false,
   );
+});
+
+test("seed resolves existing media inside article Blocks", () => {
+  assert.deepEqual(
+    resolveSeedArticleImages(
+      [
+        { type: "paragraph", children: [{ type: "text", text: "До фото" }] },
+        { type: "seed-image", asset: "gallery-gaiwan.png" },
+        { type: "divider" },
+      ],
+      new Map([
+        [
+          "gallery-gaiwan.png",
+          {
+            id: 42,
+            url: "/uploads/gallery-gaiwan.png",
+            alternativeText: "Светлая гайвань",
+            width: 1200,
+            height: 1500,
+          },
+        ],
+      ]),
+    ),
+    [
+      { type: "paragraph", children: [{ type: "text", text: "До фото" }] },
+      {
+        type: "image",
+        image: {
+          id: 42,
+          url: "/uploads/gallery-gaiwan.png",
+          alternativeText: "Светлая гайвань",
+          width: 1200,
+          height: 1500,
+        },
+        children: [{ type: "text", text: "" }],
+      },
+      { type: "divider" },
+    ],
+  );
+
+  assert.throws(
+    () =>
+      resolveSeedArticleImages(
+        [{ type: "seed-image", asset: "missing.png" }],
+        new Map(),
+      ),
+    /was not uploaded/,
+  );
+});
+
+test("seed adds Better Blocks image alignment without changing text", () => {
+  const paragraph = {
+    type: "paragraph",
+    children: [{ type: "text", text: "Текст" }],
+  };
+  const image = {
+    type: "image",
+    image: {
+      id: 42,
+      caption: "Подпись",
+    },
+    children: [{ type: "text", text: "" }],
+  };
+
+  assert.deepEqual(alignBetterBlocksImages([paragraph, image], "right"), [
+    paragraph,
+    {
+      ...image,
+      imageAlign: "right",
+      caption: "Подпись",
+    },
+  ]);
 });

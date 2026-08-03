@@ -1,18 +1,19 @@
 .chapter,
-.sectionHeader > p {
-  font-size: var(--type-caption);
-  letter-spacing: 0.15em;
+.controls > span {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .hero {
   min-height: calc(100svh - 4.75rem);
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 42% 58%;
 }
 
-.hero[data-layout="40/60"] {
-  grid-template-columns: 2fr 3fr;
+.hero[data-layout="50/50"] {
+  grid-template-columns: 1fr 1fr;
 }
 
 .hero[data-layout="100/0"] {
@@ -20,40 +21,67 @@
 }
 
 .heroCopy {
-  min-height: 42rem;
-  padding: clamp(4rem, 10vw, 9rem) var(--page-gutter);
+  min-width: 0;
+  padding: clamp(2.75rem, 7vw, 6.875rem) var(--page-gutter) 2.625rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  background: var(--surface-editorial);
 }
 
 .heroCopy h1,
 .sectionHeader h2,
-.about h2 {
+.about h2,
+.cardCopy h3 {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: -0.045em;
+  font-kerning: normal;
 }
 
 .heroCopy h1 {
-  max-width: 9ch;
-  margin: 2rem 0;
-  font-size: clamp(4rem, 8vw, 8rem);
+  max-width: 41.875rem;
+  margin: 2.5rem 0;
+  font-size: clamp(3.875rem, 7.3vw, 8rem);
+  letter-spacing: -0.025em;
   line-height: 0.86;
+  overflow-wrap: normal;
 }
 
-.heroCopy > p:not(.chapter) {
-  max-width: 32rem;
+.heroIntro {
+  max-width: 35.625rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 2.25rem;
+}
+
+.heroIntro > p {
+  margin: 0;
   font-family: var(--font-display);
-  font-size: var(--type-body-editorial);
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
-.heroCopy a {
-  width: fit-content;
-  margin-top: 2rem;
-  padding-block: 0.75rem;
-  text-underline-offset: 0.35rem;
+.editorialLink {
+  min-width: 11.25rem;
+  padding: 0.75rem 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  border-bottom: 1px solid currentColor;
+  color: inherit;
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.editorialLink svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+  stroke-width: 1.25;
 }
 
 .heroMedia,
@@ -63,102 +91,168 @@
   background: var(--surface-subtle);
 }
 
+.cardMedia {
+  aspect-ratio: 4 / 5;
+}
+
 .heroMedia img,
 .cardMedia img {
   object-fit: cover;
 }
 
+.naborCard .cardMedia img {
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.naborCard:hover .cardMedia img {
+  transform: scale(1.018);
+}
+
 .about {
   position: relative;
-  padding: clamp(5rem, 10vw, 10rem) var(--page-gutter);
+  padding: 9.375rem var(--page-gutter) 10.625rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: minmax(17.5rem, 0.95fr) minmax(22.5rem, 1.05fr);
+  gap: 8vw;
   overflow: hidden;
   border-bottom: 1px solid var(--border-default);
 }
 
 .about[data-spacing="S"] {
-  padding-block: 3rem;
-}
-.about[data-spacing="M"] {
   padding-block: 5rem;
 }
+
+.about[data-spacing="M"] {
+  padding-block: 7rem;
+}
+
 .about[data-spacing="XL"] {
   padding-block: 12rem;
 }
 
-.about > span {
+.about::before {
   position: absolute;
-  top: -0.35em;
-  left: -0.05em;
-  color: var(--text-soft);
-  opacity: 0.85;
+  top: -5.625rem;
+  left: -2.8125rem;
+  color: currentColor;
+  content: "01";
+  opacity: 0.06;
   font-family: var(--font-display);
-  font-size: clamp(12rem, 34vw, 32rem);
-  line-height: 0.7;
+  font-size: 17.5rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.aboutTitle {
+  position: relative;
+}
+
+.aboutTitle .chapter {
+  display: block;
+  margin-bottom: 2.375rem;
 }
 
 .about h2 {
-  position: relative;
-  max-width: 15ch;
-  margin: 3rem 0 0;
-  font-size: var(--type-heading-2);
-  line-height: 1;
+  margin: 0;
+  font-size: clamp(2.8125rem, 5.2vw, 5.5rem);
+  letter-spacing: -0.015em;
+  line-height: 0.98;
 }
 
 .aboutCopy {
   position: relative;
-  align-self: end;
-  columns: 2;
-  column-gap: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: end;
+  gap: 2.8125rem;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+
+.aboutCopy p {
+  margin: 0;
+}
+
+.catalog {
+  padding: 6.875rem var(--page-gutter) 8.125rem;
+  overflow: hidden;
+}
+
+.tovarySection {
+  background: var(--surface-subtle);
+}
+
+.tovarySection .sectionDescription {
+  color: var(--text-primary);
+}
+
+.sectionHeader {
+  margin-bottom: 3.375rem;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+  column-gap: 1.5rem;
+}
+
+.sectionHeader h2 {
+  grid-column: 3 / 7;
+  margin: 0;
+  font-size: clamp(3.4375rem, 6vw, 5.75rem);
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+
+.sectionHeader > .chapter {
+  grid-column: 1 / 3;
+}
+
+.sectionDescription {
+  grid-column: 7 / 11;
+  margin: 0;
+  max-width: 34rem;
+  color: var(--text-muted);
   font-family: var(--font-display);
   font-size: var(--type-body-editorial);
   line-height: 1.65;
 }
 
-.about > img {
-  grid-column: 2;
-  width: 100%;
-  height: auto;
-}
-
-.catalog {
-  padding: clamp(5rem, 10vw, 9rem) var(--page-gutter);
-  overflow: hidden;
-}
-
-.sectionHeader {
-  padding-bottom: 3rem;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  align-items: end;
-  gap: 2rem;
-}
-
-.sectionHeader h2 {
-  margin: 0;
-  font-size: var(--type-heading-1);
-  line-height: 0.9;
-}
-
-.sectionHeader a {
+.sectionHeader > .controls {
+  grid-column: 11 / 13;
   justify-self: end;
-  text-underline-offset: 0.35rem;
 }
 
 .controls {
+  min-width: 11.25rem;
+  padding: 0.75rem 0;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid currentColor;
+}
+
+.controls > div {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
 .controls button {
-  width: 3rem;
-  height: 3rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
   border: 0;
   background: transparent;
+  color: inherit;
   cursor: pointer;
+}
+
+.controls button svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  stroke-width: 1.25;
 }
 
 .controls button:disabled {
@@ -166,100 +260,227 @@
   cursor: not-allowed;
 }
 
-.ritualTrack,
-.productGrid {
+.cardTrack {
   display: grid;
-  grid-auto-columns: calc((100% - 3px) / 4);
+  grid-auto-columns: 25%;
   grid-auto-flow: column;
-  gap: 1px;
   overflow-x: auto;
-  background: var(--border-default);
   border: 1px solid var(--border-default);
+  background: transparent;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
 
-.ritualCard {
-  padding: 0 1rem 2rem;
+.cardTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.cardTrack.cardTrack {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sliderProgress {
+  margin-top: 1.25rem;
+}
+
+.naborCard,
+.productCard {
+  min-width: 0;
   display: block;
+  border-right: 1px solid var(--border-default);
+  color: inherit;
   background: var(--surface-page);
   scroll-snap-align: start;
   text-decoration: none;
 }
 
-.cardMedia {
-  aspect-ratio: 4 / 5;
-  margin-inline: -1rem;
+.naborCard:last-child,
+.productCard:last-child {
+  border-right: 0;
 }
 
-.ritualCard h3 {
-  margin: 1.5rem 0 0.75rem;
+.cardMedia > span {
+  height: 100%;
+  display: grid;
+  place-items: center;
   font-family: var(--font-display);
-  font-size: var(--type-heading-3);
-  font-weight: 400;
+  font-size: 1.5rem;
 }
 
-.ritualCard > p {
+.catalogLink {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cardCopy {
+  min-height: 10.9375rem;
+  padding: 1.4375rem 1.5625rem 1.875rem;
+  border-top: 1px solid var(--border-default);
+}
+
+.cardNumber {
+  float: right;
+  color: var(--text-soft);
+  font-size: 0.625rem;
+}
+
+.cardCopy h3 {
+  margin: 0 0 0.625rem;
+  font-size: clamp(1.6875rem, 2vw, 1.8125rem);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.cardCopy p {
+  max-width: 14.6875rem;
+  margin: 0;
   color: var(--text-muted);
-  line-height: 1.5;
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  line-height: 1.55;
 }
 
-.productGrid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-flow: initial;
-  overflow: visible;
-}
-
-.productGrid :global(.product-card) {
-  padding-inline: 1rem;
-  background: var(--surface-page);
-  border-bottom: 0;
-}
-
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .hero {
     display: flex;
     flex-direction: column;
   }
 
   .heroCopy {
-    min-height: 70svh;
+    min-height: 52svh;
+    padding: 2.75rem var(--page-gutter) 2.5rem;
   }
 
   .heroMedia {
-    min-height: 55svh;
+    min-height: 56svh;
+  }
+
+  .heroIntro,
+  .about,
+  .aboutCopy {
+    grid-template-columns: 1fr;
+  }
+
+  .heroIntro .editorialLink {
+    width: min(100%, 12rem);
+    min-width: 0;
   }
 
   .about {
-    display: block;
+    gap: 3.5rem;
+    padding: 6.25rem var(--page-gutter);
   }
 
   .aboutCopy {
-    margin-top: 4rem;
-    columns: initial;
-  }
-
-  .about > img {
-    margin-top: 3rem;
+    gap: 1.5rem;
   }
 
   .sectionHeader {
-    display: block;
+    align-items: end;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.25rem 1.5rem;
   }
 
-  .sectionHeader > :last-child {
-    margin-top: 1.5rem;
+  .sectionHeader > .chapter {
+    grid-column: 1 / -1;
   }
 
-  .ritualTrack {
-    grid-auto-columns: 82%;
+  .sectionHeader h2 {
+    grid-column: 1 / 6;
   }
 
-  .productGrid {
-    grid-template-columns: 1fr;
+  .sectionDescription {
+    grid-column: 7 / 13;
   }
 
   .controls {
     display: none;
+  }
+
+  .cardTrack.cardTrack {
+    grid-template-columns: none;
+    grid-auto-columns: 50%;
+  }
+}
+
+@media (min-width: 521px) and (max-width: 767px) {
+  .sectionHeader {
+    align-items: start;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .sectionHeader > .chapter,
+  .sectionHeader h2,
+  .sectionDescription {
+    grid-column: 1;
+  }
+
+  .sectionHeader h2 {
+    margin-top: 1.5rem;
+  }
+
+  .sectionDescription {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .heroCopy h1 {
+    font-size: 4rem;
+  }
+
+  .heroIntro {
+    gap: 2rem;
+  }
+
+  .catalog {
+    padding-inline: var(--page-gutter);
+  }
+
+  .sectionHeader {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeader > .chapter,
+  .sectionHeader h2,
+  .sectionDescription {
+    grid-column: 1;
+  }
+
+  .cardTrack.cardTrack {
+    width: calc(100% + var(--page-gutter));
+    grid-template-columns: none;
+    grid-auto-columns: 82%;
+  }
+
+  .catalogLink {
+    justify-content: flex-start;
+  }
+
+  .homeTovarTrack.homeTovarTrack {
+    width: calc(100% + var(--page-gutter));
+    grid-template-columns: none;
+    grid-auto-columns: 82%;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .homeTovarTrack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .homeTovarTrack :global(.product-card) {
+    scroll-snap-align: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .naborCard .cardMedia img {
+    transition: none;
   }
 }

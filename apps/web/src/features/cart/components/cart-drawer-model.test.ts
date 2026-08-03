@@ -10,7 +10,7 @@ import type { CartItem } from "../types.ts";
 const item: CartItem = {
   productId: "product-1",
   slug: "tea-a1b2c3",
-  type: "product",
+  type: "tovar",
   title: "Да Хун Пао",
   packageLabel: "50 г",
   unitPriceSnapshot: 1600,

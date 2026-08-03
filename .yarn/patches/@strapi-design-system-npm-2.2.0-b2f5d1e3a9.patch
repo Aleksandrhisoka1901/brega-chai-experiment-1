@@ -1,0 +1,46 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 9741b819714d19702f099a6fb389108668a336a7..4e2e23aabefae57d0027311b1fd6bb3563cae3c0 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -13421,38 +13421,13 @@ const Oa = re.define(), Ea = re.define(), wp = we.mark({
+     const a = m.useRef(), c = m.useRef(), h = m.useRef(), { error: d, ...f } = $e("JsonInput"), g = !!d || i, p = f.id ?? t, b = f.required || e;
+     let w;
+     d ? w = `${p}-error` : f.hint && (w = `${p}-hint`);
+-    const y = (L) => {
+-      var ie, K;
+-      const B = (ie = c.current) == null ? void 0 : ie.doc;
+-      if (B) {
+-        const { text: U, to: J } = B.line(L), W = J - U.trimStart().length;
+-        J > W && ((K = h.current) == null || K.dispatch({
+-          effects: Oa.of([wp.range(W, J)])
+-        }));
+-      }
+-    }, v = () => {
+-      var B, ie;
+-      const L = (B = c.current) == null ? void 0 : B.doc;
+-      if (L) {
+-        const K = L.length || 0;
+-        (ie = h.current) == null || ie.dispatch({
+-          effects: Ea.of((U, J) => J <= 0 || U >= K)
+-        });
+-      }
+-    }, k = ({ state: L, view: B }) => {
+-      h.current = B, c.current = L, v();
+-      const K = Eh()(B);
+-      K.length && y(L.doc.lineAt(K[0].from).number);
+-    }, C = (L, B) => {
+-      k(B), o(L);
+-    }, A = (L, B) => {
+-      h.current = L, c.current = B, k({ view: L, state: B });
++    const C = (L) => {
++      o(L);
+     }, { setContainer: S, view: M } = Ih({
+       value: n,
+-      onCreateEditor: A,
+       container: a.current,
+       editable: !r,
+-      extensions: [Oh(), xp],
++      extensions: [Oh()],
+       onChange: C,
+       theme: "dark",
+       basicSetup: {

@@ -11,18 +11,63 @@ const mediaSchema = z.object({
   url: z.string().min(1),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
+  formats: z
+    .object({
+      large: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+      medium: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+      small: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+      thumbnail: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+    })
+    .nullable()
+    .optional(),
 });
 
 const imageWithAltSchema = z.object({
   alt: z.string().min(1),
   image: mediaSchema,
 });
+const seoSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  image: z
+    .object({
+      url: z.string().min(1),
+    })
+    .nullable()
+    .optional(),
+});
 
 const productDetailRecordSchema = z.object({
   documentId: z.string().min(1),
   slug: z.string().min(1),
-  type: z.enum(["product", "ritual"]),
-  title: z.string().min(1),
+  type: z.enum(["tovar", "nabor"]),
+  displayName: z.string().min(1),
+  breadcrumbLabel: z.string().nullable().optional(),
+  categoryLabel: z.string().nullable().optional(),
   originalTitle: z.string().min(1).nullable().optional(),
   packageLabel: z.string().min(1),
   price: z.number().int().positive(),
@@ -30,7 +75,15 @@ const productDetailRecordSchema = z.object({
   stock: z.number().int().nonnegative(),
   cardExcerpt: z.string().min(1),
   story: z.string().min(1),
-  articleContent: z.array(z.unknown()).nullable().optional(),
+  articles: z
+    .array(
+      z.object({
+        content: z.array(z.unknown()),
+      }),
+    )
+    .optional()
+    .default([]),
+  seo: seoSchema.nullable().optional(),
   mainImage: imageWithAltSchema.nullable().optional(),
   gallery: z.array(imageWithAltSchema).optional().default([]),
 });
@@ -41,6 +94,8 @@ const productDetailResponseSchema = z.object({
 
 export type ProductDetailImage = {
   url: string;
+  thumbnailUrl: string;
+  sources: Array<{ url: string; width: number }>;
   alt: string;
   width: number;
   height: number;
@@ -49,8 +104,10 @@ export type ProductDetailImage = {
 export type ProductDetail = {
   id: string;
   slug: string;
-  type: "product" | "ritual";
+  type: "tovar" | "nabor";
   title: string;
+  breadcrumbLabel: string;
+  categoryLabel: string;
   originalTitle?: string;
   packageLabel: string;
   priceRubles: number;
@@ -59,7 +116,12 @@ export type ProductDetail = {
   inStock: boolean;
   excerpt: string;
   story: string;
-  articleContent?: RichContentBlock[];
+  seo?: {
+    title: string;
+    description: string;
+    imageUrl?: string;
+  };
+  articles: RichContentBlock[][];
   images: ProductDetailImage[];
 };
 
@@ -72,11 +134,28 @@ function mapImage(
   value: z.infer<typeof imageWithAltSchema>,
   publicBase: string,
 ): ProductDetailImage {
+  const display =
+    value.image.formats?.large ?? value.image.formats?.medium ?? value.image;
+  const thumbnail =
+    value.image.formats?.thumbnail ?? value.image.formats?.small ?? display;
+
   return {
-    url: getMediaUrl(value.image.url, publicBase),
+    url: getMediaUrl(display.url, publicBase),
+    thumbnailUrl: getMediaUrl(thumbnail.url, publicBase),
+    sources: [
+      value.image.formats?.thumbnail,
+      value.image.formats?.small,
+      value.image.formats?.medium,
+      value.image.formats?.large,
+      value.image,
+    ].flatMap((source) =>
+      source
+        ? [{ url: getMediaUrl(source.url, publicBase), width: source.width }]
+        : [],
+    ),
     alt: value.alt,
-    width: value.image.width,
-    height: value.image.height,
+    width: display.width,
+    height: display.height,
   };
 }
 
@@ -102,7 +181,11 @@ export function mapProductDetailPayload(
     id: record.documentId,
     slug: record.slug,
     type: record.type,
-    title: record.title,
+    title: record.displayName,
+    breadcrumbLabel: record.breadcrumbLabel?.trim() || record.displayName,
+    categoryLabel:
+      record.categoryLabel?.trim() ||
+      (record.type === "tovar" ? "товар" : "набор"),
     ...(record.originalTitle ? { originalTitle: record.originalTitle } : {}),
     packageLabel: record.packageLabel,
     priceRubles: record.price,
@@ -111,7 +194,22 @@ export function mapProductDetailPayload(
     inStock: record.stock > 0,
     excerpt: record.cardExcerpt,
     story: record.story,
-    articleContent: normalizeStrapiBlocks(record.articleContent, publicBase),
+    ...(record.seo
+      ? {
+          seo: {
+            title: record.seo.title,
+            description: record.seo.description,
+            ...(record.seo.image
+              ? {
+                  imageUrl: getMediaUrl(record.seo.image.url, publicBase),
+                }
+              : {}),
+          },
+        }
+      : {}),
+    articles: record.articles
+      .map((article) => normalizeStrapiBlocks(article.content, publicBase))
+      .filter((content) => content.length > 0),
     images,
   };
 }

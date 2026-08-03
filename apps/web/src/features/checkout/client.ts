@@ -14,11 +14,31 @@ export interface CheckoutClient {
   }): Promise<CheckoutResult>;
 }
 
+interface IdempotencyCryptoSource {
+  randomUUID?: () => string;
+  getRandomValues(target: Uint8Array): Uint8Array;
+}
+
+export function createIdempotencyKey(
+  source: IdempotencyCryptoSource = globalThis.crypto,
+): string {
+  if (typeof source.randomUUID === "function") {
+    return source.randomUUID();
+  }
+
+  const bytes = source.getRandomValues(new Uint8Array(16));
+  bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
+  bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+
+  return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
+}
+
 export function createFakeCheckoutClient(
   result: CheckoutResult = {
     ok: true,
-    orderNumber: "TEST-0001",
-    message: "Заявка принята. Менеджер свяжется с вами для подтверждения.",
+    orderNumber: "2607-0001",
+    message: "Менеджер свяжется с вами для подтверждения.",
   },
 ): CheckoutClient {
   return {
@@ -42,7 +62,7 @@ export function createFetchCheckoutClient({
 } = {}): CheckoutClient {
   let formToken: string | undefined;
   let formReadyAt = 0;
-  let idempotencyKey = crypto.randomUUID();
+  let idempotencyKey = createIdempotencyKey();
 
   const prepare = async () => {
     if (formToken) return;
@@ -81,7 +101,10 @@ export function createFetchCheckoutClient({
                 phone: customer.phone,
                 ...(customer.email ? { email: customer.email } : {}),
               },
-              deliveryAddress: customer.deliveryAddress,
+              deliveryMethod: customer.deliveryMethod,
+              ...(customer.deliveryMethod === "courier"
+                ? { deliveryAddress: customer.deliveryAddress }
+                : {}),
               ...(customer.comment ? { comment: customer.comment } : {}),
               consents: {
                 personalData: {
@@ -102,25 +125,25 @@ export function createFetchCheckoutClient({
         });
         const body = (await response.json()) as {
           orderId?: string;
+          orderNumber?: string;
           error?: { message?: string };
         };
-        if (!response.ok || !body.orderId) {
+        if (!response.ok || !body.orderId || !body.orderNumber) {
           return {
             ok: false,
             message:
               body.error?.message ??
-              "Не удалось создать заявку. Попробуйте ещё раз.",
+              "Не удалось создать заказ. Попробуйте ещё раз.",
           };
         }
 
-        const orderNumber = body.orderId;
-        idempotencyKey = crypto.randomUUID();
+        idempotencyKey = createIdempotencyKey();
         formToken = undefined;
         return {
           ok: true,
-          orderNumber,
+          orderNumber: body.orderNumber,
           message:
-            "Заявка принята. Менеджер свяжется с вами для подтверждения.",
+            "Менеджер свяжется с вами, чтобы подтвердить наличие и согласовать оплату.",
         };
       } catch {
         return {

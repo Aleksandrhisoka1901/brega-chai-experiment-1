@@ -13,7 +13,7 @@ export type RevalidationEvent =
       action: RevalidationAction;
       product: {
         documentId: string;
-        type: "product" | "ritual";
+        type: "tovar" | "nabor";
         slug: string;
       };
     };

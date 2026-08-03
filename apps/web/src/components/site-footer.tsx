@@ -1,7 +1,13 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 
+import { Mail } from "lucide-react";
+
 import type { GlobalSettings } from "@/server/cms/global-mapper";
+import { bindShortRussianWords } from "@/lib/typography";
+
+import { TelegramMark } from "./telegram-mark";
+import { SiteWordmark } from "./site-wordmark";
 
 const legalDocuments = [
   { href: "/legal/privacy.pdf", label: "Политика конфиденциальности" },
@@ -25,21 +31,27 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
   return (
     <footer className="site-footer">
       <div className="site-footer__brand">
-        <strong>{settings.brandName}</strong>
-        <small>© {new Date().getFullYear()}</small>
+        <strong>
+          <SiteWordmark brandName={settings.brandName} logo={settings.logo} />
+        </strong>
       </div>
       <div className="site-footer__contacts">
-        <a href={`mailto:${settings.email}`}>{settings.email}</a>
+        <h2>Контакты</h2>
+        <a href={`mailto:${settings.email}`}>
+          <Mail aria-hidden="true" />
+          <span>{settings.email}</span>
+        </a>
         <a
           href={settings.telegramUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Telegram
+          <TelegramMark />
+          <span>Telegram</span>
         </a>
       </div>
       <div className="site-footer__legal">
-        <p>{settings.legalDetails}</p>
+        <h2>Правовая информация</h2>
         {documents.length > 0 ? (
           <nav aria-label="Юридические документы">
             {documents.map(({ href, label }) => (
@@ -49,11 +61,14 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {label}
+                {bindShortRussianWords(label)}
               </a>
             ))}
           </nav>
         ) : null}
+        <small>
+          © {new Date().getFullYear()}. {settings.legalDetails}
+        </small>
       </div>
     </footer>
   );

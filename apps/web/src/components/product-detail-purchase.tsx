@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { cartDrawerStore } from "@/features/cart/components/cart-drawer-store";
 import { cartStore, useCart } from "@/features/cart";
 import type { CartProduct } from "@/features/cart";
+import { bindShortRussianWords } from "@/lib/typography";
 
 import {
   getInitialProductQuantity,
@@ -14,7 +15,13 @@ import {
 } from "./product-detail-model";
 import styles from "./product-detail.module.css";
 
-export function ProductDetailPurchase({ product }: { product: CartProduct }) {
+export function ProductDetailPurchase({
+  outOfStock,
+  product,
+}: {
+  outOfStock: string;
+  product: CartProduct;
+}) {
   const cart = useCart();
   const maximum = getMaximumProductQuantity(product.stock);
   const [quantity, setQuantity] = useState(() =>
@@ -29,10 +36,6 @@ export function ProductDetailPurchase({ product }: { product: CartProduct }) {
 
   return (
     <div className={styles.purchase}>
-      <p className={styles.availability}>
-        {inStock ? "В наличии" : "Нет в наличии"}
-      </p>
-
       {inStock ? (
         <div className={styles.quantityRow}>
           <span id="product-quantity-label">Количество</span>
@@ -85,11 +88,9 @@ export function ProductDetailPurchase({ product }: { product: CartProduct }) {
         }}
         type="button"
       >
-        {!inStock
-          ? "Нет в наличии"
-          : inCart
-            ? "В корзине"
-            : "Добавить в корзину"}
+        {bindShortRussianWords(
+          !inStock ? outOfStock : inCart ? "В корзине" : "Добавить в корзину",
+        )}
       </button>
     </div>
   );

@@ -9,23 +9,13 @@ import {
   mapProductsPagePayload,
 } from "./products-page-mapper.ts";
 
-const paragraph = (text: string) => ({
-  type: "paragraph",
-  children: [{ type: "text", text }],
-});
-
 const validPayload = {
   data: {
+    eyebrow: "Глава 03",
     title: "Чай, выбранный для внимания",
-    intro: [paragraph("Небольшая коллекция без спешки.")],
-    image: {
-      alt: "Чайные листья на светлом столе",
-      image: {
-        url: "/storefront/catalog.jpg",
-        width: 1600,
-        height: 1000,
-      },
-    },
+    emptyStateText: "Сорта скоро появятся.",
+    emptyStateLinkLabel: "Вернуться на главную",
+    intro: "Небольшая коллекция без спешки.",
     seo: {
       title: "Купить китайский чай",
       description: "Коллекция китайского чая Brega Chai.",
@@ -33,23 +23,15 @@ const validPayload = {
   },
 };
 
-test("maps the published products-page intro, image, and SEO", () => {
+test("maps the published products-page plain intro and SEO", () => {
   assert.deepEqual(
     mapProductsPagePayload(validPayload, "http://localhost:9000"),
     {
+      eyebrow: "Глава 03",
       title: "Чай, выбранный для внимания",
-      intro: [
-        {
-          type: "paragraph",
-          children: [{ type: "text", text: "Небольшая коллекция без спешки." }],
-        },
-      ],
-      image: {
-        url: "http://localhost:9000/storefront/catalog.jpg",
-        alt: "Чайные листья на светлом столе",
-        width: 1600,
-        height: 1000,
-      },
+      emptyStateText: "Сорта скоро появятся.",
+      emptyStateLinkLabel: "Вернуться на главную",
+      intro: "Небольшая коллекция без спешки.",
       seo: {
         title: "Купить китайский чай",
         description: "Коллекция китайского чая Brega Chai.",
@@ -65,45 +47,36 @@ test("accepts short and long editorial announcements without arbitrary limits", 
     const content = mapProductsPagePayload(
       {
         ...validPayload,
-        data: { ...validPayload.data, intro: [paragraph(text)] },
+        data: { ...validPayload.data, intro: text },
       },
       "http://localhost:9000",
     );
 
-    assert.deepEqual(content.intro[0], {
-      type: "paragraph",
-      children: [{ type: "text", text }],
-    });
+    assert.equal(content.intro, text);
   }
 });
 
-test("allows the optional catalog image to be absent", () => {
+test("allows optional page SEO to be absent", () => {
   const content = mapProductsPagePayload(
     {
       ...validPayload,
-      data: { ...validPayload.data, image: null },
+      data: { ...validPayload.data, seo: null },
     },
     "http://localhost:9000",
   );
 
-  assert.equal(content.image, undefined);
+  assert.equal(content.seo, undefined);
 });
 
-test("rejects malformed Blocks and incomplete optional images", () => {
-  for (const data of [
-    { ...validPayload.data, intro: [{ type: "quote", children: [] }] },
-    {
-      ...validPayload.data,
-      image: {
-        alt: "",
-        image: { url: "/catalog.jpg", width: 1200, height: 800 },
-      },
-    },
-  ]) {
+test("rejects an empty or non-text intro", () => {
+  for (const intro of ["", [{ type: "paragraph", children: [] }]]) {
     assert.throws(
       () =>
         mapProductsPagePayload(
-          { ...validPayload, data },
+          {
+            ...validPayload,
+            data: { ...validPayload.data, intro },
+          },
           "http://localhost:9000",
         ),
       CmsValidationError,

@@ -1,11 +1,16 @@
-import { randomBytes } from "node:crypto";
+import { transliterate } from "transliteration";
 
 export type Transliterate = (value: string) => string;
 export type SlugExists = (slug: string) => Promise<boolean>;
-export type HexSuffix = () => string;
 
-const FALLBACK_BASE = "product";
-const MAX_ATTEMPTS = 32;
+const FALLBACK_BASE = "item";
+const MAX_ATTEMPTS = 10_000;
+
+export function transliterateCatalogTitle(value: string): string {
+  return transliterate(value, {
+    replace: { Х: "Kh", х: "kh" },
+  });
+}
 
 export function normalizeSlugBase(value: string): string {
   return (
@@ -13,42 +18,25 @@ export function normalizeSlugBase(value: string): string {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
-      .slice(0, 173)
+      .slice(0, 180)
       .replace(/-+$/g, "") || FALLBACK_BASE
   );
-}
-
-export function createSlugCandidate(
-  title: string,
-  transliterate: Transliterate,
-  suffix: string,
-): string {
-  if (!/^[0-9a-f]{6}$/.test(suffix)) {
-    throw new Error(
-      "Slug suffix must contain exactly 6 lowercase hex characters",
-    );
-  }
-
-  return `${normalizeSlugBase(transliterate(title))}-${suffix}`;
-}
-
-export function randomHexSuffix(): string {
-  return randomBytes(3).toString("hex");
 }
 
 export async function generateUniqueSlug({
   title,
   transliterate,
   exists,
-  suffix = randomHexSuffix,
 }: {
   title: string;
   transliterate: Transliterate;
   exists: SlugExists;
-  suffix?: HexSuffix;
 }): Promise<string> {
+  const base = normalizeSlugBase(transliterate(title));
+
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
-    const candidate = createSlugCandidate(title, transliterate, suffix());
+    const suffix = attempt === 0 ? "" : `-${attempt + 1}`;
+    const candidate = `${base.slice(0, 180 - suffix.length)}${suffix}`;
 
     if (!(await exists(candidate))) {
       return candidate;
@@ -65,6 +53,10 @@ export function assertSlugImmutable(
   nextSlug: unknown,
 ): void {
   if (nextSlug !== undefined && nextSlug !== currentSlug) {
-    throw new Error("Product slug cannot be changed after creation");
+    throw new Error("Catalog item slug cannot be changed after creation");
   }
+}
+
+export function shouldGenerateSlug(slug: unknown): boolean {
+  return typeof slug !== "string" || slug.trim().length === 0;
 }

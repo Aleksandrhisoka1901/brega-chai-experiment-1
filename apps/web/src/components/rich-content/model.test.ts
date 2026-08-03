@@ -97,12 +97,17 @@ test("normalizes a representative Strapi article fixture", () => {
         },
         {
           type: "image",
+          imageAlign: "right",
+          caption: "Подпись из редактора",
           image: {
             url: "/uploads/tea.jpg",
             alternativeText: "Чайные листья",
-            caption: "Весенний сбор",
+            caption: "Старая подпись медиа",
             width: 1200,
             height: 800,
+            formats: {
+              small: { url: "/uploads/small_tea.jpg", width: 500 },
+            },
           },
           children: [{ type: "text", text: "" }],
         },
@@ -141,11 +146,88 @@ test("normalizes a representative Strapi article fixture", () => {
         type: "image",
         url: "https://cms.example.com/uploads/tea.jpg",
         alt: "Чайные листья",
-        caption: "Весенний сбор",
+        caption: "Подпись из редактора",
+        align: "right",
         width: 1200,
         height: 800,
+        sources: [
+          {
+            url: "https://cms.example.com/uploads/small_tea.jpg",
+            width: 500,
+          },
+        ],
       },
       { type: "divider" },
+    ],
+  );
+});
+
+test("normalizes a Better Blocks table and drops malformed rows", () => {
+  assert.deepEqual(
+    normalizeStrapiBlocks([
+      {
+        type: "table",
+        children: [
+          {
+            type: "table-row",
+            children: [
+              {
+                type: "table-header-cell",
+                children: [{ type: "text", text: "Пролив", bold: true }],
+              },
+              {
+                type: "table-header-cell",
+                children: [{ type: "text", text: "Время" }],
+              },
+            ],
+          },
+          {
+            type: "table-row",
+            children: [
+              {
+                type: "table-cell",
+                children: [{ type: "text", text: "Первый" }],
+              },
+              {
+                type: "table-cell",
+                children: [{ type: "text", text: "5–10 секунд" }],
+              },
+            ],
+          },
+          { type: "paragraph", children: [{ type: "text", text: "нет" }] },
+        ],
+      },
+    ]),
+    [
+      {
+        type: "table",
+        rows: [
+          {
+            cells: [
+              {
+                header: true,
+                children: [{ type: "text", text: "Пролив", bold: true }],
+              },
+              {
+                header: true,
+                children: [{ type: "text", text: "Время" }],
+              },
+            ],
+          },
+          {
+            cells: [
+              {
+                header: false,
+                children: [{ type: "text", text: "Первый" }],
+              },
+              {
+                header: false,
+                children: [{ type: "text", text: "5–10 секунд" }],
+              },
+            ],
+          },
+        ],
+      },
     ],
   );
 });

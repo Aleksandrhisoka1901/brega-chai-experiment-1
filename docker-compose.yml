@@ -1,6 +1,20 @@
 name: brega-chai
 
 services:
+  workspace-dependencies:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: base
+    command: yarn install --immutable
+    restart: "no"
+    volumes:
+      - .:/workspace
+      - root_node_modules:/workspace/node_modules
+      - web_node_modules:/workspace/apps/web/node_modules
+      - cms_node_modules:/workspace/apps/cms/node_modules
+      - contracts_node_modules:/workspace/packages/contracts/node_modules
+
   web:
     build:
       context: .
@@ -22,6 +36,8 @@ services:
       - web_node_modules:/workspace/apps/web/node_modules
       - contracts_node_modules:/workspace/packages/contracts/node_modules
     depends_on:
+      workspace-dependencies:
+        condition: service_completed_successfully
       cms:
         condition: service_healthy
 
@@ -37,6 +53,7 @@ services:
       NODE_ENV: development
     ports:
       - "1337:1337"
+      - "5173:5173"
     volumes:
       - .:/workspace
       - root_node_modules:/workspace/node_modules
@@ -44,6 +61,8 @@ services:
       - contracts_node_modules:/workspace/packages/contracts/node_modules
       - cms_uploads:/workspace/apps/cms/public/uploads
     depends_on:
+      workspace-dependencies:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       rustfs:

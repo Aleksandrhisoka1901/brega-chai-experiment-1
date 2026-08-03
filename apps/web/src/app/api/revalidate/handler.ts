@@ -6,7 +6,7 @@ const MAX_DELIVERIES = 1_000;
 const MAX_BODY_BYTES = 16_384;
 
 type PathType = "page" | "layout";
-type ProductType = "product" | "ritual";
+type ProductType = "tovar" | "nabor";
 
 interface DeliveryStore {
   claim(eventId: string, digest: string): "claimed" | "duplicate" | "conflict";
@@ -119,7 +119,7 @@ function parseEvent(value: unknown): RevalidationEvent | undefined {
     !hasExactKeys(product, ["documentId", "slug", "type"]) ||
     !isNonEmptyString(product.documentId) ||
     !isNonEmptyString(product.slug) ||
-    (product.type !== "product" && product.type !== "ritual")
+    (product.type !== "tovar" && product.type !== "nabor")
   ) {
     return;
   }
@@ -167,10 +167,13 @@ function invalidate(
   }
 
   revalidateTag("products");
-  revalidatePath("/products", "page");
+  revalidatePath("/tovary", "page");
   if (event.event === "product") {
     revalidateTag(`product-slug:${event.product.type}:${event.product.slug}`);
-    revalidatePath(`/products/${event.product.slug}`, "page");
+    revalidatePath(
+      `/${event.product.type === "nabor" ? "nabory" : "tovary"}/${event.product.slug}`,
+      "page",
+    );
     revalidatePath("/", "page");
   }
   revalidatePath("/sitemap.xml", "page");

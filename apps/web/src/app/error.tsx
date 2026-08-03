@@ -1,17 +1,33 @@
 "use client";
 
-export default function ErrorPage({ reset }: { reset: () => void }) {
+import { useEffect } from "react";
+
+import { SystemState } from "@/components/system-state";
+
+export default function ErrorPage({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error("Route rendering failed", { digest: error.digest });
+  }, [error.digest]);
+
   return (
-    <main className="holding-page">
+    <>
       <meta content="noindex, nofollow" name="robots" />
-      <div role="alert">
-        <p className="eyebrow">Сервис временно недоступен</p>
-        <h1>Не удалось открыть страницу</h1>
-        <p>Попробуйте повторить запрос немного позже.</p>
-        <button className="text-link" onClick={reset} type="button">
-          Попробовать снова
-        </button>
-      </div>
-    </main>
+      <SystemState
+        eyebrow="Ошибка 500"
+        title="Что-то пошло не так"
+        description="Попробуйте повторить запрос. Если ошибка сохранится, вернитесь немного позже."
+        action={
+          <button className="text-link" onClick={reset} type="button">
+            Попробовать снова
+          </button>
+        }
+      />
+    </>
   );
 }

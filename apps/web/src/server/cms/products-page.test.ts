@@ -12,23 +12,14 @@ test("requests only published products-page fields and tags the products cache",
 
   assert.equal(url.pathname, "/api/products-page");
   assert.equal(url.searchParams.get("status"), "published");
-  assert.equal(url.searchParams.get("fields[0]"), "title");
-  assert.equal(url.searchParams.get("fields[1]"), "intro");
+  assert.equal(url.searchParams.get("fields[0]"), "eyebrow");
+  assert.equal(url.searchParams.get("fields[1]"), "title");
+  assert.equal(url.searchParams.get("fields[2]"), "emptyStateText");
+  assert.equal(url.searchParams.get("fields[3]"), "emptyStateLinkLabel");
+  assert.equal(url.searchParams.get("fields[4]"), "intro");
   assert.equal(url.searchParams.get("populate[seo][fields][0]"), "title");
   assert.equal(url.searchParams.get("populate[seo][fields][1]"), "description");
-  assert.equal(url.searchParams.get("populate[image][fields][0]"), "alt");
-  assert.equal(
-    url.searchParams.get("populate[image][populate][image][fields][0]"),
-    "url",
-  );
-  assert.equal(
-    url.searchParams.get("populate[image][populate][image][fields][1]"),
-    "width",
-  );
-  assert.equal(
-    url.searchParams.get("populate[image][populate][image][fields][2]"),
-    "height",
-  );
+  assert.equal(url.searchParams.has("populate[image][fields][0]"), false);
   assert.deepEqual(tags, ["products"]);
 });
 
@@ -39,13 +30,11 @@ test("fetches and maps the products-page through the narrow request boundary", a
 
     return {
       data: {
+        eyebrow: "Глава 03",
         title: "Коллекция",
-        intro: [
-          {
-            type: "paragraph",
-            children: [{ type: "text", text: "Редкие сорта." }],
-          },
-        ],
+        emptyStateText: "Сорта скоро появятся.",
+        emptyStateLinkLabel: "Вернуться на главную",
+        intro: "Редкие сорта.",
         seo: { title: "Коллекция чая", description: "Каталог чая." },
       },
     };
@@ -55,10 +44,5 @@ test("fetches and maps the products-page through the narrow request boundary", a
   assert.deepEqual(calls[0]?.options.tags, ["products"]);
   assert.match(calls[0]?.path ?? "", /^\/api\/products-page\?/);
   assert.equal(content.title, "Коллекция");
-  assert.deepEqual(content.intro, [
-    {
-      type: "paragraph",
-      children: [{ type: "text", text: "Редкие сорта." }],
-    },
-  ]);
+  assert.equal(content.intro, "Редкие сорта.");
 });

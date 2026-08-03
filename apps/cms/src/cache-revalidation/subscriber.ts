@@ -53,7 +53,7 @@ function routeEvent(
   if (
     typeof value.entry?.documentId !== "string" ||
     typeof value.entry.slug !== "string" ||
-    (value.entry.type !== "product" && value.entry.type !== "ritual")
+    (value.entry.type !== "tovar" && value.entry.type !== "nabor")
   ) {
     return undefined;
   }

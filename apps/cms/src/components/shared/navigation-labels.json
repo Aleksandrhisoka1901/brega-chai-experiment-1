@@ -1,18 +1,18 @@
 {
   "collectionName": "components_shared_navigation_labels",
   "info": {
-    "displayName": "Navigation labels"
+    "displayName": "Подписи навигации"
   },
   "attributes": {
     "about": {
       "type": "string",
       "required": true
     },
-    "rituals": {
+    "nabory": {
       "type": "string",
       "required": true
     },
-    "products": {
+    "tovary": {
       "type": "string",
       "required": true
     },

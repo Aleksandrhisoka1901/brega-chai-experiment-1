@@ -8,7 +8,7 @@ export interface CartImage {
 export interface CartItem {
   productId: string;
   slug: string;
-  type: "ritual" | "product";
+  type: "nabor" | "tovar";
   title: string;
   packageLabel: string;
   unitPriceSnapshot: number;

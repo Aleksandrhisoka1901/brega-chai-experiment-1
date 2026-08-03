@@ -2,26 +2,52 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
+const cmsFixturePort = process.env.CMS_FIXTURE_PORT ?? "14338";
 
 async function addProductAndOpenCheckout(page: Page) {
-  await page.goto("/products/published-product");
+  await page.goto("/tovary/published-product");
   const add = page.getByRole("button", { name: "Добавить в корзину" });
   await expect(add).toHaveAttribute("data-cart-ready", "true");
   await add.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("heading", { name: "Корзина" })).toBeVisible();
+  await expect(dialog).toHaveCSS("width", "460px");
+  await expect(dialog).toHaveCSS("border-left-width", "1px");
+  await expect(dialog).toHaveCSS("box-shadow", "none");
+  const removeButton = dialog.getByRole("button", {
+    name: /Удалить .+ из корзины/,
+  });
+  await expect(removeButton).toHaveCSS("width", "44px");
+  const removeIcon = removeButton.locator("svg");
+  await expect(removeIcon).toHaveCount(1);
+  await expect(removeIcon).toHaveCSS("width", "20px");
   await dialog.getByRole("button", { name: "Перейти к оформлению" }).click();
   await expect(
     dialog.getByRole("heading", { name: "Оформление" }),
   ).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Отправить заявку" }),
+    dialog.getByRole("button", { name: "Подтвердить заказ" }),
   ).toBeEnabled();
+  await expect(
+    dialog.getByRole("radio", { name: /Самовывоз/ }),
+  ).not.toBeChecked();
+  await expect(
+    dialog.getByRole("radio", { name: /Доставка курьером/ }),
+  ).not.toBeChecked();
+  await expect(dialog.getByLabel("ФИО")).toHaveCount(0);
+  await expect(
+    dialog.getByRole("button", { name: "Назад к корзине" }),
+  ).toHaveCSS("margin-bottom", "24px");
+  await expect(dialog.locator("form").locator("..")).toHaveCSS(
+    "overflow-y",
+    "auto",
+  );
   return dialog;
 }
 
 async function fillValidCheckout(page: Page, comment = "") {
-  await page.getByLabel("Имя").fill("Анна");
+  await page.getByRole("radio", { name: /Доставка курьером/ }).check();
+  await page.getByLabel("ФИО").fill("Анна");
   await page.getByLabel("Телефон").fill("8 (999) 123-45-67");
   await page
     .getByLabel("Адрес доставки")
@@ -34,25 +60,103 @@ async function fillValidCheckout(page: Page, comment = "") {
 }
 
 test.beforeEach(async ({ request }) => {
-  await request.delete("http://127.0.0.1:14338/__test/orders-count");
+  await request.delete(
+    `http://127.0.0.1:${cmsFixturePort}/__test/orders-count`,
+  );
 });
 
 test("product → cart → validation → confirmed checkout success @smoke", async ({
   page,
 }) => {
   const dialog = await addProductAndOpenCheckout(page);
+  const pickup = page.getByRole("radio", { name: /Самовывоз/ });
+  const courier = page.getByRole("radio", { name: /Доставка курьером/ });
 
-  await dialog.getByRole("button", { name: "Отправить заявку" }).click();
-  await expect(dialog.getByText("Проверьте заполнение формы")).toBeVisible();
-  await expect(page.getByLabel("Имя")).toBeFocused();
+  await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
+  await expect(pickup).toBeFocused();
+  await expect(dialog.getByText("Выберите способ получения")).toBeVisible();
+
+  await courier.check();
+  const name = page.getByLabel("ФИО");
+  const phone = page.getByLabel("Телефон");
+  const email = page.getByLabel("Email (необязательно)");
+  const address = page.getByLabel("Адрес доставки");
+
+  await expect(name).toHaveAttribute("autocomplete", "name");
+  await expect(phone).toHaveAttribute("autocomplete", "tel");
+  await expect(email).toHaveAttribute("autocomplete", "email");
+  await expect(address).toHaveAttribute("autocomplete", "street-address");
+  await expect(phone).toHaveAttribute("placeholder", "+7 (XXX) XXX-XX-XX");
+  await phone.focus();
+  await expect(phone).toHaveAttribute("placeholder", "+7 (___) ___-__-__");
+  await expect(phone).toHaveValue("+7 (___) ___-__-__");
+  await phone.press("7");
+  await expect(phone).toHaveValue("+7 (___) ___-__-__");
+  await expect
+    .poll(() =>
+      phone.evaluate((input) => (input as HTMLInputElement).selectionStart),
+    )
+    .toBe(4);
+  await phone.selectText();
+  await phone.press("Backspace");
+  await expect(phone).toHaveValue("+7 (___) ___-__-__");
+  await phone.press("9");
+  await expect(phone).toHaveValue("+7 (9__) ___-__-__");
+  await phone.selectText();
+  await phone.press("Delete");
+  await expect(phone).toHaveValue("+7 (___) ___-__-__");
+  await phone.press("8");
+  await expect(phone).toHaveValue("+7 (___) ___-__-__");
+  await phone.selectText();
+  await phone.press("Backspace");
+  await phone.fill("8 (999) 123-45-67");
+  await expect(phone).toHaveValue("+7 (999) 123-45-67");
+  await phone.press("Backspace");
+  await expect(phone).toHaveValue("+7 (999) 123-45-6_");
+  await phone.fill("");
+
+  await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
+  await expect(dialog.getByText("Проверьте заполнение формы")).toHaveCount(0);
+  await expect(dialog.getByText("Укажите ФИО")).toBeVisible();
+  await expect(name).toHaveCSS("border-color", "rgb(184, 61, 47)");
+  expect(
+    await page
+      .getByLabel("Согласен на обработку персональных данных")
+      .evaluate((input) => getComputedStyle(input.parentElement!).alignItems),
+  ).toBe("center");
+  await expect(name).toBeFocused();
+
+  const comment = page.getByLabel("Комментарий (необязательно)");
+  await expect(comment).toHaveAttribute("maxlength", "1000");
+  await expect(comment.locator("..").getByText("0/1000")).toBeVisible();
+  const initialCommentHeight = await comment.evaluate(
+    (textarea) => textarea.getBoundingClientRect().height,
+  );
+  const commentValue = "Первая строка\nВторая строка\nТретья строка\nЧетвёртая";
+  await comment.fill(commentValue);
+  await expect(
+    comment.locator("..").getByText(`${commentValue.length}/1000`),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      comment.evaluate((textarea) => textarea.getBoundingClientRect().height),
+    )
+    .toBeGreaterThan(initialCommentHeight);
 
   await fillValidCheckout(page);
-  await dialog.getByRole("button", { name: "Отправить заявку" }).click();
+  await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
 
   await expect(
-    dialog.getByRole("heading", { name: "Спасибо, заявка принята" }),
+    dialog.getByRole("heading", { name: "Спасибо, заказ принят" }),
   ).toBeVisible();
-  await expect(dialog.getByText("Заказ № E2E-0001")).toBeVisible();
+  await expect(dialog.getByText("Номер заказа")).toBeVisible();
+  await expect(dialog.getByText("2607-0001")).toBeVisible();
+  await expect(dialog.getByText("Заявка принята.")).toHaveCount(0);
+  await expect(
+    dialog.getByText(
+      "Менеджер свяжется с вами, чтобы подтвердить наличие и согласовать оплату.",
+    ),
+  ).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -66,11 +170,11 @@ test("product → cart → validation → confirmed checkout success @smoke", as
 test("submit error preserves cart", async ({ page }) => {
   const dialog = await addProductAndOpenCheckout(page);
   await fillValidCheckout(page, "TRIGGER_ERROR");
-  await dialog.getByRole("button", { name: "Отправить заявку" }).click();
+  await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
 
   await expect(
     dialog.getByRole("alert").filter({
-      hasText: "Не удалось создать заявку",
+      hasText: "Не удалось создать заказ",
     }),
   ).toBeVisible();
   expect(
@@ -84,18 +188,18 @@ test("submit error preserves cart", async ({ page }) => {
 test("double click creates one upstream request", async ({ page, request }) => {
   const dialog = await addProductAndOpenCheckout(page);
   await fillValidCheckout(page, "DOUBLE_CLICK");
-  const submit = dialog.getByRole("button", { name: "Отправить заявку" });
+  const submit = dialog.getByRole("button", { name: "Подтвердить заказ" });
 
   await submit.evaluate((button: HTMLButtonElement) => {
     button.click();
     button.click();
   });
   await expect(
-    dialog.getByRole("heading", { name: "Спасибо, заявка принята" }),
+    dialog.getByRole("heading", { name: "Спасибо, заказ принят" }),
   ).toBeVisible();
 
   const count = await (
-    await request.get("http://127.0.0.1:14338/__test/orders-count")
+    await request.get(`http://127.0.0.1:${cmsFixturePort}/__test/orders-count`)
   ).json();
   expect(count.count).toBe(1);
 });
@@ -103,7 +207,7 @@ test("double click creates one upstream request", async ({ page, request }) => {
 test("drawer and checkout are keyboard-operable and axe-clean @a11y", async ({
   page,
 }) => {
-  await page.goto("/products/published-product");
+  await page.goto("/tovary/published-product");
   const add = page.getByRole("button", { name: "Добавить в корзину" });
   await expect(add).toHaveAttribute("data-cart-ready", "true");
   await add.focus();
@@ -129,9 +233,36 @@ test("drawer and checkout are keyboard-operable and axe-clean @a11y", async ({
       .violations,
   ).toEqual([]);
 
+  const submit = dialog.getByRole("button", { name: "Подтвердить заказ" });
+  await expect(submit).toBeEnabled();
+  await submit.focus();
+  await page.keyboard.press("Enter");
+  await expect(dialog.getByRole("radio", { name: /Самовывоз/ })).toBeFocused();
+  await expect(
+    dialog.getByRole("radiogroup", { name: "Способ получения" }),
+  ).toHaveAttribute("aria-invalid", "true");
+
   const close = dialog.getByRole("button", { name: "Закрыть корзину" });
   await close.focus();
   await page.keyboard.press("Enter");
+  await expect(page.locator("[data-cart-drawer]")).toHaveAttribute(
+    "data-state",
+    "closed",
+  );
   await expect(dialog).toBeHidden();
   await expect(page.getByRole("button", { name: "В корзине" })).toBeFocused();
+});
+
+test("pickup shows CMS address and discounted total without address input", async ({
+  page,
+}) => {
+  const dialog = await addProductAndOpenCheckout(page);
+  await page.getByRole("radio", { name: /Самовывоз/ }).check();
+
+  await expect(dialog.getByText(/г\. Москва, ул\. Чайная/)).toBeVisible();
+  await expect(page.getByLabel("Адрес доставки")).toHaveCount(0);
+  await expect(dialog.getByText("Со скидкой за самовывоз")).toBeVisible();
+  await expect(
+    dialog.getByText(/Скидка 10% будет зафиксирована/),
+  ).toBeVisible();
 });

@@ -8,14 +8,42 @@ import { CmsValidationError } from "./errors.ts";
 
 const mediaSchema = z.object({
   url: z.string().min(1),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
   alternativeText: z.string().nullable().optional(),
+  formats: z
+    .object({
+      small: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+      medium: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+      thumbnail: z
+        .object({
+          url: z.string().min(1),
+          width: z.number().int().positive(),
+          height: z.number().int().positive(),
+        })
+        .optional(),
+    })
+    .nullable()
+    .optional(),
 });
 
 const productRecordSchema = z.object({
   documentId: z.string().min(1),
   slug: z.string().min(1),
-  type: z.enum(["product", "ritual"]),
-  title: z.string().min(1),
+  type: z.enum(["tovar", "nabor"]),
+  displayName: z.string().min(1),
   packageLabel: z.string().min(1),
   price: z.number().int().positive(),
   stock: z.number().int().nonnegative(),
@@ -43,18 +71,37 @@ function mapProduct(
   publicBase: string,
 ): ProductSummary {
   const image = record.mainImage?.image;
+  const cardImage = image
+    ? (image.formats?.small ??
+      image.formats?.medium ??
+      image.formats?.thumbnail ??
+      image)
+    : undefined;
+  const imageSources = image
+    ? [
+        image.formats?.thumbnail,
+        image.formats?.small,
+        image.formats?.medium,
+        image,
+      ].flatMap((source) =>
+        source
+          ? [{ url: getMediaUrl(source.url, publicBase), width: source.width }]
+          : [],
+      )
+    : [];
 
   return productSummarySchema.parse({
     id: record.documentId,
     slug: record.slug,
     type: record.type,
-    title: record.title,
+    title: record.displayName,
     packageLabel: record.packageLabel,
     priceRubles: record.price,
     excerpt: record.cardExcerpt,
     inStock: record.stock > 0,
-    imageUrl: image ? getMediaUrl(image.url, publicBase) : undefined,
+    imageUrl: cardImage ? getMediaUrl(cardImage.url, publicBase) : undefined,
     imageAlt: record.mainImage?.alt ?? image?.alternativeText ?? undefined,
+    imageSources: imageSources.length > 0 ? imageSources : undefined,
   });
 }
 
