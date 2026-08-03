@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_seos",
   "info": {
-    "displayName": "SEO",
-    "description": "Search metadata. Keep the title and description concise; these are recommendations, not validation limits."
+    "displayName": "SEO-настройки",
+    "description": "Поисковые метаданные. Заголовок и описание должны быть краткими; это рекомендации, а не ограничения."
   },
   "attributes": {
     "title": {

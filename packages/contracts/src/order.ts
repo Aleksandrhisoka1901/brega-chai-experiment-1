@@ -1,6 +1,16 @@
 import { z } from "zod";
 
 const nonEmptyStringSchema = z.string().trim().min(1);
+export const checkoutFieldLimits = {
+  name: 100,
+  phone: 16,
+  phoneInput: 32,
+  email: 254,
+  deliveryAddress: 500,
+  comment: 1_000,
+} as const;
+export const deliveryMethodSchema = z.enum(["pickup", "courier"]);
+export const pickupDiscountPercentSchema = z.number().int().min(0).max(100);
 const rubleAmountSchema = z
   .number()
   .int()
@@ -26,12 +36,18 @@ export const orderItemInputSchema = z
 
 export const customerDetailsSchema = z
   .object({
-    name: nonEmptyStringSchema,
+    name: nonEmptyStringSchema.max(checkoutFieldLimits.name),
     phone: z
       .string()
       .trim()
+      .max(checkoutFieldLimits.phone)
       .regex(/^\+[1-9]\d{7,14}$/, "Phone must use E.164 format"),
-    email: z.string().trim().pipe(z.email()).optional(),
+    email: z
+      .string()
+      .trim()
+      .max(checkoutFieldLimits.email)
+      .pipe(z.email())
+      .optional(),
   })
   .strict();
 
@@ -53,13 +69,24 @@ export const createOrderInputSchema = z
   .object({
     idempotencyKey: z.uuid(),
     customer: customerDetailsSchema,
-    deliveryAddress: nonEmptyStringSchema,
-    comment: z.string().trim().optional(),
+    deliveryMethod: deliveryMethodSchema,
+    deliveryAddress: nonEmptyStringSchema
+      .max(checkoutFieldLimits.deliveryAddress)
+      .optional(),
+    comment: z.string().trim().max(checkoutFieldLimits.comment).optional(),
     consents: orderConsentsSchema,
     items: z.array(orderItemInputSchema).min(1),
   })
   .strict()
-  .superRefine(({ items }, context) => {
+  .superRefine(({ deliveryAddress, deliveryMethod, items }, context) => {
+    if (deliveryMethod === "courier" && !deliveryAddress) {
+      context.addIssue({
+        code: "custom",
+        message: "Delivery address is required for courier delivery",
+        path: ["deliveryAddress"],
+      });
+    }
+
     const seenProductIds = new Set<string>();
 
     items.forEach((item, index) => {
@@ -138,30 +165,85 @@ export const orderLineSnapshotSchema = z
     }
   });
 
+export function calculateDiscountedTotalRubles(
+  totalRubles: number,
+  discountPercent: number,
+): number {
+  if (!Number.isSafeInteger(totalRubles) || totalRubles < 0) {
+    throw new RangeError("Total must be a non-negative integer");
+  }
+  const discount = pickupDiscountPercentSchema.parse(discountPercent);
+  return Math.round((totalRubles * (100 - discount)) / 100);
+}
+
 export const orderResultSchema = z
   .object({
     orderId: nonEmptyStringSchema,
+    orderNumber: nonEmptyStringSchema,
     status: orderStatusSchema,
+    deliveryMethod: deliveryMethodSchema,
+    pickupDiscountPercent: pickupDiscountPercentSchema,
     currency: z.literal("RUB"),
     lines: z.array(orderLineSnapshotSchema).min(1),
     totalRubles: positiveRubleAmountSchema,
+    discountedTotalRubles: rubleAmountSchema,
   })
   .strict()
-  .superRefine(({ lines, totalRubles }, context) => {
-    const expectedTotal = lines.reduce(
-      (total, line) => total + line.lineTotalRubles,
-      0,
-    );
-    if (!Number.isSafeInteger(expectedTotal) || totalRubles !== expectedTotal) {
-      context.addIssue({
-        code: "custom",
-        message: "Order total must equal the sum of its lines",
-        path: ["totalRubles"],
-      });
-    }
-  });
+  .superRefine(
+    (
+      {
+        deliveryMethod,
+        discountedTotalRubles,
+        lines,
+        pickupDiscountPercent,
+        totalRubles,
+      },
+      context,
+    ) => {
+      const expectedTotal = lines.reduce(
+        (total, line) => total + line.lineTotalRubles,
+        0,
+      );
+      if (
+        !Number.isSafeInteger(expectedTotal) ||
+        totalRubles !== expectedTotal
+      ) {
+        context.addIssue({
+          code: "custom",
+          message: "Order total must equal the sum of its lines",
+          path: ["totalRubles"],
+        });
+      }
+
+      const expectedDiscountPercent =
+        deliveryMethod === "pickup" ? pickupDiscountPercent : 0;
+      if (
+        deliveryMethod === "courier" &&
+        pickupDiscountPercent !== expectedDiscountPercent
+      ) {
+        context.addIssue({
+          code: "custom",
+          message: "Courier orders cannot have a pickup discount",
+          path: ["pickupDiscountPercent"],
+        });
+      }
+
+      const expectedDiscountedTotal = calculateDiscountedTotalRubles(
+        totalRubles,
+        expectedDiscountPercent,
+      );
+      if (discountedTotalRubles !== expectedDiscountedTotal) {
+        context.addIssue({
+          code: "custom",
+          message: "Discounted total must match the stored discount snapshot",
+          path: ["discountedTotalRubles"],
+        });
+      }
+    },
+  );
 
 export type OrderItemInput = z.infer<typeof orderItemInputSchema>;
+export type DeliveryMethod = z.infer<typeof deliveryMethodSchema>;
 export type CustomerDetails = z.infer<typeof customerDetailsSchema>;
 export type OrderConsents = z.infer<typeof orderConsentsSchema>;
 export type CreateOrderInput = z.infer<typeof createOrderInputSchema>;

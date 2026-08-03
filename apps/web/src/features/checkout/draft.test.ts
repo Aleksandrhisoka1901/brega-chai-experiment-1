@@ -20,6 +20,7 @@ test("round-trips contact draft but never stores consents", () => {
   const storage = new MemoryStorage();
   const persistence = createCheckoutDraftPersistence(storage);
   persistence.save({
+    deliveryMethod: "courier",
     name: "Анна",
     phone: "+79991234567",
     email: "anna@example.test",
@@ -30,6 +31,7 @@ test("round-trips contact draft but never stores consents", () => {
   });
 
   assert.deepEqual(persistence.load(), {
+    deliveryMethod: "courier",
     name: "Анна",
     phone: "+79991234567",
     email: "anna@example.test",

@@ -22,6 +22,16 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "firefox-smoke",
+      grep: /@smoke/,
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit-smoke",
+      grep: /@smoke/,
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
   webServer: process.env.BASE_URL
     ? undefined
@@ -45,6 +55,8 @@ export default defineConfig({
             CHECKOUT_FORM_SECRET:
               "e2e-checkout-form-secret-with-enough-entropy",
             STRAPI_ORDER_TOKEN: "e2e-scoped-order-token",
+            SITE_URL: `http://127.0.0.1:${webPort}`,
+            NEXT_PUBLIC_CMS_URL: `http://127.0.0.1:${cmsFixturePort}`,
             HOSTNAME: "0.0.0.0",
             PORT: String(webPort),
           },

@@ -113,6 +113,7 @@ function browserOrder(productId: string, idempotencyKey = randomUUID()) {
     order: {
       idempotencyKey,
       customer: { name: "HTTP integration", phone: "+79991234567" },
+      deliveryMethod: "courier",
       deliveryAddress: "Москва, интеграционный тест",
       comment: "Real Next BFF to Strapi to PostgreSQL",
       consents: {

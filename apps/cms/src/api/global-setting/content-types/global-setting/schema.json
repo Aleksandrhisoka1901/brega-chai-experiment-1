@@ -4,8 +4,8 @@
   "info": {
     "singularName": "global-setting",
     "pluralName": "global-settings",
-    "displayName": "Global settings",
-    "description": "Storefront-wide content and defaults"
+    "displayName": "Общие настройки",
+    "description": "Общие данные, навигация и значения сайта по умолчанию"
   },
   "options": {
     "draftAndPublish": true
@@ -22,6 +22,32 @@
       "required": false,
       "allowedTypes": ["images"]
     },
+    "orderNotificationEmail": {
+      "type": "email",
+      "required": true,
+      "private": true,
+      "description": "Служебный адрес, на который отправляются уведомления о новых заказах. На витрине не публикуется."
+    },
+    "pickupAddress": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "description": "Адрес и график самовывоза, которые увидит покупатель и которые сохранятся в заказе."
+    },
+    "pickupDiscountPercent": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "max": 100,
+      "default": 10,
+      "description": "Скидка за самовывоз в процентах. Итог заказа округляется до целого рубля."
+    },
+    "courierDeliveryNote": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Короткие условия курьерской доставки рядом с выбором способа получения."
+    },
     "email": {
       "type": "email",
       "required": true
@@ -35,11 +61,24 @@
     "defaultProductStory": {
       "type": "blocks",
       "required": true,
-      "description": "Recommended structure: a concise opening followed by short, clearly headed sections, paragraphs, lists, links, or images as useful. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
+      "description": "Рекомендуемая структура: короткое вступление и небольшие разделы с понятными заголовками, абзацами, списками, ссылками и изображениями. H1 на сайте заменяется на H2. Неподдерживаемое или исполняемое содержимое, включая скрипты, не выводится."
     },
     "navigation": {
       "type": "component",
       "component": "shared.navigation-labels",
+      "repeatable": false,
+      "required": true
+    },
+    "sectionBreadcrumbs": {
+      "type": "component",
+      "component": "shared.section-breadcrumb",
+      "repeatable": true,
+      "required": false,
+      "description": "Необязательные подписи разделов в хлебных крошках. Для каждого раздела можно добавить только одну запись."
+    },
+    "storefrontTexts": {
+      "type": "component",
+      "component": "shared.storefront-texts",
       "repeatable": false,
       "required": true
     },

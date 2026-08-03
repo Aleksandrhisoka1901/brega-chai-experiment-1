@@ -84,7 +84,7 @@ export async function handleCreateOrder(
         return safeError(
           409,
           "IDEMPOTENCY_CONFLICT",
-          "Заявка уже обрабатывается.",
+          "Заказ уже обрабатывается.",
         );
       }
       if (upstream.status === 400 || upstream.status === 422) {
@@ -97,7 +97,7 @@ export async function handleCreateOrder(
       return safeError(
         503,
         "ORDER_SERVICE_UNAVAILABLE",
-        "Не удалось создать заявку. Попробуйте позже.",
+        "Не удалось создать заказ. Попробуйте позже.",
       );
     }
 
@@ -107,7 +107,7 @@ export async function handleCreateOrder(
       return safeError(
         503,
         "INVALID_ORDER_RESPONSE",
-        "Не удалось подтвердить создание заявки.",
+        "Не удалось подтвердить создание заказа.",
       );
     }
     return Response.json(result.data, { status: upstream.status });

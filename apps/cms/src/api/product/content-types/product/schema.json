@@ -4,16 +4,31 @@
   "info": {
     "singularName": "product",
     "pluralName": "products",
-    "displayName": "Product"
+    "displayName": "Товар",
+    "description": "Товар или готовый набор товаров"
   },
   "options": {
     "draftAndPublish": true
+  },
+  "config": {
+    "attributes": {
+      "seedKey": {
+        "hidden": true
+      }
+    }
   },
   "attributes": {
     "title": {
       "type": "string",
       "required": true,
-      "minLength": 1
+      "minLength": 1,
+      "description": "Техническое название для списка и внутренних операций, например «Ритуал: Утро без слов» или «Сорт: Да Хун Пао»."
+    },
+    "displayName": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Название, которое покупатель видит на витрине, в корзине и заказе."
     },
     "seedKey": {
       "type": "string",
@@ -24,24 +39,37 @@
     },
     "slug": {
       "type": "uid",
+      "targetField": "displayName",
       "required": true,
       "unique": true,
-      "minLength": 8,
+      "minLength": 1,
       "maxLength": 180
     },
     "type": {
       "type": "enumeration",
-      "enum": ["ritual", "product"],
+      "enum": ["nabor", "tovar"],
       "required": true
+    },
+    "breadcrumbLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Необязательная короткая подпись для последнего пункта хлебных крошек. Если поле пустое, используется название."
+    },
+    "categoryLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Категория для SEO и структурированных данных, например «сорт чая» или «подарочный набор». Если поле пустое, используется общий тип позиции."
     },
     "originalTitle": {
       "type": "string",
-      "required": false
+      "required": false,
+      "regex": "^[А-Яа-яЁё0-9 .,'’«»()\\-]+$"
     },
     "packageLabel": {
       "type": "string",
       "required": true,
-      "minLength": 1
+      "minLength": 1,
+      "description": "Укажите тип упаковки и фасовку целиком, например: «Маленькая банка (90 г)» или «Пакетик (50 г)»."
     },
     "price": {
       "type": "integer",
@@ -55,17 +83,6 @@
       "default": "RUB"
     },
     "stock": {
-      "type": "integer",
-      "required": true,
-      "min": 0,
-      "default": 0
-    },
-    "active": {
-      "type": "boolean",
-      "required": true,
-      "default": true
-    },
-    "sortOrder": {
       "type": "integer",
       "required": true,
       "min": 0,
@@ -93,24 +110,18 @@
       "required": true,
       "minLength": 1
     },
-    "articleContent": {
-      "type": "blocks",
+    "articles": {
+      "type": "component",
+      "component": "product.article",
+      "repeatable": true,
       "required": false,
-      "description": "Recommended structure: a concise introduction followed by short sections with descriptive headings, paragraphs, lists, links, or images as useful. An H1 entered here is rendered as H2 by the storefront. Unsupported or executable content, including scripts, is not rendered."
+      "description": "Добавляйте, удаляйте и меняйте порядок отдельных статей нижней контентной зоны товара."
     },
-    "seoTitle": {
-      "type": "string",
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
       "required": false
-    },
-    "seoDescription": {
-      "type": "text",
-      "required": false
-    },
-    "seoImage": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": ["images"]
     }
   }
 }

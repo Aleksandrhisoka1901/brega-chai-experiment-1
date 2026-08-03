@@ -1,5 +1,7 @@
 import "server-only";
 
+import { publicMediaOrigin } from "@/server/public-runtime-config";
+
 import { fetchCms } from "./client";
 import {
   fetchProductsPageContent,
@@ -7,10 +9,7 @@ import {
 } from "./products-page-mapper";
 
 export async function getProductsPage(): Promise<ProductsPageContent> {
-  const publicBase =
-    process.env.NEXT_PUBLIC_MEDIA_URL ??
-    process.env.NEXT_PUBLIC_CMS_URL ??
-    "http://localhost:1337";
+  const publicBase = publicMediaOrigin();
 
   return fetchProductsPageContent(fetchCms, publicBase);
 }

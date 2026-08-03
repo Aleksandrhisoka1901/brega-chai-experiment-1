@@ -12,8 +12,8 @@ import type { CartProduct } from "./types.ts";
 
 const product: CartProduct = {
   productId: "product-1",
-  slug: "da-hun-pao-a1b2c3",
-  type: "product",
+  slug: "da-hun-pao",
+  type: "tovar",
   title: "Да Хун Пао",
   packageLabel: "50 г",
   unitPriceSnapshot: 1600,
@@ -77,7 +77,7 @@ test("removes one item or clears the complete cart", () => {
   const first = addItem(createEmptyCart(), product, 1);
   const second = addItem(
     first,
-    { ...product, productId: "product-2", slug: "gyokuro-d4e5f6" },
+    { ...product, productId: "product-2", slug: "gyokuro" },
     1,
   );
 

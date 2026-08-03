@@ -87,7 +87,7 @@ test("maps home, global and products to their exact cache boundaries", async () 
       payload: { id: "evt-products", event: "products" },
       tags: ["products"],
       paths: [
-        ["/products", "page"],
+        ["/tovary", "page"],
         ["/sitemap.xml", "page"],
       ],
     },
@@ -113,7 +113,7 @@ test("maps one product to listing, detail, home and sitemap", async () => {
       event: "product",
       product: {
         documentId: "doc-42",
-        type: "product",
+        type: "tovar",
         slug: "sencha-42",
       },
     }),
@@ -121,10 +121,10 @@ test("maps one product to listing, detail, home and sitemap", async () => {
   );
 
   assert.equal(response.status, 200);
-  assert.deepEqual(tags, ["products", "product-slug:product:sencha-42"]);
+  assert.deepEqual(tags, ["products", "product-slug:tovar:sencha-42"]);
   assert.deepEqual(paths, [
-    ["/products", "page"],
-    ["/products/sencha-42", "page"],
+    ["/tovary", "page"],
+    ["/tovary/sencha-42", "page"],
     ["/", "page"],
     ["/sitemap.xml", "page"],
   ]);

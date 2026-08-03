@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_home_rituals_previews",
+  "info": {
+    "displayName": "Анонс ритуалов",
+    "description": "Заголовок и короткий анонс раздела ритуалов."
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "subtitle": {
+      "type": "text",
+      "required": false
+    }
+  }
+}

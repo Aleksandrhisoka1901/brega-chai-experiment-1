@@ -1,5 +1,7 @@
 import "server-only";
 
+import { publicMediaOrigin } from "@/server/public-runtime-config";
+
 import { fetchCms } from "./client";
 import {
   mapProductDetailPayload,
@@ -7,15 +9,14 @@ import {
 } from "./product-detail-mapper";
 
 export async function getProductBySlug(
-  type: "product" | "ritual",
+  type: "tovar" | "nabor",
   slug: string,
 ): Promise<ProductDetail | null> {
   const query = new URLSearchParams({
     status: "published",
     "filters[type][$eq]": type,
     "filters[slug][$eq]": slug,
-    "filters[active][$eq]": "true",
-    "fields[0]": "title",
+    "fields[0]": "displayName",
     "fields[1]": "slug",
     "fields[2]": "type",
     "fields[3]": "originalTitle",
@@ -25,22 +26,26 @@ export async function getProductBySlug(
     "fields[7]": "stock",
     "fields[8]": "cardExcerpt",
     "fields[9]": "story",
-    "fields[10]": "articleContent",
+    "fields[10]": "breadcrumbLabel",
+    "fields[11]": "categoryLabel",
+    "populate[seo][fields][0]": "title",
+    "populate[seo][fields][1]": "description",
+    "populate[seo][populate][image][fields][0]": "url",
     "populate[mainImage][populate][image][fields][0]": "url",
     "populate[mainImage][populate][image][fields][1]": "width",
     "populate[mainImage][populate][image][fields][2]": "height",
+    "populate[mainImage][populate][image][fields][3]": "formats",
     "populate[gallery][populate][image][fields][0]": "url",
     "populate[gallery][populate][image][fields][1]": "width",
     "populate[gallery][populate][image][fields][2]": "height",
+    "populate[gallery][populate][image][fields][3]": "formats",
+    "populate[articles][fields][0]": "content",
     "pagination[pageSize]": "1",
   });
   const payload = await fetchCms(`/api/products?${query}`, {
     tags: ["products", `product-slug:${type}:${slug}`],
   });
-  const publicBase =
-    process.env.NEXT_PUBLIC_MEDIA_URL ??
-    process.env.NEXT_PUBLIC_CMS_URL ??
-    "http://localhost:1337";
+  const publicBase = publicMediaOrigin();
 
   return mapProductDetailPayload(payload, publicBase);
 }

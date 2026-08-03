@@ -7,12 +7,20 @@ function envFrom(values: Record<string, string>) {
   return (key: string, fallback?: string) => values[key] ?? fallback;
 }
 
-test("local upload leaves the S3 provider disabled", () => {
+test("local upload leaves S3 disabled while keeping editor plugins", () => {
   const config = createPluginsConfig({
     env: envFrom({ UPLOAD_PROVIDER: "local" }),
   });
 
-  assert.deepEqual(config, {});
+  assert.equal(config["better-blocks"].enabled, true);
+  assert.deepEqual(config["order-admin"], {
+    enabled: true,
+    resolve: "./src/plugins/order-admin",
+  });
+  assert.equal(config.email.config.provider, "nodemailer");
+  assert.equal(config.email.config.providerOptions.host, "localhost");
+  assert.equal(config.email.config.providerOptions.port, 1025);
+  assert.equal(config.upload, undefined);
 });
 
 test("RustFS uses the S3 provider with path style and a 12 MB limit", () => {
@@ -28,6 +36,7 @@ test("RustFS uses the S3 provider with path style and a 12 MB limit", () => {
     }),
   });
 
+  assert.equal(config["better-blocks"].enabled, true);
   assert.equal(config.upload.config.provider, "aws-s3");
   assert.equal(config.upload.config.sizeLimit, 12 * 1024 * 1024);
   assert.equal(

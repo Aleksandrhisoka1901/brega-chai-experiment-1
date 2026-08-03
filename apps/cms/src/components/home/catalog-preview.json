@@ -1,10 +1,15 @@
 {
   "collectionName": "components_home_catalog_previews",
   "info": {
-    "displayName": "Catalog preview",
-    "description": "Keep headings and short announcements concise; length guidance is editorial, not a validation error."
+    "displayName": "Анонс сортов",
+    "description": "Заголовок, короткий анонс и ссылка на каталог сортов."
   },
   "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
     "title": {
       "type": "string",
       "required": true,
@@ -13,6 +18,11 @@
     "subtitle": {
       "type": "text",
       "required": false
+    },
+    "linkLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Текст ссылки на полный каталог сортов."
     }
   }
 }

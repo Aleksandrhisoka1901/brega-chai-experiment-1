@@ -1,27 +1,63 @@
+import type { Metadata } from "next";
+
 import { HomeAbout } from "@/components/home-about";
 import { HomeHero } from "@/components/home-hero";
-import { HomeProducts } from "@/components/home-products";
-import { HomeRituals } from "@/components/home-rituals";
+import { HomeNabory } from "@/components/home-nabory";
+import { HomeTovary } from "@/components/home-tovary";
 import { CmsUnavailableError } from "@/server/cms/errors";
 import { getHomePage } from "@/server/cms/home";
+import { getGlobalSettings } from "@/server/cms/global";
+import { pageMetadata } from "@/lib/seo/metadata";
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const [{ content }, settings] = await Promise.all([
+      getHomePage(),
+      getGlobalSettings(),
+    ]);
+
+    return pageMetadata({
+      title: content.seo?.title ?? settings.defaultSeo.title,
+      description: content.seo?.description ?? settings.defaultSeo.description,
+      imageUrl: content.seo?.imageUrl ?? settings.defaultSeo.imageUrl,
+      path: "/",
+    });
+  } catch (error) {
+    if (!(error instanceof CmsUnavailableError)) throw error;
+    return {
+      title: "Главная страница временно недоступна",
+      robots: { index: false, follow: false },
+    };
+  }
+}
 
 export default async function HomePage() {
   try {
-    const { content, rituals, products } = await getHomePage();
+    const [{ content, nabory, tovary }, settings] = await Promise.all([
+      getHomePage(),
+      getGlobalSettings(),
+    ]);
 
     return (
       <main>
         <HomeHero hero={content.hero} />
         <HomeAbout about={content.about} />
-        <HomeRituals
-          products={rituals}
-          subtitle={content.ritualsPreview.subtitle}
-          title={content.ritualsPreview.title}
+        <HomeNabory
+          eyebrow={content.naboryPreview.eyebrow}
+          imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+          products={nabory}
+          subtitle={content.naboryPreview.subtitle}
+          title={content.naboryPreview.title}
         />
-        <HomeProducts
-          products={products}
-          subtitle={content.productsPreview.subtitle}
-          title={content.productsPreview.title}
+        <HomeTovary
+          brandName={settings.brandName}
+          eyebrow={content.tovaryPreview.eyebrow}
+          imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+          linkLabel={content.tovaryPreview.linkLabel}
+          outOfStock={settings.storefrontTexts.outOfStock}
+          products={tovary}
+          subtitle={content.tovaryPreview.subtitle}
+          title={content.tovaryPreview.title}
         />
       </main>
     );

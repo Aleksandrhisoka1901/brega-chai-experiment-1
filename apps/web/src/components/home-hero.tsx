@@ -1,36 +1,47 @@
-import Image from "next/image";
-import Link from "next/link";
-
 import type { HomePageContent } from "@/server/cms/home-mapper";
+import { bindShortRussianWords } from "@/lib/typography";
 
+import { EditorialLink } from "./editorial-link";
+import { ResponsiveImage } from "./responsive-image";
 import styles from "./home.module.css";
 
 export function HomeHero({ hero }: { hero: HomePageContent["hero"] }) {
   return (
-    <section
-      className={styles.hero}
-      data-layout={hero.layout}
-      style={{
-        backgroundColor: hero.backgroundColor,
-        color: hero.textColor,
-      }}
-    >
-      <div className={styles.heroCopy}>
-        <p className={styles.chapter}>Brega Chai · Чайное издание</p>
-        <h1>{hero.title}</h1>
-        <p>{hero.text}</p>
-        {hero.cta ? <Link href={hero.cta.url}>{hero.cta.label}</Link> : null}
+    <section className={styles.hero} data-layout={hero.layout}>
+      <div
+        className={styles.heroCopy}
+        style={{
+          backgroundColor: hero.backgroundColor,
+          color: hero.textColor,
+        }}
+      >
+        <p className={styles.chapter}>{bindShortRussianWords(hero.eyebrow)}</p>
+        <h1>{bindShortRussianWords(hero.title)}</h1>
+        <div className={styles.heroIntro}>
+          <p>{bindShortRussianWords(hero.text)}</p>
+          {hero.cta ? (
+            <EditorialLink
+              direction="down"
+              href={hero.cta.url}
+              label={hero.cta.label}
+            />
+          ) : null}
+        </div>
       </div>
-      {hero.image ? (
+      {hero.layout !== "100/0" ? (
         <div className={styles.heroMedia}>
-          <Image
-            alt={hero.image.alt}
-            fill
-            priority
-            sizes="(max-width: 767px) 100vw, 60vw"
-            src={hero.image.url}
-            unoptimized
-          />
+          {hero.image ? (
+            <ResponsiveImage
+              alt={hero.image.alt}
+              fill
+              height={hero.image.height}
+              priority
+              sizes="(max-width: 767px) 100vw, 60vw"
+              sources={hero.image.sources}
+              src={hero.image.url}
+              width={hero.image.width}
+            />
+          ) : null}
         </div>
       ) : null}
     </section>

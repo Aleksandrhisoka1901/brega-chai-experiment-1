@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_product_articles",
+  "info": {
+    "displayName": "Статья",
+    "description": "Упорядоченная статья в нижней контентной зоне товара"
+  },
+  "attributes": {
+    "content": {
+      "type": "json",
+      "customField": "plugin::better-blocks.better-blocks",
+      "required": true,
+      "description": "Рекомендуемая структура: короткое вступление и небольшие разделы с понятными заголовками, абзацами, списками, ссылками и изображениями. H1 на сайте заменяется на H2. Неподдерживаемое или исполняемое содержимое, включая скрипты, не выводится."
+    }
+  }
+}

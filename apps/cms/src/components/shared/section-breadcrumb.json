@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_section_breadcrumbs",
+  "info": {
+    "displayName": "Хлебная крошка раздела",
+    "description": "Редактируемая подпись раздела для хлебных крошек"
+  },
+  "attributes": {
+    "route": {
+      "type": "enumeration",
+      "enum": ["tovary", "nabory"],
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    }
+  }
+}

@@ -11,6 +11,7 @@
     "test": "node --experimental-strip-types --test",
     "test:integration:order": "node --experimental-strip-types --test tests/integration/order-flow.integration.test.ts",
     "test:e2e": "playwright test",
+    "legal:placeholders": "node scripts/generate-placeholder-legal-documents.mjs",
     "test:e2e:server": "yarn workspace @brega-chai/contracts build && next build && node scripts/start-standalone.mjs",
     "typecheck": "tsc --noEmit"
   },
@@ -25,6 +26,7 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-hook-form": "7.62.0",
+    "react-imask": "^7.6.1",
     "server-only": "0.0.1",
     "zod": "4.1.11"
   },

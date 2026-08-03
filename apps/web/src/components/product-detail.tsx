@@ -1,9 +1,12 @@
 import type { ProductDetail as ProductDetailData } from "@/server/cms/product-detail-mapper";
+import { bindShortRussianWords } from "@/lib/typography";
 
 import { ProductDetailGallery } from "./product-detail-gallery";
 import { ProductDetailPurchase } from "./product-detail-purchase";
+import { Breadcrumbs, type BreadcrumbItem } from "./breadcrumbs";
 import { RichContent } from "./rich-content/rich-content";
 import styles from "./product-detail.module.css";
+import type { RichContentBlock } from "./rich-content/model";
 
 const priceFormatter = new Intl.NumberFormat("ru-RU", {
   style: "currency",
@@ -11,26 +14,53 @@ const priceFormatter = new Intl.NumberFormat("ru-RU", {
   maximumFractionDigits: 0,
 });
 
-export function ProductDetail({ product }: { product: ProductDetailData }) {
+export function ProductDetail({
+  brandName,
+  breadcrumbs,
+  boutiqueStory,
+  imagePlaceholder,
+  outOfStock,
+  product,
+}: {
+  brandName: string;
+  breadcrumbs: BreadcrumbItem[];
+  boutiqueStory: RichContentBlock[];
+  imagePlaceholder: string;
+  outOfStock: string;
+  product: ProductDetailData;
+}) {
   return (
     <article className={styles.page}>
+      <Breadcrumbs items={breadcrumbs} />
       <div className={styles.top}>
-        <ProductDetailGallery images={product.images} title={product.title} />
+        <ProductDetailGallery
+          brandName={brandName}
+          imagePlaceholder={imagePlaceholder}
+          images={product.images}
+          title={product.title}
+        />
 
         <div className={styles.commerce}>
-          <p className={styles.eyebrow}>
-            {product.type === "ritual" ? "Ритуал" : "Сорт"}
+          <h1>{bindShortRussianWords(product.title)}</h1>
+          <p
+            aria-hidden={product.originalTitle ? undefined : true}
+            className={styles.originalTitle}
+            data-empty={product.originalTitle ? undefined : true}
+            data-original-title-slot
+          >
+            {product.originalTitle
+              ? bindShortRussianWords(product.originalTitle)
+              : "\u00a0"}
           </p>
-          <h1>{product.title}</h1>
-          {product.originalTitle ? (
-            <p className={styles.originalTitle}>{product.originalTitle}</p>
-          ) : null}
-          <p className={styles.package}>{product.packageLabel}</p>
+          <p className={styles.package}>
+            {bindShortRussianWords(product.packageLabel)}
+          </p>
           <p className={styles.price}>
             {priceFormatter.format(product.priceRubles)}
           </p>
 
           <ProductDetailPurchase
+            outOfStock={outOfStock}
             product={{
               productId: product.id,
               slug: product.slug,
@@ -53,16 +83,18 @@ export function ProductDetail({ product }: { product: ProductDetailData }) {
           />
 
           <div className={styles.copy}>
-            <p>{product.excerpt}</p>
-            <p>{product.story}</p>
+            <div className={styles.boutiqueStory}>
+              <RichContent content={boutiqueStory} />
+            </div>
+            <p>{bindShortRussianWords(product.story)}</p>
           </div>
         </div>
       </div>
-      {product.articleContent && product.articleContent.length > 0 ? (
-        <div className={styles.articleContent}>
-          <RichContent content={product.articleContent} />
-        </div>
-      ) : null}
+      {product.articles.map((content, index) => (
+        <section className={styles.articleContent} key={index}>
+          <RichContent content={content} />
+        </section>
+      ))}
     </article>
   );
 }

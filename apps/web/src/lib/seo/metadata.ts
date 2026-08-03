@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-const DEFAULT_TITLE = "Brega Chai";
-const DEFAULT_DESCRIPTION = "Чай и ритуалы Brega Chai";
+const DEFAULT_TITLE = "Brega Tea";
+const DEFAULT_DESCRIPTION = "Чай и ритуалы Brega Tea";
 
-export function siteOrigin(value = process.env.SITE_URL) {
+export function siteOrigin(value = process.env["SITE_URL"]) {
   const url = new URL(value ?? "http://localhost:3000");
   return url.origin.toLowerCase();
 }
@@ -27,6 +27,7 @@ export function metadataWithFallbacks(input: {
 export function pageMetadata(input: {
   title?: string | null;
   description?: string | null;
+  imageUrl?: string;
   path: string;
 }): Metadata {
   const values = metadataWithFallbacks(input);
@@ -37,6 +38,7 @@ export function pageMetadata(input: {
     alternates: { canonical },
     openGraph: {
       ...values,
+      ...(input.imageUrl ? { images: [{ url: input.imageUrl }] } : {}),
       type: "website",
       url: canonical,
       siteName: DEFAULT_TITLE,

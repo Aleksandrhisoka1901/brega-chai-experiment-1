@@ -3,35 +3,43 @@ import test from "node:test";
 
 import {
   assertSlugImmutable,
-  createSlugCandidate,
   generateUniqueSlug,
   normalizeSlugBase,
+  shouldGenerateSlug,
+  transliterateCatalogTitle,
 } from "../src/api/product/content-types/product/slug.ts";
 
 const transliterateFixture = (value: string) =>
   value === "Да Хун Пао" ? "Da Khun Pao" : value;
 
-test("normalizes a transliterated title and appends six hex characters", () => {
+test("normalizes a transliterated title without a random suffix", () => {
   assert.equal(
-    createSlugCandidate("Да Хун Пао", transliterateFixture, "a1b2c3"),
-    "da-khun-pao-a1b2c3",
+    normalizeSlugBase(transliterateFixture("Да Хун Пао")),
+    "da-khun-pao",
   );
 });
 
-test("uses a stable fallback for titles without latin characters", () => {
-  assert.equal(normalizeSlugBase("茶"), "product");
+test("uses the agreed URL transliteration for Cyrillic titles", () => {
+  assert.equal(transliterateCatalogTitle("Да Хун Пао"), "Da Khun Pao");
 });
 
-test("retries when a generated slug collides", async () => {
-  const suffixes = ["a1b2c3", "d4e5f6"];
+test("uses a stable fallback for titles without latin characters", () => {
+  assert.equal(normalizeSlugBase("茶"), "item");
+});
+
+test("adds deterministic numeric suffixes when a generated slug collides", async () => {
+  const checked: string[] = [];
   const slug = await generateUniqueSlug({
     title: "Да Хун Пао",
     transliterate: transliterateFixture,
-    suffix: () => suffixes.shift() ?? "000000",
-    exists: async (candidate) => candidate.endsWith("a1b2c3"),
+    exists: async (candidate) => {
+      checked.push(candidate);
+      return candidate === "da-khun-pao" || candidate === "da-khun-pao-2";
+    },
   });
 
-  assert.equal(slug, "da-khun-pao-d4e5f6");
+  assert.equal(slug, "da-khun-pao-3");
+  assert.deepEqual(checked, ["da-khun-pao", "da-khun-pao-2", "da-khun-pao-3"]);
 });
 
 test("rejects a changed slug but permits an omitted or unchanged value", () => {
@@ -41,4 +49,10 @@ test("rejects a changed slug but permits an omitted or unchanged value", () => {
     () => assertSlugImmutable("tea-a1b2c3", "other-d4e5f6"),
     /cannot be changed/,
   );
+});
+
+test("generates a slug only when create data does not already carry one", () => {
+  assert.equal(shouldGenerateSlug(undefined), true);
+  assert.equal(shouldGenerateSlug(""), true);
+  assert.equal(shouldGenerateSlug("tea-a1b2c3"), false);
 });

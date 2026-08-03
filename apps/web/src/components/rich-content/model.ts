@@ -37,8 +37,19 @@ export type RichContentBlock =
       url: string;
       alt: string;
       caption?: string;
+      align: "left" | "center" | "right";
       width: number;
       height: number;
+      sources: Array<{ url: string; width: number }>;
+    }
+  | {
+      type: "table";
+      rows: Array<{
+        cells: Array<{
+          header: boolean;
+          children: RichInline[];
+        }>;
+      }>;
     }
   | { type: "divider" };
 
@@ -192,19 +203,85 @@ function normalizeImage(
     return null;
   }
 
-  const caption =
+  const blockCaption =
+    typeof block.caption === "string" && block.caption.trim()
+      ? block.caption.trim()
+      : undefined;
+  const mediaCaption =
     typeof media.caption === "string" && media.caption.trim()
       ? media.caption.trim()
       : undefined;
+  const caption = blockCaption ?? mediaCaption;
+  const align =
+    block.imageAlign === "left" ||
+    block.imageAlign === "center" ||
+    block.imageAlign === "right"
+      ? block.imageAlign
+      : "center";
+  const sources = isRecord(media.formats)
+    ? Object.values(media.formats).flatMap((format) => {
+        if (
+          !isRecord(format) ||
+          typeof format.url !== "string" ||
+          typeof format.width !== "number" ||
+          !Number.isInteger(format.width) ||
+          format.width <= 0
+        ) {
+          return [];
+        }
+        const sourceUrl = normalizeImageUrl(format.url, publicBase);
+        return sourceUrl ? [{ url: sourceUrl, width: format.width }] : [];
+      })
+    : [];
 
   return {
     type: "image",
     url,
     alt,
     ...(caption ? { caption } : {}),
+    align,
     width,
     height,
+    sources,
   };
+}
+
+function normalizeTable(block: RecordValue): RichContentBlock | null {
+  if (!Array.isArray(block.children)) return null;
+
+  const rows = block.children.flatMap((row) => {
+    if (
+      !isRecord(row) ||
+      row.type !== "table-row" ||
+      !Array.isArray(row.children)
+    ) {
+      return [];
+    }
+
+    const cells = row.children.flatMap((cell) => {
+      if (
+        !isRecord(cell) ||
+        (cell.type !== "table-cell" && cell.type !== "table-header-cell") ||
+        !Array.isArray(cell.children)
+      ) {
+        return [];
+      }
+
+      return [
+        {
+          header: cell.type === "table-header-cell",
+          children: normalizeInlines(cell.children),
+        },
+      ];
+    });
+
+    return cells.length > 0 ? [{ cells }] : [];
+  });
+
+  const hasContent = rows.some((row) =>
+    row.cells.some((cell) => hasVisibleText(cell.children)),
+  );
+  return hasContent ? { type: "table", rows } : null;
 }
 
 function normalizeBlock(
@@ -249,6 +326,10 @@ function normalizeBlock(
 
   if (value.type === "image" || value.type === "media") {
     return normalizeImage(value, publicBase);
+  }
+
+  if (value.type === "table") {
+    return normalizeTable(value);
   }
 
   if (value.type === "divider" || value.type === "horizontal-rule") {

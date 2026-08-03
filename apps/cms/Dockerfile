@@ -6,6 +6,7 @@ RUN corepack enable
 
 FROM base AS dependencies
 COPY package.json yarn.lock .yarnrc.yml turbo.json tsconfig.base.json ./
+COPY .yarn/patches .yarn/patches
 COPY apps/web/package.json apps/web/package.json
 COPY apps/cms/package.json apps/cms/package.json
 COPY packages/contracts/package.json packages/contracts/package.json

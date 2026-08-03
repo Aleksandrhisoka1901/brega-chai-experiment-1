@@ -23,7 +23,7 @@ test("signs and sends a product publication event", async () => {
     action: "publish",
     product: {
       documentId: "product-document-id",
-      type: "product",
+      type: "tovar",
       slug: "assam",
     },
   });
@@ -39,7 +39,7 @@ test("signs and sends a product publication event", async () => {
     action: "publish",
     product: {
       documentId: "product-document-id",
-      type: "product",
+      type: "tovar",
       slug: "assam",
     },
     occurredAt: "2026-07-29T00:00:00.000Z",
@@ -139,7 +139,7 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
 
   await subscriber?.("entry.publish", {
     uid: "api::product.product",
-    entry: { documentId: "doc-1", slug: "darjeeling", type: "product" },
+    entry: { documentId: "doc-1", slug: "darjeeling", type: "tovar" },
   });
   await subscriber?.("entry.update", {
     uid: "api::home-page.home-page",
@@ -150,7 +150,7 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     entry: {
       documentId: "draft-doc",
       slug: "draft",
-      type: "product",
+      type: "tovar",
       publishedAt: null,
     },
   });
@@ -171,7 +171,7 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
       product: {
         documentId: "doc-1",
         slug: "darjeeling",
-        type: "product",
+        type: "tovar",
       },
     },
     { event: "home", action: "update" },

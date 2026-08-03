@@ -1,0 +1,19 @@
+.root {
+  position: relative;
+  display: block;
+}
+
+.root .textarea {
+  padding-bottom: 1.75rem;
+}
+
+.counter {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.55rem;
+  color: var(--text-muted);
+  font-size: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
+}

@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_storefront_texts",
+  "info": {
+    "displayName": "Тексты витрины",
+    "description": "Общие подписи карточек и изображений товаров и наборов"
+  },
+  "attributes": {
+    "imagePlaceholder": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "outOfStock": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    }
+  }
+}

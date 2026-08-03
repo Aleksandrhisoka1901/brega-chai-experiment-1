@@ -1,20 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { SystemState } from "@/components/system-state";
 export const metadata: Metadata = {
-  title: "Страница не найдена — Brega Chai",
+  title: "Страница не найдена — Brega Tea",
   robots: { index: false, follow: false },
 };
 
 export default function NotFound() {
   return (
-    <main className="holding-page">
-      <p className="eyebrow">Ошибка 404</p>
-      <h1>Такой страницы нет</h1>
-      <p>Возможно, ссылка устарела или в адресе есть ошибка.</p>
-      <Link className="text-link" href="/">
-        Вернуться на главную
-      </Link>
-    </main>
+    <SystemState
+      eyebrow="Ошибка 404"
+      title="Такой страницы нет"
+      description="Возможно, ссылка устарела или в адресе есть ошибка."
+    />
   );
 }

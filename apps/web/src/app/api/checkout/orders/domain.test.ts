@@ -42,3 +42,34 @@ test("rejects tampered tokens and strict payload extras", () => {
   });
   assert.equal(result.success, false);
 });
+
+test("accepts pickup without an address and requires one for courier", () => {
+  const base = {
+    formToken: "signed",
+    honeypot: "",
+    order: {
+      idempotencyKey: "550e8400-e29b-41d4-a716-446655440000",
+      customer: { name: "Анна", phone: "+79991234567" },
+      consents: {
+        personalData: { accepted: true, documentVersion: "2026-07-28" },
+        salesAndDelivery: { accepted: true, documentVersion: "2026-07-28" },
+      },
+      items: [{ productId: "product-1", quantity: 1 }],
+    },
+  };
+
+  assert.equal(
+    parseBrowserOrderRequest({
+      ...base,
+      order: { ...base.order, deliveryMethod: "pickup" },
+    }).success,
+    true,
+  );
+  assert.equal(
+    parseBrowserOrderRequest({
+      ...base,
+      order: { ...base.order, deliveryMethod: "courier" },
+    }).success,
+    false,
+  );
+});

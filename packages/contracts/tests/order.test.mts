@@ -17,6 +17,7 @@ const validInput = {
     phone: "+79991234567",
     email: "anna@example.com",
   },
+  deliveryMethod: "courier",
   deliveryAddress: "Москва, ул. Чайная, д. 1, кв. 2",
   comment: "Позвонить перед доставкой",
   consents: {
@@ -146,7 +147,10 @@ test("rejects browser-supplied commercial values and duplicate products", () => 
 test("accepts a server result with immutable integer-RUB line snapshots", () => {
   const result = {
     orderId: "order-1",
+    orderNumber: "2607-0001",
     status: "new",
+    deliveryMethod: "courier",
+    pickupDiscountPercent: 0,
     currency: "RUB",
     lines: [
       {
@@ -161,6 +165,7 @@ test("accepts a server result with immutable integer-RUB line snapshots", () => 
       },
     ],
     totalRubles: 3200,
+    discountedTotalRubles: 3200,
   };
 
   assert.deepEqual(orderResultSchema.parse(result), result);

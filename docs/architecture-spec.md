@@ -86,9 +86,10 @@
 | Database               | PostgreSQL 16                                     | Strapi content и orders; точный patch/image digest фиксируется при bootstrap    |
 | Validation             | Zod                                               | формы, API payload, env                                                         |
 | Forms                  | React Hook Form + Zod resolver                    | checkout                                                                        |
+| Phone mask             | `react-imask` 7.6.1                               | ввод, caret, paste, autofill и очистка российского номера                       |
 | Phone                  | libphonenumber-js                                 | parse и E.164 normalization                                                     |
 | Cart state             | собственный store на `useSyncExternalStore`       | клиентская корзина без отдельной state-библиотеки                               |
-| Rich content           | стандартный Strapi Blocks                         | статьи товара                                                                   |
+| Rich content           | repeatable-компонент с Better Blocks              | несколько упорядоченных статей товара                                           |
 | E2E                    | Playwright + axe-core                             | критические сценарии                                                            |
 | Unit/integration tests | встроенный Node test runner                       | domain, mapper и service tests без отдельного test framework                    |
 | Containers             | Docker Compose local; отдельные production images | воспроизводимый deploy                                                          |
@@ -268,7 +269,7 @@ Client Components только для:
 - Использовать явный allowlist полей и relations.
 - Не использовать бесконтрольный deep populate.
 - Для listing и detail создать разные projections.
-- Listing не получает gallery и article content.
+- Listing не получает gallery и articles.
 - Sitemap не получает изображения/статьи, кроме реально используемых sitemap image полей.
 
 ## 9. Кэширование и публикация
@@ -334,7 +335,10 @@ payload. Для MVP сохраняется дополнительный TTL cach
 dead-letter добавляются только при появлении нескольких web instances или
 требования к гарантированной мгновенной доставке.
 
-Slug продукта создаётся один раз до сохранения и далее не изменяется, поэтому redirect registry в MVP не нужен.
+Slug продукта создаётся один раз до сохранения и далее не изменяется, поэтому
+реестр редиректов для переименованных slug в MVP не нужен. Отдельный небольшой
+реестр структурных legacy aliases используется только для `/catalog`,
+`/product/:slug` и `/ritual/:slug`.
 
 ### 9.3. Fallback
 
@@ -365,7 +369,8 @@ Slug продукта создаётся один раз до сохранени
 - hero;
 - about;
 - rituals preview settings;
-- products preview settings.
+- products preview settings;
+- две упорядоченные relations `featuredRituals` и `featuredProducts`.
 
 `products-page`:
 
@@ -383,7 +388,9 @@ Slug продукта создаётся один раз до сохранени
 - цена — обязательный integer в рублях, `> 0`;
 - валюта — ISO 4217;
 - `stock` — integer `≥ 0`, доступность вычисляется как `stock > 0`;
-- статусы публикации и активности разделены.
+- Draft & Publish — единственный переключатель публичной видимости;
+- `packageLabel` хранит единую строку типа упаковки и фасовки;
+- `active`, `sortOrder` и priority-поля отсутствуют.
 
 `order`:
 
@@ -406,6 +413,16 @@ Slug продукта создаётся один раз до сохранени
 - `product.gallery-image`;
 - `commerce.order-line`;
 - `commerce.customer`;
+
+`HomePage`, `ProductsPage` и `Product` используют один опциональный
+`shared.seo`; отдельные `seoTitle`, `seoDescription` и `seoImage` запрещены.
+`GlobalSettings.defaultSeo` остаётся обязательным системным fallback.
+`HomePage.seo` имеет приоритет над global fallback для главной.
+Organization/WebSite JSON-LD получают название из `GlobalSettings.brandName`.
+
+Главная запрашивает товары через relations `HomePage` и сохраняет их порядок.
+`/products` использует две published-only выборки (`stock > 0` и `stock = 0`),
+каждую с `title:asc`, после чего объединяет доступную группу с недоступной.
 
 ### 10.4. Lifecycle и policy
 
@@ -493,6 +510,12 @@ Radix Dialog является основой drawer-поведения:
 8. атомарно списывает остаток, создаёт immutable order snapshot и сохраняет заказ;
 9. фиксирует transaction и возвращает подтверждение заказа-заявки.
 
+Публичный результат содержит внутренний `orderId` для системной
+идемпотентности и отдельный `orderNumber` для покупателя. Новые `orderNumber`
+имеют формат `ГГММ-NNNN`, где четырёхзначная последовательность начинается
+заново каждый месяц. Выдача защищена PostgreSQL advisory lock на месячный
+префикс. Старые номера остаются читаемыми без обязательной миграции.
+
 Next.js не выполняет отдельное предварительное списание stock или создание заказа. Ошибка до commit откатывает и order, и stock.
 
 Корзина не резервирует stock. Переход заказа в `cancelled` один раз возвращает списанное количество; операция защищена от повторного применения.
@@ -532,13 +555,16 @@ new ─► confirmed ─► completed
 
 ### 13.1. Граница MVP
 
-MVP не интегрируется со СДЭК и платёжным провайдером. Checkout принимает единый адрес, показывает только стоимость товаров и сообщает, что доставку и оплату подтвердит менеджер.
+MVP не интегрируется со службой доставки и платёжным провайдером. Checkout
+принимает единый адрес, показывает только стоимость товаров и сообщает, что
+доставку и оплату подтвердит менеджер.
 
 Будущие delivery/payment adapters добавляются отдельными ADR и не усложняют текущий order contract заранее.
 
 ### 13.2. Будущая доставка
 
-СДЭК не входит в MVP. При последующем подключении SDK/API вызывается только сервером, а адрес сохраняется snapshot.
+Интеграция доставки не входит в MVP. При последующем подключении SDK/API
+вызывается только сервером, а адрес сохраняется snapshot.
 
 ### 13.3. Будущая оплата
 
@@ -590,9 +616,16 @@ Next.js `sitemap.ts`:
 - один host и protocol;
 - единая политика trailing slash;
 - lowercase slug;
-- один 301/308 без redirect chain;
+- один `301` без redirect chain;
 - hash-секции не создают отдельные canonical;
-- middleware/proxy не выполняет CMS-запросы.
+- middleware удаляет пустые query-параметры и сохраняет непустые;
+- `/catalog`, `/product/:slug` и `/ritual/:slug` считаются структурными legacy
+  aliases;
+- media, PDF, Next assets, API и внутренний `503` route не канонизируются;
+- единственный CMS-запрос из middleware — короткий
+  `/api/health/readiness` с коротким timeout и `cache: no-store`, чтобы падение
+  или восстановление БД не скрывалось кешем; content-запросы и проверка
+  существования slug выполняются только в server data layer.
 
 ## 15. Изображения и rich content
 
@@ -611,24 +644,68 @@ Next.js `sitemap.ts`:
 
 Для production используется RustFS отдельным сервисом на том же VPS. Версия image фиксируется, автоматические обновления запрещены. Данные находятся на persistent volume и включаются в локальный backup на отдельный persistent path того же VPS. Локальный upload volume Strapi допустим только в development.
 
+Strapi Admin CSP явно разрешает `img-src` и `media-src` с origin,
+вычисленного из `MEDIA_PUBLIC_URL`; bucket при этом сохраняет только публичный
+read-only `GetObject`, без listing и write-доступа.
+
+Storefront не должен загружать оригинал для компактного слота, если Strapi уже
+создал responsive formats. Все контентные изображения получают нативные
+`srcset` и `sizes`: браузер выбирает формат по ширине слота, viewport и device
+pixel ratio. Listing и preview-карточки используют `small` как базовый `src`;
+товарная галерея — `large` для основного изображения и `thumbnail` для ленты.
+При отсутствии производных форматов остаётся исходный `src` без искусственного
+`srcset`.
+
 ### 15.2. Rich content
 
-Используется стандартный Strapi Blocks без кастомизации toolbar и без публикационных ошибок за структуру. Renderer:
+`Product.articles` — опциональный упорядоченный repeatable-компонент. Каждый
+элемент содержит обязательное поле `content` — JSON custom field плагина Better
+Blocks, совместимое со структурой Strapi Blocks. Это позволяет
+добавлять на страницу товара несколько самостоятельных статей и менять их
+порядок в Strapi. Заголовки остаются частью Blocks, чтобы редактор не вводил один
+и тот же заголовок в двух полях.
+
+Одиночное поле `articleContent` было заменено до появления production-данных.
+Канонический локальный контент перенесён в `articles[]` через повторяемый seed,
+поэтому отдельная production database migration для этого перехода не нужна.
+
+Используется Better Blocks без публикационных ошибок за структуру. Редактор
+добавляет к изображениям `imageAlign: left | center | right`; storefront
+на desktop заменяет боковое выравнивание на ограниченный по ширине float с
+обтеканием текстом, изолированным внутри статьи. На телефонах float отключается,
+и изображение выводится на всю ширину контентной зоны. Renderer:
 
 - не рендерит raw HTML по умолчанию;
 - нормализует внешние ссылки;
 - рендерит content `h1` как `h2`;
 - отбрасывает пустые блоки;
 - требует alt;
+- нормализует таблицы в семантические `table/th/td` и ограничивает их прокрутку
+  локальным контейнером;
 - покрыт fixture-тестами.
 
 ## 16. Безопасность
 
 ### 16.1. Secrets
 
+Полная матрица переменных, правила хранения и процедура расширения allowlist
+зафиксированы в [`runtime-configuration-spec.md`](runtime-configuration-spec.md).
+
 - Strapi token, webhook secret и DB password — server-only;
 - env валидируется при старте;
-- `NEXT_PUBLIC_*` используется только для действительно публичных значений;
+- storefront публикует runtime-конфигурацию через динамический
+  `/runtime-config.js` с `no-store`; скрипт выполняется до клиентского bundle и
+  задаёт `window.__APP_CONFIG__`;
+- allowlist browser runtime config содержит только `SITE_URL`,
+  `NEXT_PUBLIC_CMS_URL` и `NEXT_PUBLIC_MEDIA_URL`; значения обязаны быть
+  абсолютными `http(s)` URL без credentials;
+- `CMS_INTERNAL_URL` остаётся server-only как деталь внутренней топологии;
+- `CHECKOUT_FORM_SECRET`, `STRAPI_ORDER_TOKEN`,
+  `CACHE_REVALIDATION_SECRET`, Strapi secrets, DB и S3 credentials никогда не
+  сериализуются в browser runtime config;
+- server components читают публичные URL из env запущенного контейнера через
+  тот же типизированный контракт, поэтому один Docker image не требует rebuild
+  между окружениями;
 - секреты не попадают в Docker image, git или browser runtime config.
 
 ### 16.2. Public endpoints
@@ -682,13 +759,22 @@ Next.js `sitemap.ts`:
 
 Budgets:
 
-| Метрика           | Цель                                                    |
-| ----------------- | ------------------------------------------------------- |
-| LCP p75 mobile    | ≤ 2,5 с                                                 |
-| INP p75           | ≤ 200 мс                                                |
-| CLS p75           | ≤ 0,1                                                   |
-| Initial client JS | фиксируется после прототипа; regression gate обязателен |
-| Hero image        | отдельный art-direction budget                          |
+| Метрика           | Цель                                                |
+| ----------------- | --------------------------------------------------- |
+| LCP p75 mobile    | ≤ 2,5 с                                             |
+| INP p75           | ≤ 200 мс                                            |
+| CLS p75           | ≤ 0,1                                               |
+| Initial client JS | ≤ 180 KiB encoded; baseline прототипа 152 019 bytes |
+| Fonts             | ≤ 300 KiB                                           |
+| Hero image        | ≤ 350 KiB desktop / ≤ 220 KiB mobile                |
+| Card image        | ≤ 160 KiB                                           |
+
+LCP и CLS дополнительно имеют synthetic regression gate на production build
+для mobile и desktop. INP остаётся production RUM-метрикой: единичное
+синтетическое взаимодействие не заменяет p75 реальных пользователей. Вес
+шрифтов и initial client JS проверяется детерминированно в Playwright по
+`encodedBodySize`; бюджеты изображений применяются к финальному production
+контенту.
 
 Меры:
 
@@ -699,6 +785,8 @@ Budgets:
 - lazy load checkout UI до открытия;
 - минимальные client DTO;
 - локальные subset fonts;
+- checkout form загружается отдельным client chunk только после перехода к
+  оформлению;
 - `content-visibility` только после измерений и без вреда якорной навигации;
 - bundle analyzer в CI по требованию, а не production dependency.
 
@@ -909,4 +997,5 @@ Backup PostgreSQL и RustFS в MVP хранится на отдельном pers
 - webhook-driven tag revalidation;
 - серверная перепроверка цены и идемпотентное создание заказа.
 
-Такой вариант остаётся небольшим для MVP, но не создаёт тупиков при подключении СДЭК, оплаты и дальнейшей смене товарной категории.
+Такой вариант остаётся небольшим для MVP, но не создаёт тупиков при подключении
+доставки, оплаты и дальнейшей смене товарной категории.

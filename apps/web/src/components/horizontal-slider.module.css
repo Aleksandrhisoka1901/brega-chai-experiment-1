@@ -1,0 +1,21 @@
+.progress {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: var(--border-default);
+}
+
+.progress > span {
+  position: absolute;
+  inset: 0;
+  background: var(--text-primary);
+  transform: scaleX(var(--slider-progress));
+  transform-origin: left center;
+  transition: transform 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress > span {
+    transition: none;
+  }
+}

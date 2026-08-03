@@ -11,5 +11,11 @@
     "src/**/*.json",
     "types/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "src/plugins/order-admin/admin",
+    "src/plugins/order-admin/strapi-admin.ts"
+  ]
 }
