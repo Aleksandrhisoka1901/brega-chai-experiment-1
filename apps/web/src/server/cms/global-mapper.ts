@@ -26,7 +26,13 @@ const responseSchema = z.object({
   data: z.object({
     brandName: z.string().trim().min(1),
     pickupAddress: z.string().trim().min(1),
-    pickupDiscountPercent: z.number().int().min(0).max(100),
+    pickupDiscountPercent: z
+      .number()
+      .int()
+      .min(0)
+      .max(100)
+      .nullish()
+      .transform((value) => value ?? null),
     courierDeliveryNote: z.string().trim().min(1),
     logo: mediaSchema.nullable().optional(),
     email: z.email(),

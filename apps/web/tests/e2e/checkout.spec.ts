@@ -157,6 +157,19 @@ test("product → cart → validation → confirmed checkout success @smoke", as
       "Менеджер свяжется с вами, чтобы подтвердить наличие и согласовать оплату.",
     ),
   ).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      const raw = localStorage.getItem("brega-chai:cart:v1");
+      return raw ? JSON.parse(raw).items.length : 0;
+    }),
+  ).toBe(1);
+
+  await dialog.getByRole("button", { name: "Вернуться к покупкам" }).click();
+  await expect(page.locator("[data-cart-drawer]")).toHaveAttribute(
+    "data-state",
+    "closed",
+  );
+  await expect(dialog).toBeHidden();
   await expect
     .poll(() =>
       page.evaluate(() => {

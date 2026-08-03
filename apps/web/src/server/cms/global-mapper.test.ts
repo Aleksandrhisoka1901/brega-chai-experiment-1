@@ -159,3 +159,34 @@ test("fills missing breadcrumb routes with stable visible-text fallbacks", () =>
     nabory: "Ритуалы",
   });
 });
+
+test("maps an unfilled pickup discount to an explicit no-discount value", () => {
+  const settings = mapGlobalSettingsPayload(
+    {
+      data: {
+        brandName: "Brega Chai",
+        pickupAddress: "Москва",
+        courierDeliveryNote: "До 1000 руб.",
+        email: "hello@brega.test",
+        telegramUrl: "https://t.me/brega",
+        navigation: {
+          about: "О нас",
+          nabory: "Ритуалы",
+          tovary: "Сорта",
+          cart: "Заказ",
+        },
+        sectionBreadcrumbs: [],
+        storefrontTexts: {
+          imagePlaceholder: "Изображение готовится",
+          outOfStock: "Нет в наличии",
+        },
+        legalDetails: "Реквизиты",
+        defaultProductStory: [],
+        defaultSeo: { title: "Brega Chai", description: "Чай." },
+      },
+    },
+    "http://localhost:9000",
+  );
+
+  assert.equal(settings.pickupDiscountPercent, null);
+});

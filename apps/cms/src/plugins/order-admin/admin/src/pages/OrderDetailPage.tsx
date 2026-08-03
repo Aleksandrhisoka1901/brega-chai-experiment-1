@@ -28,7 +28,6 @@ import type { OrderDetail } from "../types";
 import {
   formatOrderDate,
   formatRubles,
-  getConsentLabel,
   getDeliveryMethodPresentation,
   getStatusActionLabel,
   getStatusConfirmation,
@@ -207,7 +206,14 @@ export function OrderDetailPage() {
         )}
 
         <ContentGrid gap={6}>
-          <Grid.Item alignItems="stretch" col={8} direction="column" s={12}>
+          <Grid.Item
+            alignItems="stretch"
+            col={8}
+            data-testid="order-main-column"
+            direction="column"
+            s={12}
+            xs={12}
+          >
             <Flex direction="column" gap={6} width="100%">
               <DataSection title="Состав заказа">
                 <Box overflow="auto">
@@ -266,17 +272,21 @@ export function OrderDetailPage() {
                   gap={2}
                   paddingTop={5}
                 >
-                  <NumericText textColor="neutral600">
-                    Стандартная сумма: {formatRubles(order.totalRubles)}
-                  </NumericText>
                   {order.pickupDiscountPercent > 0 ? (
-                    <Typography textColor="neutral600">
-                      Скидка за самовывоз: {order.pickupDiscountPercent}%
-                    </Typography>
+                    <>
+                      <NumericText textColor="neutral600">
+                        Стандартная сумма: {formatRubles(order.totalRubles)}
+                      </NumericText>
+                      <Typography textColor="neutral600">
+                        Скидка за самовывоз: {order.pickupDiscountPercent}%
+                      </Typography>
+                    </>
                   ) : null}
                   <NumericText fontWeight="bold" variant="beta">
-                    Сумма со скидкой:{" "}
-                    {formatRubles(order.discountedTotalRubles)}
+                    {order.pickupDiscountPercent > 0
+                      ? "Сумма со скидкой"
+                      : "Итого"}
+                    : {formatRubles(order.discountedTotalRubles)}
                   </NumericText>
                 </Flex>
               </DataSection>
@@ -317,7 +327,14 @@ export function OrderDetailPage() {
             </Flex>
           </Grid.Item>
 
-          <Grid.Item alignItems="stretch" col={4} direction="column" s={12}>
+          <Grid.Item
+            alignItems="stretch"
+            col={4}
+            data-testid="order-side-column"
+            direction="column"
+            s={12}
+            xs={12}
+          >
             <Flex direction="column" gap={6} width="100%">
               <DataSection title="Детали заказа">
                 <Flex
@@ -365,42 +382,29 @@ export function OrderDetailPage() {
                   <DataPair label={delivery.addressLabel}>
                     {order.deliveryAddress}
                   </DataPair>
-                  <DataPair label="Стандартная сумма">
-                    {formatRubles(order.totalRubles)}
-                  </DataPair>
-                  <DataPair label="Скидка за самовывоз">
-                    {order.pickupDiscountPercent}%
-                  </DataPair>
-                  <DataPair label="Сумма со скидкой">
-                    {formatRubles(order.discountedTotalRubles)}
-                  </DataPair>
+                  {order.pickupDiscountPercent > 0 ? (
+                    <>
+                      <DataPair label="Стандартная сумма">
+                        {formatRubles(order.totalRubles)}
+                      </DataPair>
+                      <DataPair label="Скидка за самовывоз">
+                        {order.pickupDiscountPercent}%
+                      </DataPair>
+                      <DataPair label="Сумма со скидкой">
+                        {formatRubles(order.discountedTotalRubles)}
+                      </DataPair>
+                    </>
+                  ) : (
+                    <DataPair label="Сумма заказа">
+                      {formatRubles(order.totalRubles)}
+                    </DataPair>
+                  )}
                   <DataPair label="Комментарий покупателя">
                     {order.comment}
                   </DataPair>
                   <DataPair label="Комментарий менеджера">
                     {order.managerComment}
                   </DataPair>
-                </Flex>
-              </DataSection>
-              <DataSection title="Согласия">
-                <Flex
-                  alignItems="stretch"
-                  direction="column"
-                  gap={4}
-                  width="100%"
-                >
-                  {Object.entries(order.consents).map(([key, consent]) => (
-                    <DataPair
-                      key={key}
-                      label={getConsentLabel(
-                        key as keyof OrderDetail["consents"],
-                      )}
-                    >
-                      {consent.accepted
-                        ? `Принято, версия ${consent.documentVersion}`
-                        : "Не принято"}
-                    </DataPair>
-                  ))}
                 </Flex>
               </DataSection>
             </Flex>

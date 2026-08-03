@@ -36,11 +36,10 @@
     },
     "pickupDiscountPercent": {
       "type": "integer",
-      "required": true,
+      "required": false,
       "min": 0,
       "max": 100,
-      "default": 10,
-      "description": "Скидка за самовывоз в процентах. Итог заказа округляется до целого рубля."
+      "description": "Необязательная скидка за самовывоз в процентах. Оставьте поле пустым, чтобы не применять скидку. Итог заказа округляется до целого рубля."
     },
     "courierDeliveryNote": {
       "type": "string",

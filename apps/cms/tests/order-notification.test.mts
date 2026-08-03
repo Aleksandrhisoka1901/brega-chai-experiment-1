@@ -60,6 +60,18 @@ test("builds a Brega Tea notification with fulfillment and both totals", () => {
   assert.match(message.html, /Позвонить &amp; подтвердить/);
 });
 
+test("omits discount details when the order has no pickup discount", () => {
+  const message = buildOrderNotification({
+    ...order,
+    pickupDiscountPercent: 0,
+    discountedTotalRubles: order.totalRubles,
+  });
+
+  assert.doesNotMatch(message.text, /скидк/iu);
+  assert.doesNotMatch(message.html, /скидк/iu);
+  assert.match(message.text, /Сумма заказа: 1[\s\u00a0]495/);
+});
+
 test("sends only to the configured admin address and uses customer email as reply-to", async () => {
   const calls: unknown[] = [];
   await sendOrderNotification({

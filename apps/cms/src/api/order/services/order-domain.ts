@@ -126,7 +126,7 @@ export type EditOrderInput = z.infer<typeof editOrderInputSchema>;
 
 export interface OrderCheckoutSettings {
   pickupAddress: string;
-  pickupDiscountPercent: number;
+  pickupDiscountPercent?: number | null;
 }
 
 export interface OrderCreation {
@@ -221,9 +221,11 @@ function toResult(order: StoredOrder): OrderResult {
   });
 }
 
-function validateCheckoutSettings(
-  settings: OrderCheckoutSettings,
-): OrderCheckoutSettings {
+function validateCheckoutSettings(settings: OrderCheckoutSettings): Required<
+  Omit<OrderCheckoutSettings, "pickupDiscountPercent">
+> & {
+  pickupDiscountPercent: number;
+} {
   const pickupAddress = settings.pickupAddress.trim();
   if (!pickupAddress) {
     throw new OrderServiceError(
@@ -231,10 +233,11 @@ function validateCheckoutSettings(
       "Pickup address is not configured",
     );
   }
+  const pickupDiscountPercent = settings.pickupDiscountPercent ?? 0;
   if (
-    !Number.isInteger(settings.pickupDiscountPercent) ||
-    settings.pickupDiscountPercent < 0 ||
-    settings.pickupDiscountPercent > 100
+    !Number.isInteger(pickupDiscountPercent) ||
+    pickupDiscountPercent < 0 ||
+    pickupDiscountPercent > 100
   ) {
     throw new OrderServiceError(
       "ORDER_CONFIGURATION_UNAVAILABLE",
@@ -243,7 +246,7 @@ function validateCheckoutSettings(
   }
   return {
     pickupAddress,
-    pickupDiscountPercent: settings.pickupDiscountPercent,
+    pickupDiscountPercent,
   };
 }
 

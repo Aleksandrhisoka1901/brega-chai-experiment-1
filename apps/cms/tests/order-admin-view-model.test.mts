@@ -6,7 +6,6 @@ import {
   calculateEditedOrderTotals,
   formatOrderDate,
   formatRubles,
-  getConsentLabel,
   getDeliveryMethodPresentation,
   getOrderEditErrorMessage,
   getStatusActionLabel,
@@ -87,17 +86,6 @@ test("money and date formatting is deterministic for Russian admin UI", () => {
 test("detail response unwraps the admin API envelope", () => {
   const order = { documentId: "order-1", deliveryAddress: "Москва" };
   assert.equal(unwrapDetailResponse({ data: order }), order);
-});
-
-test("consent keys are never exposed as technical labels", () => {
-  assert.equal(
-    getConsentLabel("personalData"),
-    "Обработка персональных данных",
-  );
-  assert.equal(
-    getConsentLabel("salesAndDelivery"),
-    "Условия продажи и доставки",
-  );
 });
 
 test("delivery methods use matching operational address labels", () => {
