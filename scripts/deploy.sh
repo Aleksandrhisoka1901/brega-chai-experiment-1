@@ -31,7 +31,11 @@ else
   initial_deploy=0
 fi
 
-./scripts/backup.sh
+if [ "$initial_deploy" -eq 0 ]; then
+  ./scripts/backup.sh
+else
+  echo "Initial deploy detected; skipping backup because no application containers exist yet."
+fi
 docker compose $compose_files pull web cms
 docker compose $compose_files up -d postgres rustfs rustfs-init
 docker compose $compose_files up -d cms

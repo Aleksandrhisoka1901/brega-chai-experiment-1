@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 
+compose_files="-f docker-compose.yml -f docker-compose.production.yml"
 backup_root=${BACKUP_ROOT:-./backups}
 keep=${BACKUP_KEEP:-3}
 timestamp=$(date -u +%Y%m%dT%H%M%SZ)
@@ -15,18 +16,17 @@ esac
 mkdir -p "$destination"
 
 restart_writes() {
-  docker compose up -d rustfs rustfs-init cms web
+  docker compose $compose_files up -d rustfs rustfs-init cms web
 }
 trap restart_writes EXIT INT TERM
 
-docker compose stop web cms rustfs
+docker compose $compose_files stop web cms rustfs
 
-docker compose exec -T postgres pg_dump \
-  --username="${POSTGRES_USER:?Set POSTGRES_USER}" \
-  --dbname="${POSTGRES_DB:?Set POSTGRES_DB}" \
-  --format=custom > "${destination}/postgres.dump"
+docker compose $compose_files exec -T postgres sh -eu -c \
+  'exec pg_dump --username="$POSTGRES_USER" --dbname="$POSTGRES_DB" --format=custom' \
+  > "${destination}/postgres.dump"
 
-rustfs_container=$(docker compose ps -aq rustfs)
+rustfs_container=$(docker compose $compose_files ps -aq rustfs)
 test -n "$rustfs_container"
 docker run --rm --volumes-from "$rustfs_container" \
   -v "$(cd "$destination" && pwd):/backup" \
