@@ -412,6 +412,7 @@ deploy:production:
     - test -n "$DEPLOY_PATH"
     - test -n "$SMOKE_URL"
     - install -m 600 "$DEPLOY_SSH_PRIVATE_KEY" /tmp/deploy_key
+    - printf '\n' >> /tmp/deploy_key
     - install -m 700 -d ~/.ssh
     - printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
   needs:
@@ -442,6 +443,7 @@ tls:renew:
     - test -n "$DEPLOY_USER"
     - test -n "$DEPLOY_PATH"
     - install -m 600 "$DEPLOY_SSH_PRIVATE_KEY" /tmp/deploy_key
+    - printf '\n' >> /tmp/deploy_key
     - install -m 700 -d ~/.ssh
     - printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
   rules:
