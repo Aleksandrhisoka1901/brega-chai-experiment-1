@@ -376,6 +376,7 @@ container:smoke:
         -e ENCRYPTION_KEY=ci-encryption-key \
         "$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA"
       docker run -d --name smoke-web --network brega-smoke \
+        -e CMS_INTERNAL_URL=http://smoke-cms:1337 \
         "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA"
       attempt=0
       until docker exec smoke-cms node -e \
