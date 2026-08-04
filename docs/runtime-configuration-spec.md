@@ -58,6 +58,7 @@ script-breaking символов.
 | `CACHE_REVALIDATION_URL`           | cms                 | Внутренний Next endpoint для cache revalidation                |
 | `CACHE_REVALIDATION_SECRET`        | web, cms            | HMAC-подпись cache revalidation                                |
 | `CACHE_REVALIDATION_TIMEOUT_MS`    | cms                 | Таймаут отправки revalidation                                  |
+| `STRAPI_URL`                       | cms                 | Публичный HTTPS origin Strapi для абсолютных URL                |
 | `DATABASE_HOST/PORT/NAME/USERNAME` | cms, служебные jobs | Параметры соединения с PostgreSQL                              |
 | `S3_ENDPOINT/REGION/BUCKET`        | cms, служебные jobs | Внутренние параметры object storage                            |
 | `MEDIA_PUBLIC_URL`                 | cms                 | Публичная база URL, которую Strapi записывает для media        |

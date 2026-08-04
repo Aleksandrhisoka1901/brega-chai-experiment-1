@@ -85,6 +85,7 @@ yarn build
 - [Checkout и уведомления](docs/checkout-update-spec.md)
 - [Управление заказами](docs/order-admin-spec.md)
 - [Операционная инструкция менеджера](docs/order-admin-operations.md)
+- [Production VPS: риски и обязательная подготовка](docs/production-vps-readiness.md)
 - [Design reference](docs/design-reference.html)
 - [Component showcase](docs/component-showcase.html)
 - [Architecture Decision Records](docs/adr/)

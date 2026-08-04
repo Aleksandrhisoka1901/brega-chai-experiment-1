@@ -2,6 +2,19 @@
 set -eu
 
 compose_files="-f docker-compose.tls.yml"
+
+read_env_value() {
+  key=$1
+  test -f .env || return 0
+  awk -v key="$key" \
+    'index($0, key "=") == 1 { print substr($0, length(key) + 2); exit }' \
+    .env
+}
+
+: "${APP_DOMAIN:=$(read_env_value APP_DOMAIN)}"
+: "${ADMIN_DOMAIN:=$(read_env_value ADMIN_DOMAIN)}"
+: "${MEDIA_DOMAIN:=$(read_env_value MEDIA_DOMAIN)}"
+: "${TLS_EMAIL:=$(read_env_value TLS_EMAIL)}"
 : "${APP_DOMAIN:?Set APP_DOMAIN}"
 : "${ADMIN_DOMAIN:?Set ADMIN_DOMAIN}"
 : "${MEDIA_DOMAIN:?Set MEDIA_DOMAIN}"
