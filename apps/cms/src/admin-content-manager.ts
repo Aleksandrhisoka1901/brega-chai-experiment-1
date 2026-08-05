@@ -49,9 +49,7 @@ export const getRussianFieldLabels = (
     ),
   );
 
-  return isComponent
-    ? translatedLabels
-    : { ...SYSTEM_FIELD_LABELS, ...translatedLabels };
+  return { ...SYSTEM_FIELD_LABELS, ...translatedLabels };
 };
 
 export const applyRussianFieldLabels = (

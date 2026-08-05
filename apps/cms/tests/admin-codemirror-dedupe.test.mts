@@ -162,6 +162,10 @@ test("writes Russian labels into Content Manager metadata", () => {
   assert.equal(configuration.metadatas.brandName.list.label, "Название бренда");
   assert.equal(configuration.metadatas.id.edit.label, "Идентификатор");
   assert.equal(configuration.metadatas.id.list.label, "Идентификатор");
+  assert.equal(
+    getRussianFieldLabels("shared.link", true, russianAdminTranslations).id,
+    "Идентификатор",
+  );
 });
 
 test("syncs Russian labels for content types and components", async () => {
