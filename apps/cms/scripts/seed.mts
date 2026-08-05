@@ -10,6 +10,7 @@ import {
   PUBLIC_STOREFRONT_ACTIONS,
   resolveSeedArticleImages,
 } from "./seed-helpers.ts";
+import { SHENG_PUER_PRODUCT } from "./seed-product-fixtures.ts";
 
 const require = createRequire(import.meta.url);
 const { compileStrapi, createStrapi } =
@@ -357,20 +358,7 @@ const products = [
     imageAsset: "tea-gyokuro-asahi.png",
     imageAlt: "Тёмно-зелёные листья гёкуро и зелёная чайная банка",
   },
-  {
-    key: "product-without-image",
-    title:
-      "Шэн пуэр выдержанный — длинное тестовое название карточки для проверки предельной длины заголовка каталога и переноса текста в интерфейсе",
-    type: "tovar",
-    packageLabel: "Блин (100 г)",
-    price: 3100,
-    currency: "RUB",
-    stock: 3,
-    cardExcerpt:
-      "Этот намеренно длинный кураторский анонс проверяет предельную длину текста карточки, перенос строк и устойчивость каталожной сетки на разных ширинах экрана. У товара также отсутствуют все необязательные поля и изображение, поэтому storefront обязан показать контролируемый placeholder без нарушения композиции.",
-    story:
-      "Чистый fixture без изображения, оригинального названия, галереи и SEO.",
-  },
+  SHENG_PUER_PRODUCT,
   {
     key: "product-lun-jing",
     title: "Лунцзин",

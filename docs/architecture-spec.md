@@ -39,7 +39,7 @@
 - timeout и типизированные ошибки CMS;
 - безопасное состояние при недоступности CMS;
 - SEO helpers для canonical, metadata и breadcrumbs;
-- `robots.ts`, `sitemap.ts`, JSON-LD;
+- управляемый через Strapi `robots.txt`, `sitemap.ts`, JSON-LD;
 - локальные шрифты через `next/font`;
 - Playwright + axe;
 - ESLint, Prettier, typecheck и CI gates;
@@ -186,7 +186,8 @@ src/app/
 ├── not-found.tsx
 ├── error.tsx
 ├── global-error.tsx
-├── robots.ts
+├── robots.txt/
+│   └── route.ts
 ├── sitemap.ts
 ├── manifest.ts
 ├── products/
@@ -604,12 +605,17 @@ Next.js `sitemap.ts`:
 - `lastModified` из Strapi;
 - опциональные product images.
 
-`robots.ts`:
+`robots.txt`:
 
-- до публичного запуска запрещает обход всего сайта через `Disallow: /`;
-- не публикует sitemap и CMS/admin URLs;
-- дублируется глобальным `X-Robots-Tag: noindex, nofollow, noarchive`
-  на публичном домене.
+- содержимое редактируется без публикационного workflow в Strapi single-type
+  `robots.txt`;
+- динамический Next.js route запрашивает только поле `content` и отдаёт его как
+  `text/plain` без кэширования;
+- пустой или некорректный документ и недоступность CMS приводят к безопасному
+  fallback `User-agent: *` + `Disallow: /`;
+- Nginx не подменяет route статическим ответом;
+- до публичного запуска запрет дублируется глобальным
+  `X-Robots-Tag: noindex, nofollow, noarchive` на публичном домене.
 
 Для `/legal/*.pdf` Nginx добавляет `X-Robots-Tag: noindex`; ссылки на документы остаются доступными пользователям.
 

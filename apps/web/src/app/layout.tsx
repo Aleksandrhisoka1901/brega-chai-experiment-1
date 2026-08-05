@@ -26,6 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteOrigin()),
     title: settings?.defaultSeo.title ?? "Brega Tea",
     description: settings?.defaultSeo.description ?? "Чай и ритуалы Brega Tea",
+    icons: {
+      icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+      shortcut: "/favicon.svg",
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    },
     alternates: { canonical: "/" },
     ...(settings?.defaultSeo.imageUrl
       ? { openGraph: { images: [{ url: settings.defaultSeo.imageUrl }] } }

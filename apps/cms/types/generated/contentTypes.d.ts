@@ -799,6 +799,41 @@ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiRobotsTxtRobotsTxt extends Struct.SingleTypeSchema {
+  collectionName: "robots_txts";
+  info: {
+    description: "\u041F\u0440\u0430\u0432\u0438\u043B\u0430 \u0438\u043D\u0434\u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u0441\u0430\u0439\u0442\u0430 \u0434\u043B\u044F \u043F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0445 \u0440\u043E\u0431\u043E\u0442\u043E\u0432";
+    displayName: "robots.txt";
+    pluralName: "robots-txts";
+    singularName: "robots-txt";
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    content: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20000;
+        minLength: 1;
+      }> &
+      Schema.Attribute.DefaultTo<"User-agent: *\nDisallow: /\n">;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::robots-txt.robots-txt"
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: "strapi_releases";
@@ -1315,6 +1350,7 @@ declare module "@strapi/strapi" {
       "api::order.order": ApiOrderOrder;
       "api::product.product": ApiProductProduct;
       "api::products-page.products-page": ApiProductsPageProductsPage;
+      "api::robots-txt.robots-txt": ApiRobotsTxtRobotsTxt;
       "plugin::content-releases.release": PluginContentReleasesRelease;
       "plugin::content-releases.release-action": PluginContentReleasesReleaseAction;
       "plugin::i18n.locale": PluginI18NLocale;

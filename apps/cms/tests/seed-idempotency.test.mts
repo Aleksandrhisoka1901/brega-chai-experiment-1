@@ -8,6 +8,7 @@ import {
   PUBLIC_STOREFRONT_ACTIONS,
   resolveSeedArticleImages,
 } from "../scripts/seed-helpers.ts";
+import { SHENG_PUER_PRODUCT } from "../scripts/seed-product-fixtures.ts";
 
 test("first seed creates fixtures and the next seed updates the same documents", () => {
   const desired = [
@@ -44,6 +45,12 @@ test("first seed creates fixtures and the next seed updates the same documents",
       },
     ],
   );
+});
+
+test("Sheng puer seed fixture provides the main image used by product cards", () => {
+  assert.equal(SHENG_PUER_PRODUCT.key, "product-without-image");
+  assert.equal(SHENG_PUER_PRODUCT.imageAsset, "gallery-gaiwan.png");
+  assert.match(SHENG_PUER_PRODUCT.imageAlt, /\S/);
 });
 
 test("seed requires explicit opt-in and rejects production", () => {

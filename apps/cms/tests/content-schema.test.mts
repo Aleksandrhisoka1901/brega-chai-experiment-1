@@ -82,6 +82,22 @@ test("global settings expose reusable breadcrumb and storefront text components"
   assert.equal(storefrontTexts.attributes.outOfStock.required, true);
 });
 
+test("robots.txt is an immediately editable, bounded single type", async () => {
+  const robots = await schema(
+    "src/api/robots-txt/content-types/robots-txt/schema.json",
+  );
+
+  assert.equal(robots.options?.draftAndPublish, false);
+  assert.equal(robots.attributes.content.type, "text");
+  assert.equal(robots.attributes.content.required, true);
+  assert.equal(robots.attributes.content.minLength, 1);
+  assert.equal(robots.attributes.content.maxLength, 20_000);
+  assert.equal(
+    robots.attributes.content.default,
+    "User-agent: *\nDisallow: /\n",
+  );
+});
+
 test("home and catalog schemas expose every agreed editable text", async () => {
   const hero = await schema("src/components/home/hero.json");
   const about = await schema("src/components/home/editorial-section.json");

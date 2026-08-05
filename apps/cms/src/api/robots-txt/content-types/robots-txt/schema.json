@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "robots_txts",
+  "info": {
+    "singularName": "robots-txt",
+    "pluralName": "robots-txts",
+    "displayName": "robots.txt",
+    "description": "Правила индексации сайта для поисковых роботов"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "content": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 20000,
+      "default": "User-agent: *\nDisallow: /\n",
+      "description": "Содержимое публичного /robots.txt. Укажите как минимум директиву User-agent. Если запись отсутствует, некорректна или CMS недоступна, сайт запретит индексацию полностью."
+    }
+  }
+}

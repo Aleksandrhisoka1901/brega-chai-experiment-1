@@ -67,7 +67,9 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
         ((aboutCopyBox?.y ?? 0) + (aboutCopyBox?.height ?? 0)),
     ),
   ).toBeLessThanOrEqual(2);
-  await expect(aboutColumns.nth(1).locator("p")).toHaveCount(2);
+  const aboutParagraphs = aboutColumns.nth(1).locator("p");
+  await expect(aboutParagraphs).toHaveCount(2);
+  await expect(aboutParagraphs.first()).toHaveCSS("font-size", "20px");
 
   const nabory = page.locator("#nabory");
   const naborCards = nabory.locator('[data-home-card="nabor"]');
