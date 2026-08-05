@@ -37,6 +37,7 @@ COPY --chown=node:node --from=production-dependencies /workspace/node_modules ./
 COPY --chown=node:node --from=production-dependencies /workspace/apps/cms/node_modules ./apps/cms/node_modules
 COPY --chown=node:node --from=build /workspace/packages/contracts ./packages/contracts
 COPY --chown=node:node --from=build /workspace/apps/cms/config ./apps/cms/config
+COPY --chown=node:node --from=build /workspace/apps/cms/database ./apps/cms/database
 COPY --chown=node:node --from=build /workspace/apps/cms/src ./apps/cms/src
 COPY --chown=node:node --from=build /workspace/apps/cms/dist ./apps/cms/dist
 RUN mkdir -p /workspace/apps/cms/public/uploads \
