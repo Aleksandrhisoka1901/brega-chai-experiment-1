@@ -8,6 +8,21 @@ timestamp=$(date -u +%Y%m%dT%H%M%SZ)
 destination="${backup_root}/${timestamp}"
 archive_image=alpine:3.22.1
 
+resolve_service_image() {
+  service=$1
+  docker ps -a \
+    --filter "label=com.docker.compose.project=brega-chai" \
+    --filter "label=com.docker.compose.service=$service" \
+    --format '{{.Image}}' |
+    head -n 1
+}
+
+WEB_IMAGE=${WEB_IMAGE:-$(resolve_service_image web)}
+CMS_IMAGE=${CMS_IMAGE:-$(resolve_service_image cms)}
+: "${WEB_IMAGE:?Cannot resolve the current web image}"
+: "${CMS_IMAGE:?Cannot resolve the current CMS image}"
+export WEB_IMAGE CMS_IMAGE
+
 case "$keep" in
   ''|*[!0-9]*) echo "BACKUP_KEEP must be a positive integer" >&2; exit 1 ;;
   0) echo "BACKUP_KEEP must be greater than zero" >&2; exit 1 ;;

@@ -606,10 +606,10 @@ Next.js `sitemap.ts`:
 
 `robots.ts`:
 
-- разрешает публичные страницы;
-- закрывает `/api/`;
-- не публикует CMS/admin URLs;
-- содержит абсолютный sitemap URL.
+- до публичного запуска запрещает обход всего сайта через `Disallow: /`;
+- не публикует sitemap и CMS/admin URLs;
+- дублируется глобальным `X-Robots-Tag: noindex, nofollow, noarchive`
+  на публичном домене.
 
 Для `/legal/*.pdf` Nginx добавляет `X-Robots-Tag: noindex`; ссылки на документы остаются доступными пользователям.
 
