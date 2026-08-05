@@ -22,6 +22,20 @@ const mediaSchema = z.object({
     .optional(),
 });
 
+const legalDocumentSchema = z.object({
+  url: z.string().min(1),
+  mime: z.string().min(1),
+});
+
+const legalDocumentsSchema = z
+  .object({
+    privacyPolicy: legalDocumentSchema.nullable().optional(),
+    terms: legalDocumentSchema.nullable().optional(),
+    deliveryAndReturns: legalDocumentSchema.nullable().optional(),
+  })
+  .nullable()
+  .optional();
+
 const responseSchema = z.object({
   data: z.object({
     brandName: z.string().trim().min(1),
@@ -59,6 +73,7 @@ const responseSchema = z.object({
       outOfStock: z.string().trim().min(1),
     }),
     legalDetails: z.string().trim().min(1),
+    legalDocuments: legalDocumentsSchema,
     defaultProductStory: z.array(z.unknown()),
     defaultSeo: z.object({
       title: z.string().min(1),
@@ -73,7 +88,11 @@ const responseSchema = z.object({
 
 export type GlobalSettings = Omit<
   z.infer<typeof responseSchema>["data"],
-  "logo" | "defaultProductStory" | "defaultSeo" | "sectionBreadcrumbs"
+  | "logo"
+  | "defaultProductStory"
+  | "defaultSeo"
+  | "sectionBreadcrumbs"
+  | "legalDocuments"
 > & {
   logo?: {
     url: string;
@@ -88,6 +107,9 @@ export type GlobalSettings = Omit<
     imageUrl?: string;
   };
   sectionBreadcrumbs: Record<"tovary" | "nabory", string>;
+  legalDocuments?: Partial<
+    Record<"privacyPolicy" | "terms" | "deliveryAndReturns", string>
+  >;
 };
 
 export type CheckoutSettings = Pick<
@@ -110,6 +132,7 @@ export function mapGlobalSettingsPayload(
     defaultProductStory,
     defaultSeo,
     sectionBreadcrumbs,
+    legalDocuments,
     ...settings
   } = parsed.data.data;
   const breadcrumbLabels: Record<"tovary" | "nabory", string> = {
@@ -120,9 +143,24 @@ export function mapGlobalSettingsPayload(
     breadcrumbLabels[breadcrumb.route] = breadcrumb.label;
   }
 
+  const legalDocumentUrls: GlobalSettings["legalDocuments"] = {};
+  for (const field of [
+    "privacyPolicy",
+    "terms",
+    "deliveryAndReturns",
+  ] as const) {
+    const document = legalDocuments?.[field];
+    if (document?.mime === "application/pdf") {
+      legalDocumentUrls[field] = mediaUrl(document.url, publicBase);
+    }
+  }
+
   return {
     ...settings,
     sectionBreadcrumbs: breadcrumbLabels,
+    ...(Object.keys(legalDocumentUrls).length > 0
+      ? { legalDocuments: legalDocumentUrls }
+      : {}),
     ...(logo
       ? {
           logo: {

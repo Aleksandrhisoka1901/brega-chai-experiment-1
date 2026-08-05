@@ -3,7 +3,7 @@ set -eu
 
 compose_files="-f docker-compose.yml -f docker-compose.production.yml"
 backup_root=${BACKUP_ROOT:-./backups}
-keep=${BACKUP_KEEP:-3}
+keep=${BACKUP_KEEP:-1}
 timestamp=$(date -u +%Y%m%dT%H%M%SZ)
 destination="${backup_root}/${timestamp}"
 archive_image=alpine:3.22.1

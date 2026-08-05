@@ -11,7 +11,6 @@
     "test": "node --experimental-strip-types --test",
     "test:integration:order": "node --experimental-strip-types --test tests/integration/order-flow.integration.test.ts",
     "test:e2e": "playwright test",
-    "legal:placeholders": "node scripts/generate-placeholder-legal-documents.mjs",
     "test:e2e:server": "yarn workspace @brega-chai/contracts build && next build && node scripts/start-standalone.mjs",
     "typecheck": "tsc --noEmit"
   },

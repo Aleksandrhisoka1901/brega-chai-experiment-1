@@ -33,8 +33,9 @@ healthcheck и smoke-check. При ошибке healthcheck pipeline возвр�
 web/CMS images; данные и schema автоматически не откатываются. Автоматический
 deploy принимает только backward-compatible schema changes.
 
-Ежедневный локальный backup хранит последние три копии на отдельном persistent
-path того же VPS. Off-site backup отложен.
+Ежедневный локальный backup хранит только последнюю копию на отдельном
+persistent path того же VPS. Новая копия перед deploy заменяет предыдущую.
+Off-site backup отложен.
 
 ## Последствия
 

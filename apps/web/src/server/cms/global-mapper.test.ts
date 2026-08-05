@@ -34,6 +34,16 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
             outOfStock: "Закончилось",
           },
           legalDetails: "ИП Иванов\nИНН 123456789012",
+          legalDocuments: {
+            privacyPolicy: {
+              url: "/uploads/privacy.pdf",
+              mime: "application/pdf",
+            },
+            terms: {
+              url: "/uploads/terms.docx",
+              mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            },
+          },
           defaultProductStory: [
             {
               type: "paragraph",
@@ -76,6 +86,9 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
         outOfStock: "Закончилось",
       },
       legalDetails: "ИП Иванов\nИНН 123456789012",
+      legalDocuments: {
+        privacyPolicy: "http://localhost:9000/uploads/privacy.pdf",
+      },
       defaultProductStory: [
         {
           type: "paragraph",

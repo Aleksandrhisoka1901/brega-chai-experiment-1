@@ -100,7 +100,7 @@ trap cleanup EXIT INT TERM
     "TLS_EMAIL=$TLS_EMAIL" \
     '' \
     'BACKUP_ROOT=./backups' \
-    'BACKUP_KEEP=3' \
+    'BACKUP_KEEP=1' \
     '' \
     'WEB_IMAGE=' \
     'CMS_IMAGE=' \

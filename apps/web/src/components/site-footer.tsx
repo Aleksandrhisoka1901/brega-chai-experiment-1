@@ -7,15 +7,28 @@ import { TelegramMark } from "./telegram-mark";
 import { SiteWordmark } from "./site-wordmark";
 
 const legalDocuments = [
-  { href: "/legal/privacy.pdf", label: "Политика конфиденциальности" },
-  { href: "/legal/terms.pdf", label: "Пользовательское соглашение" },
   {
+    field: "privacyPolicy",
+    href: "/legal/privacy.pdf",
+    label: "Политика конфиденциальности",
+  },
+  {
+    field: "terms",
+    href: "/legal/terms.pdf",
+    label: "Пользовательское соглашение",
+  },
+  {
+    field: "deliveryAndReturns",
     href: "/legal/delivery-and-returns.pdf",
     label: "Условия доставки и возврата",
   },
 ] as const;
 
 export function SiteFooter({ settings }: { settings: GlobalSettings }) {
+  const configuredLegalDocuments = legalDocuments.filter(
+    ({ field }) => settings.legalDocuments?.[field],
+  );
+
   return (
     <footer className="site-footer">
       <div className="site-footer__brand">
@@ -40,13 +53,20 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
       </div>
       <div className="site-footer__legal">
         <h2>Правовая информация</h2>
-        <nav aria-label="Юридические документы">
-          {legalDocuments.map(({ href, label }) => (
-            <a key={href} href={href} target="_blank" rel="noopener noreferrer">
-              {bindShortRussianWords(label)}
-            </a>
-          ))}
-        </nav>
+        {configuredLegalDocuments.length > 0 ? (
+          <nav aria-label="Юридические документы">
+            {configuredLegalDocuments.map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {bindShortRussianWords(label)}
+              </a>
+            ))}
+          </nav>
+        ) : null}
         <small>
           © {new Date().getFullYear()}. {settings.legalDetails}
         </small>

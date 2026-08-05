@@ -121,7 +121,16 @@ const legalDocumentResponse = async (request: NextRequest) => {
         signal: AbortSignal.timeout(CMS_READINESS_TIMEOUT_MS),
       },
     );
-    if (!response.ok) return null;
+    if (!response.ok) {
+      return new NextResponse(null, {
+        status: 503,
+        headers: {
+          "Cache-Control": "no-store",
+          "Retry-After": "60",
+          "X-Robots-Tag": "noindex, nofollow",
+        },
+      });
+    }
 
     const payload = (await response.json()) as {
       data?: {
@@ -134,15 +143,30 @@ const legalDocumentResponse = async (request: NextRequest) => {
       } | null;
     };
     const document = payload.data?.legalDocuments?.[field];
-    if (!document?.url || document.mime !== "application/pdf") return null;
+    if (!document?.url || document.mime !== "application/pdf") {
+      return new NextResponse(null, {
+        status: 404,
+        headers: { "X-Robots-Tag": "noindex, nofollow" },
+      });
+    }
 
     const target = new URL(document.url, publicMediaUrl);
     if (target.protocol !== "http:" && target.protocol !== "https:") {
-      return null;
+      return new NextResponse(null, {
+        status: 404,
+        headers: { "X-Robots-Tag": "noindex, nofollow" },
+      });
     }
     return NextResponse.rewrite(target);
   } catch {
-    return null;
+    return new NextResponse(null, {
+      status: 503,
+      headers: {
+        "Cache-Control": "no-store",
+        "Retry-After": "60",
+        "X-Robots-Tag": "noindex, nofollow",
+      },
+    });
   }
 };
 

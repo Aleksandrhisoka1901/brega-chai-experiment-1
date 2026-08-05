@@ -137,7 +137,7 @@ test("proxies configured legal PDFs while preserving their public URLs", async (
   }
 });
 
-test("keeps bundled legal PDFs as a fallback for missing or non-PDF media", async () => {
+test("returns 404 when a legal PDF is missing or has another media type", async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>
     Response.json({
@@ -156,8 +156,28 @@ test("keeps bundled legal PDFs as a fallback for missing or non-PDF media", asyn
       new NextRequest("https://brega.example/legal/terms.pdf"),
     );
 
-    assert.equal(response.status, 200);
-    assert.equal(response.headers.get("x-middleware-next"), "1");
+    assert.equal(response.status, 404);
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("returns 503 for legal PDFs when CMS cannot be reached", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new TypeError("network unavailable");
+  };
+
+  try {
+    const response = await middleware(
+      new NextRequest("https://brega.example/legal/privacy.pdf"),
+    );
+
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal(response.headers.get("retry-after"), "60");
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
   } finally {
     globalThis.fetch = originalFetch;
   }
