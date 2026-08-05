@@ -30,6 +30,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 COPY --chown=node:node --from=build /workspace/apps/web/.next/standalone ./
 COPY --chown=node:node --from=build /workspace/apps/web/.next/static ./apps/web/.next/static
+COPY --chown=node:node --from=build /workspace/apps/web/public ./apps/web/public
 USER node
 EXPOSE 3000
 CMD ["node", "apps/web/server.js"]
