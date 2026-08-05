@@ -3,9 +3,13 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  applyRussianFieldLabels,
   configureOrderReadOnlyFields,
   configureProductFields,
+  getRussianFieldLabels,
+  syncAdminContentManager,
 } from "../src/admin-content-manager.ts";
+import { russianAdminTranslations } from "../src/admin/app.ts";
 import viteConfig from "../src/admin/vite.config.ts";
 
 test("deduplicates the CodeMirror module graph used by Strapi JSON fields", () => {
@@ -128,4 +132,105 @@ test("makes every order field read-only in Content Manager", () => {
   assert.equal(configuration.metadatas.orderNumber.edit.editable, false);
   assert.equal(configuration.metadatas.orderStatus.edit.editable, false);
   assert.deepEqual(configuration.layouts.list, ["orderNumber", "orderStatus"]);
+});
+
+test("writes Russian labels into Content Manager metadata", () => {
+  const labels = getRussianFieldLabels(
+    "api::global-setting.global-setting",
+    false,
+    russianAdminTranslations,
+  );
+  const configuration = applyRussianFieldLabels(
+    {
+      layouts: {
+        edit: [[{ name: "brandName", size: 6 }]],
+        list: ["brandName"],
+      },
+      settings: {},
+      metadatas: {
+        brandName: {
+          edit: { label: "brandName", visible: true },
+          list: { label: "brandName", searchable: true },
+        },
+        id: { edit: {}, list: { label: "id" } },
+      },
+    },
+    labels,
+  );
+
+  assert.equal(configuration.metadatas.brandName.edit.label, "Название бренда");
+  assert.equal(configuration.metadatas.brandName.list.label, "Название бренда");
+  assert.equal(configuration.metadatas.id.edit.label, "Идентификатор");
+  assert.equal(configuration.metadatas.id.list.label, "Идентификатор");
+});
+
+test("syncs Russian labels for content types and components", async () => {
+  const updates: Array<{
+    kind: "content-type" | "component";
+    uid: string;
+    configuration: {
+      metadatas: Record<string, { edit: { label?: string } }>;
+    };
+  }> = [];
+  const configuration = (field: string) => ({
+    layouts: { edit: [[{ name: field, size: 6 }]], list: [field] },
+    settings: {},
+    metadatas: {
+      [field]: {
+        edit: { label: field, visible: true, editable: true },
+        list: { label: field, searchable: true, sortable: true },
+      },
+    },
+  });
+  const services = {
+    "content-types": {
+      findConfiguration: async () => configuration("brandName"),
+      updateConfiguration: async (
+        schema: { uid: string },
+        updated: (typeof updates)[number]["configuration"],
+      ) =>
+        updates.push({
+          kind: "content-type",
+          uid: schema.uid,
+          configuration: updated,
+        }),
+    },
+    components: {
+      findConfiguration: async () => configuration("url"),
+      updateConfiguration: async (
+        schema: { uid: string },
+        updated: (typeof updates)[number]["configuration"],
+      ) =>
+        updates.push({
+          kind: "component",
+          uid: schema.uid,
+          configuration: updated,
+        }),
+    },
+  };
+
+  await syncAdminContentManager(
+    {
+      contentTypes: {
+        "api::global-setting.global-setting": {
+          uid: "api::global-setting.global-setting",
+        },
+      },
+      components: { "shared.link": { uid: "shared.link" } },
+      plugin: () => ({
+        service: (name: keyof typeof services) => services[name],
+      }),
+    },
+    russianAdminTranslations,
+  );
+
+  assert.equal(updates.length, 2);
+  assert.equal(
+    updates[0]?.configuration.metadatas.brandName?.edit.label,
+    "Название бренда",
+  );
+  assert.equal(
+    updates[1]?.configuration.metadatas.url?.edit.label,
+    "Адрес ссылки",
+  );
 });

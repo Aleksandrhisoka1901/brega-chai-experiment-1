@@ -1,4 +1,4 @@
-export default {
+const adminApp = {
   config: {
     locales: ["ru"],
     translations: {
@@ -208,4 +208,8 @@ export default {
     },
   },
   bootstrap() {},
-};
+} as const;
+
+export const russianAdminTranslations = adminApp.config.translations.ru;
+
+export default adminApp;
