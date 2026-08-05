@@ -176,7 +176,6 @@ function invalidate(
     );
     revalidatePath("/", "page");
   }
-  revalidatePath("/sitemap.xml", "page");
 }
 
 export async function handleRevalidation(

@@ -29,7 +29,7 @@ allowlist `PUBLIC_RUNTIME_CONFIG_KEYS`.
 
 | Переменная              | Потребитель                             | Назначение                                                                | Пример                                        |
 | ----------------------- | --------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------- |
-| `SITE_URL`              | Next server и browser config            | Origin storefront для canonical URL, Open Graph, sitemap и JSON-LD        | `https://brega-chai.example`                  |
+| `SITE_URL`              | Next server, CMS и browser config       | Origin storefront для canonical URL, Open Graph, sitemap и JSON-LD        | `https://brega-chai.example`                  |
 | `NEXT_PUBLIC_CMS_URL`   | Next server и при необходимости браузер | Публичный origin Strapi; fallback для публичных CMS media URL             | `https://admin.brega-chai.example`            |
 | `NEXT_PUBLIC_MEDIA_URL` | Next server и browser config            | Публичный origin RustFS/CDN, из которого посетитель загружает изображения | `https://media.brega-chai.example/storefront` |
 

@@ -21,7 +21,8 @@ Components ограничиваются интерактивными облас�
 смысловые теги `global`, `home`, `products`, `product:{documentId}` и
 `product-slug:{type}:{slug}`. После publish, update или unpublish Strapi вызывает
 защищённый идемпотентный `POST /api/revalidate`, который инвалидирует нужные
-теги и sitemap.
+теги и страницы. Sitemap генерируется Strapi-плагином напрямую из актуальных
+опубликованных документов и не использует Next.js cache.
 
 Каталог и продуктовые страницы допускают stale-while-revalidate. Checkout и
 создание заказа всегда работают с `no-store`. CMS доступна через server-only

@@ -10,6 +10,9 @@ export default ({ env }) => {
     "better-blocks": {
       enabled: true,
     },
+    "strapi-5-sitemap-plugin": {
+      enabled: true,
+    },
     "order-admin": {
       enabled: true,
       resolve: "./src/plugins/order-admin",

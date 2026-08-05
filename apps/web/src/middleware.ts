@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server.js";
 
 export const SERVICE_UNAVAILABLE_PATH = "/service-unavailable-internal";
+export const SITEMAP_PLUGIN_PATH = "/api/strapi-5-sitemap-plugin/sitemap.xml";
 
 const CMS_READINESS_TIMEOUT_MS = 2_000;
 const FILE_PATH = /\.[^/]+$/;
@@ -82,13 +83,24 @@ const serviceUnavailableResponse = (request: NextRequest) => {
   });
 };
 
+const sitemapResponse = (request: NextRequest) => {
+  if (request.nextUrl.pathname !== "/sitemap.xml") return null;
+
+  const cmsUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
+  const target = new URL(SITEMAP_PLUGIN_PATH, cmsUrl);
+  target.search = request.nextUrl.search;
+  return NextResponse.rewrite(target);
+};
+
 export async function middleware(request: NextRequest) {
-  if (
-    (request.method !== "GET" && request.method !== "HEAD") ||
-    isExcludedPath(request.nextUrl.pathname)
-  ) {
+  if (request.method !== "GET" && request.method !== "HEAD") {
     return NextResponse.next();
   }
+
+  const sitemap = sitemapResponse(request);
+  if (sitemap) return sitemap;
+
+  if (isExcludedPath(request.nextUrl.pathname)) return NextResponse.next();
 
   if (!(await isCmsReady())) {
     return serviceUnavailableResponse(request);

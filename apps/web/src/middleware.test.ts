@@ -3,7 +3,11 @@ import test from "node:test";
 
 import { NextRequest } from "next/server.js";
 
-import { middleware, SERVICE_UNAVAILABLE_PATH } from "./middleware.ts";
+import {
+  middleware,
+  SERVICE_UNAVAILABLE_PATH,
+  SITEMAP_PLUGIN_PATH,
+} from "./middleware.ts";
 
 const withCmsReadiness = async (status: number, run: () => Promise<void>) => {
   const originalFetch = globalThis.fetch;
@@ -56,6 +60,34 @@ test("does not run readiness checks for internal and non-page routes", async () 
     assert.equal(requests, 0);
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test("proxies the public sitemap to the Strapi plugin at runtime", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCmsUrl = process.env.CMS_INTERNAL_URL;
+  let requests = 0;
+  globalThis.fetch = async () => {
+    requests += 1;
+    return new Response(null, { status: 503 });
+  };
+  process.env.CMS_INTERNAL_URL = "http://cms.internal:1337";
+
+  try {
+    const response = await middleware(
+      new NextRequest("https://brega.example/sitemap.xml?preview=1"),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("x-middleware-rewrite"),
+      `http://cms.internal:1337${SITEMAP_PLUGIN_PATH}?preview=1`,
+    );
+    assert.equal(requests, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCmsUrl === undefined) delete process.env.CMS_INTERNAL_URL;
+    else process.env.CMS_INTERNAL_URL = originalCmsUrl;
   }
 });
 

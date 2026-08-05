@@ -39,7 +39,7 @@
 - timeout и типизированные ошибки CMS;
 - безопасное состояние при недоступности CMS;
 - SEO helpers для canonical, metadata и breadcrumbs;
-- управляемый через Strapi `robots.txt`, `sitemap.ts`, JSON-LD;
+- управляемые через Strapi `robots.txt` и sitemap, JSON-LD;
 - локальные шрифты через `next/font`;
 - Playwright + axe;
 - ESLint, Prettier, typecheck и CI gates;
@@ -54,7 +54,7 @@
 | React Query гидратируется в публичный контент    | Публичный контент читается в React Server Components; React Query не нужен по умолчанию                |
 | Root layout `force-dynamic`                      | Статический/cache-first layout с tag-based revalidation                                                |
 | Общая библиотека содержит UI и формы             | Shared package хранит прежде всего схемы, DTO и чистые domain-функции                                  |
-| Strapi sitemap plugin                            | Sitemap генерирует Next.js из опубликованных продуктов                                                 |
+| Strapi sitemap plugin                            | Strapi 5 plugin генерирует sitemap; middleware проксирует его на публичный `/sitemap.xml`               |
 | Lead endpoint                                    | Order endpoint с повторной проверкой цен, идемпотентностью и адаптерами доставки/оплаты                |
 | Privacy как HTML-страница                        | Юридические PDF версионируются в `apps/web/public/legal`                                               |
 | Radix Themes задаёт большую часть оформления     | Radix используется для поведения; editorial visual language задают CSS tokens и собственные компоненты |
@@ -68,7 +68,6 @@
 - прямое создание заказа через публичный Strapi CRUD;
 - хранение цены заказа только как ссылки на текущий товар;
 - module-level mutable state для rate limiting в production;
-- зависимость SEO от стороннего Strapi sitemap plugin;
 - React Toastify, если достаточно локального accessible live region.
 
 ## 3. Целевой стек
@@ -86,6 +85,7 @@
 | Styling                | CSS Modules + global design tokens                | кастомная журнальная стилистика                                                 |
 | CMS                    | Strapi 5.45.0                                     | товары, страницы, SEO, заказы                                                   |
 | CMS color field        | `@strapi/plugin-color-picker` 5.45.0              | HEX color picker для Hero и «О проекте»; версия обновляется синхронно со Strapi |
+| CMS sitemap            | `strapi-5-sitemap-plugin` 1.0.8                   | Sitemap из опубликованных документов с настройками в Strapi Admin               |
 | Database               | PostgreSQL 16                                     | Strapi content и orders; точный patch/image digest фиксируется при bootstrap    |
 | Validation             | Zod                                               | формы, API payload, env                                                         |
 | Forms                  | React Hook Form + Zod resolver                    | checkout                                                                        |
@@ -188,7 +188,6 @@ src/app/
 ├── global-error.tsx
 ├── robots.txt/
 │   └── route.ts
-├── sitemap.ts
 ├── manifest.ts
 ├── products/
 │   ├── page.tsx
@@ -264,7 +263,6 @@ Client Components только для:
 - `getProducts()`;
 - `getProductBySlug(type, slug)`;
 - `getProductSeoBySlug(type, slug)`;
-- `getSitemapProducts()`.
 
 Не экспортировать generic `get/post/put/delete` в UI-слой.
 
@@ -274,7 +272,8 @@ Client Components только для:
 - Не использовать бесконтрольный deep populate.
 - Для listing и detail создать разные projections.
 - Listing не получает gallery и articles.
-- Sitemap не получает изображения/статьи, кроме реально используемых sitemap image полей.
+- Sitemap строится внутри Strapi plugin по узкой конфигурации типа `product` и
+  не запрашивает изображения или статьи.
 
 ## 9. Кэширование и публикация
 
@@ -326,8 +325,8 @@ server-only secret; подпись, secret и payload не логируются.
 | ---------- | ---------------------------------------- | --------------------------------------------------------------------- |
 | `global`   | `global`                                 | публичный layout                                                      |
 | `home`     | `home`                                   | `/`                                                                   |
-| `products` | `products`                               | `/tovary`, `/sitemap.xml`                                             |
-| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/tovary/{slug}` или `/nabory/{slug}`, `/sitemap.xml` |
+| `products` | `products`                               | `/tovary`                                                      |
+| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/tovary/{slug}` или `/nabory/{slug}`          |
 
 Next.js хранит bounded in-memory registry `id → body digest`. Точный повтор
 возвращает успех без повторной invalidation, а тот же ID с другим payload
@@ -596,14 +595,18 @@ Payment adapter и webhook route не создаются до отдельног
 
 ### 14.2. Sitemap и robots
 
-Next.js `sitemap.ts`:
+Strapi sitemap plugin:
 
-- `/`;
-- `/tovary`;
-- все опубликованные `/tovary/[slug]`;
-- все опубликованные `/nabory/[slug]`;
-- `lastModified` из Strapi;
-- опциональные product images.
+- хранит base URL, коллекции и статические URL в собственных настройках Strapi;
+- при первом запуске получает безопасную конфигурацию `/`, `/tovary` и
+  `product` с шаблоном `/[type]y/[slug]`;
+- включает только опубликованные товары и наборы, добавляет `lastmod` из
+  `updatedAt`;
+- публичный `/sitemap.xml` через runtime middleware rewrite проксируется на
+  `/api/strapi-5-sitemap-plugin/sitemap.xml` внутри CMS;
+- rewrite выполняется до file-path guard и не раскрывает внутренний CMS URL;
+- plugin endpoint получает только публичное read-разрешение `getSitemap`;
+- изменения sitemap не требуют Next.js cache revalidation.
 
 `robots.txt`:
 

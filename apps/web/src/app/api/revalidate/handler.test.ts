@@ -86,10 +86,7 @@ test("maps home, global and products to their exact cache boundaries", async () 
     {
       payload: { id: "evt-products", event: "products" },
       tags: ["products"],
-      paths: [
-        ["/tovary", "page"],
-        ["/sitemap.xml", "page"],
-      ],
+      paths: [["/tovary", "page"]],
     },
   ] as const;
 
@@ -105,7 +102,7 @@ test("maps home, global and products to their exact cache boundaries", async () 
   }
 });
 
-test("maps one product to listing, detail, home and sitemap", async () => {
+test("maps one product to listing, detail and home", async () => {
   const { dependencies, tags, paths } = harness();
   const response = await handleRevalidation(
     signedRequest({
@@ -126,7 +123,6 @@ test("maps one product to listing, detail, home and sitemap", async () => {
     ["/tovary", "page"],
     ["/tovary/sencha-42", "page"],
     ["/", "page"],
-    ["/sitemap.xml", "page"],
   ]);
 });
 
