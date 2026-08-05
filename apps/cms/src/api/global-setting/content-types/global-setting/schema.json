@@ -97,6 +97,13 @@
       "type": "text",
       "required": true,
       "minLength": 1
+    },
+    "legalDocuments": {
+      "type": "component",
+      "component": "shared.legal-documents",
+      "repeatable": false,
+      "required": false,
+      "description": "Заменяемые PDF-файлы правовой информации. Если поле не заполнено, сайт использует резервные документы."
     }
   }
 }

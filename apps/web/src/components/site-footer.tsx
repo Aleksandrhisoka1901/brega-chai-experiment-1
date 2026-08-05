@@ -1,6 +1,3 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
-
 import { Mail } from "lucide-react";
 
 import type { GlobalSettings } from "@/server/cms/global-mapper";
@@ -18,16 +15,7 @@ const legalDocuments = [
   },
 ] as const;
 
-function availableLegalDocuments() {
-  const publicDirectory = path.join(process.cwd(), "public");
-  return legalDocuments.filter(({ href }) =>
-    existsSync(path.join(publicDirectory, href)),
-  );
-}
-
 export function SiteFooter({ settings }: { settings: GlobalSettings }) {
-  const documents = availableLegalDocuments();
-
   return (
     <footer className="site-footer">
       <div className="site-footer__brand">
@@ -52,20 +40,13 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
       </div>
       <div className="site-footer__legal">
         <h2>Правовая информация</h2>
-        {documents.length > 0 ? (
-          <nav aria-label="Юридические документы">
-            {documents.map(({ href, label }) => (
-              <a
-                key={href}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {bindShortRussianWords(label)}
-              </a>
-            ))}
-          </nav>
-        ) : null}
+        <nav aria-label="Юридические документы">
+          {legalDocuments.map(({ href, label }) => (
+            <a key={href} href={href} target="_blank" rel="noopener noreferrer">
+              {bindShortRussianWords(label)}
+            </a>
+          ))}
+        </nav>
         <small>
           © {new Date().getFullYear()}. {settings.legalDetails}
         </small>

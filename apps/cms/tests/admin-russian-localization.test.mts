@@ -1,55 +1,56 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
+import { basename, dirname, relative, sep } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import adminApp from "../src/admin/app.ts";
 
-const schemas = [
-  [
-    "api/global-setting/content-types/global-setting/schema.json",
-    "api::global-setting.global-setting",
-  ],
-  [
-    "api/home-page/content-types/home-page/schema.json",
-    "api::home-page.home-page",
-  ],
-  ["api/order/content-types/order/schema.json", "api::order.order"],
-  ["api/product/content-types/product/schema.json", "api::product.product"],
-  [
-    "api/products-page/content-types/products-page/schema.json",
-    "api::products-page.products-page",
-  ],
-  ["components/home/catalog-preview.json", "home.catalog-preview"],
-  ["components/home/editorial-section.json", "home.editorial-section"],
-  ["components/home/hero.json", "home.hero"],
-  ["components/home/rituals-preview.json", "home.rituals-preview"],
-  ["components/product/article.json", "product.article"],
-  ["components/product/gallery-image.json", "product.gallery-image"],
-  ["components/shared/image-with-alt.json", "shared.image-with-alt"],
-  ["components/shared/link.json", "shared.link"],
-  ["components/shared/navigation-labels.json", "shared.navigation-labels"],
-  ["components/shared/section-breadcrumb.json", "shared.section-breadcrumb"],
-  ["components/shared/seo.json", "shared.seo"],
-  ["components/shared/storefront-texts.json", "shared.storefront-texts"],
-] as const;
-
 const translations = adminApp.config.translations.ru;
+const sourceDirectory = fileURLToPath(new URL("../src", import.meta.url));
+
+async function schemaFiles(directory: string): Promise<string[]> {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map(async (entry) => {
+      const path = `${directory}/${entry.name}`;
+      if (entry.isDirectory()) return schemaFiles(path);
+      if (path.includes(`${sep}api${sep}`) && entry.name === "schema.json") {
+        return [path];
+      }
+      if (
+        path.includes(`${sep}components${sep}`) &&
+        entry.name.endsWith(".json")
+      ) {
+        return [path];
+      }
+      return [];
+    }),
+  );
+  return files.flat().sort();
+}
 
 test("enables Russian Strapi Admin and labels every custom field", async () => {
   assert.deepEqual(adminApp.config.locales, ["ru"]);
 
-  for (const [path, uid] of schemas) {
-    const schema = JSON.parse(
-      await readFile(new URL(`../src/${path}`, import.meta.url), "utf8"),
-    ) as {
-      info: { displayName: string };
+  const schemas = await schemaFiles(sourceDirectory);
+  assert.ok(schemas.length > 0);
+
+  for (const absolutePath of schemas) {
+    const path = relative(sourceDirectory, absolutePath).split(sep).join("/");
+    const schema = JSON.parse(await readFile(absolutePath, "utf8")) as {
+      info: { displayName: string; singularName?: string };
       attributes: Record<string, unknown>;
     };
+    const isApi = path.startsWith("api/");
+    const uid = isApi
+      ? `api::${path.split("/")[1]}.${schema.info.singularName}`
+      : `${basename(dirname(path))}.${basename(path, ".json")}`;
 
     assert.match(schema.info.displayName, /[А-Яа-яЁё]/, path);
 
     for (const attribute of Object.keys(schema.attributes)) {
-      const prefix = path.startsWith("api/")
+      const prefix = isApi
         ? `content-manager.content-types.${uid}`
         : `content-manager.components.${uid}`;
       const key = `${prefix}.${attribute}` as keyof typeof translations;

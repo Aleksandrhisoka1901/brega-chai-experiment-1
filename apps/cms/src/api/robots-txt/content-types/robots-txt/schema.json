@@ -4,7 +4,7 @@
   "info": {
     "singularName": "robots-txt",
     "pluralName": "robots-txts",
-    "displayName": "robots.txt",
+    "displayName": "Настройки robots.txt",
     "description": "Правила индексации сайта для поисковых роботов"
   },
   "options": {

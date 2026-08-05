@@ -122,6 +122,18 @@ for (const viewport of viewports) {
             .poll(() => productTrack.evaluate((element) => element.scrollLeft))
             .toBeGreaterThan(beforeProducts);
           await expect(products.getByText("Сортов: 4")).toHaveCount(0);
+
+          const progressBox = await products
+            .locator("[data-slider-progress]")
+            .boundingBox();
+          const catalogLinkBox = await products
+            .getByRole("link", { name: "Все сорта" })
+            .boundingBox();
+          expect(progressBox).not.toBeNull();
+          expect(catalogLinkBox).not.toBeNull();
+          expect(
+            (progressBox?.y ?? 0) + (progressBox?.height ?? 0),
+          ).toBeLessThan(catalogLinkBox?.y ?? 0);
         }
       }
 

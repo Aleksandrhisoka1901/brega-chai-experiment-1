@@ -82,6 +82,7 @@ export function SliderProgress({ progress }: { progress: number }) {
     <div
       aria-hidden="true"
       className={styles.progress}
+      data-slider-progress
       style={
         {
           "--slider-progress": Math.min(1, Math.max(0, progress)),

@@ -91,6 +91,78 @@ test("proxies the public sitemap to the Strapi plugin at runtime", async () => {
   }
 });
 
+test("proxies configured legal PDFs while preserving their public URLs", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCmsUrl = process.env.CMS_INTERNAL_URL;
+  const originalMediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL;
+  let requestedUrl = "";
+  globalThis.fetch = async (input) => {
+    requestedUrl = String(input);
+    return Response.json({
+      data: {
+        legalDocuments: {
+          privacyPolicy: {
+            mime: "application/pdf",
+            url: "/uploads/privacy-v2.pdf",
+          },
+        },
+      },
+    });
+  };
+  process.env.CMS_INTERNAL_URL = "http://cms.internal:1337";
+  process.env.NEXT_PUBLIC_MEDIA_URL = "https://media.brega.example";
+
+  try {
+    const response = await middleware(
+      new NextRequest("https://brega.example/legal/privacy.pdf"),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("x-middleware-rewrite"),
+      "https://media.brega.example/uploads/privacy-v2.pdf",
+    );
+    assert.match(
+      requestedUrl,
+      /^http:\/\/cms\.internal:1337\/api\/global-setting\?/,
+    );
+    assert.match(requestedUrl, /privacyPolicy/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCmsUrl === undefined) delete process.env.CMS_INTERNAL_URL;
+    else process.env.CMS_INTERNAL_URL = originalCmsUrl;
+    if (originalMediaUrl === undefined)
+      delete process.env.NEXT_PUBLIC_MEDIA_URL;
+    else process.env.NEXT_PUBLIC_MEDIA_URL = originalMediaUrl;
+  }
+});
+
+test("keeps bundled legal PDFs as a fallback for missing or non-PDF media", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    Response.json({
+      data: {
+        legalDocuments: {
+          terms: {
+            mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            url: "/uploads/terms.docx",
+          },
+        },
+      },
+    });
+
+  try {
+    const response = await middleware(
+      new NextRequest("https://brega.example/legal/terms.pdf"),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-middleware-next"), "1");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("continues public navigation when CMS readiness is healthy", async () => {
   const originalFetch = globalThis.fetch;
   let readinessRequest: { input: string; cache?: RequestCache } | undefined;

@@ -62,14 +62,14 @@ export function HomeTovary({
         products={products}
         trackRef={slider.ref}
       />
-      <div className={styles.catalogLink}>
-        <EditorialLink href="/tovary" label={linkLabel} />
-      </div>
       {slider.canScroll ? (
         <div className={styles.sliderProgress}>
           <SliderProgress progress={slider.progress} />
         </div>
       ) : null}
+      <div className={styles.catalogLink}>
+        <EditorialLink href="/tovary" label={linkLabel} />
+      </div>
     </section>
   );
 }

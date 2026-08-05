@@ -4,6 +4,11 @@ export const SERVICE_UNAVAILABLE_PATH = "/service-unavailable-internal";
 export const SITEMAP_PLUGIN_PATH = "/api/strapi-5-sitemap-plugin/sitemap.xml";
 
 const CMS_READINESS_TIMEOUT_MS = 2_000;
+const LEGAL_DOCUMENT_PATHS = {
+  "/legal/privacy.pdf": "privacyPolicy",
+  "/legal/terms.pdf": "terms",
+  "/legal/delivery-and-returns.pdf": "deliveryAndReturns",
+} as const;
 const FILE_PATH = /\.[^/]+$/;
 const INDEX_ALIAS = /^\/index\.(?:html|php)$/i;
 const GARBAGE_SEGMENT = /^[^\p{L}\p{N}]+$/u;
@@ -92,6 +97,55 @@ const sitemapResponse = (request: NextRequest) => {
   return NextResponse.rewrite(target);
 };
 
+const legalDocumentResponse = async (request: NextRequest) => {
+  const field =
+    LEGAL_DOCUMENT_PATHS[
+      request.nextUrl.pathname as keyof typeof LEGAL_DOCUMENT_PATHS
+    ];
+  if (!field) return null;
+
+  const cmsUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
+  const publicMediaUrl =
+    process.env.NEXT_PUBLIC_MEDIA_URL ??
+    process.env.NEXT_PUBLIC_CMS_URL ??
+    cmsUrl;
+  const query = new URLSearchParams({ status: "published" });
+  query.set(`populate[legalDocuments][populate][${field}][fields][0]`, "url");
+  query.set(`populate[legalDocuments][populate][${field}][fields][1]`, "mime");
+
+  try {
+    const response = await fetch(
+      new URL(`/api/global-setting?${query}`, cmsUrl),
+      {
+        next: { revalidate: 300, tags: ["global"] },
+        signal: AbortSignal.timeout(CMS_READINESS_TIMEOUT_MS),
+      },
+    );
+    if (!response.ok) return null;
+
+    const payload = (await response.json()) as {
+      data?: {
+        legalDocuments?: Partial<
+          Record<
+            (typeof LEGAL_DOCUMENT_PATHS)[keyof typeof LEGAL_DOCUMENT_PATHS],
+            { mime?: string; url?: string } | null
+          >
+        > | null;
+      } | null;
+    };
+    const document = payload.data?.legalDocuments?.[field];
+    if (!document?.url || document.mime !== "application/pdf") return null;
+
+    const target = new URL(document.url, publicMediaUrl);
+    if (target.protocol !== "http:" && target.protocol !== "https:") {
+      return null;
+    }
+    return NextResponse.rewrite(target);
+  } catch {
+    return null;
+  }
+};
+
 export async function middleware(request: NextRequest) {
   if (request.method !== "GET" && request.method !== "HEAD") {
     return NextResponse.next();
@@ -99,6 +153,9 @@ export async function middleware(request: NextRequest) {
 
   const sitemap = sitemapResponse(request);
   if (sitemap) return sitemap;
+
+  const legalDocument = await legalDocumentResponse(request);
+  if (legalDocument) return legalDocument;
 
   if (isExcludedPath(request.nextUrl.pathname)) return NextResponse.next();
 

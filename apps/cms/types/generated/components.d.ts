@@ -151,6 +151,19 @@ export interface SharedImageWithAlt extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedLegalDocuments extends Struct.ComponentSchema {
+  collectionName: "components_shared_legal_documents";
+  info: {
+    description: "PDF-\u0444\u0430\u0439\u043B\u044B, \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u044B\u0435 \u043F\u043E \u043F\u043E\u0441\u0442\u043E\u044F\u043D\u043D\u044B\u043C \u0430\u0434\u0440\u0435\u0441\u0430\u043C \u0432 \u0440\u0430\u0437\u0434\u0435\u043B\u0435 /legal";
+    displayName: "\u042E\u0440\u0438\u0434\u0438\u0447\u0435\u0441\u043A\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B";
+  };
+  attributes: {
+    deliveryAndReturns: Schema.Attribute.Media<"files">;
+    privacyPolicy: Schema.Attribute.Media<"files">;
+    terms: Schema.Attribute.Media<"files">;
+  };
+}
+
 export interface SharedLink extends Struct.ComponentSchema {
   collectionName: "components_shared_links";
   info: {
@@ -244,6 +257,7 @@ declare module "@strapi/strapi" {
       "product.article": ProductArticle;
       "product.gallery-image": ProductGalleryImage;
       "shared.image-with-alt": SharedImageWithAlt;
+      "shared.legal-documents": SharedLegalDocuments;
       "shared.link": SharedLink;
       "shared.navigation-labels": SharedNavigationLabels;
       "shared.section-breadcrumb": SharedSectionBreadcrumb;

@@ -23,6 +23,8 @@ export default {
           "Электронная почта",
         "content-manager.content-types.api::global-setting.global-setting.legalDetails":
           "Реквизиты",
+        "content-manager.content-types.api::global-setting.global-setting.legalDocuments":
+          "Юридические PDF-документы",
         "content-manager.content-types.api::global-setting.global-setting.logo":
           "Логотип",
         "content-manager.content-types.api::global-setting.global-setting.orderNotificationEmail":
@@ -131,6 +133,9 @@ export default {
         "content-manager.content-types.api::products-page.products-page.title":
           "Заголовок",
 
+        "content-manager.content-types.api::robots-txt.robots-txt.content":
+          "Содержимое robots.txt",
+
         "content-manager.content-types.api::home-page.home-page.featuredNabory":
           "Ритуалы на главной",
         "content-manager.content-types.api::home-page.home-page.featuredTovary":
@@ -178,6 +183,12 @@ export default {
         "content-manager.components.shared.image-with-alt.image": "Изображение",
         "content-manager.components.shared.link.label": "Текст ссылки",
         "content-manager.components.shared.link.url": "Адрес ссылки",
+        "content-manager.components.shared.legal-documents.privacyPolicy":
+          "Политика конфиденциальности",
+        "content-manager.components.shared.legal-documents.terms":
+          "Пользовательское соглашение",
+        "content-manager.components.shared.legal-documents.deliveryAndReturns":
+          "Условия доставки и возврата",
         "content-manager.components.shared.navigation-labels.about":
           "О проекте",
         "content-manager.components.shared.navigation-labels.cart": "Корзина",

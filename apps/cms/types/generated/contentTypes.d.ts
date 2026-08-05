@@ -477,6 +477,7 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
+    legalDocuments: Schema.Attribute.Component<"shared.legal-documents", false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       "oneToMany",
@@ -803,7 +804,7 @@ export interface ApiRobotsTxtRobotsTxt extends Struct.SingleTypeSchema {
   collectionName: "robots_txts";
   info: {
     description: "\u041F\u0440\u0430\u0432\u0438\u043B\u0430 \u0438\u043D\u0434\u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u0441\u0430\u0439\u0442\u0430 \u0434\u043B\u044F \u043F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0445 \u0440\u043E\u0431\u043E\u0442\u043E\u0432";
-    displayName: "robots.txt";
+    displayName: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 robots.txt";
     pluralName: "robots-txts";
     singularName: "robots-txt";
   };

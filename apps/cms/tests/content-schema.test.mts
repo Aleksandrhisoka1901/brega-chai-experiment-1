@@ -82,6 +82,29 @@ test("global settings expose reusable breadcrumb and storefront text components"
   assert.equal(storefrontTexts.attributes.outOfStock.required, true);
 });
 
+test("global settings expose replaceable legal PDFs at stable routes", async () => {
+  const global = await schema(
+    "src/api/global-setting/content-types/global-setting/schema.json",
+  );
+  const documents = await schema("src/components/shared/legal-documents.json");
+
+  assert.equal(global.attributes.legalDocuments.type, "component");
+  assert.equal(
+    global.attributes.legalDocuments.component,
+    "shared.legal-documents",
+  );
+  assert.equal(global.attributes.legalDocuments.repeatable, false);
+  assert.equal(global.attributes.legalDocuments.required, false);
+
+  for (const field of ["privacyPolicy", "terms", "deliveryAndReturns"]) {
+    assert.equal(documents.attributes[field].type, "media");
+    assert.equal(documents.attributes[field].multiple, false);
+    assert.equal(documents.attributes[field].required, false);
+    assert.deepEqual(documents.attributes[field].allowedTypes, ["files"]);
+    assert.match(String(documents.attributes[field].description), /\/legal\//);
+  }
+});
+
 test("robots.txt is an immediately editable, bounded single type", async () => {
   const robots = await schema(
     "src/api/robots-txt/content-types/robots-txt/schema.json",

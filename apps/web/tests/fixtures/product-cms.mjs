@@ -108,6 +108,12 @@ const cms = createServer((request, response) => {
     return;
   }
 
+  if (/^\/uploads\/legal-[a-z-]+\.pdf$/.test(url.pathname)) {
+    response.writeHead(200, { "Content-Type": "application/pdf" });
+    response.end("%PDF-1.4\n%%EOF\n");
+    return;
+  }
+
   if (url.pathname === "/api/orders" && request.method === "POST") {
     orderRequests += 1;
     let raw = "";
@@ -264,6 +270,20 @@ const cms = createServer((request, response) => {
             outOfStock: "Нет в наличии",
           },
           legalDetails: "ИП Иванов Иван. ИНН 123456789",
+          legalDocuments: {
+            privacyPolicy: {
+              mime: "application/pdf",
+              url: "/uploads/legal-privacy.pdf",
+            },
+            terms: {
+              mime: "application/pdf",
+              url: "/uploads/legal-terms.pdf",
+            },
+            deliveryAndReturns: {
+              mime: "application/pdf",
+              url: "/uploads/legal-delivery-and-returns.pdf",
+            },
+          },
           defaultProductStory: [
             {
               type: "paragraph",
