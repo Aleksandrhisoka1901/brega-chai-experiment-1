@@ -43,7 +43,8 @@ docker compose $compose_files up -d cms
 if ! wait_service cms http://127.0.0.1:1337/admin; then
   failed=1
 else
-  docker compose $compose_files up -d web nginx
+  docker compose $compose_files up -d web
+  docker compose $compose_files up -d --force-recreate --no-deps nginx
   failed=0
 fi
 
