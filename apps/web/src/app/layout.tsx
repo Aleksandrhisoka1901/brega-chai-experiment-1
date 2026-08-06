@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { AnalyticsConsent } from "@/features/analytics/analytics-consent";
 import { siteOrigin } from "@/lib/seo/metadata";
 import {
   organizationStructuredData,
@@ -101,6 +102,7 @@ export default async function RootLayout({
           {children}
         </div>
         {settings ? <SiteFooter settings={settings} /> : null}
+        <AnalyticsConsent />
       </body>
     </html>
   );

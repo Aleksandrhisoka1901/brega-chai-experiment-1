@@ -1,0 +1,133 @@
+.banner {
+  position: fixed;
+  z-index: 50;
+  right: var(--page-gutter);
+  bottom: clamp(1rem, 3vw, 2rem);
+  width: min(34rem, calc(100vw - var(--page-gutter) * 2));
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  border: 1px solid #42443a;
+  background: var(--text-primary);
+  box-shadow: 0 1.25rem 4rem rgb(24 25 20 / 24%);
+  color: var(--surface-page);
+  animation: banner-in 280ms ease-out both;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: #b9baae;
+  font-size: var(--type-caption);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.content {
+  display: block;
+}
+
+.text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: 1.45;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.decisionActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.button {
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--surface-page);
+  border-radius: 0;
+  font: 600 0.6875rem/1 var(--font-interface);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.detailsButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--surface-page);
+}
+
+.detailsButton:hover {
+  background: rgb(239 237 228 / 10%);
+}
+
+.reject {
+  background: transparent;
+  color: var(--surface-page);
+}
+
+.reject:hover {
+  background: rgb(239 237 228 / 10%);
+}
+
+.accept {
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+.accept:hover {
+  background: var(--surface-subtle);
+}
+
+@keyframes banner-in {
+  from {
+    transform: translateY(0.75rem);
+  }
+}
+
+@media (max-width: 44rem) {
+  .banner {
+    right: 0;
+    bottom: 0;
+    width: min(30rem, 100%);
+    padding: 1.25rem var(--page-gutter);
+    border-bottom: 0;
+  }
+
+  .decisionActions {
+    flex: 1 1 13rem;
+  }
+
+  .decisionActions .button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 32rem) {
+  .banner {
+    border-right: 0;
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner {
+    animation: none;
+  }
+
+  .button,
+  .detailsButton {
+    transition: none;
+  }
+}

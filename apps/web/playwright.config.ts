@@ -2,6 +2,21 @@ import { defineConfig, devices } from "@playwright/test";
 
 const cmsFixturePort = Number(process.env.CMS_FIXTURE_PORT ?? 14338);
 const webPort = Number(process.env.WEB_E2E_PORT ?? 13000);
+const baseURL = process.env.BASE_URL ?? `http://127.0.0.1:${webPort}`;
+const decidedAnalyticsStorageState = {
+  cookies: [],
+  origins: [
+    {
+      origin: new URL(baseURL).origin,
+      localStorage: [
+        {
+          name: "brega.analytics-consent.v1",
+          value: "rejected",
+        },
+      ],
+    },
+  ],
+};
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -13,8 +28,9 @@ export default defineConfig({
     ? [["dot"], ["html", { open: "never" }]]
     : [["list"], ["html", { open: "on-failure" }]],
   use: {
-    baseURL: process.env.BASE_URL ?? `http://127.0.0.1:${webPort}`,
+    baseURL,
     screenshot: "only-on-failure",
+    storageState: decidedAnalyticsStorageState,
     trace: "on-first-retry",
   },
   projects: [
