@@ -61,13 +61,17 @@ trap cleanup EXIT INT TERM
     "JWT_SECRET=$(random_secret)" \
     "ENCRYPTION_KEY=$(random_secret)" \
     '' \
+    'EMAIL_PROVIDER=nodemailer' \
+    "EMAIL_FROM=\"Brega <no-reply@$APP_DOMAIN>\"" \
+    "EMAIL_REPLY_TO=$STRAPI_ADMIN_EMAIL" \
+    'MAILGUN_API_KEY=' \
+    'MAILGUN_DOMAIN=' \
+    'MAILGUN_URL=https://api.mailgun.net' \
     'SMTP_HOST=localhost' \
     'SMTP_PORT=1025' \
     'SMTP_SECURE=false' \
     'SMTP_USERNAME=' \
     'SMTP_PASSWORD=' \
-    "SMTP_FROM=\"Brega <no-reply@$APP_DOMAIN>\"" \
-    "SMTP_REPLY_TO=$STRAPI_ADMIN_EMAIL" \
     'SMTP_CONNECTION_TIMEOUT_MS=5000' \
     '' \
     "SITE_URL=https://$APP_DOMAIN" \
@@ -112,4 +116,4 @@ mv "$temporary" "$target"
 trap - EXIT INT TERM
 
 echo "Production env created: $target"
-echo "SMTP and STRAPI_ORDER_TOKEN remain intentionally pending."
+echo "Email provider credentials and STRAPI_ORDER_TOKEN remain intentionally pending."

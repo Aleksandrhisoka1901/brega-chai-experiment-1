@@ -173,7 +173,7 @@ images из одного авторизованного registry.
 - [ ] Production `.env` находится вне Git и доступен только deploy-пользователю.
 - [ ] Все секреты сгенерированы отдельно для production и не повторяют local/CI
   значения.
-- [ ] PostgreSQL, Strapi, RustFS, SMTP, checkout и cache-revalidation используют
+- [ ] PostgreSQL, Strapi, RustFS, email-провайдер, checkout и cache-revalidation используют
   разные секреты по назначению.
 - [ ] Выполнены healthcheck и smoke-check storefront, admin, media и оформления
   заказа.

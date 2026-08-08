@@ -20,6 +20,7 @@
     "@k11k/strapi-plugin-better-blocks": "0.21.0",
     "@strapi/plugin-color-picker": "5.45.1",
     "@strapi/plugin-users-permissions": "5.45.1",
+    "@strapi/provider-email-mailgun": "5.45.1",
     "@strapi/provider-email-nodemailer": "5.45.1",
     "@strapi/provider-upload-aws-s3": "5.45.1",
     "@strapi/strapi": "5.45.1",
