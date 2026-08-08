@@ -411,6 +411,8 @@ deploy:production:
     - test -n "$DEPLOY_USER"
     - test -n "$DEPLOY_PATH"
     - test -n "$SMOKE_URL"
+    - test -n "$CI_DEPLOY_USER"
+    - test -n "$CI_DEPLOY_PASSWORD"
     - install -m 600 "$DEPLOY_SSH_PRIVATE_KEY" /tmp/deploy_key
     - printf '\n' >> /tmp/deploy_key
     - install -m 700 -d ~/.ssh
@@ -428,7 +430,7 @@ deploy:production:
     - tar -czf /tmp/deploy-config.tar.gz docker-compose.yml docker-compose.production.yml docker-compose.tls.yml infra scripts
     - scp -i /tmp/deploy_key /tmp/deploy-config.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy-config.tar.gz"
     - ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && tar -xzf deploy-config.tar.gz && rm deploy-config.tar.gz"
-    - printf '%s' "$CI_REGISTRY_PASSWORD" | ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "docker login -u '$CI_REGISTRY_USER' --password-stdin '$CI_REGISTRY'"
+    - printf '%s' "$CI_DEPLOY_PASSWORD" | ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "docker login -u '$CI_DEPLOY_USER' --password-stdin '$CI_REGISTRY'"
     - ssh -i /tmp/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && CI_COMMIT_SHA='$CI_COMMIT_SHA' WEB_IMAGE='$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA' CMS_IMAGE='$CI_REGISTRY_IMAGE/cms:$CI_COMMIT_SHA' SMOKE_URL='$SMOKE_URL' ./scripts/deploy.sh"
 
 tls:renew:
