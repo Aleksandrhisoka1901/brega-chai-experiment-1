@@ -24,4 +24,13 @@ test("opens, closes and preserves the latest trigger for focus return", () => {
   store.close();
   assert.equal(store.getSnapshot().open, false);
   assert.equal(notifications, 2);
+
+  store.registerStocks({ "product-1": 3, "product-2": 0 });
+  assert.deepEqual(store.getSnapshot().stockByProductId, {
+    "product-1": 3,
+    "product-2": 0,
+  });
+  assert.equal(notifications, 3);
+  store.registerStocks({ "product-1": 3 });
+  assert.equal(notifications, 3);
 });

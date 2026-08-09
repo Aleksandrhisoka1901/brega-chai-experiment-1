@@ -3,7 +3,10 @@
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { cartDrawerStore } from "@/features/cart/components/cart-drawer-store";
+import {
+  cartDrawerStore,
+  useCartDrawer,
+} from "@/features/cart/components/cart-drawer-store";
 import { cartStore, useCart } from "@/features/cart";
 import type { CartProduct } from "@/features/cart";
 import { bindShortRussianWords } from "@/lib/typography";
@@ -23,12 +26,23 @@ export function ProductDetailPurchase({
   product: CartProduct;
 }) {
   const cart = useCart();
-  const maximum = getMaximumProductQuantity(product.stock);
+  const drawer = useCartDrawer();
+  const currentStock =
+    drawer.stockByProductId[product.productId] ?? product.stock;
+  const maximum = getMaximumProductQuantity(currentStock);
   const [quantity, setQuantity] = useState(() =>
     getInitialProductQuantity(product.stock),
   );
   const [cartReady, setCartReady] = useState(false);
   useEffect(() => setCartReady(true), []);
+  useEffect(() => {
+    cartDrawerStore.registerStock(product.productId, product.stock);
+  }, [product.productId, product.stock]);
+  useEffect(() => {
+    setQuantity((current) =>
+      maximum === 0 ? 0 : Math.max(1, Math.min(current, maximum)),
+    );
+  }, [maximum]);
   const inStock = maximum > 0;
   const inCart = cart.items.some(
     (item) => item.productId === product.productId,
@@ -81,8 +95,8 @@ export function ProductDetailPurchase({
         disabled={!inStock}
         onClick={(event) => {
           if (!inCart) {
-            cartStore.add(product, quantity);
-            cartDrawerStore.registerStock(product.productId, product.stock);
+            cartStore.add({ ...product, stock: currentStock }, quantity);
+            cartDrawerStore.registerStock(product.productId, currentStock);
           }
           cartDrawerStore.open(event.currentTarget);
         }}

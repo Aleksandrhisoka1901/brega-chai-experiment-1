@@ -1,5 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
+
 import { createFormToken } from "./domain.ts";
 import { handleCreateOrder } from "./handler.ts";
+import { invalidateOrderStock } from "./invalidation.ts";
 
 export const dynamic = "force-dynamic";
 
@@ -38,5 +41,17 @@ export async function POST(request: Request) {
       { status: 503 },
     );
   }
-  return handleCreateOrder(request, dependencies);
+  return handleCreateOrder(request, {
+    ...dependencies,
+    onOrderAccepted(order) {
+      try {
+        invalidateOrderStock(order, { revalidatePath, revalidateTag });
+      } catch (error) {
+        console.error("Order stock cache invalidation failed", {
+          errorType: error instanceof Error ? error.name : "UnknownError",
+          orderNumber: order.orderNumber,
+        });
+      }
+    },
+  });
 }

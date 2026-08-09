@@ -14,6 +14,7 @@ export interface CartDrawerStore {
   close(): void;
   setOpen(open: boolean): void;
   registerStock(productId: string, stock: number): void;
+  registerStocks(stockByProductId: Readonly<Record<string, number>>): void;
   getTrigger(): HTMLElement | undefined;
 }
 
@@ -38,6 +39,22 @@ export function createCartDrawerStore(): CartDrawerStore {
     publish({ ...snapshot, open });
   };
 
+  const registerStocks = (
+    stockByProductId: Readonly<Record<string, number>>,
+  ) => {
+    const entries = Object.entries(stockByProductId).filter(
+      ([productId, stock]) => snapshot.stockByProductId[productId] !== stock,
+    );
+    if (entries.length === 0) return;
+    publish({
+      ...snapshot,
+      stockByProductId: {
+        ...snapshot.stockByProductId,
+        ...Object.fromEntries(entries),
+      },
+    });
+  };
+
   return {
     getSnapshot: () => snapshot,
     subscribe(listener) {
@@ -53,15 +70,9 @@ export function createCartDrawerStore(): CartDrawerStore {
     },
     setOpen,
     registerStock(productId, stock) {
-      if (snapshot.stockByProductId[productId] === stock) return;
-      publish({
-        ...snapshot,
-        stockByProductId: {
-          ...snapshot.stockByProductId,
-          [productId]: stock,
-        },
-      });
+      registerStocks({ [productId]: stock });
     },
+    registerStocks,
     getTrigger: () => trigger,
   };
 }

@@ -65,7 +65,7 @@ export function CheckoutPanel({
     | { type: "success"; message: string; orderNumber: string }
     | { type: "error"; message: string }
   >();
-  const [honeypot, setHoneypot] = useState("");
+  const [honeypot, setHoneypot] = useState(false);
   const [isPreparing, setIsPreparing] = useState(true);
   const submittingRef = useRef(false);
   const {
@@ -184,13 +184,14 @@ export function CheckoutPanel({
 
         <div className={styles.fields}>
           <label className={styles.honeypot} aria-hidden="true">
-            Website
+            Не отмечайте это поле
             <input
               autoComplete="off"
-              name="website"
-              onChange={(event) => setHoneypot(event.currentTarget.value)}
+              checked={honeypot}
+              name="checkout_secondary_confirmation"
+              onChange={(event) => setHoneypot(event.currentTarget.checked)}
               tabIndex={-1}
-              value={honeypot}
+              type="checkbox"
             />
           </label>
           <fieldset className={styles.methodGroup}>
@@ -225,7 +226,7 @@ export function CheckoutPanel({
                   {...register("deliveryMethod")}
                 />
                 <span>
-                  <strong>Доставка курьером</strong>
+                  <strong>Доставка</strong>
                   <small>
                     {bindShortRussianWords(
                       checkoutSettings.courierDeliveryNote,

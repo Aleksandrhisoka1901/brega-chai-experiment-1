@@ -10,7 +10,7 @@ export interface CheckoutClient {
   submit(input: {
     customer: CheckoutPayload;
     items: CartItem[];
-    honeypot: string;
+    honeypot: boolean;
   }): Promise<CheckoutResult>;
 }
 

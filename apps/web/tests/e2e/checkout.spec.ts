@@ -4,8 +4,8 @@ import { expect, test, type Page } from "@playwright/test";
 test.describe.configure({ mode: "serial" });
 const cmsFixturePort = process.env.CMS_FIXTURE_PORT ?? "14338";
 
-async function addProductAndOpenCheckout(page: Page) {
-  await page.goto("/tovary/published-product");
+async function addProductAndOpenCart(page: Page, slug = "published-product") {
+  await page.goto(`/tovary/${slug}`);
   const add = page.getByRole("button", { name: "Добавить в корзину" });
   await expect(add).toHaveAttribute("data-cart-ready", "true");
   await add.click();
@@ -21,6 +21,14 @@ async function addProductAndOpenCheckout(page: Page) {
   const removeIcon = removeButton.locator("svg");
   await expect(removeIcon).toHaveCount(1);
   await expect(removeIcon).toHaveCSS("width", "20px");
+  return dialog;
+}
+
+async function addProductAndOpenCheckout(
+  page: Page,
+  slug = "published-product",
+) {
+  const dialog = await addProductAndOpenCart(page, slug);
   await dialog.getByRole("button", { name: "Перейти к оформлению" }).click();
   await expect(
     dialog.getByRole("heading", { name: "Оформление" }),
@@ -32,7 +40,7 @@ async function addProductAndOpenCheckout(page: Page) {
     dialog.getByRole("radio", { name: /Самовывоз/ }),
   ).not.toBeChecked();
   await expect(
-    dialog.getByRole("radio", { name: /Доставка курьером/ }),
+    dialog.getByRole("radio", { name: /^Доставка/ }),
   ).not.toBeChecked();
   await expect(dialog.getByLabel("ФИО")).toHaveCount(0);
   await expect(
@@ -46,7 +54,7 @@ async function addProductAndOpenCheckout(page: Page) {
 }
 
 async function fillValidCheckout(page: Page, comment = "") {
-  await page.getByRole("radio", { name: /Доставка курьером/ }).check();
+  await page.getByRole("radio", { name: /^Доставка/ }).check();
   await page.getByLabel("ФИО").fill("Анна");
   await page.getByLabel("Телефон").fill("8 (999) 123-45-67");
   await page
@@ -70,7 +78,7 @@ test("product → cart → validation → confirmed checkout success @smoke", as
 }) => {
   const dialog = await addProductAndOpenCheckout(page);
   const pickup = page.getByRole("radio", { name: /Самовывоз/ });
-  const courier = page.getByRole("radio", { name: /Доставка курьером/ });
+  const courier = page.getByRole("radio", { name: /^Доставка/ });
 
   await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
   await expect(pickup).toBeFocused();
@@ -196,6 +204,73 @@ test("submit error preserves cart", async ({ page }) => {
       return raw ? JSON.parse(raw).items.length : 0;
     }),
   ).toBe(1);
+});
+
+test("stock conflict shows an availability message and preserves cart", async ({
+  page,
+}) => {
+  const dialog = await addProductAndOpenCheckout(page);
+  await fillValidCheckout(page, "TRIGGER_STOCK");
+  await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
+
+  await expect(
+    dialog.getByRole("alert").filter({
+      hasText:
+        "Некоторых товаров уже нет в нужном количестве. Проверьте корзину.",
+    }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      const raw = localStorage.getItem("brega-chai:cart:v1");
+      return raw ? JSON.parse(raw).items.length : 0;
+    }),
+  ).toBe(1);
+});
+
+test("refreshes live stock before opening checkout", async ({
+  page,
+  request,
+}) => {
+  const dialog = await addProductAndOpenCart(page);
+  await request.put(
+    `http://127.0.0.1:${cmsFixturePort}/__test/stock?slug=published-product&stock=0`,
+  );
+
+  await dialog.getByRole("button", { name: "Перейти к оформлению" }).click();
+
+  await expect(dialog.getByRole("heading", { name: "Корзина" })).toBeVisible();
+  await expect(
+    dialog.getByRole("alert").filter({
+      hasText: "Остатки изменились. Проверьте позиции в корзине.",
+    }),
+  ).toBeVisible();
+  await expect(dialog.getByText("Товар закончился.")).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Перейти к оформлению" }),
+  ).toBeDisabled();
+});
+
+test("updates product availability after success without page navigation", async ({
+  page,
+}) => {
+  const dialog = await addProductAndOpenCheckout(page, "last-product");
+  await fillValidCheckout(page);
+  let navigations = 0;
+  page.on("framenavigated", (frame) => {
+    if (frame === page.mainFrame()) navigations += 1;
+  });
+
+  await dialog.getByRole("button", { name: "Подтвердить заказ" }).click();
+  await expect(
+    dialog.getByRole("heading", { name: "Спасибо, заказ принят" }),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "Вернуться к покупкам" }).click();
+
+  await expect(page).toHaveURL(/\/tovary\/last-product$/);
+  await expect(
+    page.getByRole("button", { name: "Нет в наличии" }),
+  ).toBeDisabled();
+  expect(navigations).toBe(0);
 });
 
 test("double click creates one upstream request", async ({ page, request }) => {

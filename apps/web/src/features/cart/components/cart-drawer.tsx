@@ -11,6 +11,7 @@ import type { CheckoutSettings } from "../../../server/cms/global-mapper";
 import { IconButton } from "../../../components/icon-button";
 import { ScrollArea } from "../../../components/scroll-area";
 import { bindShortRussianWords } from "../../../lib/typography";
+import { fetchCartStock } from "../availability-client";
 import { getCartQuantity, getCartSubtotal } from "../model";
 import { cartStore } from "../use-cart";
 import { useCart } from "../use-cart";
@@ -57,13 +58,54 @@ export function CartDrawer({
   const totalQuantity = getCartQuantity(cart);
   const [view, setView] = useState<"cart" | "checkout">("cart");
   const clearCartAfterCloseRef = useRef(false);
+  const [isCheckingStock, setIsCheckingStock] = useState(false);
+  const [stockCheckError, setStockCheckError] = useState<string>();
+  const hasStockIssue = cart.items.some((item) => {
+    const availability = getCartItemAvailability(
+      item,
+      drawer.stockByProductId[item.productId],
+    );
+    return availability === "insufficient" || availability === "unavailable";
+  });
+
+  const refreshStock = async () => {
+    const stockByProductId = await fetchCartStock(cart.items);
+    cartDrawerStore.registerStocks(stockByProductId);
+    return stockByProductId;
+  };
+
+  const openCheckout = async () => {
+    if (isCheckingStock) return;
+    setIsCheckingStock(true);
+    setStockCheckError(undefined);
+    try {
+      const stockByProductId = await refreshStock();
+      const hasLiveStockIssue = cart.items.some(
+        (item) => (stockByProductId[item.productId] ?? 0) < item.quantity,
+      );
+      if (hasLiveStockIssue) {
+        setStockCheckError("Остатки изменились. Проверьте позиции в корзине.");
+        return;
+      }
+      setView("checkout");
+    } catch {
+      setStockCheckError(
+        "Не удалось проверить наличие товаров. Попробуйте ещё раз.",
+      );
+    } finally {
+      setIsCheckingStock(false);
+    }
+  };
 
   return (
     <Dialog.Root
       open={drawer.open}
       onOpenChange={(open) => {
         cartDrawerStore.setOpen(open);
-        if (!open) setView("cart");
+        if (!open) {
+          setView("cart");
+          setStockCheckError(undefined);
+        }
       }}
     >
       <Dialog.Portal>
@@ -117,6 +159,7 @@ export function CartDrawer({
               onComplete={cartDrawerStore.close}
               onOrderAccepted={() => {
                 clearCartAfterCloseRef.current = true;
+                void refreshStock().catch(() => {});
               }}
             />
           ) : cart.items.length === 0 ? (
@@ -255,22 +298,20 @@ export function CartDrawer({
                     "Стоимость доставки будет рассчитана после оформления.",
                   )}
                 </p>
+                {stockCheckError ? (
+                  <p className={styles.stockCheckError} role="alert">
+                    {bindShortRussianWords(stockCheckError)}
+                  </p>
+                ) : null}
                 <button
                   className={styles.checkout}
-                  disabled={cart.items.some((item) => {
-                    const availability = getCartItemAvailability(
-                      item,
-                      drawer.stockByProductId[item.productId],
-                    );
-                    return (
-                      availability === "insufficient" ||
-                      availability === "unavailable"
-                    );
-                  })}
-                  onClick={() => setView("checkout")}
+                  disabled={hasStockIssue || isCheckingStock}
+                  onClick={() => void openCheckout()}
                   type="button"
                 >
-                  Перейти к оформлению
+                  {isCheckingStock
+                    ? "Проверяем наличие…"
+                    : "Перейти к оформлению"}
                 </button>
               </footer>
             </>

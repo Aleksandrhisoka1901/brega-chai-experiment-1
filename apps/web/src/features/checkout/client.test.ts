@@ -21,14 +21,22 @@ test("creates a UUID when randomUUID is unavailable on an insecure origin", () =
 
 test("fetch client prepares signed token and reuses idempotency key on retry", async () => {
   const originalFetch = globalThis.fetch;
-  const orders: Array<Record<string, unknown>> = [];
+  const requests: Array<{
+    formToken: string;
+    order: Record<string, unknown>;
+  }> = [];
   let postCount = 0;
+  let tokenCount = 0;
   globalThis.fetch = async (_input, init) => {
-    if (!init?.method) return Response.json({ formToken: "signed-token" });
+    if (!init?.method) {
+      tokenCount += 1;
+      return Response.json({ formToken: `signed-token-${tokenCount}` });
+    }
     const body = JSON.parse(String(init.body)) as {
+      formToken: string;
       order: Record<string, unknown>;
     };
-    orders.push(body.order);
+    requests.push(body);
     postCount += 1;
     return postCount === 1
       ? Response.json(
@@ -68,7 +76,7 @@ test("fetch client prepares signed token and reuses idempotency key on retry", a
           quantity: 1,
         },
       ],
-      honeypot: "",
+      honeypot: false,
     };
     assert.equal((await client.submit(input)).ok, false);
     assert.deepEqual(await client.submit(input), {
@@ -77,9 +85,20 @@ test("fetch client prepares signed token and reuses idempotency key on retry", a
       message:
         "Менеджер свяжется с вами, чтобы подтвердить наличие и согласовать оплату.",
     });
-    assert.equal(orders[0]?.idempotencyKey, orders[1]?.idempotencyKey);
-    assert.equal(orders[0]?.deliveryMethod, "courier");
-    assert.equal(orders[0]?.deliveryAddress, "Москва");
+    assert.equal((await client.submit(input)).ok, true);
+    assert.equal(
+      requests[0]?.order.idempotencyKey,
+      requests[1]?.order.idempotencyKey,
+    );
+    assert.notEqual(
+      requests[1]?.order.idempotencyKey,
+      requests[2]?.order.idempotencyKey,
+    );
+    assert.equal(requests[0]?.formToken, requests[1]?.formToken);
+    assert.notEqual(requests[1]?.formToken, requests[2]?.formToken);
+    assert.equal(tokenCount, 2);
+    assert.equal(requests[0]?.order.deliveryMethod, "courier");
+    assert.equal(requests[0]?.order.deliveryAddress, "Москва");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -125,7 +144,7 @@ test("pickup submission never trusts or forwards a customer address", async () =
           quantity: 1,
         },
       ],
-      honeypot: "",
+      honeypot: false,
     });
 
     assert.equal(order?.deliveryMethod, "pickup");

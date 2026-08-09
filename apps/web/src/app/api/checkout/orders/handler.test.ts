@@ -19,18 +19,22 @@ const order = {
 
 test("forwards strict order with scoped token and idempotency header", async () => {
   let forwarded: Request | undefined;
+  let acceptedOrderNumber: string | undefined;
   const token = createFormToken({ secret, now: 10_000, nonce: "fixed" });
   const response = await handleCreateOrder(
     new Request("http://local/api/checkout/orders", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ formToken: token, honeypot: "", order }),
+      body: JSON.stringify({ formToken: token, honeypot: false, order }),
     }),
     {
       now: () => 12_000,
       secret,
       strapiUrl: "http://cms:1337",
       strapiToken: "scoped-order-token",
+      onOrderAccepted: (accepted) => {
+        acceptedOrderNumber = accepted.orderNumber;
+      },
       fetch: async (request) => {
         forwarded = request;
         return Response.json(
@@ -72,6 +76,7 @@ test("forwards strict order with scoped token and idempotency header", async () 
   );
   assert.equal(forwarded?.headers.get("idempotency-key"), order.idempotencyKey);
   assert.deepEqual(await forwarded?.json(), order);
+  assert.equal(acceptedOrderNumber, "2607-0001");
 });
 
 test("honeypot and too-fast submissions never reach Strapi", async () => {
@@ -85,7 +90,7 @@ test("honeypot and too-fast submissions never reach Strapi", async () => {
   const honeypot = await handleCreateOrder(
     new Request("http://local", {
       method: "POST",
-      body: JSON.stringify({ formToken: token, honeypot: "spam", order }),
+      body: JSON.stringify({ formToken: token, honeypot: true, order }),
     }),
     {
       now: () => 12_000,
@@ -98,7 +103,7 @@ test("honeypot and too-fast submissions never reach Strapi", async () => {
   const fast = await handleCreateOrder(
     new Request("http://local", {
       method: "POST",
-      body: JSON.stringify({ formToken: token, honeypot: "", order }),
+      body: JSON.stringify({ formToken: token, honeypot: false, order }),
     }),
     {
       now: () => 10_500,
@@ -119,7 +124,7 @@ test("maps private upstream errors to safe public responses", async () => {
   const response = await handleCreateOrder(
     new Request("http://local", {
       method: "POST",
-      body: JSON.stringify({ formToken: token, honeypot: "", order }),
+      body: JSON.stringify({ formToken: token, honeypot: false, order }),
     }),
     {
       now: () => 12_000,
@@ -140,12 +145,70 @@ test("maps private upstream errors to safe public responses", async () => {
   assert.equal(body.includes("+79991234567"), false);
 });
 
+test("maps upstream order conflicts by their safe error code", async () => {
+  const token = createFormToken({ secret, now: 10_000, nonce: "fixed" });
+  const cases = [
+    {
+      upstreamCode: "IDEMPOTENCY_CONFLICT",
+      expected: {
+        code: "IDEMPOTENCY_CONFLICT",
+        message: "Заказ уже обрабатывается.",
+      },
+    },
+    {
+      upstreamCode: "INSUFFICIENT_STOCK",
+      expected: {
+        code: "INSUFFICIENT_STOCK",
+        message:
+          "Некоторых товаров уже нет в нужном количестве. Проверьте корзину.",
+      },
+    },
+    {
+      upstreamCode: "PRODUCT_UNAVAILABLE",
+      expected: {
+        code: "PRODUCT_UNAVAILABLE",
+        message: "Некоторые товары больше недоступны. Проверьте корзину.",
+      },
+    },
+    {
+      upstreamCode: "UNKNOWN_CONFLICT",
+      expected: {
+        code: "ORDER_REJECTED",
+        message: "Проверьте состав корзины и данные заказа.",
+      },
+    },
+  ] as const;
+
+  for (const { expected, upstreamCode } of cases) {
+    const response = await handleCreateOrder(
+      new Request("http://local", {
+        method: "POST",
+        body: JSON.stringify({ formToken: token, honeypot: false, order }),
+      }),
+      {
+        now: () => 12_000,
+        secret,
+        strapiUrl: "http://cms",
+        strapiToken: "x",
+        fetch: async () =>
+          Response.json(
+            { error: { code: upstreamCode, message: "private detail" } },
+            { status: 409 },
+          ),
+      },
+    );
+
+    assert.equal(response.status, 409);
+    assert.deepEqual(await response.json(), { error: expected });
+  }
+});
+
 test("aborts a slow Strapi request and returns a safe timeout", async () => {
   const token = createFormToken({ secret, now: 10_000, nonce: "fixed" });
   const response = await handleCreateOrder(
     new Request("http://local", {
       method: "POST",
-      body: JSON.stringify({ formToken: token, honeypot: "", order }),
+      body: JSON.stringify({ formToken: token, honeypot: false, order }),
     }),
     {
       now: () => 12_000,

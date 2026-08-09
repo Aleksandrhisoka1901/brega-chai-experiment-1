@@ -36,7 +36,7 @@ test("rejects tampered tokens and strict payload extras", () => {
 
   const result = parseBrowserOrderRequest({
     formToken: token,
-    honeypot: "",
+    honeypot: false,
     unexpected: "value",
     order: {},
   });
@@ -46,7 +46,7 @@ test("rejects tampered tokens and strict payload extras", () => {
 test("accepts pickup without an address and requires one for courier", () => {
   const base = {
     formToken: "signed",
-    honeypot: "",
+    honeypot: false,
     order: {
       idempotencyKey: "550e8400-e29b-41d4-a716-446655440000",
       customer: { name: "Анна", phone: "+79991234567" },

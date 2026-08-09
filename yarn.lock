@@ -1125,6 +1125,7 @@ __metadata:
     "@types/node": "npm:22.18.6"
     "@types/react": "npm:18.3.24"
     "@types/react-dom": "npm:18.3.7"
+    handlebars: "npm:4.7.9"
     pg: "npm:8.16.3"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"

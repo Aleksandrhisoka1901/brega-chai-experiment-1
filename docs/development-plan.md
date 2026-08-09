@@ -92,7 +92,7 @@ production-контент и внешний release-readiness.
 
 - RED: контрактные и domain-тесты способов получения, снимков адреса/скидки и
   двух сумм;
-- RED: тест формата и однократного запуска SMTP-уведомления;
+- RED: тест формата и однократного запуска email-уведомлений;
 - RED: mapper/admin DTO и checkout validation/UI expectations;
 - GREEN: CMS-настройки, order transaction, уведомление и admin UI;
 - GREEN: пошаговый checkout и публичное переименование в `Brega Tea`;
@@ -102,8 +102,9 @@ Acceptance criteria определены в `checkout-update-spec.md`.
 
 Критерии выполнены: CMS хранит служебный email и коммерческие настройки,
 checkout сохраняет серверные snapshots способа получения, адреса, скидки и двух
-сумм, а первое создание заказа запускает SMTP-уведомление без отката заказа при
-ошибке транспорта. Публичный бренд заменён на `Brega Tea`, пустой media-логотип
+сумм, а первое создание заказа запускает независимые email-уведомления
+администратору и покупателю без отката заказа при ошибке транспорта. Публичный
+бренд заменён на `Brega Tea`, пустой media-логотип
 показывает текстовый wordmark. Unit suites, typecheck, CMS build, checkout E2E,
 axe, keyboard flow и Linux visual regression прошли; PostgreSQL harness остаётся
 условной проверкой и запускается при наличии seeded local database.

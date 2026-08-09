@@ -257,6 +257,11 @@
   font-size: var(--type-caption);
 }
 
+.summary .stockCheckError {
+  margin-top: -0.5rem;
+  color: #b83d2f;
+}
+
 .checkout {
   width: 100%;
   min-height: 3.5rem;

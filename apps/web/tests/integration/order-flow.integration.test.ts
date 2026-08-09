@@ -109,7 +109,7 @@ async function freshFormToken(webUrl: string): Promise<string> {
 function browserOrder(productId: string, idempotencyKey = randomUUID()) {
   return {
     formToken: "",
-    honeypot: "",
+    honeypot: false,
     order: {
       idempotencyKey,
       customer: { name: "HTTP integration", phone: "+79991234567" },

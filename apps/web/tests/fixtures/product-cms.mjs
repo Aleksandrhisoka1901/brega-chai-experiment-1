@@ -4,6 +4,11 @@ const png =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 const port = Number(process.env.CMS_FIXTURE_PORT ?? 14338);
 let orderRequests = 0;
+const initialStock = new Map([
+  ["published-product", 12],
+  ["last-product", 1],
+]);
+let stockBySlug = new Map(initialStock);
 
 function product(slug, stock) {
   const title = stock > 0 ? "Да Хун Пао" : "Шу Пуэр";
@@ -90,6 +95,10 @@ function product(slug, stock) {
   };
 }
 
+function stockedProduct(slug, fallback) {
+  return product(slug, stockBySlug.get(slug) ?? fallback);
+}
+
 const cms = createServer((request, response) => {
   const url = new URL(request.url ?? "/", "http://127.0.0.1:14338");
   const slug = url.searchParams.get("filters[slug][$eq]");
@@ -102,9 +111,24 @@ const cms = createServer((request, response) => {
   }
 
   if (url.pathname === "/__test/orders-count") {
-    if (request.method === "DELETE") orderRequests = 0;
+    if (request.method === "DELETE") {
+      orderRequests = 0;
+      stockBySlug = new Map(initialStock);
+    }
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSON.stringify({ count: orderRequests }));
+    return;
+  }
+
+  if (url.pathname === "/__test/stock" && request.method === "PUT") {
+    const nextSlug = url.searchParams.get("slug");
+    const nextStock = Number(url.searchParams.get("stock"));
+    if (!nextSlug || !Number.isInteger(nextStock) || nextStock < 0) {
+      response.writeHead(400).end();
+      return;
+    }
+    stockBySlug.set(nextSlug, nextStock);
+    response.writeHead(204).end();
     return;
   }
 
@@ -135,18 +159,35 @@ const cms = createServer((request, response) => {
         response.end(JSON.stringify({ error: "fixture failure" }));
         return;
       }
+      if (order.comment === "TRIGGER_STOCK") {
+        response.writeHead(409, { "Content-Type": "application/json" });
+        response.end(
+          JSON.stringify({
+            error: {
+              code: "INSUFFICIENT_STOCK",
+              message: "fixture stock conflict",
+            },
+          }),
+        );
+        return;
+      }
 
       const finish = () => {
-        const lines = order.items.map((item) => ({
-          productId: item.productId,
-          slug: "published-product",
-          title: "Да Хун Пао",
-          packageLabel: "Пакетик (50 г)",
-          unitPriceRubles: 1600,
-          quantity: item.quantity,
-          lineTotalRubles: 1600 * item.quantity,
-          currency: "RUB",
-        }));
+        const lines = order.items.map((item) => {
+          const itemSlug = item.productId.replace(/^document-/, "");
+          const currentStock = stockBySlug.get(itemSlug) ?? 12;
+          stockBySlug.set(itemSlug, Math.max(0, currentStock - item.quantity));
+          return {
+            productId: item.productId,
+            slug: itemSlug,
+            title: "Да Хун Пао",
+            packageLabel: "Пакетик (50 г)",
+            unitPriceRubles: 1600,
+            quantity: item.quantity,
+            lineTotalRubles: 1600 * item.quantity,
+            currency: "RUB",
+          };
+        });
         const totalRubles = lines.reduce(
           (total, line) => total + line.lineTotalRubles,
           0,
@@ -176,6 +217,23 @@ const cms = createServer((request, response) => {
       if (order.comment === "DOUBLE_CLICK") setTimeout(finish, 500);
       else finish();
     });
+    return;
+  }
+
+  const requestedProductIds = [...url.searchParams.entries()]
+    .filter(([key]) => /^filters\[documentId\]\[\$in\]\[\d+\]$/.test(key))
+    .map(([, value]) => value);
+  if (url.pathname === "/api/products" && requestedProductIds.length > 0) {
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(
+      JSON.stringify({
+        data: requestedProductIds.flatMap((productId) => {
+          const itemSlug = productId.replace(/^document-/, "");
+          const stock = stockBySlug.get(itemSlug);
+          return stock === undefined ? [] : [{ documentId: productId, stock }];
+        }),
+      }),
+    );
     return;
   }
 
@@ -231,7 +289,7 @@ const cms = createServer((request, response) => {
             { ...product("ritual-four", 12), type: "nabor" },
           ],
           featuredTovary: [
-            product("published-product", 12),
+            stockedProduct("published-product", 12),
             product("green-tea", 0),
             product("aged-tea", 12),
             product("evening-tea", 12),
@@ -345,7 +403,7 @@ const cms = createServer((request, response) => {
     response.end(
       JSON.stringify({
         data: [
-          product("published-product", 12),
+          stockedProduct("published-product", 12),
           product("green-tea", 0),
           product("aged-tea", 12),
           product("evening-tea", 12),
@@ -357,7 +415,7 @@ const cms = createServer((request, response) => {
 
   if (!slug && type === "tovar") {
     const products = [
-      product("published-product", 12),
+      stockedProduct("published-product", 12),
       product("green-tea", 0),
       product("aged-tea", 12),
       product("evening-tea", 12),
@@ -416,8 +474,8 @@ const cms = createServer((request, response) => {
   }
 
   const data =
-    slug === "published-product"
-      ? [product(slug, 12)]
+    slug === "published-product" || slug === "last-product"
+      ? [stockedProduct(slug, slug === "last-product" ? 1 : 12)]
       : slug === "out-of-stock-product"
         ? [product(slug, 0)]
         : [];

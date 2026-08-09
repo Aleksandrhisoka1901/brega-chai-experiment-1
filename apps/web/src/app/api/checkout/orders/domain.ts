@@ -6,7 +6,7 @@ import { z } from "zod";
 const browserOrderRequestSchema = z
   .object({
     formToken: z.string().min(1),
-    honeypot: z.string().max(500),
+    honeypot: z.boolean(),
     order: createOrderInputSchema,
   })
   .strict();

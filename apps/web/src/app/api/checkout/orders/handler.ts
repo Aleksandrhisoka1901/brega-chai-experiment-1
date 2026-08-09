@@ -1,4 +1,4 @@
-import { orderResultSchema } from "@brega-chai/contracts";
+import { orderResultSchema, type OrderResult } from "@brega-chai/contracts";
 
 import { parseBrowserOrderRequest, verifyFormToken } from "./domain.ts";
 
@@ -12,11 +12,23 @@ export interface OrderHandlerDependencies {
   strapiToken: string;
   now?: () => number;
   fetch?: FetchBoundary;
+  onOrderAccepted?: (order: OrderResult) => void;
   timeoutMs?: number;
 }
 
 function safeError(status: number, code: string, message: string) {
   return Response.json({ error: { code, message } }, { status });
+}
+
+async function readUpstreamErrorCode(response: Response) {
+  try {
+    const body = (await response.json()) as {
+      error?: { code?: unknown };
+    };
+    return typeof body.error?.code === "string" ? body.error.code : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function handleCreateOrder(
@@ -80,16 +92,42 @@ export async function handleCreateOrder(
     ]);
 
     if (!upstream.ok) {
-      if (upstream.status === 409) {
+      const upstreamCode = await readUpstreamErrorCode(upstream);
+      if (upstream.status === 409 && upstreamCode === "IDEMPOTENCY_CONFLICT") {
         return safeError(
           409,
           "IDEMPOTENCY_CONFLICT",
           "Заказ уже обрабатывается.",
         );
       }
+      if (upstream.status === 409 && upstreamCode === "INSUFFICIENT_STOCK") {
+        return safeError(
+          409,
+          "INSUFFICIENT_STOCK",
+          "Некоторых товаров уже нет в нужном количестве. Проверьте корзину.",
+        );
+      }
+      if (
+        upstream.status === 409 &&
+        (upstreamCode === "PRODUCT_NOT_FOUND" ||
+          upstreamCode === "PRODUCT_UNAVAILABLE")
+      ) {
+        return safeError(
+          409,
+          "PRODUCT_UNAVAILABLE",
+          "Некоторые товары больше недоступны. Проверьте корзину.",
+        );
+      }
       if (upstream.status === 400 || upstream.status === 422) {
         return safeError(
           upstream.status,
+          "ORDER_REJECTED",
+          "Проверьте состав корзины и данные заказа.",
+        );
+      }
+      if (upstream.status === 409) {
+        return safeError(
+          409,
           "ORDER_REJECTED",
           "Проверьте состав корзины и данные заказа.",
         );
@@ -110,6 +148,7 @@ export async function handleCreateOrder(
         "Не удалось подтвердить создание заказа.",
       );
     }
+    dependencies.onOrderAccepted?.(result.data);
     return Response.json(result.data, { status: upstream.status });
   } catch {
     return safeError(

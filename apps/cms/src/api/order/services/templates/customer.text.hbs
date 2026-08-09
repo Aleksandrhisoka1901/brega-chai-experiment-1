@@ -1,0 +1,23 @@
+Спасибо за заказ
+Заказ №{{orderNumber}}
+
+{{lead}}
+
+Способ получения: {{method}}
+{{addressLabel}}: {{address}}
+{{#if comment}}
+Ваш комментарий: {{comment}}
+{{/if}}
+
+Состав заказа:
+{{#each lines}}
+• {{title}} ({{packageLabel}}) — {{quantity}} шт. × {{unitPrice}} = {{lineTotal}}
+{{/each}}
+
+{{#if hasDiscount}}
+Стандартная сумма: {{standardTotal}}
+Скидка за самовывоз: {{discountPercent}}%
+Сумма со скидкой: {{finalTotal}}
+{{else}}
+Сумма заказа: {{finalTotal}}
+{{/if}}
