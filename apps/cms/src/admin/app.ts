@@ -1,3 +1,11 @@
+const ADMIN_LANGUAGE_STORAGE_KEY = "strapi-admin-language";
+
+export const setRussianAdminLocale = (
+  storage: Pick<Storage, "setItem"> = globalThis.localStorage,
+) => {
+  storage.setItem(ADMIN_LANGUAGE_STORAGE_KEY, "ru");
+};
+
 const adminApp = {
   config: {
     locales: ["ru"],
@@ -207,7 +215,9 @@ const adminApp = {
       },
     },
   },
-  bootstrap() {},
+  bootstrap() {
+    setRussianAdminLocale();
+  },
 } as const;
 
 export const russianAdminTranslations = adminApp.config.translations.ru;

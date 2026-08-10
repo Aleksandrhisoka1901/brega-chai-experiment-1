@@ -4,7 +4,8 @@ import { basename, dirname, relative, sep } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import adminApp from "../src/admin/app.ts";
+import { ensureRussianAdminLocale } from "../src/admin-localization.ts";
+import adminApp, { setRussianAdminLocale } from "../src/admin/app.ts";
 
 const translations = adminApp.config.translations.ru;
 const sourceDirectory = fileURLToPath(new URL("../src", import.meta.url));
@@ -71,4 +72,49 @@ test("enables Russian Strapi Admin and labels every custom field", async () => {
     translations["content-manager.content-types.api::product.product.seedKey"],
     "Системный ключ",
   );
+});
+
+test("defaults the browser and admin users to Russian", async () => {
+  const stored = new Map<string, string>();
+  setRussianAdminLocale({
+    setItem(key, value) {
+      stored.set(key, value);
+    },
+  });
+  assert.equal(stored.get("strapi-admin-language"), "ru");
+
+  let subscriber:
+    | {
+        beforeCreate(event: {
+          params: { data: { preferedLanguage?: string } };
+        }): void;
+      }
+    | undefined;
+  const updates: unknown[] = [];
+  await ensureRussianAdminLocale({
+    db: {
+      query: () => ({
+        updateMany: async (input: unknown) => updates.push(input),
+      }),
+      lifecycles: {
+        subscribe(input: typeof subscriber) {
+          subscriber = input;
+        },
+      },
+    },
+  });
+
+  assert.deepEqual(updates, [
+    {
+      where: { preferedLanguage: { $null: true } },
+      data: { preferedLanguage: "ru" },
+    },
+  ]);
+  const newUser = { params: { data: {} as { preferedLanguage?: string } } };
+  subscriber?.beforeCreate(newUser);
+  assert.equal(newUser.params.data.preferedLanguage, "ru");
+
+  const englishUser = { params: { data: { preferedLanguage: "en" } } };
+  subscriber?.beforeCreate(englishUser);
+  assert.equal(englishUser.params.data.preferedLanguage, "en");
 });
