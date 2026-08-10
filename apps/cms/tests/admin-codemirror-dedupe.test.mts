@@ -180,8 +180,8 @@ test("applies canonical local Content Manager layouts", () => {
   });
 
   assert.deepEqual(configuration.layouts.edit[0], [
-    { name: "title", size: 6 },
-    { name: "text", size: 6 },
+    { name: "eyebrow", size: 4 },
+    { name: "title", size: 8 },
   ]);
   assert.deepEqual(configuration.layouts.list, [
     "id",
@@ -191,6 +191,120 @@ test("applies canonical local Content Manager layouts", () => {
   ]);
   assert.equal(configuration.settings.mainField, "title");
   assert.equal(configuration.settings.defaultSortBy, "title");
+});
+
+test("covers every editable storefront schema with a canonical layout", () => {
+  const expectedFields: Record<string, string[]> = {
+    "api::global-setting.global-setting": [
+      "brandName",
+      "currency",
+      "logo",
+      "email",
+      "telegramUrl",
+      "navigation",
+      "storefrontTexts",
+      "pickupAddress",
+      "pickupDiscountPercent",
+      "courierDeliveryNote",
+      "orderNotificationEmail",
+      "defaultProductStory",
+      "sectionBreadcrumbs",
+      "defaultSeo",
+      "legalDetails",
+      "legalDocuments",
+    ],
+    "api::home-page.home-page": [
+      "hero",
+      "about",
+      "naboryPreview",
+      "featuredNabory",
+      "tovaryPreview",
+      "featuredTovary",
+      "seo",
+    ],
+    "api::product.product": [
+      "title",
+      "displayName",
+      "slug",
+      "type",
+      "originalTitle",
+      "packageLabel",
+      "price",
+      "stock",
+      "currency",
+      "cardExcerpt",
+      "story",
+      "mainImage",
+      "gallery",
+      "articles",
+      "breadcrumbLabel",
+      "categoryLabel",
+      "seo",
+    ],
+    "api::products-page.products-page": [
+      "eyebrow",
+      "title",
+      "intro",
+      "emptyStateText",
+      "emptyStateLinkLabel",
+      "seo",
+    ],
+    "home.catalog-preview": ["eyebrow", "title", "subtitle", "linkLabel"],
+    "home.editorial-section": [
+      "eyebrow",
+      "title",
+      "textBlock1",
+      "textBlock2",
+      "spacing",
+      "backgroundColor",
+      "textColor",
+    ],
+    "home.hero": [
+      "eyebrow",
+      "title",
+      "text",
+      "layout",
+      "backgroundColor",
+      "textColor",
+      "image",
+      "cta",
+    ],
+    "home.rituals-preview": ["eyebrow", "title", "subtitle"],
+    "product.article": ["content"],
+    "product.gallery-image": ["image", "alt"],
+    "shared.image-with-alt": ["image", "alt"],
+    "shared.legal-documents": ["privacyPolicy", "terms", "deliveryAndReturns"],
+    "shared.link": ["label", "url"],
+    "shared.navigation-labels": ["about", "cart", "nabory", "tovary"],
+    "shared.section-breadcrumb": ["route", "label"],
+    "shared.seo": ["title", "description", "image"],
+    "shared.storefront-texts": ["imagePlaceholder", "outOfStock"],
+  };
+
+  for (const [uid, fields] of Object.entries(expectedFields)) {
+    const configuration = applyAdminContentManagerPreset(uid, {
+      layouts: { edit: [], list: [] },
+      settings: {},
+      metadatas: {},
+    });
+    const actualFields = configuration.layouts.edit.flatMap((row) =>
+      row.map(({ name }) => name),
+    );
+
+    assert.deepEqual(actualFields, fields, `Unexpected field order for ${uid}`);
+    for (const row of configuration.layouts.edit) {
+      assert.ok(
+        row.reduce((total, field) => total + field.size, 0) <= 12,
+        `Layout row exceeds 12 columns for ${uid}`,
+      );
+      for (const field of row) {
+        assert.ok(
+          [4, 6, 8, 12].includes(field.size),
+          `Unsupported field width for ${uid}.${field.name}`,
+        );
+      }
+    }
+  }
 });
 
 test("applies canonical local field metadata", () => {

@@ -49,31 +49,45 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
     layouts: {
       edit: [
         [
-          { name: "brandName", size: 6 },
-          { name: "logo", size: 6 },
+          { name: "brandName", size: 8 },
+          { name: "currency", size: 4 },
         ],
+        [{ name: "logo", size: 12 }],
         [
           { name: "email", size: 6 },
           { name: "telegramUrl", size: 6 },
         ],
-        [{ name: "defaultProductStory", size: 12 }],
         [{ name: "navigation", size: 12 }],
-        [{ name: "currency", size: 6 }],
-        [{ name: "defaultSeo", size: 12 }],
+        [{ name: "storefrontTexts", size: 12 }],
         [
-          { name: "legalDetails", size: 6 },
-          { name: "orderNotificationEmail", size: 6 },
-        ],
-        [
-          { name: "pickupAddress", size: 6 },
+          { name: "pickupAddress", size: 8 },
           { name: "pickupDiscountPercent", size: 4 },
         ],
-        [{ name: "courierDeliveryNote", size: 6 }],
+        [
+          { name: "courierDeliveryNote", size: 6 },
+          { name: "orderNotificationEmail", size: 6 },
+        ],
+        [{ name: "defaultProductStory", size: 12 }],
         [{ name: "sectionBreadcrumbs", size: 12 }],
-        [{ name: "storefrontTexts", size: 12 }],
+        [{ name: "defaultSeo", size: 12 }],
+        [{ name: "legalDetails", size: 12 }],
         [{ name: "legalDocuments", size: 12 }],
       ],
       list: ["id", "brandName", "logo", "email"],
+    },
+  },
+  "api::home-page.home-page": {
+    layouts: {
+      edit: [
+        [{ name: "hero", size: 12 }],
+        [{ name: "about", size: 12 }],
+        [{ name: "naboryPreview", size: 12 }],
+        [{ name: "featuredNabory", size: 12 }],
+        [{ name: "tovaryPreview", size: 12 }],
+        [{ name: "featuredTovary", size: 12 }],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "hero", "about"],
     },
   },
   "api::order.order": {
@@ -116,10 +130,13 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
   "api::product.product": {
     layouts: {
       edit: [
-        [{ name: "title", size: 6 }],
         [
-          { name: "slug", size: 6 },
-          { name: "type", size: 6 },
+          { name: "title", size: 6 },
+          { name: "displayName", size: 6 },
+        ],
+        [
+          { name: "slug", size: 8 },
+          { name: "type", size: 4 },
         ],
         [
           { name: "originalTitle", size: 6 },
@@ -127,39 +144,46 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
         ],
         [
           { name: "price", size: 4 },
-          { name: "currency", size: 6 },
+          { name: "stock", size: 4 },
+          { name: "currency", size: 4 },
         ],
-        [{ name: "stock", size: 4 }],
+        [{ name: "cardExcerpt", size: 12 }],
+        [{ name: "story", size: 12 }],
         [{ name: "mainImage", size: 12 }],
         [{ name: "gallery", size: 12 }],
-        [
-          { name: "cardExcerpt", size: 6 },
-          { name: "story", size: 6 },
-        ],
         [{ name: "articles", size: 12 }],
-        [{ name: "seo", size: 12 }],
         [
           { name: "breadcrumbLabel", size: 6 },
           { name: "categoryLabel", size: 6 },
         ],
-        [{ name: "displayName", size: 6 }],
+        [{ name: "seo", size: 12 }],
       ],
-      list: ["id", "title", "slug", "breadcrumbLabel", "displayName"],
+      list: [
+        "id",
+        "title",
+        "displayName",
+        "type",
+        "price",
+        "stock",
+        "updatedAt",
+      ],
     },
   },
   "api::products-page.products-page": {
     layouts: {
       edit: [
-        [{ name: "seo", size: 12 }],
-        [{ name: "title", size: 6 }],
+        [
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
+        ],
         [{ name: "intro", size: 12 }],
         [
-          { name: "eyebrow", size: 6 },
-          { name: "emptyStateText", size: 6 },
+          { name: "emptyStateText", size: 8 },
+          { name: "emptyStateLinkLabel", size: 4 },
         ],
-        [{ name: "emptyStateLinkLabel", size: 6 }],
+        [{ name: "seo", size: 12 }],
       ],
-      list: ["id", "seo", "title"],
+      list: ["id", "title", "eyebrow", "updatedAt"],
     },
     metadatas: {
       intro: { list: { searchable: false, sortable: false } },
@@ -169,12 +193,12 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
     layouts: {
       edit: [
         [
-          { name: "title", size: 6 },
-          { name: "subtitle", size: 6 },
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
         ],
         [
-          { name: "eyebrow", size: 6 },
-          { name: "linkLabel", size: 6 },
+          { name: "subtitle", size: 8 },
+          { name: "linkLabel", size: 4 },
         ],
       ],
       list: ["id", "title", "subtitle", "eyebrow"],
@@ -185,57 +209,155 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
     layouts: {
       edit: [
         [
-          { name: "backgroundColor", size: 6 },
-          { name: "textColor", size: 6 },
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
         ],
         [
-          { name: "spacing", size: 6 },
-          { name: "eyebrow", size: 6 },
-        ],
-        [
-          { name: "title", size: 6 },
           { name: "textBlock1", size: 6 },
+          { name: "textBlock2", size: 6 },
         ],
-        [{ name: "textBlock2", size: 6 }],
+        [
+          { name: "spacing", size: 4 },
+          { name: "backgroundColor", size: 4 },
+          { name: "textColor", size: 4 },
+        ],
       ],
-      list: ["id", "backgroundColor", "textColor"],
+      list: ["id", "title", "eyebrow", "spacing"],
     },
-    settings: {
-      mainField: "backgroundColor",
-      defaultSortBy: "backgroundColor",
-    },
+    settings: { mainField: "title", defaultSortBy: "title" },
   },
   "home.hero": {
     layouts: {
       edit: [
         [
-          { name: "title", size: 6 },
-          { name: "text", size: 6 },
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
         ],
-        [{ name: "layout", size: 6 }],
-        [{ name: "image", size: 12 }],
+        [{ name: "text", size: 12 }],
         [
-          { name: "backgroundColor", size: 6 },
-          { name: "textColor", size: 6 },
+          { name: "layout", size: 4 },
+          { name: "backgroundColor", size: 4 },
+          { name: "textColor", size: 4 },
         ],
+        [{ name: "image", size: 12 }],
         [{ name: "cta", size: 12 }],
-        [{ name: "eyebrow", size: 6 }],
       ],
       list: ["id", "title", "text", "layout"],
     },
     settings: { mainField: "title", defaultSortBy: "title" },
   },
+  "home.rituals-preview": {
+    layouts: {
+      edit: [
+        [
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
+        ],
+        [{ name: "subtitle", size: 12 }],
+      ],
+      list: ["id", "title", "subtitle", "eyebrow"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
+  },
+  "product.article": {
+    layouts: {
+      edit: [[{ name: "content", size: 12 }]],
+      list: ["id", "content"],
+    },
+  },
+  "product.gallery-image": {
+    layouts: {
+      edit: [
+        [
+          { name: "image", size: 6 },
+          { name: "alt", size: 6 },
+        ],
+      ],
+      list: ["id", "alt", "image"],
+    },
+    settings: { mainField: "alt", defaultSortBy: "alt" },
+  },
+  "shared.image-with-alt": {
+    layouts: {
+      edit: [
+        [
+          { name: "image", size: 6 },
+          { name: "alt", size: 6 },
+        ],
+      ],
+      list: ["id", "alt", "image"],
+    },
+    settings: { mainField: "alt", defaultSortBy: "alt" },
+  },
+  "shared.legal-documents": {
+    layouts: {
+      edit: [
+        [{ name: "privacyPolicy", size: 12 }],
+        [{ name: "terms", size: 12 }],
+        [{ name: "deliveryAndReturns", size: 12 }],
+      ],
+      list: ["id", "privacyPolicy", "terms", "deliveryAndReturns"],
+    },
+  },
+  "shared.link": {
+    layouts: {
+      edit: [
+        [
+          { name: "label", size: 4 },
+          { name: "url", size: 8 },
+        ],
+      ],
+      list: ["id", "label", "url"],
+    },
+    settings: { mainField: "label", defaultSortBy: "label" },
+  },
   "shared.navigation-labels": {
     layouts: {
       edit: [
-        [{ name: "about", size: 6 }],
         [
+          { name: "about", size: 6 },
           { name: "cart", size: 6 },
-          { name: "nabory", size: 6 },
         ],
-        [{ name: "tovary", size: 6 }],
+        [
+          { name: "nabory", size: 6 },
+          { name: "tovary", size: 6 },
+        ],
       ],
       list: ["id", "about", "nabory", "tovary"],
+    },
+  },
+  "shared.section-breadcrumb": {
+    layouts: {
+      edit: [
+        [
+          { name: "route", size: 4 },
+          { name: "label", size: 8 },
+        ],
+      ],
+      list: ["id", "route", "label"],
+    },
+    settings: { mainField: "label", defaultSortBy: "label" },
+  },
+  "shared.seo": {
+    layouts: {
+      edit: [
+        [{ name: "title", size: 12 }],
+        [{ name: "description", size: 12 }],
+        [{ name: "image", size: 12 }],
+      ],
+      list: ["id", "title", "description", "image"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
+  },
+  "shared.storefront-texts": {
+    layouts: {
+      edit: [
+        [
+          { name: "imagePlaceholder", size: 6 },
+          { name: "outOfStock", size: 6 },
+        ],
+      ],
+      list: ["id", "imagePlaceholder", "outOfStock"],
     },
   },
 };
