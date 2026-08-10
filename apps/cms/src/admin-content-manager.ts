@@ -35,6 +35,13 @@ type FieldLabels = Record<string, string>;
 type AdminTranslations = Readonly<Record<string, string>>;
 type ContentManagerPreset = Pick<ContentManagerConfiguration, "layouts"> & {
   settings?: Record<string, unknown>;
+  metadatas?: Record<
+    string,
+    {
+      edit?: Record<string, unknown>;
+      list?: Record<string, unknown>;
+    }
+  >;
 };
 
 const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
@@ -154,6 +161,9 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       ],
       list: ["id", "seo", "title"],
     },
+    metadatas: {
+      intro: { list: { searchable: false, sortable: false } },
+    },
   },
   "home.catalog-preview": {
     layouts: {
@@ -240,6 +250,20 @@ export const applyAdminContentManagerPreset = (
   return {
     ...configuration,
     layouts: preset.layouts,
+    metadatas: Object.fromEntries(
+      Object.entries(configuration.metadatas).map(([name, metadata]) => {
+        const override = preset.metadatas?.[name];
+        if (!override) return [name, metadata];
+
+        return [
+          name,
+          {
+            edit: { ...metadata.edit, ...override.edit },
+            list: { ...metadata.list, ...override.list },
+          },
+        ];
+      }),
+    ),
     settings: { ...configuration.settings, ...preset.settings },
   };
 };

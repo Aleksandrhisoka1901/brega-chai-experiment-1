@@ -193,6 +193,31 @@ test("applies canonical local Content Manager layouts", () => {
   assert.equal(configuration.settings.defaultSortBy, "title");
 });
 
+test("applies canonical local field metadata", () => {
+  const configuration = applyAdminContentManagerPreset(
+    "api::products-page.products-page",
+    {
+      layouts: {
+        edit: [[{ name: "intro", size: 12 }]],
+        list: ["id", "intro"],
+      },
+      settings: {},
+      metadatas: {
+        intro: {
+          edit: { label: "Вступление", editable: true },
+          list: { label: "Вступление", searchable: true, sortable: true },
+        },
+      },
+    },
+  );
+
+  assert.deepEqual(configuration.metadatas.intro?.list, {
+    label: "Вступление",
+    searchable: false,
+    sortable: false,
+  });
+});
+
 test("syncs Russian labels for content types and components", async () => {
   const updates: Array<{
     kind: "content-type" | "component";
