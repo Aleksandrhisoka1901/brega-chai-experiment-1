@@ -115,6 +115,7 @@ export function CheckoutPanel({
 
   const deliveryMethod = watch("deliveryMethod");
   const standardTotal = getCartSubtotal(cart);
+  const configuredPickupDiscount = checkoutSettings.pickupDiscountPercent ?? 0;
   const pricing = getCheckoutPricing(
     standardTotal,
     deliveryMethod,
@@ -123,7 +124,7 @@ export function CheckoutPanel({
 
   if (result?.type === "success") {
     return (
-      <ScrollArea className={styles.viewport}>
+      <ScrollArea className={styles.viewport} topShadow>
         <div className={styles.result} role="status">
           <h2>Спасибо, заказ принят</h2>
           <div className={styles.orderNumber}>
@@ -141,7 +142,7 @@ export function CheckoutPanel({
   }
 
   return (
-    <ScrollArea className={styles.viewport}>
+    <ScrollArea className={styles.viewport} topShadow>
       <form
         className={styles.form}
         noValidate
@@ -214,8 +215,8 @@ export function CheckoutPanel({
                 />
                 <span>
                   <strong>Самовывоз</strong>
-                  {pricing.hasDiscount ? (
-                    <small>Скидка {pricing.discountPercent}%</small>
+                  {configuredPickupDiscount > 0 ? (
+                    <small>Скидка {configuredPickupDiscount}%</small>
                   ) : null}
                 </span>
               </label>

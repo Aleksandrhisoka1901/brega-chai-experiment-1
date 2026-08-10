@@ -80,6 +80,56 @@ test("published product has a vertical keyboard-operable gallery @smoke", async 
   await expect(secondThumbnail).toBeFocused();
 });
 
+test("mobile gallery switches images with horizontal touch swipes", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/tovary/published-product");
+
+  const gallery = page.getByRole("group", { name: "Изображения товара" });
+  const firstThumbnail = gallery.getByRole("button").first();
+  const secondThumbnail = gallery.getByRole("button").nth(1);
+  const swipeSurface = page.getByRole("group", {
+    name: "Главное изображение товара",
+  });
+  const box = await swipeSurface.boundingBox();
+
+  expect(box).not.toBeNull();
+  await swipeSurface.dispatchEvent("pointerdown", {
+    clientX: box!.x + box!.width * 0.8,
+    clientY: box!.y + box!.height * 0.5,
+    pointerId: 7,
+    pointerType: "touch",
+  });
+  await swipeSurface.dispatchEvent("pointerup", {
+    clientX: box!.x + box!.width * 0.2,
+    clientY: box!.y + box!.height * 0.52,
+    pointerId: 7,
+    pointerType: "touch",
+  });
+
+  await expect(secondThumbnail).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("img", { name: "Сухой чайный лист" }),
+  ).toBeVisible();
+
+  await swipeSurface.dispatchEvent("pointerdown", {
+    clientX: box!.x + box!.width * 0.2,
+    clientY: box!.y + box!.height * 0.5,
+    pointerId: 8,
+    pointerType: "touch",
+  });
+  await swipeSurface.dispatchEvent("pointerup", {
+    clientX: box!.x + box!.width * 0.8,
+    clientY: box!.y + box!.height * 0.48,
+    pointerId: 8,
+    pointerType: "touch",
+  });
+
+  await expect(firstThumbnail).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("img", { name: "Пачка чая" })).toBeVisible();
+});
+
 test("quantity starts at one and is capped at five", async ({ page }) => {
   await page.goto("/tovary/published-product");
 

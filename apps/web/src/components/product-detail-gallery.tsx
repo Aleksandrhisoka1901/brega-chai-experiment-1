@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 
 import type { ProductDetailImage } from "@/server/cms/product-detail-mapper";
 
 import { SliderProgress, useHorizontalSlider } from "./horizontal-slider";
+import { getGallerySwipeStep } from "./product-gallery-swipe";
 import { ResponsiveImage } from "./responsive-image";
 import styles from "./product-detail.module.css";
+
+type SwipeOrigin = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  width: number;
+};
 
 export function ProductDetailGallery({
   brandName,
@@ -20,8 +32,39 @@ export function ProductDetailGallery({
   title: string;
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const swipeOriginRef = useRef<SwipeOrigin | null>(null);
   const slider = useHorizontalSlider<HTMLDivElement>();
   const selectedImage = images[selectedIndex];
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch" || images.length < 2) return;
+
+    swipeOriginRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      width: event.currentTarget.getBoundingClientRect().width,
+    };
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const origin = swipeOriginRef.current;
+    swipeOriginRef.current = null;
+    if (!origin || origin.pointerId !== event.pointerId) return;
+
+    const step = getGallerySwipeStep({
+      endX: event.clientX,
+      endY: event.clientY,
+      startX: origin.startX,
+      startY: origin.startY,
+      width: origin.width,
+    });
+    if (step === 0) return;
+
+    setSelectedIndex((currentIndex) =>
+      Math.max(0, Math.min(images.length - 1, currentIndex + step)),
+    );
+  };
 
   if (!selectedImage) {
     return (
@@ -70,7 +113,16 @@ export function ProductDetailGallery({
         </div>
       ) : null}
 
-      <div className={styles.mainImage}>
+      <div
+        aria-label="Главное изображение товара"
+        className={styles.mainImage}
+        onPointerCancel={() => {
+          swipeOriginRef.current = null;
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        role="group"
+      >
         {images.map((image, index) => {
           const isSelected = index === selectedIndex;
 

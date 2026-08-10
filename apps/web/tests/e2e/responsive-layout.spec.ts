@@ -184,6 +184,14 @@ for (const viewport of viewports) {
         right: viewport.width,
       });
 
+    const cartHeader = dialog.locator("header");
+    await expect(cartHeader).toHaveCSS("border-bottom-style", "none");
+    await expect(cartHeader).toHaveCSS("box-shadow", "none");
+    await expect(dialog.locator("ul").locator("..")).toHaveCSS(
+      "box-shadow",
+      "none",
+    );
+
     await dialog.getByRole("button", { name: "Перейти к оформлению" }).click();
     await expect(
       dialog.getByRole("heading", { name: "Оформление" }),
@@ -192,5 +200,15 @@ for (const viewport of viewports) {
       "overflow-y",
       "auto",
     );
+    const checkoutHeader = dialog.locator("header");
+    await expect(checkoutHeader).toHaveCSS("border-bottom-style", "none");
+    await expect(checkoutHeader).toHaveCSS("box-shadow", "none");
+    await expect(dialog.locator("form").locator("..")).toHaveCSS(
+      "box-shadow",
+      "none",
+    );
+    await expect(
+      dialog.getByRole("button", { name: "Назад к корзине" }),
+    ).toHaveCSS("padding-top", "12px");
   });
 }

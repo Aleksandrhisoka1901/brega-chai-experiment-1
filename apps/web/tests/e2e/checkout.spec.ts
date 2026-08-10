@@ -39,6 +39,7 @@ async function addProductAndOpenCheckout(
   await expect(
     dialog.getByRole("radio", { name: /Самовывоз/ }),
   ).not.toBeChecked();
+  await expect(dialog.getByText("Скидка 10%", { exact: true })).toBeVisible();
   await expect(
     dialog.getByRole("radio", { name: /^Доставка/ }),
   ).not.toBeChecked();
@@ -353,4 +354,52 @@ test("pickup shows CMS address and discounted total without address input", asyn
   await expect(
     dialog.getByText(/Скидка 10% будет зафиксирована/),
   ).toBeVisible();
+});
+
+test("cart scroll shadows track remaining overflowing content", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 600 });
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "brega-chai:cart:v1",
+      JSON.stringify({
+        version: 1,
+        items: Array.from({ length: 5 }, (_, index) => ({
+          productId: `scroll-shadow-${index}`,
+          slug: `scroll-shadow-${index}`,
+          type: "tovar",
+          title: `Чай для проверки ${index + 1}`,
+          packageLabel: "Пакетик (50 г)",
+          unitPriceSnapshot: 1600,
+          currency: "RUB",
+          image: { url: "/favicon.ico", alt: "Пачка чая" },
+          quantity: 1,
+        })),
+      }),
+    );
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: /Открыть корзину/ }).click();
+
+  const dialog = page.getByRole("dialog");
+  const scroller = dialog.locator("ul").locator("..");
+  await expect(scroller).toHaveAttribute("data-scrollable", "true");
+  await expect(scroller).not.toHaveAttribute("data-scrolled", "true");
+  await expect(scroller).toHaveAttribute("data-scroll-below", "true");
+  await expect(scroller).not.toHaveCSS("box-shadow", "none");
+
+  await scroller.evaluate((element) => {
+    element.scrollTop = 100;
+  });
+  await expect(scroller).toHaveAttribute("data-scrolled", "true");
+  await expect(scroller).toHaveAttribute("data-scroll-below", "true");
+  await expect(scroller).not.toHaveCSS("box-shadow", "none");
+
+  await scroller.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(scroller).toHaveAttribute("data-scrolled", "true");
+  await expect(scroller).not.toHaveAttribute("data-scroll-below", "true");
+  await expect(scroller).not.toHaveCSS("box-shadow", "none");
 });

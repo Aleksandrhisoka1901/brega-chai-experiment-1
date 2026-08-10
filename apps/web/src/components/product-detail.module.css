@@ -468,6 +468,12 @@
     display: block;
   }
 
+  .mainImage {
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
   .commerce {
     padding-top: 4rem;
   }

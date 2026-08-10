@@ -182,7 +182,11 @@ export function CartDrawer({
             </div>
           ) : (
             <>
-              <ScrollArea className={styles.itemsViewport}>
+              <ScrollArea
+                bottomShadow
+                className={styles.itemsViewport}
+                topShadow
+              >
                 <ul className={styles.items}>
                   {cart.items.map((item) => {
                     const currentStock =
