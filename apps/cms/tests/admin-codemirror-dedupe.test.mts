@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  applyAdminContentManagerPreset,
   applyRussianFieldLabels,
   configureOrderReadOnlyFields,
   configureProductFields,
@@ -166,6 +167,30 @@ test("writes Russian labels into Content Manager metadata", () => {
     getRussianFieldLabels("shared.link", true, russianAdminTranslations).id,
     "Идентификатор",
   );
+});
+
+test("applies canonical local Content Manager layouts", () => {
+  const configuration = applyAdminContentManagerPreset("home.hero", {
+    layouts: {
+      edit: [[{ name: "eyebrow", size: 12 }]],
+      list: ["id", "eyebrow"],
+    },
+    settings: { mainField: "eyebrow", defaultSortBy: "eyebrow" },
+    metadatas: {},
+  });
+
+  assert.deepEqual(configuration.layouts.edit[0], [
+    { name: "title", size: 6 },
+    { name: "text", size: 6 },
+  ]);
+  assert.deepEqual(configuration.layouts.list, [
+    "id",
+    "title",
+    "text",
+    "layout",
+  ]);
+  assert.equal(configuration.settings.mainField, "title");
+  assert.equal(configuration.settings.defaultSortBy, "title");
 });
 
 test("syncs Russian labels for content types and components", async () => {

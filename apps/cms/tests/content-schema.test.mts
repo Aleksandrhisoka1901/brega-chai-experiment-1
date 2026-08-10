@@ -110,6 +110,7 @@ test("robots.txt is an immediately editable, bounded single type", async () => {
     "src/api/robots-txt/content-types/robots-txt/schema.json",
   );
 
+  assert.equal(robots.info.displayName, "robots.txt");
   assert.equal(robots.options?.draftAndPublish, false);
   assert.equal(robots.attributes.content.type, "text");
   assert.equal(robots.attributes.content.required, true);

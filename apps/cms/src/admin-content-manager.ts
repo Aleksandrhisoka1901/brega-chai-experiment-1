@@ -33,6 +33,216 @@ type ContentManagerConfiguration = {
 
 type FieldLabels = Record<string, string>;
 type AdminTranslations = Readonly<Record<string, string>>;
+type ContentManagerPreset = Pick<ContentManagerConfiguration, "layouts"> & {
+  settings?: Record<string, unknown>;
+};
+
+const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
+  "api::global-setting.global-setting": {
+    layouts: {
+      edit: [
+        [
+          { name: "brandName", size: 6 },
+          { name: "logo", size: 6 },
+        ],
+        [
+          { name: "email", size: 6 },
+          { name: "telegramUrl", size: 6 },
+        ],
+        [{ name: "defaultProductStory", size: 12 }],
+        [{ name: "navigation", size: 12 }],
+        [{ name: "currency", size: 6 }],
+        [{ name: "defaultSeo", size: 12 }],
+        [
+          { name: "legalDetails", size: 6 },
+          { name: "orderNotificationEmail", size: 6 },
+        ],
+        [
+          { name: "pickupAddress", size: 6 },
+          { name: "pickupDiscountPercent", size: 4 },
+        ],
+        [{ name: "courierDeliveryNote", size: 6 }],
+        [{ name: "sectionBreadcrumbs", size: 12 }],
+        [{ name: "storefrontTexts", size: 12 }],
+        [{ name: "legalDocuments", size: 12 }],
+      ],
+      list: ["id", "brandName", "logo", "email"],
+    },
+  },
+  "api::order.order": {
+    layouts: {
+      edit: [
+        [
+          { name: "orderNumber", size: 6 },
+          { name: "idempotencyKey", size: 6 },
+        ],
+        [{ name: "requestFingerprint", size: 6 }],
+        [
+          { name: "customerName", size: 6 },
+          { name: "customerPhone", size: 6 },
+        ],
+        [
+          { name: "customerEmail", size: 6 },
+          { name: "deliveryAddress", size: 6 },
+        ],
+        [{ name: "comment", size: 6 }],
+        [{ name: "consents", size: 12 }],
+        [{ name: "lines", size: 12 }],
+        [
+          { name: "currency", size: 6 },
+          { name: "totalRubles", size: 4 },
+        ],
+        [{ name: "statusHistory", size: 12 }],
+        [
+          { name: "orderStatus", size: 6 },
+          { name: "deliveryMethod", size: 6 },
+        ],
+        [
+          { name: "pickupDiscountPercent", size: 4 },
+          { name: "discountedTotalRubles", size: 4 },
+        ],
+        [{ name: "managerComment", size: 6 }],
+      ],
+      list: ["id", "orderNumber", "idempotencyKey", "requestFingerprint"],
+    },
+  },
+  "api::product.product": {
+    layouts: {
+      edit: [
+        [{ name: "title", size: 6 }],
+        [
+          { name: "slug", size: 6 },
+          { name: "type", size: 6 },
+        ],
+        [
+          { name: "originalTitle", size: 6 },
+          { name: "packageLabel", size: 6 },
+        ],
+        [
+          { name: "price", size: 4 },
+          { name: "currency", size: 6 },
+        ],
+        [{ name: "stock", size: 4 }],
+        [{ name: "mainImage", size: 12 }],
+        [{ name: "gallery", size: 12 }],
+        [
+          { name: "cardExcerpt", size: 6 },
+          { name: "story", size: 6 },
+        ],
+        [{ name: "articles", size: 12 }],
+        [{ name: "seo", size: 12 }],
+        [
+          { name: "breadcrumbLabel", size: 6 },
+          { name: "categoryLabel", size: 6 },
+        ],
+        [{ name: "displayName", size: 6 }],
+      ],
+      list: ["id", "title", "slug", "breadcrumbLabel", "displayName"],
+    },
+  },
+  "api::products-page.products-page": {
+    layouts: {
+      edit: [
+        [{ name: "seo", size: 12 }],
+        [{ name: "title", size: 6 }],
+        [{ name: "intro", size: 12 }],
+        [
+          { name: "eyebrow", size: 6 },
+          { name: "emptyStateText", size: 6 },
+        ],
+        [{ name: "emptyStateLinkLabel", size: 6 }],
+      ],
+      list: ["id", "seo", "title"],
+    },
+  },
+  "home.catalog-preview": {
+    layouts: {
+      edit: [
+        [
+          { name: "title", size: 6 },
+          { name: "subtitle", size: 6 },
+        ],
+        [
+          { name: "eyebrow", size: 6 },
+          { name: "linkLabel", size: 6 },
+        ],
+      ],
+      list: ["id", "title", "subtitle", "eyebrow"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
+  },
+  "home.editorial-section": {
+    layouts: {
+      edit: [
+        [
+          { name: "backgroundColor", size: 6 },
+          { name: "textColor", size: 6 },
+        ],
+        [
+          { name: "spacing", size: 6 },
+          { name: "eyebrow", size: 6 },
+        ],
+        [
+          { name: "title", size: 6 },
+          { name: "textBlock1", size: 6 },
+        ],
+        [{ name: "textBlock2", size: 6 }],
+      ],
+      list: ["id", "backgroundColor", "textColor"],
+    },
+    settings: {
+      mainField: "backgroundColor",
+      defaultSortBy: "backgroundColor",
+    },
+  },
+  "home.hero": {
+    layouts: {
+      edit: [
+        [
+          { name: "title", size: 6 },
+          { name: "text", size: 6 },
+        ],
+        [{ name: "layout", size: 6 }],
+        [{ name: "image", size: 12 }],
+        [
+          { name: "backgroundColor", size: 6 },
+          { name: "textColor", size: 6 },
+        ],
+        [{ name: "cta", size: 12 }],
+        [{ name: "eyebrow", size: 6 }],
+      ],
+      list: ["id", "title", "text", "layout"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
+  },
+  "shared.navigation-labels": {
+    layouts: {
+      edit: [
+        [{ name: "about", size: 6 }],
+        [
+          { name: "cart", size: 6 },
+          { name: "nabory", size: 6 },
+        ],
+        [{ name: "tovary", size: 6 }],
+      ],
+      list: ["id", "about", "nabory", "tovary"],
+    },
+  },
+};
+
+export const applyAdminContentManagerPreset = (
+  uid: string,
+  configuration: ContentManagerConfiguration,
+): ContentManagerConfiguration => {
+  const preset = CONTENT_MANAGER_PRESETS[uid];
+  if (!preset) return configuration;
+
+  return {
+    ...configuration,
+    layouts: preset.layouts,
+    settings: { ...configuration.settings, ...preset.settings },
+  };
+};
 
 export const getRussianFieldLabels = (
   uid: string,
@@ -150,7 +360,10 @@ export const syncAdminContentManager = async (
     if (Object.keys(labels).length === 0) continue;
 
     const schema = strapi.contentTypes[uid];
-    const configuration = await contentTypeService.findConfiguration(schema);
+    const configuration = applyAdminContentManagerPreset(
+      uid,
+      await contentTypeService.findConfiguration(schema),
+    );
     const configured =
       uid === PRODUCT_UID
         ? configureProductFields(configuration)
@@ -169,7 +382,10 @@ export const syncAdminContentManager = async (
     if (Object.keys(labels).length === 0) continue;
 
     const schema = strapi.components[uid];
-    const configuration = await componentService.findConfiguration(schema);
+    const configuration = applyAdminContentManagerPreset(
+      uid,
+      await componentService.findConfiguration(schema),
+    );
     await componentService.updateConfiguration(
       schema,
       applyRussianFieldLabels(configuration, labels),

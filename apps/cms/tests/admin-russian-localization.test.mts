@@ -47,7 +47,11 @@ test("enables Russian Strapi Admin and labels every custom field", async () => {
       ? `api::${path.split("/")[1]}.${schema.info.singularName}`
       : `${basename(dirname(path))}.${basename(path, ".json")}`;
 
-    assert.match(schema.info.displayName, /[А-Яа-яЁё]/, path);
+    if (uid === "api::robots-txt.robots-txt") {
+      assert.equal(schema.info.displayName, "robots.txt", path);
+    } else {
+      assert.match(schema.info.displayName, /[А-Яа-яЁё]/, path);
+    }
 
     for (const attribute of Object.keys(schema.attributes)) {
       const prefix = isApi
