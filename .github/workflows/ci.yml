@@ -112,7 +112,6 @@ jobs:
       JWT_SECRET: ci-jwt-secret
       ENCRYPTION_KEY: ci-encryption-key
       SEED_ALLOWED: "true"
-      CRON_ENABLED: "false"
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace

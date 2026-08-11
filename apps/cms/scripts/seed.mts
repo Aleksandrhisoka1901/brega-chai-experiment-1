@@ -503,6 +503,7 @@ async function run() {
 
   const appContext = await compileStrapi();
   const strapi = await createStrapi(appContext).load();
+  strapi.cron.stop();
 
   try {
     const imageByAsset = new Map<string, { id: number }>();
