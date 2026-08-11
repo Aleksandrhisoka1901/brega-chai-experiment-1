@@ -189,6 +189,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     container: mcr.microsoft.com/playwright:v1.55.1-noble
+    env:
+      HOME: /root
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
