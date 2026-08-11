@@ -1,0 +1,109 @@
+{
+  "kind": "singleType",
+  "collectionName": "global_settings",
+  "info": {
+    "singularName": "global-setting",
+    "pluralName": "global-settings",
+    "displayName": "Общие настройки",
+    "description": "Общие данные, навигация и значения сайта по умолчанию"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "brandName": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "orderNotificationEmail": {
+      "type": "email",
+      "required": true,
+      "private": true,
+      "description": "Служебный адрес, на который отправляются уведомления о новых заказах. На витрине не публикуется."
+    },
+    "pickupAddress": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "description": "Адрес и график самовывоза, которые увидит покупатель и которые сохранятся в заказе."
+    },
+    "pickupDiscountPercent": {
+      "type": "integer",
+      "required": false,
+      "min": 0,
+      "max": 100,
+      "description": "Необязательная скидка за самовывоз в процентах. Оставьте поле пустым, чтобы не применять скидку. Итог заказа округляется до целого рубля."
+    },
+    "courierDeliveryNote": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Короткие условия курьерской доставки рядом с выбором способа получения."
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "telegramUrl": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "defaultProductStory": {
+      "type": "blocks",
+      "required": true,
+      "description": "Рекомендуемая структура: короткое вступление и небольшие разделы с понятными заголовками, абзацами, списками, ссылками и изображениями. H1 на сайте заменяется на H2. Неподдерживаемое или исполняемое содержимое, включая скрипты, не выводится."
+    },
+    "navigation": {
+      "type": "component",
+      "component": "shared.navigation-labels",
+      "repeatable": false,
+      "required": true
+    },
+    "sectionBreadcrumbs": {
+      "type": "component",
+      "component": "shared.section-breadcrumb",
+      "repeatable": true,
+      "required": false,
+      "description": "Необязательные подписи разделов в хлебных крошках. Для каждого раздела можно добавить только одну запись."
+    },
+    "storefrontTexts": {
+      "type": "component",
+      "component": "shared.storefront-texts",
+      "repeatable": false,
+      "required": true
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["RUB"],
+      "required": true,
+      "default": "RUB"
+    },
+    "defaultSeo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": true
+    },
+    "legalDetails": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "legalDocuments": {
+      "type": "component",
+      "component": "shared.legal-documents",
+      "repeatable": false,
+      "required": false,
+      "description": "Заменяемые PDF-файлы правовой информации. Если поле не заполнено, сайт использует резервные документы."
+    }
+  }
+}

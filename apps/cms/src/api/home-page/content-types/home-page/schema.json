@@ -1,0 +1,55 @@
+{
+  "kind": "singleType",
+  "collectionName": "home_pages",
+  "info": {
+    "singularName": "home-page",
+    "pluralName": "home-pages",
+    "displayName": "Главная страница",
+    "description": "Редактируемые блоки главной страницы"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    },
+    "hero": {
+      "type": "component",
+      "component": "home.hero",
+      "repeatable": false,
+      "required": true
+    },
+    "about": {
+      "type": "component",
+      "component": "home.editorial-section",
+      "repeatable": false,
+      "required": true
+    },
+    "naboryPreview": {
+      "type": "component",
+      "component": "home.rituals-preview",
+      "repeatable": false,
+      "required": true
+    },
+    "tovaryPreview": {
+      "type": "component",
+      "component": "home.catalog-preview",
+      "repeatable": false,
+      "required": true
+    },
+    "featuredNabory": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product"
+    },
+    "featuredTovary": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product"
+    }
+  }
+}

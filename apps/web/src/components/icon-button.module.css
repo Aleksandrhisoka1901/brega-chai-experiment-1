@@ -1,0 +1,40 @@
+.button {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--action-subtle-hover);
+}
+
+.button:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.sizeS svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.sizeM svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.sizeL svg {
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.button svg {
+  stroke-width: 1.25;
+}

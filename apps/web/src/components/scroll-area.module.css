@@ -1,0 +1,19 @@
+.root {
+  overflow: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.root[data-scrolled="true"] {
+  box-shadow: inset 0 0.75rem 0.75rem -0.85rem rgb(36 37 30 / 36%);
+}
+
+.root[data-scroll-below="true"] {
+  box-shadow: inset 0 -0.75rem 0.75rem -0.85rem rgb(36 37 30 / 36%);
+}
+
+.root[data-scrolled="true"][data-scroll-below="true"] {
+  box-shadow:
+    inset 0 0.75rem 0.75rem -0.85rem rgb(36 37 30 / 36%),
+    inset 0 -0.75rem 0.75rem -0.85rem rgb(36 37 30 / 36%);
+}

@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_shared_legal_documents",
+  "info": {
+    "displayName": "Юридические документы",
+    "description": "PDF-файлы, доступные по постоянным адресам в разделе /legal"
+  },
+  "attributes": {
+    "privacyPolicy": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"],
+      "description": "Публичный адрес: /legal/privacy.pdf"
+    },
+    "terms": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"],
+      "description": "Публичный адрес: /legal/terms.pdf"
+    },
+    "deliveryAndReturns": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"],
+      "description": "Публичный адрес: /legal/delivery-and-returns.pdf"
+    }
+  }
+}

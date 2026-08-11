@@ -1,0 +1,108 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Заказ",
+    "description": "Заказ покупателя и история его обработки"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "orderNumber": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "private": true,
+      "configurable": false
+    },
+    "requestFingerprint": {
+      "type": "string",
+      "required": true,
+      "private": true,
+      "configurable": false
+    },
+    "orderStatus": {
+      "type": "enumeration",
+      "enum": ["new", "confirmed", "completed", "cancelled"],
+      "required": true,
+      "default": "new"
+    },
+    "customerName": {
+      "type": "string",
+      "required": true
+    },
+    "customerPhone": {
+      "type": "string",
+      "required": true,
+      "private": true
+    },
+    "customerEmail": {
+      "type": "email",
+      "required": false,
+      "private": true
+    },
+    "deliveryMethod": {
+      "type": "enumeration",
+      "enum": ["pickup", "courier"],
+      "default": "courier"
+    },
+    "deliveryAddress": {
+      "type": "text",
+      "required": true,
+      "private": true
+    },
+    "comment": {
+      "type": "text",
+      "required": false,
+      "private": true
+    },
+    "managerComment": {
+      "type": "text",
+      "required": false,
+      "private": true,
+      "description": "Внутренний комментарий менеджера: дополнительный телефон, пожелания клиента и договорённости."
+    },
+    "consents": {
+      "type": "json",
+      "required": true,
+      "private": true
+    },
+    "lines": {
+      "type": "json",
+      "required": true
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["RUB"],
+      "required": true,
+      "default": "RUB"
+    },
+    "totalRubles": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "pickupDiscountPercent": {
+      "type": "integer",
+      "min": 0,
+      "max": 100,
+      "default": 0
+    },
+    "discountedTotalRubles": {
+      "type": "integer",
+      "min": 0
+    },
+    "statusHistory": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,133 @@
+name: brega-chai
+
+services:
+  workspace-dependencies:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: base
+    command: yarn install --immutable
+    restart: "no"
+    volumes:
+      - .:/workspace
+      - root_node_modules:/workspace/node_modules
+      - web_node_modules:/workspace/apps/web/node_modules
+      - cms_node_modules:/workspace/apps/cms/node_modules
+      - contracts_node_modules:/workspace/packages/contracts/node_modules
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: development
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      CHECKOUT_FORM_SECRET: ${CHECKOUT_FORM_SECRET:-}
+      STRAPI_ORDER_TOKEN: ${STRAPI_ORDER_TOKEN:-}
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/workspace
+      - root_node_modules:/workspace/node_modules
+      - web_node_modules:/workspace/apps/web/node_modules
+      - contracts_node_modules:/workspace/packages/contracts/node_modules
+    depends_on:
+      workspace-dependencies:
+        condition: service_completed_successfully
+      cms:
+        condition: service_healthy
+
+  cms:
+    build:
+      context: .
+      dockerfile: apps/cms/Dockerfile
+      target: development
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: development
+    ports:
+      - "1337:1337"
+      - "5173:5173"
+    volumes:
+      - .:/workspace
+      - root_node_modules:/workspace/node_modules
+      - cms_node_modules:/workspace/apps/cms/node_modules
+      - contracts_node_modules:/workspace/packages/contracts/node_modules
+      - cms_uploads:/workspace/apps/cms/public/uploads
+    depends_on:
+      workspace-dependencies:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_started
+      rustfs-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:1337/api/health/readiness').then(r=>{if(r.status!==204)process.exit(1)}).catch(()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  postgres:
+    image: postgres:16.10-alpine3.22
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  rustfs:
+    image: ${RUSTFS_IMAGE:?Set an immutable RUSTFS_IMAGE in .env}
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:?Set RUSTFS_ACCESS_KEY in .env}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:?Set RUSTFS_SECRET_KEY in .env}
+    ports:
+      - "9000:9000"
+    volumes:
+      - rustfs_data:/data
+
+  rustfs-init:
+    image: ${S3_CLIENT_IMAGE:?Set an immutable S3_CLIENT_IMAGE in .env}
+    restart: "no"
+    entrypoint: ["/bin/sh", "/init-rustfs.sh"]
+    environment:
+      S3_ENDPOINT: http://rustfs:9000
+      S3_ACCESS_KEY_ID: ${RUSTFS_ACCESS_KEY:?Set RUSTFS_ACCESS_KEY in .env}
+      S3_ACCESS_SECRET: ${RUSTFS_SECRET_KEY:?Set RUSTFS_SECRET_KEY in .env}
+      S3_BUCKET: ${RUSTFS_BUCKET:?Set RUSTFS_BUCKET in .env}
+    volumes:
+      - ./scripts/init-rustfs.sh:/init-rustfs.sh:ro
+    depends_on:
+      rustfs:
+        condition: service_started
+
+volumes:
+  root_node_modules:
+  web_node_modules:
+  cms_node_modules:
+  contracts_node_modules:
+  cms_uploads:
+  postgres_data:
+  rustfs_data:

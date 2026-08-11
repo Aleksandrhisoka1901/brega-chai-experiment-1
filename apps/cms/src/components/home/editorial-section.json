@@ -1,0 +1,43 @@
+{
+  "collectionName": "components_home_editorial_sections",
+  "info": {
+    "displayName": "Редакционный раздел",
+    "description": "Текстовый раздел «О проекте» с настраиваемыми цветами"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "textBlock1": {
+      "type": "text",
+      "required": false
+    },
+    "textBlock2": {
+      "type": "text",
+      "required": false
+    },
+    "backgroundColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "textColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "spacing": {
+      "type": "enumeration",
+      "enum": ["S", "M", "L", "XL"],
+      "required": true,
+      "default": "L"
+    }
+  }
+}

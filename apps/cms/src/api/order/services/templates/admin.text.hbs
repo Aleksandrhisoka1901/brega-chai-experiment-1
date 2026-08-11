@@ -1,0 +1,25 @@
+Новый заказ №{{orderNumber}}
+
+Заказ оформлен на сайте Brega Tea.
+
+{{#each adminContacts}}
+{{label}}: {{value}}
+{{/each}}
+Способ получения: {{method}}
+{{addressLabel}}: {{address}}
+{{#if comment}}
+Комментарий клиента: {{comment}}
+{{/if}}
+
+Состав заказа:
+{{#each lines}}
+• {{title}} ({{packageLabel}}) — {{quantity}} шт. × {{unitPrice}} = {{lineTotal}}
+{{/each}}
+
+{{#if hasDiscount}}
+Стандартная сумма: {{standardTotal}}
+Скидка за самовывоз: {{discountPercent}}%
+Сумма со скидкой: {{finalTotal}}
+{{else}}
+Сумма заказа: {{finalTotal}}
+{{/if}}

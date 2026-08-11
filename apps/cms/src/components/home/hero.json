@@ -1,0 +1,52 @@
+{
+  "collectionName": "components_home_heroes",
+  "info": {
+    "displayName": "Первый экран",
+    "description": "Изображение и alt обязательны для всех макетов, кроме 100/0"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "text": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "layout": {
+      "type": "enumeration",
+      "enum": ["50/50", "40/60", "100/0"],
+      "required": true,
+      "default": "50/50"
+    },
+    "image": {
+      "type": "component",
+      "component": "shared.image-with-alt",
+      "repeatable": false,
+      "required": false
+    },
+    "backgroundColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "textColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "cta": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": false,
+      "required": false
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Товар",
+    "description": "Товар или готовый набор товаров"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "config": {
+    "attributes": {
+      "seedKey": {
+        "hidden": true
+      }
+    }
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Техническое название для списка и внутренних операций, например «Ритуал: Утро без слов» или «Сорт: Да Хун Пао»."
+    },
+    "displayName": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Название, которое покупатель видит на витрине, в корзине и заказе."
+    },
+    "seedKey": {
+      "type": "string",
+      "required": false,
+      "unique": true,
+      "private": true,
+      "configurable": false
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "displayName",
+      "required": true,
+      "unique": true,
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["nabor", "tovar"],
+      "required": true
+    },
+    "breadcrumbLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Необязательная короткая подпись для последнего пункта хлебных крошек. Если поле пустое, используется название."
+    },
+    "categoryLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Категория для SEO и структурированных данных, например «сорт чая» или «подарочный набор». Если поле пустое, используется общий тип позиции."
+    },
+    "originalTitle": {
+      "type": "string",
+      "required": false,
+      "regex": "^[А-Яа-яЁё0-9 .,'’«»()\\-]+$"
+    },
+    "packageLabel": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Укажите тип упаковки и фасовку целиком, например: «Маленькая банка (90 г)» или «Пакетик (50 г)»."
+    },
+    "price": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["RUB"],
+      "required": true,
+      "default": "RUB"
+    },
+    "stock": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 0
+    },
+    "mainImage": {
+      "type": "component",
+      "component": "shared.image-with-alt",
+      "repeatable": false,
+      "required": false
+    },
+    "gallery": {
+      "type": "component",
+      "component": "product.gallery-image",
+      "repeatable": true,
+      "required": false
+    },
+    "cardExcerpt": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "story": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "articles": {
+      "type": "component",
+      "component": "product.article",
+      "repeatable": true,
+      "required": false,
+      "description": "Добавляйте, удаляйте и меняйте порядок отдельных статей нижней контентной зоны товара."
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    }
+  }
+}

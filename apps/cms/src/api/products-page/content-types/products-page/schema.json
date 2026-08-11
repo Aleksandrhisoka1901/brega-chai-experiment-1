@@ -1,0 +1,47 @@
+{
+  "kind": "singleType",
+  "collectionName": "products_pages",
+  "info": {
+    "singularName": "products-page",
+    "pluralName": "products-pages",
+    "displayName": "Страница сортов",
+    "description": "Вступление и SEO каталога сортов"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "emptyStateText": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "emptyStateLinkLabel": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "intro": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "description": "Обычный длинный текст без форматирования. Переносы строк сохраняются на витрине."
+    }
+  }
+}

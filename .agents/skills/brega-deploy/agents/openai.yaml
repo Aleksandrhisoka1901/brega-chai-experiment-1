@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brega deploy"
+  short_description: "Deploy Brega Chai via GitHub Actions or manual rollout"
+  default_prompt: "Use $brega-deploy to choose a deployment path, verify the change, and release Brega Chai safely."

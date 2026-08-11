@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_links",
+  "info": {
+    "displayName": "Ссылка"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 2048
+    }
+  }
+}

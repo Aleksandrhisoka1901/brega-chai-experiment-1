@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_product_gallery_images",
+  "info": {
+    "displayName": "Изображение галереи",
+    "description": "Для каждого изображения нужен содержательный alt. Размеры рекомендательные, ограничивается только вес файла."
+  },
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "alt": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    }
+  }
+}
