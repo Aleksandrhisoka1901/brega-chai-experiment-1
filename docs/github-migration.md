@@ -52,6 +52,11 @@ write` только jobs, публикующим images.
 | `DEPLOY_SSH_PRIVATE_KEY` | приватный deploy key без passphrase |
 | `DEPLOY_KNOWN_HOSTS`     | закреплённая строка host key VPS    |
 
+На время cutover те же variables и `DEPLOY_KNOWN_HOSTS` настроены на уровне
+репозитория. Workflows также поддерживают существующий repository secret
+`SSH_PRIVATE_KEY` как fallback. Владелец репозитория должен создать environment
+`production` и перенести значения туда, чтобы ограничить их только deploy jobs.
+
 Registry credential переносить из GitLab не требуется. Release workflow
 публикует и скачивает связанные с репозиторием GHCR packages через
 короткоживущий `GITHUB_TOKEN`, в том числе передаёт его VPS непосредственно
