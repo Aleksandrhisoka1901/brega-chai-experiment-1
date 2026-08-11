@@ -58,7 +58,7 @@ script-breaking символов.
 | `CACHE_REVALIDATION_URL`           | cms                 | Внутренний Next endpoint для cache revalidation                |
 | `CACHE_REVALIDATION_SECRET`        | web, cms            | HMAC-подпись cache revalidation                                |
 | `CACHE_REVALIDATION_TIMEOUT_MS`    | cms                 | Таймаут отправки revalidation                                  |
-| `STRAPI_URL`                       | cms                 | Публичный HTTPS origin Strapi для абсолютных URL                |
+| `STRAPI_URL`                       | cms                 | Публичный HTTPS origin Strapi для абсолютных URL               |
 | `DATABASE_HOST/PORT/NAME/USERNAME` | cms, служебные jobs | Параметры соединения с PostgreSQL                              |
 | `S3_ENDPOINT/REGION/BUCKET`        | cms, служебные jobs | Внутренние параметры object storage                            |
 | `MEDIA_PUBLIC_URL`                 | cms                 | Публичная база URL, которую Strapi записывает для media        |
@@ -102,18 +102,19 @@ Access key/username не всегда является секретом сам �
 
 ### 5.2. CI/CD и production
 
-- secrets создаются как GitLab CI/CD variables с `Masked` и `Protected`;
-- production variables дополнительно ограничиваются production environment;
-- SSH/deploy keys по возможности используются как file variables;
+- secrets создаются в GitHub Environment `production`;
+- production variables и secrets доступны только jobs, явно использующим
+  environment `production`;
+- SSH private key и `known_hosts` хранятся как environment secrets;
 - на VPS runtime env хранится вне Git и доступен только deploy-пользователю;
 - Docker Compose передаёт каждому сервису только необходимые ему значения;
 - secrets не передаются через Docker `ARG` и не записываются постоянным
   `ENV` в Dockerfile;
 - логи pipeline, deploy scripts и application logs не выводят значения env.
 
-GitLab variable становится доступна контейнеру только после явной безопасной
-передачи deploy-механизмом. Сам факт создания variable не настраивает runtime
-env автоматически.
+GitHub Actions variable или secret становится доступна контейнеру только после
+явной безопасной передачи deploy-механизмом. Сам факт создания значения не
+настраивает runtime env автоматически.
 
 ## 6. Запрещённые места
 

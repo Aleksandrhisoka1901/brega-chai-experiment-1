@@ -21,12 +21,13 @@ production, пока проверки не завершились успешно
 - Nginx публикует только read-only объекты storefront bucket RustFS;
 - данные PostgreSQL, RustFS и сертификаты находятся на persistent volumes.
 
-GitLab CI собирает immutable web/CMS images по commit SHA и публикует их в GitLab
-Container Registry. Production deploy запускает только protected-тег
-`release-{semver}` на коммите из `main`; создавать такие теги может Maintainer.
-Deploy зависит от зелёных lint, typecheck, test, build, smoke/a11y и image jobs.
-VPS скачивает готовые images через непривилегированного SSH-пользователя
-`deploy`; GitLab Runner и исходный build toolchain на VPS не устанавливаются.
+GitHub Actions собирает immutable web/CMS images по commit SHA и публикует их в
+GitHub Container Registry (GHCR). Production deploy запускает только защищённый
+GitHub ruleset тег `release-{semver}` на коммите из `main`. Deploy зависит от
+зелёных lint, typecheck, test, build, smoke/a11y и image jobs. VPS скачивает
+готовые images через непривилегированного SSH-пользователя `deploy`;
+self-hosted GitHub Actions runner и исходный build toolchain на VPS не
+устанавливаются.
 
 Перед deploy создаётся backup PostgreSQL и RustFS. После запуска выполняются
 healthcheck и smoke-check. При ошибке healthcheck pipeline возвращает предыдущие
@@ -44,7 +45,7 @@ Off-site backup отложен.
 - Отказ диска или потеря VPS уничтожит и рабочие данные, и локальные backup;
   этот принятый для MVP риск нужно закрыть off-site копированием позднее.
 - Удаление, переименование или смена типа поля требуют отдельной миграции,
-  backup и явного подтверждения в release MR.
+  backup и явного подтверждения в release PR.
 - Версии RustFS и остальных container images фиксируются; автоматические
   обновления запрещены.
 - Для восстановления данных нужна документированная ручная команда.

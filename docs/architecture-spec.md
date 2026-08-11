@@ -54,7 +54,7 @@
 | React Query гидратируется в публичный контент    | Публичный контент читается в React Server Components; React Query не нужен по умолчанию                |
 | Root layout `force-dynamic`                      | Статический/cache-first layout с tag-based revalidation                                                |
 | Общая библиотека содержит UI и формы             | Shared package хранит прежде всего схемы, DTO и чистые domain-функции                                  |
-| Strapi sitemap plugin                            | Strapi 5 plugin генерирует sitemap; middleware проксирует его на публичный `/sitemap.xml`               |
+| Strapi sitemap plugin                            | Strapi 5 plugin генерирует sitemap; middleware проксирует его на публичный `/sitemap.xml`              |
 | Lead endpoint                                    | Order endpoint с повторной проверкой цен, идемпотентностью и адаптерами доставки/оплаты                |
 | Privacy как HTML-страница                        | Юридические PDF редактируются в Strapi и доступны по стабильным маршрутам `/legal/*.pdf`               |
 | Radix Themes задаёт большую часть оформления     | Radix используется для поведения; editorial visual language задают CSS tokens и собственные компоненты |
@@ -322,12 +322,12 @@ server-only secret; подпись, secret и payload не логируются.
 обязательны `documentId`, `type` и `slug`; произвольные tags/paths и лишние поля
 не принимаются.
 
-| Event      | Tags                                     | Paths                                                                 |
-| ---------- | ---------------------------------------- | --------------------------------------------------------------------- |
-| `global`   | `global`                                 | публичный layout                                                      |
-| `home`     | `home`                                   | `/`                                                                   |
-| `products` | `products`                               | `/tovary`                                                      |
-| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/tovary/{slug}` или `/nabory/{slug}`          |
+| Event      | Tags                                     | Paths                                                 |
+| ---------- | ---------------------------------------- | ----------------------------------------------------- |
+| `global`   | `global`                                 | публичный layout                                      |
+| `home`     | `home`                                   | `/`                                                   |
+| `products` | `products`                               | `/tovary`                                             |
+| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/tovary/{slug}` или `/nabory/{slug}` |
 
 Next.js хранит bounded in-memory registry `id → body digest`. Точный повтор
 возвращает успех без повторной invalidation, а тот же ID с другим payload
@@ -855,7 +855,7 @@ LCP и CLS дополнительно имеют synthetic regression gate на 
 2. Рабочий цикл изменения — `red → green → refactor`: сначала падающий тест,
    затем минимальная реализация, затем рефакторинг на зелёной suite.
 3. Исправление дефекта начинается с regression-теста, воспроизводящего дефект.
-4. В MR описание и сценарий проверки ссылаются на затронутый контракт.
+4. В PR описание и сценарий проверки ссылаются на затронутый контракт.
 
 Исследовательский spike может временно обходиться без TDD, но его код не
 мерджится в `main`: решение либо удаляется, либо переписывается через обычный
@@ -899,7 +899,7 @@ LCP и CLS дополнительно имеют synthetic regression gate на 
 - 404 и service unavailable.
 
 Не тестировать критический checkout только через mocked browser state. Обязательный
-MR/release job `integration:commerce` сначала проверяет транзакционный order
+PR/release job `integration:commerce` сначала проверяет транзакционный order
 service на реальном PostgreSQL container, затем поднимает настоящий Strapi и
 Next BFF и выполняет HTTP-сценарий без mocked upstream. Сценарий создаёт заказ,
 повторяет запрос с тем же idempotency key, проверяет сохранённую запись и
@@ -907,11 +907,13 @@ Next BFF и выполняет HTTP-сценарий без mocked upstream. С�
 
 ## 21. CI/CD
 
-### 21.1. Merge request pipeline
+### 21.1. Pull request workflow
 
-Ветка `main` защищена: прямые push запрещены, изменения попадают только через merge request. Обязательный approval не требуется, merge разрешён только при успешном pipeline.
+Ветка `main` защищена GitHub ruleset: прямые push запрещены, изменения попадают
+только через pull request. Обязательный approval не требуется, merge разрешён
+только при успешных GitHub Actions checks.
 
-Merge request запускает полный проверочный pipeline:
+Pull request запускает полный проверочный workflow:
 
 1. install с immutable lockfile;
 2. format check;
@@ -926,35 +928,41 @@ Merge request запускает полный проверочный pipeline:
 11. container smoke;
 12. container vulnerability scan — когда будет подключён.
 
-После merge ветка `main` повторяет только быстрые проверки итогового
-merge-коммита: format, lint, typecheck, unit и production build. E2E, сборка
-images, PostgreSQL integration и container smoke здесь не повторяются.
+После merge ветка `main` повторяет полный проверочный workflow итогового
+merge-коммита, включая PostgreSQL integration и E2E. Сборка и публикация images
+и container smoke выполняются только для release-тега.
 
-Protected-тег `release-{semver}` запускает полный pipeline заново, публикует
+Защищённый тег `release-{semver}` запускает полный workflow заново, публикует
 images tagged commit и только после всех зелёных проверок допускает deploy.
-Обычные теги pipeline не создают. Scheduled pipeline с `TLS_RENEWAL=true`
-запускает только renewal job.
+Обычные теги release workflow не запускают. Отдельный scheduled workflow
+ежедневно запускает только TLS renewal job.
 
 ### 21.2. Deploy
 
 - immutable images по commit SHA;
-- GitLab CI публикует проверенные images в GitLab Container Registry;
+- GitHub Actions публикует проверенные images в GitHub Container Registry
+  (GHCR);
 - merge в `main` запускает проверки, но не deploy;
-- production автоматически разворачивается только pipeline protected-тега формата `release-{semver}`, например `release-1.0.0`, указывающего на коммит в `main`;
-- шаблон `release-*` может создавать только Maintainer; pipeline валидирует SemVer и наличие tagged commit в `main`, остальные теги deploy не запускают;
+- production автоматически разворачивается только workflow защищённого тега формата `release-{semver}`, например `release-1.0.0`, указывающего на коммит в `main`;
+- GitHub ruleset разрешает создание `release-*` только владельцам репозитория; workflow валидирует SemVer и наличие tagged commit в `main`, остальные теги deploy не запускают;
 - отдельного staging нет;
 - deploy job зависит от успешного завершения всех lint, typecheck, test, build, container smoke/a11y jobs и публикации images;
 - дополнительный backup PostgreSQL и RustFS перед production-deploy;
 - health/readiness checks;
 - автоматический deploy допускает только backward-compatible schema changes;
-- удаление, переименование или смена типа поля требуют отдельного migration script, backup и явного подтверждения в release MR;
+- удаление, переименование или смена типа поля требуют отдельного migration script, backup и явного подтверждения в release PR;
 - frontend deploy после совместимого CMS;
 - при failure production healthcheck pipeline возвращает предыдущие web/CMS images и повторяет healthcheck;
 - PostgreSQL, schema и данные автоматически не откатываются; schema changes должны быть backward-compatible, для ручного восстановления используется pre-deploy backup;
 - smoke checks после deploy.
 
-VPS только авторизуется в GitLab Container Registry, скачивает готовые images по commit SHA и обновляет Compose. Сборка из исходников на production не выполняется.
-Release job подключается по SSH отдельным непривилегированным пользователем `deploy`; приватный ключ хранится в protected file variable GitLab. Пользователь получает только необходимые права на каталог Compose и Docker deploy-команды. GitLab Runner на production VPS не устанавливается.
+VPS авторизуется в GHCR короткоживущим `GITHUB_TOKEN`, скачивает готовые images
+по commit SHA и обновляет Compose. Сборка из исходников на production не
+выполняется. Release job подключается по SSH отдельным непривилегированным
+пользователем `deploy`; приватный ключ хранится в secret GitHub Environment
+`production`. Пользователь получает только необходимые права на каталог
+Compose и Docker deploy-команды. Self-hosted GitHub Actions runner на production
+VPS не устанавливается.
 
 ## 22. Deployment topology
 

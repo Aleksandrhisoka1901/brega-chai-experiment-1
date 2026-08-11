@@ -1,0 +1,205 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  YARN_ENABLE_GLOBAL_CACHE: "false"
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn format:check
+
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn turbo run lint typecheck test --filter=@brega-chai/contracts
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn turbo run lint typecheck test --filter=@brega-chai/web
+
+  cms:
+    name: CMS
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn turbo run lint typecheck test --filter=@brega-chai/cms
+
+  production-config:
+    name: Production config
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell and Compose configuration
+        run: |
+          sh -n \
+            infra/vps/docker-firewall.sh \
+            infra/vps/init-production-env.sh \
+            scripts/backup.sh \
+            scripts/deploy.sh \
+            scripts/restore.sh \
+            scripts/tls-bootstrap.sh \
+            scripts/tls-renew.sh \
+            scripts/verify-production-config.sh
+          ./scripts/verify-production-config.sh
+
+  integration-commerce:
+    name: Commerce integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.10-alpine3.22
+        env:
+          POSTGRES_DB: brega_chai_test
+          POSTGRES_USER: brega
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U brega -d brega_chai_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      POSTGRES_DB: brega_chai_test
+      POSTGRES_USER: brega
+      POSTGRES_PASSWORD: ci-only-password
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: brega_chai_test
+      DATABASE_USERNAME: brega
+      DATABASE_PASSWORD: ci-only-password
+      ORDER_PG_TEST_ALLOW: isolated-schema
+      ORDER_PG_TEST_URL: postgres://brega:ci-only-password@127.0.0.1:5432/brega_chai_test
+      APP_KEYS: ci-app-key-1,ci-app-key-2,ci-app-key-3,ci-app-key-4
+      API_TOKEN_SALT: ci-api-token-salt
+      ADMIN_JWT_SECRET: ci-admin-jwt-secret
+      TRANSFER_TOKEN_SALT: ci-transfer-token-salt
+      JWT_SECRET: ci-jwt-secret
+      ENCRYPTION_KEY: ci-encryption-key
+      SEED_ALLOWED: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - name: Prepare integration workspace
+        run: mkdir -p apps/cms/public/uploads
+      - name: Test PostgreSQL and HTTP order flow
+        run: |
+          set -eu
+          cleanup() {
+            test -z "${web_pid:-}" || kill "$web_pid" >/dev/null 2>&1 || true
+            test -z "${cms_pid:-}" || kill "$cms_pid" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT INT TERM
+
+          yarn workspace @brega-chai/contracts build
+          yarn workspace @brega-chai/cms test:integration:order
+          yarn workspace @brega-chai/cms seed
+          ORDER_API_TOKEN_OUTPUT_FILE="$RUNNER_TEMP/order-api-token" \
+            yarn workspace @brega-chai/cms setup:order-token >"$RUNNER_TEMP/token-setup.log"
+          test -s "$RUNNER_TEMP/order-api-token"
+
+          yarn workspace @brega-chai/cms develop >"$RUNNER_TEMP/cms.log" 2>&1 &
+          cms_pid=$!
+          attempt=0
+          until curl -fsS http://127.0.0.1:1337/admin >/dev/null; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 60 ]; then
+              cat "$RUNNER_TEMP/cms.log"
+              exit 1
+            fi
+            sleep 2
+          done
+
+          CHECKOUT_FORM_SECRET=ci-checkout-form-secret \
+          STRAPI_ORDER_TOKEN="$(cat "$RUNNER_TEMP/order-api-token")" \
+          CMS_INTERNAL_URL=http://127.0.0.1:1337 \
+            yarn workspace @brega-chai/web dev >"$RUNNER_TEMP/web.log" 2>&1 &
+          web_pid=$!
+          attempt=0
+          until curl -fsS http://127.0.0.1:3000/api/checkout/orders >/dev/null; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 60 ]; then
+              cat "$RUNNER_TEMP/web.log"
+              exit 1
+            fi
+            sleep 2
+          done
+
+          ORDER_HTTP_TEST_ALLOW=seeded-local-database \
+          ORDER_HTTP_TEST_WEB_URL=http://127.0.0.1:3000 \
+            yarn workspace @brega-chai/web test:integration:order
+
+  build-web:
+    name: Web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn turbo run build --filter=@brega-chai/web
+
+  build-cms:
+    name: CMS build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NODE_OPTIONS: --max-old-space-size=3072
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn turbo run build --filter=@brega-chai/cms
+
+  e2e-web:
+    name: Web E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.55.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-workspace
+      - run: yarn test:e2e
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          if-no-files-found: ignore
+          retention-days: 14

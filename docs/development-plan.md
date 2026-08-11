@@ -11,7 +11,7 @@ production-контент и внешний release-readiness.
 - Каждый срез начинается с требования и измеримых acceptance criteria.
 - Реализация следует циклу `red → green → refactor`.
 - Исправление дефекта начинается с regression-теста.
-- Один merge request закрывает один проверяемый вертикальный срез.
+- Один pull request закрывает один проверяемый вертикальный срез.
 - Срез завершается только после необходимых unit, integration, E2E и
   accessibility-проверок.
 - Исследовательский spike не попадает в `main` без переписывания через обычный
@@ -26,7 +26,7 @@ production-контент и внешний release-readiness.
 - локальный seed и публичные read-only CMS permissions;
 - RustFS/S3 provider и технический лимит веса файлов;
 - production images, Nginx, security headers, healthchecks;
-- GitLab pipeline и deploy только по protected-тегу `release-{semver}`;
+- GitHub Actions и deploy только по защищённому тегу `release-{semver}`;
 - backup/restore scripts и rollback application images;
 - дизайн-система, showcase и Lucide icons.
 
@@ -455,7 +455,7 @@ content types, компоненты, поля и редакторские descri
 8. **Документация и handoff**
    - описать назначение ролей и действия менеджера;
    - обновить architecture/development status;
-   - приложить проверяемые acceptance results к MR.
+   - приложить проверяемые acceptance results к PR.
 
 Order-admin срез не включает аналитику, delivery/payment integrations или
 повторную отправку уведомлений из плагина. Email о новом заказе реализован
@@ -673,7 +673,7 @@ Responsive image audit — реализован:
 
 В `ТЗ_сайт_2.docx` запрошен базовый счётчик Яндекс Метрики, тогда как
 `product-spec.md` исключает продуктовую веб-аналитику из MVP. До release нужно
-явно выбрать одно из двух: отдельный небольшой MR с ID счётчика и согласованным
+явно выбрать одно из двух: отдельный небольшой PR с ID счётчика и согласованным
 privacy/consent-контрактом либо документированный перенос после запуска.
 
 ## Срез: сверка с исходным ТЗ
@@ -701,7 +701,7 @@ privacy/consent-контрактом либо документированный
 - axe на главной, каталоге, товаре, корзине и checkout;
 - `git diff --check`.
 
-## Следующие merge requests
+## Следующие pull requests
 
 1. `release-hardening` — production-проверки безопасности, наблюдаемости и
    эксплуатационных процедур;

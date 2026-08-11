@@ -1,5 +1,7 @@
 # Brega Chai
 
+[![CI](https://github.com/Aleksandr190101996/brega-chai/actions/workflows/ci.yml/badge.svg)](https://github.com/Aleksandr190101996/brega-chai/actions/workflows/ci.yml)
+
 Интернет-витрина чайного проекта с каталогом, корзиной и оформлением
 заказа-заявки. Контент и заказы управляются через Strapi.
 
@@ -91,6 +93,6 @@ yarn build
 - [Component showcase](docs/component-showcase.html)
 - [Architecture Decision Records](docs/adr/)
 
-Production выпускается protected-тегом формата `release-{semver}` на коммите
-ветки `main`, например `release-1.0.0`. Merge в `main` сам по себе production
-deploy не запускает.
+Production выпускается защищённым GitHub ruleset тегом формата
+`release-{semver}` на коммите ветки `main`, например `release-1.0.0`. Merge в
+`main` сам по себе production deploy не запускает.

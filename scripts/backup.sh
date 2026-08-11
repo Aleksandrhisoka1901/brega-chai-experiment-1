@@ -47,7 +47,7 @@ docker run --rm --volumes-from "$rustfs_container" \
   -v "$(cd "$destination" && pwd):/backup" \
   "$archive_image" tar -czf /backup/rustfs.tar.gz -C /data .
 
-printf '%s\n' "${CI_COMMIT_SHA:-unknown}" > "${destination}/commit-sha"
+printf '%s\n' "${DEPLOY_COMMIT_SHA:-unknown}" > "${destination}/commit-sha"
 
 find "$backup_root" -mindepth 1 -maxdepth 1 -type d |
   sort -r |

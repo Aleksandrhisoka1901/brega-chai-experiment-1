@@ -1,0 +1,27 @@
+name: Setup workspace
+description: Install the pinned Node and Yarn dependencies for Brega Chai
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.18.0
+
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Cache Yarn artifacts
+      uses: actions/cache@v4
+      with:
+        path: |
+          .yarn/cache
+          .yarn/install-state.gz
+        key: yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: yarn-${{ runner.os }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn install --immutable
