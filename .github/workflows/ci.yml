@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn format:check
 
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn turbo run lint typecheck test --filter=@brega-chai/contracts
 
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn turbo run lint typecheck test --filter=@brega-chai/web
 
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn turbo run lint typecheck test --filter=@brega-chai/cms
 
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Validate shell and Compose configuration
         run: |
           sh -n \
@@ -113,7 +113,7 @@ jobs:
       ENCRYPTION_KEY: ci-encryption-key
       SEED_ALLOWED: "true"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - name: Prepare integration workspace
         run: mkdir -p apps/cms/public/uploads
@@ -169,7 +169,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn turbo run build --filter=@brega-chai/web
 
@@ -180,7 +180,7 @@ jobs:
     env:
       NODE_OPTIONS: --max-old-space-size=3072
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn turbo run build --filter=@brega-chai/cms
 
@@ -190,12 +190,12 @@ jobs:
     timeout-minutes: 25
     container: mcr.microsoft.com/playwright:v1.55.1-noble
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-workspace
       - run: yarn test:e2e
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ github.run_id }}
           path: |
