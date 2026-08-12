@@ -62,8 +62,16 @@ images собираются в GitHub Actions; сборка приложения
   последующие deploy сохраняют pre-deploy backup.
 - Production images собираются в CI и задаются неизменяемыми ссылками; плавающий
   `latest` не используется.
-- TLS bootstrap/renewal, локальный backup/restore, application rollback и
-  smoke-check реализованы скриптами, но требуют rehearsal на настоящем VPS.
+- Перед заменой Compose/nginx/scripts release workflow сохраняет предыдущую
+  deployment-конфигурацию и ссылки на работающие application images. При сбое
+  переноса или rollout он возвращает конфигурацию, поднимает прежние web/CMS
+  images и повторяет публичный smoke-check; три последних config-backup
+  сохраняются на VPS.
+- Pre-deploy backup продолжает rollout только после проверки, что PostgreSQL
+  dump читается `pg_restore`, а архив RustFS открывается `tar`.
+- TLS bootstrap/renewal, локальный backup/restore, application/config rollback
+  и smoke-check реализованы скриптами; data restore остаётся намеренно ручным,
+  чтобы автоматический rollback не удалил новые заказы.
 
 ## 3. Обязательно до первого релиза
 

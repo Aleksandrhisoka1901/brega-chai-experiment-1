@@ -69,12 +69,14 @@ jobs:
             infra/vps/docker-firewall.sh \
             infra/vps/init-production-env.sh \
             scripts/backup.sh \
+            scripts/deployment-config.sh \
             scripts/deploy.sh \
             scripts/restore.sh \
             scripts/tls-bootstrap.sh \
             scripts/tls-renew.sh \
             scripts/verify-production-config.sh
           ./scripts/verify-production-config.sh
+          ./scripts/test-deployment-config.sh
 
   integration-commerce:
     name: Commerce integration

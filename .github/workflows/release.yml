@@ -193,27 +193,99 @@ jobs:
           printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" >"$RUNNER_TEMP/ssh/deploy_key"
           chmod 600 "$RUNNER_TEMP/ssh/deploy_key"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" >"$RUNNER_TEMP/ssh/known_hosts"
-      - name: Transfer reviewed deployment configuration
+      - name: Back up current deployment configuration
+        id: config_backup
         run: |
-          ssh_options="-i $RUNNER_TEMP/ssh/deploy_key -o UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
-          ssh $ssh_options "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p '$DEPLOY_PATH'"
+          ssh_options=(
+            -i "$RUNNER_TEMP/ssh/deploy_key"
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
+          )
+          remote_script="/tmp/brega-deployment-config-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.sh"
+          scp "${ssh_options[@]}" scripts/deployment-config.sh \
+            "$DEPLOY_USER@$DEPLOY_HOST:$remote_script"
+          ssh "${ssh_options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$remote_script" "$DEPLOY_PATH" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" <<'REMOTE'
+          set -eu
+          remote_script=$1
+          deploy_path=$2
+          run_id=$3
+          run_attempt=$4
+          cleanup() {
+            rm -f "$remote_script"
+          }
+          trap cleanup EXIT INT TERM
+          chmod 700 "$remote_script"
+          "$remote_script" prepare "$deploy_path" "$run_id" "$run_attempt"
+          REMOTE
+      - name: Transfer reviewed deployment configuration
+        id: config_transfer
+        run: |
+          ssh_options=(
+            -i "$RUNNER_TEMP/ssh/deploy_key"
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
+          )
+          remote_state="$DEPLOY_PATH/.release-state/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           tar -czf "$RUNNER_TEMP/deploy-config.tar.gz" \
             docker-compose.yml \
             docker-compose.production.yml \
             docker-compose.tls.yml \
             infra \
             scripts
-          scp $ssh_options "$RUNNER_TEMP/deploy-config.tar.gz" \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy-config.tar.gz"
-          ssh $ssh_options "$DEPLOY_USER@$DEPLOY_HOST" \
-            "cd '$DEPLOY_PATH' && tar -xzf deploy-config.tar.gz && rm deploy-config.tar.gz"
+          scp "${ssh_options[@]}" "$RUNNER_TEMP/deploy-config.tar.gz" \
+            "$DEPLOY_USER@$DEPLOY_HOST:$remote_state/reviewed-config.tar.gz"
+          ssh "${ssh_options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$remote_state" "$DEPLOY_PATH" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" <<'REMOTE'
+          set -eu
+          "$1/recovery.sh" install "$2" "$3" "$4"
+          REMOTE
       - name: Deploy immutable images
+        id: deploy
         env:
           WEB_IMAGE: ${{ env.IMAGE_PREFIX }}-web:${{ github.sha }}
           CMS_IMAGE: ${{ env.IMAGE_PREFIX }}-cms:${{ github.sha }}
         run: |
-          ssh_options="-i $RUNNER_TEMP/ssh/deploy_key -o UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
-          printf '%s' "$GHCR_TOKEN" | ssh $ssh_options "$DEPLOY_USER@$DEPLOY_HOST" \
+          ssh_options=(
+            -i "$RUNNER_TEMP/ssh/deploy_key"
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
+          )
+          # shellcheck disable=SC2029
+          printf '%s' "$GHCR_TOKEN" | ssh "${ssh_options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" \
             "docker login ghcr.io -u '${{ github.actor }}' --password-stdin"
-          ssh $ssh_options "$DEPLOY_USER@$DEPLOY_HOST" \
-            "cd '$DEPLOY_PATH' && DEPLOY_COMMIT_SHA='$GITHUB_SHA' WEB_IMAGE='$WEB_IMAGE' CMS_IMAGE='$CMS_IMAGE' SMOKE_URL='$SMOKE_URL' ./scripts/deploy.sh"
+          ssh "${ssh_options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$DEPLOY_PATH" "$GITHUB_SHA" "$WEB_IMAGE" "$CMS_IMAGE" "$SMOKE_URL" <<'REMOTE'
+          set -eu
+          cd "$1"
+          DEPLOY_COMMIT_SHA=$2 WEB_IMAGE=$3 CMS_IMAGE=$4 SMOKE_URL=$5 \
+            ./scripts/deploy.sh
+          REMOTE
+      - name: Restore previous deployment configuration after failure
+        if: >-
+          always() &&
+          steps.config_backup.outcome == 'success' &&
+          (steps.config_transfer.outcome == 'failure' || steps.deploy.outcome == 'failure')
+        run: |
+          ssh_options=(
+            -i "$RUNNER_TEMP/ssh/deploy_key"
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
+          )
+          remote_state="$DEPLOY_PATH/.release-state/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ssh "${ssh_options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$remote_state" "$DEPLOY_PATH" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" <<'REMOTE'
+          set -eu
+          "$1/recovery.sh" restore "$2" "$3" "$4"
+          REMOTE
+          curl --fail --silent --show-error --retry 5 --retry-all-errors \
+            "$SMOKE_URL" >/dev/null
+      - name: Preserve deployment configuration backup
+        if: steps.deploy.outcome == 'success'
+        run: |
+          ssh_options=(
+            -i "$RUNNER_TEMP/ssh/deploy_key"
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts"
+          )
+          remote_state="$DEPLOY_PATH/.release-state/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ssh "${ssh_options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$remote_state" "$DEPLOY_PATH" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" <<'REMOTE'
+          set -eu
+          "$1/recovery.sh" finalize "$2" "$3" "$4"
+          REMOTE
