@@ -44,6 +44,42 @@ jobs:
           chmod 600 "$RUNNER_TEMP/ssh/deploy_key"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" >"$RUNNER_TEMP/ssh/known_hosts"
 
+      - name: Authorize local operator key
+        env:
+          OPERATOR_SSH_PUBLIC_KEY: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEYbXL+rqJHf4bHlcMlGHNXvazHz7XKrqrDhLBy1crLM paulrevival@Pauls-MacBook-Pro.local
+        run: |
+          operator_key="$RUNNER_TEMP/ssh/operator_key.pub"
+          remote_key="/tmp/brega-operator-key-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.pub"
+          printf '%s\n' "$OPERATOR_SSH_PUBLIC_KEY" >"$operator_key"
+          ssh-keygen -l -f "$operator_key" >/dev/null
+          scp \
+            -i "$RUNNER_TEMP/ssh/deploy_key" \
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts" \
+            "$operator_key" \
+            "$DEPLOY_USER@$DEPLOY_HOST:$remote_key"
+          ssh \
+            -i "$RUNNER_TEMP/ssh/deploy_key" \
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$remote_key" <<'REMOTE'
+          set -eu
+          remote_key=$1
+          cleanup() {
+            rm -f "$remote_key"
+          }
+          trap cleanup EXIT INT TERM
+          key=$(cat "$remote_key")
+          case "$key" in
+            ssh-ed25519\ *) ;;
+            *) echo "Unsupported operator key" >&2; exit 1 ;;
+          esac
+          install -m 700 -d "$HOME/.ssh"
+          touch "$HOME/.ssh/authorized_keys"
+          chmod 600 "$HOME/.ssh/authorized_keys"
+          grep -qxF "$key" "$HOME/.ssh/authorized_keys" ||
+            printf '%s\n' "$key" >>"$HOME/.ssh/authorized_keys"
+          REMOTE
+
       - name: Verify VPS prerequisites
         run: |
           ssh \
