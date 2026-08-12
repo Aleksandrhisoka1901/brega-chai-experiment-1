@@ -11,8 +11,10 @@ GitHub без force-push: вместе с отдельно перенесённ�
 итоговом графе сохранятся все доступные исходные commits и первоначальный
 GitHub commit с проверкой SSH.
 
-GitLab остаётся нетронутым архивным источником. Переезд не удаляет его ветки,
-теги, pipelines, variables, Container Registry или историю.
+Прежний GitLab-репозиторий остаётся нетронутым архивом вне активной
+конфигурации проекта. В локальной копии нет remote, workflows или credentials,
+связывающих проект с GitLab; его ветки, теги, pipelines, variables, Container
+Registry и история не изменялись.
 
 ## Что уже находится в репозитории
 
@@ -57,10 +59,9 @@ write` только jobs, публикующим images.
 `SSH_PRIVATE_KEY` как fallback. Владелец репозитория должен создать environment
 `production` и перенести значения туда, чтобы ограничить их только deploy jobs.
 
-Registry credential переносить из GitLab не требуется. Release workflow
-публикует и скачивает связанные с репозиторием GHCR packages через
-короткоживущий `GITHUB_TOKEN`, в том числе передаёт его VPS непосредственно
-перед `docker compose pull`.
+Release workflow публикует и скачивает связанные с репозиторием GHCR packages
+через короткоживущий `GITHUB_TOKEN`, в том числе передаёт его VPS
+непосредственно перед `docker compose pull`.
 
 ### Rulesets
 
@@ -82,20 +83,16 @@ config`, `Commerce integration`, `Web build`, `CMS build`, `Web E2E`;
 `release.yml` дополнительно отклоняет нестрогий SemVer и теги, чей commit не
 входит в `main`.
 
-## Завершение cutover
+## Состояние после cutover
 
-После зелёного CI и merge миграционного PR:
+Cutover завершён: `origin` указывает только на GitHub.
 
-1. Убедиться, что GitHub содержит все нужные release tags и рабочие ветки.
-2. Выполнить ручной `TLS renewal` и проверить SSH/known_hosts.
-3. Выпустить новый `release-X.Y.Z`; проверить GHCR packages, backup, deploy,
-   health и storefront smoke.
-4. Только после успешного release переключить локальные имена remote:
+```bash
+git remote -v
+# origin  git@github.com:Aleksandr190101996/brega-chai.git (fetch)
+# origin  git@github.com:Aleksandr190101996/brega-chai.git (push)
+```
 
-   ```bash
-   git remote rename origin gitlab
-   git remote rename github origin
-   ```
-
-Эта операция меняет только локальную конфигурацию clone. GitLab remote и все
-данные на GitLab сохраняются.
+CI, releases, GHCR и production automation работают только через GitHub.
+Production deploy по-прежнему запускается исключительно тегом
+`release-X.Y.Z`; обычный push или merge в `main` выполняет только CI.
