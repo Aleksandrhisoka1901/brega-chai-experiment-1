@@ -1,0 +1,95 @@
+name: Deployment preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: production-preflight
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: Verify deployment prerequisites
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      SMOKE_URL: ${{ vars.SMOKE_URL }}
+      DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY || secrets.SSH_PRIVATE_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate deployment inputs
+        run: |
+          test -n "$DEPLOY_HOST"
+          test -n "$DEPLOY_USER"
+          test -n "$DEPLOY_PATH"
+          test -n "$SMOKE_URL"
+          test -n "$DEPLOY_SSH_PRIVATE_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+
+      - name: Configure SSH
+        run: |
+          install -m 700 -d "$RUNNER_TEMP/ssh"
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" >"$RUNNER_TEMP/ssh/deploy_key"
+          chmod 600 "$RUNNER_TEMP/ssh/deploy_key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" >"$RUNNER_TEMP/ssh/known_hosts"
+
+      - name: Verify VPS prerequisites
+        run: |
+          ssh \
+            -i "$RUNNER_TEMP/ssh/deploy_key" \
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            sh -s -- "$DEPLOY_PATH" <<'REMOTE'
+          set -eu
+          deploy_path=$1
+
+          test -d "$deploy_path"
+          test -w "$deploy_path"
+          test "$(uname -m)" = x86_64
+          command -v docker >/dev/null
+          docker info >/dev/null
+          docker compose version >/dev/null
+
+          available_kib=$(df -Pk "$deploy_path" | awk 'NR == 2 {print $4}')
+          test "$available_kib" -gt 5242880
+
+          cd "$deploy_path"
+          test -x scripts/deploy.sh
+          test -x scripts/backup.sh
+          test -x scripts/restore.sh
+          sh -n scripts/deploy.sh scripts/backup.sh scripts/restore.sh
+
+          for service in postgres rustfs cms web nginx; do
+            test -n "$(docker ps \
+              --filter label=com.docker.compose.project=brega-chai \
+              --filter "label=com.docker.compose.service=$service" \
+              --format '{{.ID}}')"
+          done
+          REMOTE
+
+      - name: Verify ephemeral GHCR login from VPS
+        run: |
+          printf '%s' "$GHCR_TOKEN" | ssh \
+            -i "$RUNNER_TEMP/ssh/deploy_key" \
+            -o "UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "set -eu
+             temporary_config=\$(mktemp -d)
+             trap 'rm -rf \"\$temporary_config\"' EXIT INT TERM
+             DOCKER_CONFIG=\$temporary_config docker login ghcr.io \
+               -u '${{ github.actor }}' --password-stdin >/dev/null
+             DOCKER_CONFIG=\$temporary_config docker logout ghcr.io >/dev/null"
+
+      - name: Verify public storefront
+        run: curl --fail --silent --show-error --retry 3 --retry-all-errors "$SMOKE_URL" >/dev/null

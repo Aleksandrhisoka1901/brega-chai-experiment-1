@@ -54,10 +54,15 @@ write` только jobs, публикующим images.
 | `DEPLOY_SSH_PRIVATE_KEY` | приватный deploy key без passphrase |
 | `DEPLOY_KNOWN_HOSTS`     | закреплённая строка host key VPS    |
 
-На время cutover те же variables и `DEPLOY_KNOWN_HOSTS` настроены на уровне
-репозитория. Workflows также поддерживают существующий repository secret
-`SSH_PRIVATE_KEY` как fallback. Владелец репозитория должен создать environment
-`production` и перенести значения туда, чтобы ограничить их только deploy jobs.
+Deploy variables и `DEPLOY_KNOWN_HOSTS` хранятся только в environment
+`production`. Workflows временно поддерживают существующий repository secret
+`SSH_PRIVATE_KEY` как fallback, пока отдельный `DEPLOY_SSH_PRIVATE_KEY` не будет
+установлен на VPS и добавлен в environment.
+
+Ручной workflow `.github/workflows/deployment-preflight.yml` проверяет значения
+environment, SSH, Docker/Compose, свободное место, наличие production-сервисов,
+временный GHCR login и публичный storefront. Он не запускает `deploy.sh`, не
+передаёт конфигурацию и не перезапускает контейнеры.
 
 Release workflow публикует и скачивает связанные с репозиторием GHCR packages
 через короткоживущий `GITHUB_TOKEN`, в том числе передаёт его VPS

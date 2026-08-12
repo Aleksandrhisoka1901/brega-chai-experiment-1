@@ -158,7 +158,9 @@ images из одного авторизованного registry.
       пересоздание контейнеров.
 - [ ] Ежедневный локальный backup хранит только последнюю копию.
 - [ ] Pre-deploy backup выполняется до изменения production.
-- [ ] Проведён тест восстановления PostgreSQL и RustFS из созданной копии.
+- [x] Проведён изолированный rehearsal восстановления PostgreSQL и RustFS из
+      синтетической копии реальными `backup.sh` и `restore.sh`; production backup
+      и volumes не использовались.
 - [ ] Согласовано место хранения off-site backup и срок хранения.
 - [ ] Ключи off-site backup не дают публичного доступа к production media или
       базе данных.
