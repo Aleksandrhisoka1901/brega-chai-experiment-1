@@ -49,6 +49,15 @@ docker run --rm --volumes-from "$rustfs_container" \
 
 printf '%s\n' "${DEPLOY_COMMIT_SHA:-unknown}" > "${destination}/commit-sha"
 
+test -s "${destination}/postgres.dump"
+docker compose $compose_files exec -T postgres \
+  pg_restore --list < "${destination}/postgres.dump" >/dev/null
+test -s "${destination}/rustfs.tar.gz"
+docker run --rm \
+  -v "$(cd "$destination" && pwd):/backup:ro" \
+  "$archive_image" tar -tzf /backup/rustfs.tar.gz >/dev/null
+test -s "${destination}/commit-sha"
+
 find "$backup_root" -mindepth 1 -maxdepth 1 -type d |
   sort -r |
   awk "NR > ${keep}" |
