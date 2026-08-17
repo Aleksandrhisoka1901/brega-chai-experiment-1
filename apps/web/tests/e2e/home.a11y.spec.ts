@@ -31,6 +31,10 @@ test("homepage smoke and accessibility @smoke @a11y", async ({ page }) => {
     ),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "К ритуалам" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Все ритуалы" })).toHaveAttribute(
+    "href",
+    "/nabory",
+  );
   const about = page.locator("#about");
   await expect(about.locator("p")).toContainText([
     "Глава 01 · О проекте",

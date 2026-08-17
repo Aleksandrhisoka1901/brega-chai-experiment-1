@@ -6,7 +6,7 @@ import { validateHeroImage } from "../src/api/home-page/content-types/home-page/
 test("requires an image for split hero layouts", () => {
   assert.throws(
     () => validateHeroImage({ layout: "50/50" }),
-    /image and alt are required/,
+    /image is required/,
   );
   assert.doesNotThrow(() =>
     validateHeroImage({ layout: "40/60", image: { alt: "Tea" } }),

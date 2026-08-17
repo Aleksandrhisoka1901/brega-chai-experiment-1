@@ -83,8 +83,8 @@ test.describe("admin content manager live smoke", () => {
       /Ассортимент короткий намеренно/,
     );
     await expect(page.locator('[name="about.image"]')).toHaveCount(0);
-    await expect(page.locator('[name="naboryPreview.linkLabel"]')).toHaveCount(
-      0,
+    await expect(page.locator('[name="naboryPreview.linkLabel"]')).toHaveValue(
+      "Все ритуалы",
     );
     await expect(page.locator('[name="tovaryPreview.linkLabel"]')).toHaveValue(
       "Все сорта",
@@ -110,6 +110,11 @@ test.describe("admin content manager live smoke", () => {
       {
         label: "Страница сортов",
         uid: "api::products-page.products-page",
+        readyField: '[name="title"]',
+      },
+      {
+        label: "Страница ритуалов",
+        uid: "api::rituals-page.rituals-page",
         readyField: '[name="title"]',
       },
       {

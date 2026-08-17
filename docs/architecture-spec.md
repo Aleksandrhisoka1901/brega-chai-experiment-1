@@ -288,6 +288,11 @@ Client Components только для:
 Каталог и продуктовые страницы допускают stale-while-revalidate. Checkout, quote и order creation всегда `no-store`.
 Live-проверка остатков перед checkout также выполняется через узкий BFF endpoint
 с `no-store` и возвращает только стабильный ID товара и текущий stock.
+Тот же endpoint является источником истины для интерактивного счётчика на
+карточке товара: клиент запрашивает его при монтировании и при возврате вкладки
+в активное состояние. Постоянный polling не используется. Кешированное значение
+из server-rendered карточки остаётся быстрым начальным состоянием, но не должно
+разрешать увеличить количество выше последнего успешно полученного live stock.
 
 ### 9.2. Webhook Strapi
 
@@ -326,8 +331,8 @@ server-only secret; подпись, secret и payload не логируются.
 | ---------- | ---------------------------------------- | ----------------------------------------------------- |
 | `global`   | `global`                                 | публичный layout                                      |
 | `home`     | `home`                                   | `/`                                                   |
-| `products` | `products`                               | `/tovary`                                             |
-| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/tovary/{slug}` или `/nabory/{slug}` |
+| `products` | `products`                               | `/tovary`, `/nabory`                                  |
+| `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/nabory` и соответствующая карточка |
 
 Next.js хранит bounded in-memory registry `id → body digest`. Точный повтор
 возвращает успех без повторной invalidation, а тот же ID с другим payload
@@ -383,6 +388,15 @@ Slug продукта создаётся один раз до сохранени
 - empty-state тексты;
 - media-поля отсутствуют.
 
+`rituals-page`:
+
+- тот же ограниченный контракт полей, что у `products-page`;
+- хранит собственные SEO, title, eyebrow, intro и empty-state тексты `/nabory`;
+- не переиспользует и не дублирует `HomePage.naboryPreview`.
+- при отсутствии записи bootstrap один раз создаёт опубликованный стартовый
+  документ и узкое public-разрешение `find`; существующий редакторский документ
+  и уже выданное разрешение не изменяются.
+
 ### 10.2. Collection types
 
 `product`:
@@ -424,15 +438,17 @@ Slug продукта создаётся один раз до сохранени
 - `commerce.order-line`;
 - `commerce.customer`;
 
-`HomePage`, `ProductsPage` и `Product` используют один опциональный
+`HomePage`, `ProductsPage`, `RitualsPage` и `Product` используют один опциональный
 `shared.seo`; отдельные `seoTitle`, `seoDescription` и `seoImage` запрещены.
 `GlobalSettings.defaultSeo` остаётся обязательным системным fallback.
 `HomePage.seo` имеет приоритет над global fallback для главной.
 Organization/WebSite JSON-LD получают название из `GlobalSettings.brandName`.
 
 Главная запрашивает товары через relations `HomePage` и сохраняет их порядок.
-`/tovary` использует две published-only выборки (`stock > 0` и `stock = 0`),
-каждую с `title:asc`, после чего объединяет доступную группу с недоступной.
+`/tovary` и `/nabory` используют общий каталоговый query: две published-only
+выборки (`stock > 0` и `stock = 0`) нужного `type`, каждую с
+`displayName:asc, slug:asc`, после чего объединяют доступную группу с
+недоступной и применяют серверную пагинацию по 8 товаров.
 
 ### 10.4. Lifecycle и policy
 
@@ -535,7 +551,20 @@ Next.js не выполняет отдельное предварительно�
 обновляет общий cart/stock store; `router.refresh()` и визуальная перезагрузка
 страницы для этого не используются.
 
-Корзина не резервирует stock. Переход заказа в `cancelled` один раз возвращает списанное количество; операция защищена от повторного применения.
+Stock-транзакции, инициированные из CMS admin, проходят вне Next.js BFF. Поэтому
+после успешного редактирования состава заказа и после отмены CMS отправляет в
+существующий подписанный endpoint событие ревалидации `products`. Запрос
+ожидается до ответа admin API, чтобы последующее обновление страницы уже видело
+свежие данные; недоступность endpoint логируется, но не откатывает завершённую
+транзакцию. Переходы `confirmed` и `completed` stock не меняют и ревалидацию не
+запускают.
+
+Корзина не резервирует stock. Переход заказа в `cancelled` один раз возвращает
+списанное количество по стабильному product `documentId`; physical record ID
+версии Strapi не является inventory identity. Если товар полностью удалён,
+возврат его остатка пропускается и отмена заказа завершается. Переход
+`new → confirmed` отклоняется с понятной операционной ошибкой, если хотя бы один
+товар заказа удалён. Операции защищены от повторного применения.
 После первого успешного создания CMS отправляет служебное email-уведомление на
 `orderNotificationEmail` и, при наличии email покупателя, клиентское
 подтверждение. Доставки выполняются независимо; ошибка транспорта не откатывает
@@ -595,7 +624,7 @@ Payment adapter и webhook route не создаются до отдельног
 ### 14.1. Metadata
 
 - root metadata defaults из `global-setting`;
-- `generateMetadata` на `/tovary` и routes товаров/наборов;
+- `generateMetadata` на `/tovary`, `/nabory` и routes товаров/наборов;
 - canonical формируется одним helper из нормализованного base URL;
 - title/description имеют fallback;
 - share image преобразуется CMS media mapper;
@@ -606,7 +635,7 @@ Payment adapter и webhook route не создаются до отдельног
 Strapi sitemap plugin:
 
 - хранит base URL, коллекции и статические URL в собственных настройках Strapi;
-- при первом запуске получает безопасную конфигурацию `/`, `/tovary` и
+- при первом запуске получает безопасную конфигурацию `/`, `/tovary`, `/nabory` и
   `product` с шаблоном `/[type]y/[slug]`;
 - включает только опубликованные товары и наборы, добавляет `lastmod` из
   `updatedAt`;
@@ -928,9 +957,11 @@ Pull request запускает полный проверочный workflow:
 11. container smoke;
 12. container vulnerability scan — когда будет подключён.
 
-После merge ветка `main` повторяет полный проверочный workflow итогового
-merge-коммита, включая PostgreSQL integration и E2E. Сборка и публикация images
-и container smoke выполняются только для release-тега.
+После merge отдельный полный workflow для `push` в `main` не запускается:
+итоговый commit защищён обязательными актуальными PR checks. Полный reusable
+quality gate, включая PostgreSQL integration и E2E, повторяется перед релизом.
+Сборка и публикация images и container smoke выполняются только для
+release-тега.
 
 Защищённый тег `release-{semver}` запускает полный workflow заново, публикует
 images tagged commit и только после всех зелёных проверок допускает deploy.
@@ -942,7 +973,7 @@ images tagged commit и только после всех зелёных пров
 - immutable images по commit SHA;
 - GitHub Actions публикует проверенные images в GitHub Container Registry
   (GHCR);
-- merge в `main` запускает проверки, но не deploy;
+- merge в `main` не запускает повторный полный CI и не выполняет deploy;
 - production автоматически разворачивается только workflow защищённого тега формата `release-{semver}`, например `release-1.0.0`, указывающего на коммит в `main`;
 - GitHub ruleset разрешает создание `release-*` только владельцам репозитория; workflow валидирует SemVer и наличие tagged commit в `main`, остальные теги deploy не запускают;
 - отдельного staging нет;

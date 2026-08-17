@@ -40,6 +40,21 @@ test("maps the published products-page plain intro and SEO", () => {
   );
 });
 
+test("maps an absent or blank products-page eyebrow without a placeholder", () => {
+  for (const eyebrow of [undefined, null, "", "   "]) {
+    const content = mapProductsPagePayload(
+      {
+        ...validPayload,
+        data: { ...validPayload.data, eyebrow },
+      },
+      "http://localhost:9000",
+    );
+
+    assert.equal(content.eyebrow, undefined);
+    assert.equal(Object.hasOwn(content, "eyebrow"), false);
+  }
+});
+
 test("accepts short and long editorial announcements without arbitrary limits", () => {
   const longAnnouncement = "Чай ".repeat(200).trim();
 

@@ -45,6 +45,7 @@ export default async function HomePage() {
         <HomeNabory
           eyebrow={content.naboryPreview.eyebrow}
           imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+          linkLabel={content.naboryPreview.linkLabel}
           products={nabory}
           subtitle={content.naboryPreview.subtitle}
           title={content.naboryPreview.title}
@@ -65,7 +66,7 @@ export default async function HomePage() {
     if (!(error instanceof CmsUnavailableError)) throw error;
 
     return (
-      <main className="holding-page">
+      <main className="holding-page content-frame" data-content-frame>
         <div role="alert">
           <p className="eyebrow">Сервис временно недоступен</p>
           <h1>Главная страница временно недоступна</h1>

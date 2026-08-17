@@ -74,6 +74,37 @@ test.beforeEach(async ({ request }) => {
   );
 });
 
+test("cart and checkout money use compact interface typography", async ({
+  page,
+}) => {
+  const dialog = await addProductAndOpenCart(page);
+  const linePrice = dialog.locator('[data-money="line"]');
+  const cartTotal = dialog.locator('[data-money="total"]');
+
+  await expect(linePrice).toHaveText("1 600 ₽");
+  await expect(cartTotal).toHaveText("1 600 ₽");
+  for (const amount of [linePrice, cartTotal]) {
+    await expect(amount).toHaveCSS("font-family", /Manrope/);
+    await expect(amount).toHaveCSS("font-weight", "500");
+    await expect(amount).toHaveCSS("font-variant-numeric", "tabular-nums");
+    await expect(amount).toHaveCSS("white-space", "nowrap");
+  }
+  await expect(linePrice).toHaveCSS("font-size", "16px");
+  await expect(cartTotal).toHaveCSS("font-size", "24px");
+
+  await dialog.getByRole("button", { name: "Перейти к оформлению" }).click();
+  await dialog.getByRole("radio", { name: /Самовывоз/ }).check();
+
+  const previousTotal = dialog.locator('[data-money="previous-total"]');
+  const discountedTotal = dialog.locator('[data-money="total"]');
+  await expect(previousTotal).toHaveText("1 600 ₽");
+  await expect(discountedTotal).toHaveText("1 440 ₽");
+  await expect(previousTotal).toHaveCSS("font-family", /Manrope/);
+  await expect(previousTotal).toHaveCSS("font-size", "16px");
+  await expect(discountedTotal).toHaveCSS("font-family", /Manrope/);
+  await expect(discountedTotal).toHaveCSS("font-size", "24px");
+});
+
 test("product → cart → validation → confirmed checkout success @smoke", async ({
   page,
 }) => {

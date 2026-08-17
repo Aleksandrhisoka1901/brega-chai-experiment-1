@@ -7,6 +7,7 @@ import {
   applyRussianFieldLabels,
   configureOrderReadOnlyFields,
   configureProductFields,
+  configureSingleTypeMainField,
   getRussianFieldLabels,
   syncAdminContentManager,
 } from "../src/admin-content-manager.ts";
@@ -90,8 +91,9 @@ test("configures technical and storefront product names in Content Manager", () 
           { name: "title", size: 6 },
           { name: "seedKey", size: 6 },
         ],
+        [{ name: "slug", size: 12 }],
       ],
-      list: ["title", "seedKey"],
+      list: ["title", "seedKey", "slug"],
     },
     settings: {},
     metadatas: {
@@ -105,8 +107,15 @@ test("configures technical and storefront product names in Content Manager", () 
     },
   });
 
-  assert.deepEqual(configuration.layouts.edit, [[{ name: "title", size: 6 }]]);
-  assert.deepEqual(configuration.layouts.list, ["title", "displayName"]);
+  assert.deepEqual(configuration.layouts.edit, [
+    [{ name: "title", size: 6 }],
+    [{ name: "slug", size: 12 }],
+  ]);
+  assert.deepEqual(configuration.layouts.list, [
+    "title",
+    "slug",
+    "displayName",
+  ]);
   assert.deepEqual(configuration.metadatas.seedKey.edit, {
     visible: false,
     editable: false,
@@ -115,6 +124,12 @@ test("configures technical and storefront product names in Content Manager", () 
     visible: true,
     editable: false,
   });
+  assert.ok(
+    configuration.layouts.edit.some((row) =>
+      row.some((field) => field.name === "slug"),
+    ),
+  );
+  assert.ok(configuration.layouts.list.includes("slug"));
 });
 
 test("makes every order field read-only in Content Manager", () => {
@@ -133,6 +148,20 @@ test("makes every order field read-only in Content Manager", () => {
   assert.equal(configuration.metadatas.orderNumber.edit.editable, false);
   assert.equal(configuration.metadatas.orderStatus.edit.editable, false);
   assert.deepEqual(configuration.layouts.list, ["orderNumber", "orderStatus"]);
+});
+
+test("uses the menu display name as every local single-type title", () => {
+  const configuration = configureSingleTypeMainField({
+    layouts: { edit: [], list: [] },
+    settings: {
+      mainField: "documentId",
+      defaultSortBy: "documentId",
+    },
+    metadatas: {},
+  });
+
+  assert.equal(configuration.settings.mainField, "id");
+  assert.equal(configuration.settings.defaultSortBy, "documentId");
 });
 
 test("writes Russian labels into Content Manager metadata", () => {
@@ -249,6 +278,14 @@ test("covers every editable storefront schema with a canonical layout", () => {
       "emptyStateLinkLabel",
       "seo",
     ],
+    "api::rituals-page.rituals-page": [
+      "eyebrow",
+      "title",
+      "intro",
+      "emptyStateText",
+      "emptyStateLinkLabel",
+      "seo",
+    ],
     "home.catalog-preview": ["eyebrow", "title", "subtitle", "linkLabel"],
     "home.editorial-section": [
       "eyebrow",
@@ -269,7 +306,7 @@ test("covers every editable storefront schema with a canonical layout", () => {
       "image",
       "cta",
     ],
-    "home.rituals-preview": ["eyebrow", "title", "subtitle"],
+    "home.rituals-preview": ["eyebrow", "title", "subtitle", "linkLabel"],
     "product.article": ["content"],
     "product.gallery-image": ["image", "alt"],
     "shared.image-with-alt": ["image", "alt"],
@@ -337,6 +374,7 @@ test("syncs Russian labels for content types and components", async () => {
     kind: "content-type" | "component";
     uid: string;
     configuration: {
+      settings: Record<string, unknown>;
       metadatas: Record<string, { edit: { label?: string } }>;
     };
   }> = [];
@@ -354,7 +392,7 @@ test("syncs Russian labels for content types and components", async () => {
     "content-types": {
       findConfiguration: async () => configuration("brandName"),
       updateConfiguration: async (
-        schema: { uid: string },
+        schema: { uid: string; kind?: string },
         updated: (typeof updates)[number]["configuration"],
       ) =>
         updates.push({
@@ -382,6 +420,7 @@ test("syncs Russian labels for content types and components", async () => {
       contentTypes: {
         "api::global-setting.global-setting": {
           uid: "api::global-setting.global-setting",
+          kind: "singleType",
         },
       },
       components: { "shared.link": { uid: "shared.link" } },
@@ -397,6 +436,7 @@ test("syncs Russian labels for content types and components", async () => {
     updates[0]?.configuration.metadatas.brandName?.edit.label,
     "Название бренда",
   );
+  assert.equal(updates[0]?.configuration.settings.mainField, "id");
   assert.equal(
     updates[1]?.configuration.metadatas.url?.edit.label,
     "Адрес ссылки",

@@ -26,7 +26,7 @@ const routeConfig = {
     type: "tovar",
   },
   nabory: {
-    collectionUrl: "/#nabory",
+    collectionUrl: "/nabory",
     pathPrefix: "/nabory",
     type: "nabor",
   },
@@ -115,7 +115,7 @@ export async function CatalogItemPage(options: CatalogItemPageOptions) {
     if (!(error instanceof CmsUnavailableError)) throw error;
 
     return (
-      <main className="holding-page">
+      <main className="holding-page content-frame" data-content-frame>
         <div role="alert">
           <p className="eyebrow">Сервис временно недоступен</p>
           <h1>Страница товара временно недоступна</h1>

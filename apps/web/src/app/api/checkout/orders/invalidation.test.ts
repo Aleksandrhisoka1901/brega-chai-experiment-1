@@ -27,6 +27,7 @@ test("invalidates product data and possible detail routes after an order", () =>
   assert.deepEqual(paths, [
     ["/", "page"],
     ["/tovary", "page"],
+    ["/nabory", "page"],
     ["/tovary/sencha", "page"],
     ["/nabory/sencha", "page"],
     ["/tovary/ritual-one", "page"],

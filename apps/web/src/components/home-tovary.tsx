@@ -1,6 +1,7 @@
 "use client";
 
 import type { ProductSummary } from "@brega-chai/contracts";
+import type { CSSProperties } from "react";
 
 import { bindShortRussianWords } from "@/lib/typography";
 
@@ -9,6 +10,7 @@ import { HomeSliderControls } from "./home-slider-controls";
 import { SliderProgress, useHorizontalSlider } from "./horizontal-slider";
 import styles from "./home.module.css";
 import { ProductGrid } from "./product-grid";
+import { getHomeCollectionLayout } from "./home-collection-layout";
 
 export function HomeTovary({
   brandName,
@@ -21,7 +23,7 @@ export function HomeTovary({
   title,
 }: {
   brandName: string;
-  eyebrow: string;
+  eyebrow?: string;
   imagePlaceholder: string;
   linkLabel: string;
   outOfStock: string;
@@ -30,45 +32,67 @@ export function HomeTovary({
   title: string;
 }) {
   const slider = useHorizontalSlider<HTMLDivElement>();
+  const layout = getHomeCollectionLayout(products.length);
+
+  if (layout.mode === "hidden") return null;
 
   return (
     <section
       className={`${styles.catalog} ${styles.tovarySection}`}
       id="tovary"
     >
-      <header className={styles.sectionHeader}>
-        <p className={styles.chapter}>{eyebrow}</p>
-        <h2>{bindShortRussianWords(title)}</h2>
-        {subtitle ? (
-          <p className={styles.sectionDescription}>
-            {bindShortRussianWords(subtitle)}
-          </p>
-        ) : null}
+      <div
+        className={`${styles.catalogInner} content-frame`}
+        data-content-frame
+      >
+        <header
+          className={styles.sectionHeader}
+          data-has-eyebrow={Boolean(eyebrow)}
+        >
+          {eyebrow ? (
+            <p className={styles.chapter}>{bindShortRussianWords(eyebrow)}</p>
+          ) : null}
+          <h2>{bindShortRussianWords(title)}</h2>
+          {subtitle ? (
+            <p className={styles.sectionDescription}>
+              {bindShortRussianWords(subtitle)}
+            </p>
+          ) : null}
+          {slider.canScroll ? (
+            <HomeSliderControls
+              atEnd={slider.atEnd}
+              atStart={slider.atStart}
+              onNext={() => slider.scrollItem(1)}
+              onPrevious={() => slider.scrollItem(-1)}
+              prominent
+              subject="сорта"
+            />
+          ) : null}
+        </header>
+        <ProductGrid
+          brandName={brandName}
+          className={styles.homeTovarTrack}
+          dataCardCount={products.length}
+          dataCollectionLayout={layout.mode}
+          imagePlaceholder={imagePlaceholder}
+          outOfStock={outOfStock}
+          products={products}
+          style={
+            {
+              "--home-card-count": layout.visibleCardCount,
+              "--home-track-width": `${layout.visibleCardCount * 25}%`,
+            } as CSSProperties
+          }
+          trackRef={slider.ref}
+        />
         {slider.canScroll ? (
-          <HomeSliderControls
-            atEnd={slider.atEnd}
-            atStart={slider.atStart}
-            onNext={() => slider.scrollItem(1)}
-            onPrevious={() => slider.scrollItem(-1)}
-            subject="сорта"
-          />
+          <div className={styles.sliderProgress}>
+            <SliderProgress progress={slider.progress} />
+          </div>
         ) : null}
-      </header>
-      <ProductGrid
-        brandName={brandName}
-        className={styles.homeTovarTrack}
-        imagePlaceholder={imagePlaceholder}
-        outOfStock={outOfStock}
-        products={products}
-        trackRef={slider.ref}
-      />
-      {slider.canScroll ? (
-        <div className={styles.sliderProgress}>
-          <SliderProgress progress={slider.progress} />
+        <div className={styles.catalogLink}>
+          <EditorialLink href="/tovary" label={linkLabel} />
         </div>
-      ) : null}
-      <div className={styles.catalogLink}>
-        <EditorialLink href="/tovary" label={linkLabel} />
       </div>
     </section>
   );

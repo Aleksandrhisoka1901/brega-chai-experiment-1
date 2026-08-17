@@ -73,6 +73,7 @@ export default defineConfig({
             STRAPI_ORDER_TOKEN: "e2e-scoped-order-token",
             SITE_URL: `http://127.0.0.1:${webPort}`,
             NEXT_PUBLIC_CMS_URL: `http://127.0.0.1:${cmsFixturePort}`,
+            NEXT_PUBLIC_MEDIA_URL: `http://127.0.0.1:${cmsFixturePort}/storefront`,
             HOSTNAME: "0.0.0.0",
             PORT: String(webPort),
           },

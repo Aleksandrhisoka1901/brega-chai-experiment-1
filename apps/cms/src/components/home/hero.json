@@ -2,13 +2,12 @@
   "collectionName": "components_home_heroes",
   "info": {
     "displayName": "Первый экран",
-    "description": "Изображение и alt обязательны для всех макетов, кроме 100/0"
+    "description": "Изображение обязательно для макетов 50/50 и 40/60; alt можно оставить пустым для декоративного изображения"
   },
   "attributes": {
     "eyebrow": {
       "type": "string",
-      "required": true,
-      "minLength": 1
+      "required": false
     },
     "title": {
       "type": "string",

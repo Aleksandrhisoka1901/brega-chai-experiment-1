@@ -101,6 +101,7 @@ test("normalizes a representative Strapi article fixture", () => {
           caption: "Подпись из редактора",
           image: {
             url: "/uploads/tea.jpg",
+            updatedAt: "2026-08-16T12:34:56.000Z",
             alternativeText: "Чайные листья",
             caption: "Старая подпись медиа",
             width: 1200,
@@ -144,7 +145,7 @@ test("normalizes a representative Strapi article fixture", () => {
       },
       {
         type: "image",
-        url: "https://cms.example.com/uploads/tea.jpg",
+        url: "https://cms.example.com/uploads/tea.jpg?v=2026-08-16T12%3A34%3A56.000Z",
         alt: "Чайные листья",
         caption: "Подпись из редактора",
         align: "right",
@@ -152,7 +153,7 @@ test("normalizes a representative Strapi article fixture", () => {
         height: 800,
         sources: [
           {
-            url: "https://cms.example.com/uploads/small_tea.jpg",
+            url: "https://cms.example.com/uploads/small_tea.jpg?v=2026-08-16T12%3A34%3A56.000Z",
             width: 500,
           },
         ],

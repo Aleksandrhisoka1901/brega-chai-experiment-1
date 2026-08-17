@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { CheckoutSettings } from "../../server/cms/global-mapper";
 
 import { AutoResizeTextarea } from "../../components/auto-resize-textarea";
+import { MoneyAmount } from "../../components/money-amount";
 import { ScrollArea } from "../../components/scroll-area";
 import { bindShortRussianWords } from "../../lib/typography";
 import { getCartSubtotal } from "../cart/model";
@@ -23,12 +24,6 @@ import {
   type CheckoutPayload,
 } from "./validation";
 import styles from "./checkout-panel.module.css";
-
-const priceFormatter = new Intl.NumberFormat("ru-RU", {
-  style: "currency",
-  currency: "RUB",
-  maximumFractionDigits: 0,
-});
 
 const defaults = {
   deliveryMethod: undefined,
@@ -130,11 +125,13 @@ export function CheckoutPanel({
           <div className={styles.orderNumber}>
             <span>Номер заказа</span>
             <strong>{result.orderNumber}</strong>
-            <small>Сохраните его для обращения к менеджеру</small>
+            <small>
+              {bindShortRussianWords("Сохраните его для обращения к менеджеру")}
+            </small>
           </div>
           <p>{bindShortRussianWords(result.message)}</p>
           <button onClick={onComplete} type="button">
-            Вернуться к покупкам
+            {bindShortRussianWords("Вернуться к покупкам")}
           </button>
         </div>
       </ScrollArea>
@@ -180,7 +177,7 @@ export function CheckoutPanel({
       >
         <button className={styles.back} onClick={onBack} type="button">
           <ArrowLeft aria-hidden="true" />
-          Назад к корзине
+          {bindShortRussianWords("Назад к корзине")}
         </button>
 
         <div className={styles.fields}>
@@ -352,13 +349,19 @@ export function CheckoutPanel({
             <strong
               className={pricing.hasDiscount ? styles.standardTotal : undefined}
             >
-              {priceFormatter.format(standardTotal)}
+              <MoneyAmount
+                rubles={standardTotal}
+                variant={pricing.hasDiscount ? "previous-total" : "total"}
+              />
             </strong>
             {pricing.hasDiscount ? (
               <>
-                <span>Со скидкой за самовывоз</span>
+                <span>{bindShortRussianWords("Со скидкой за самовывоз")}</span>
                 <strong>
-                  {priceFormatter.format(pricing.discountedTotal)}
+                  <MoneyAmount
+                    rubles={pricing.discountedTotal}
+                    variant="total"
+                  />
                 </strong>
               </>
             ) : null}
@@ -428,9 +431,11 @@ function Field({
 }) {
   return (
     <label className={styles.field}>
-      <span>{label}</span>
+      <span>{bindShortRussianWords(label)}</span>
       {children}
-      <small aria-live="polite">{error ?? "\u00a0"}</small>
+      <small aria-live="polite">
+        {error ? bindShortRussianWords(error) : "\u00a0"}
+      </small>
     </label>
   );
 }
@@ -445,7 +450,9 @@ function Checkbox({
   return (
     <label className={styles.checkbox}>
       <span className={styles.checkboxLine}>{children}</span>
-      <small aria-live="polite">{error ?? "\u00a0"}</small>
+      <small aria-live="polite">
+        {error ? bindShortRussianWords(error) : "\u00a0"}
+      </small>
     </label>
   );
 }

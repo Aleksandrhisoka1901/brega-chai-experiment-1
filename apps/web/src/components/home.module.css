@@ -1,22 +1,29 @@
 .chapter,
 .controls > span {
   margin: 0;
-  font-size: 0.625rem;
+  font-size: var(--type-caption);
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .hero {
   min-height: calc(100svh - 4.75rem);
-  display: grid;
-  grid-template-columns: 42% 58%;
 }
 
-.hero[data-layout="50/50"] {
+.heroInner {
+  min-height: calc(100svh - 4.75rem);
+  display: grid;
+}
+
+.hero[data-layout="40/60"] .heroInner {
+  grid-template-columns: 2fr 3fr;
+}
+
+.hero[data-layout="50/50"] .heroInner {
   grid-template-columns: 1fr 1fr;
 }
 
-.hero[data-layout="100/0"] {
+.hero[data-layout="100/0"] .heroInner {
   grid-template-columns: 1fr;
 }
 
@@ -26,7 +33,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: var(--surface-editorial);
+  background: var(--hero-copy-background, var(--surface-editorial));
 }
 
 .heroCopy h1,
@@ -41,10 +48,14 @@
 .heroCopy h1 {
   max-width: 41.875rem;
   margin: 2.5rem 0;
-  font-size: clamp(3.875rem, 7.3vw, 8rem);
+  font-size: var(--type-hero);
   letter-spacing: -0.025em;
   line-height: 0.86;
   overflow-wrap: normal;
+}
+
+.heroCopy > .chapter {
+  line-height: 1.2;
 }
 
 .heroIntro {
@@ -58,7 +69,7 @@
 .heroIntro > p {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: var(--type-body-editorial);
   line-height: 1.65;
 }
 
@@ -71,7 +82,7 @@
   gap: 2rem;
   border-bottom: 1px solid currentColor;
   color: inherit;
-  font-size: 0.625rem;
+  font-size: var(--type-caption);
   letter-spacing: 0.12em;
   text-decoration: none;
   text-transform: uppercase;
@@ -109,28 +120,31 @@
 }
 
 .about {
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.aboutInner {
   position: relative;
   padding: 9.375rem var(--page-gutter) 10.625rem;
   display: grid;
   grid-template-columns: minmax(17.5rem, 0.95fr) minmax(22.5rem, 1.05fr);
   gap: 8vw;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border-default);
 }
 
-.about[data-spacing="S"] {
+.about[data-spacing="S"] .aboutInner {
   padding-block: 5rem;
 }
 
-.about[data-spacing="M"] {
+.about[data-spacing="M"] .aboutInner {
   padding-block: 7rem;
 }
 
-.about[data-spacing="XL"] {
+.about[data-spacing="XL"] .aboutInner {
   padding-block: 12rem;
 }
 
-.about::before {
+.aboutInner::before {
   position: absolute;
   top: -5.625rem;
   left: -2.8125rem;
@@ -154,7 +168,7 @@
 
 .about h2 {
   margin: 0;
-  font-size: clamp(2.8125rem, 5.2vw, 5.5rem);
+  font-size: var(--type-heading-2);
   letter-spacing: -0.015em;
   line-height: 0.98;
 }
@@ -175,8 +189,11 @@
 }
 
 .catalog {
-  padding: 6.875rem var(--page-gutter) 8.125rem;
   overflow: hidden;
+}
+
+.catalogInner {
+  padding: 6.875rem var(--page-gutter) 8.125rem;
 }
 
 .tovarySection {
@@ -188,6 +205,9 @@
 }
 
 .sectionHeader {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
   margin-bottom: 3.375rem;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -198,7 +218,7 @@
 .sectionHeader h2 {
   grid-column: 3 / 7;
   margin: 0;
-  font-size: clamp(3.4375rem, 6vw, 5.75rem);
+  font-size: var(--type-heading-2);
   letter-spacing: -0.015em;
   line-height: 1;
 }
@@ -260,7 +280,45 @@
   cursor: not-allowed;
 }
 
+.controlsProminent {
+  min-width: 0;
+  padding: 0;
+  justify-content: flex-end;
+  border-bottom: 0;
+}
+
+.controlsProminent > div {
+  gap: 0.625rem;
+}
+
+.controlsProminent button {
+  width: 2.5rem;
+  height: 2.5rem;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.controlsProminent button svg {
+  width: 1.375rem;
+  height: 1.375rem;
+  stroke-width: 1.5;
+}
+
+.controlsProminent button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .controlsProminent button:not(:disabled):hover {
+    transform: scale(1.08);
+  }
+}
+
 .cardTrack {
+  max-width: var(--content-max);
+  margin-inline: auto;
   display: grid;
   grid-auto-columns: 25%;
   grid-auto-flow: column;
@@ -276,10 +334,16 @@
 }
 
 .cardTrack.cardTrack {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--home-card-count), minmax(0, 1fr));
+}
+
+.cardTrack[data-collection-layout="slider"] {
+  grid-template-columns: none;
 }
 
 .sliderProgress {
+  max-width: var(--content-max);
+  margin-inline: auto;
   margin-top: 1.25rem;
 }
 
@@ -308,6 +372,8 @@
 }
 
 .catalogLink {
+  max-width: var(--content-max);
+  margin-inline: auto;
   margin-top: 2.5rem;
   display: flex;
   justify-content: flex-end;
@@ -322,12 +388,12 @@
 .cardNumber {
   float: right;
   color: var(--text-soft);
-  font-size: 0.625rem;
+  font-size: var(--type-caption);
 }
 
 .cardCopy h3 {
   margin: 0 0 0.625rem;
-  font-size: clamp(1.6875rem, 2vw, 1.8125rem);
+  font-size: var(--type-heading-3);
   letter-spacing: -0.01em;
   line-height: 1;
 }
@@ -337,12 +403,104 @@
   margin: 0;
   color: var(--text-muted);
   font-family: var(--font-display);
-  font-size: 0.8125rem;
+  font-size: var(--type-body-ui);
   line-height: 1.55;
 }
 
-@media (max-width: 1023px) {
+@media (min-width: 1024px) {
+  .heroCopy[data-has-eyebrow="false"]::before {
+    height: calc(var(--type-caption) * 1.2);
+    flex: 0 0 auto;
+    content: "";
+  }
+
+  .sectionHeader[data-has-eyebrow="false"] h2 {
+    grid-column: 1 / 5;
+  }
+
+  .cardTrack[data-collection-layout="fixed"],
+  .homeTovarTrack[data-collection-layout="fixed"] {
+    width: var(--home-track-width);
+    margin-left: max(0px, calc((100% - var(--content-max)) / 2));
+    margin-right: auto;
+  }
+
+  .homeTovarTrack {
+    max-width: var(--content-max);
+    margin-inline: auto;
+    grid-template-columns: repeat(var(--home-card-count), minmax(0, 1fr));
+  }
+
+  .homeTovarTrack[data-collection-layout="slider"] {
+    grid-template-columns: none;
+    grid-auto-columns: 25%;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .homeTovarTrack[data-collection-layout="slider"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .homeTovarTrack[data-collection-layout="slider"] :global(.product-card) {
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .heroIntro {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .heroIntro .editorialLink {
+    width: min(100%, 12rem);
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1601px) {
   .hero {
+    position: relative;
+    isolation: isolate;
+    background: var(--surface-subtle);
+  }
+
+  .hero::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--hero-copy-background, var(--surface-editorial));
+    content: "";
+    pointer-events: none;
+  }
+
+  .hero[data-layout="40/60"]::before {
+    width: calc(50% - 10rem);
+  }
+
+  .hero[data-layout="50/50"]::before {
+    width: 50%;
+  }
+
+  .hero[data-layout="100/0"]::before {
+    width: 100%;
+  }
+
+  .heroInner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .heroCopy {
+    background: transparent;
+  }
+}
+
+@media (max-width: 1023px) {
+  .heroInner {
     display: flex;
     flex-direction: column;
   }
@@ -352,12 +510,16 @@
     padding: 2.75rem var(--page-gutter) 2.5rem;
   }
 
+  .hero[data-layout="100/0"] .heroCopy {
+    flex: 1;
+  }
+
   .heroMedia {
     min-height: 56svh;
   }
 
   .heroIntro,
-  .about,
+  .aboutInner,
   .aboutCopy {
     grid-template-columns: 1fr;
   }
@@ -367,7 +529,7 @@
     min-width: 0;
   }
 
-  .about {
+  .aboutInner {
     gap: 3.5rem;
     padding: 6.25rem var(--page-gutter);
   }
@@ -404,6 +566,23 @@
   }
 }
 
+@media (min-width: 521px) and (max-width: 1023px) {
+  .cardTrack[data-collection-layout="fixed"][data-card-count="1"],
+  .homeTovarTrack[data-collection-layout="fixed"][data-card-count="1"] {
+    width: 50%;
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .cardTrack[data-collection-layout="fixed"][data-card-count="1"] {
+    grid-auto-columns: 100%;
+  }
+
+  .homeTovarTrack.homeTovarTrack[data-collection-layout="fixed"][data-card-count="1"] {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (min-width: 521px) and (max-width: 767px) {
   .sectionHeader {
     align-items: start;
@@ -421,21 +600,21 @@
     margin-top: 1.5rem;
   }
 
+  .sectionHeader[data-has-eyebrow="false"] h2 {
+    margin-top: 0;
+  }
+
   .sectionDescription {
     margin-top: 2rem;
   }
 }
 
 @media (max-width: 520px) {
-  .heroCopy h1 {
-    font-size: 4rem;
-  }
-
   .heroIntro {
     gap: 2rem;
   }
 
-  .catalog {
+  .catalogInner {
     padding-inline: var(--page-gutter);
   }
 

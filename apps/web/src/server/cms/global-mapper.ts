@@ -5,11 +5,13 @@ import {
   type RichContentBlock,
 } from "../../components/rich-content/model.ts";
 import { CmsValidationError } from "./errors.ts";
+import { versionCmsMediaUrl } from "./media-url.ts";
 
 const mediaSchema = z.object({
   url: z.string().min(1),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
+  updatedAt: z.iso.datetime(),
   formats: z
     .record(
       z.string(),
@@ -79,7 +81,7 @@ const responseSchema = z.object({
       title: z.string().min(1),
       description: z.string().min(1),
       image: z
-        .object({ url: z.string().min(1) })
+        .object({ url: z.string().min(1), updatedAt: z.iso.datetime() })
         .nullable()
         .optional(),
     }),
@@ -164,11 +166,11 @@ export function mapGlobalSettingsPayload(
     ...(logo
       ? {
           logo: {
-            url: mediaUrl(logo.url, publicBase),
+            url: versionCmsMediaUrl(logo.url, publicBase, logo.updatedAt),
             width: logo.width,
             height: logo.height,
             sources: Object.values(logo.formats ?? {}).map((format) => ({
-              url: mediaUrl(format.url, publicBase),
+              url: versionCmsMediaUrl(format.url, publicBase, logo.updatedAt),
               width: format.width,
             })),
           },
@@ -179,7 +181,13 @@ export function mapGlobalSettingsPayload(
       title: defaultSeo.title,
       description: defaultSeo.description,
       ...(defaultSeo.image
-        ? { imageUrl: mediaUrl(defaultSeo.image.url, publicBase) }
+        ? {
+            imageUrl: versionCmsMediaUrl(
+              defaultSeo.image.url,
+              publicBase,
+              defaultSeo.image.updatedAt,
+            ),
+          }
         : {}),
     },
   };

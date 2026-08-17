@@ -6,11 +6,13 @@ import {
 } from "../../components/rich-content/model.ts";
 
 import { CmsValidationError } from "./errors.ts";
+import { versionCmsMediaUrl } from "./media-url.ts";
 
 const mediaSchema = z.object({
   url: z.string().min(1),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
+  updatedAt: z.iso.datetime(),
   formats: z
     .object({
       large: z
@@ -47,7 +49,7 @@ const mediaSchema = z.object({
 });
 
 const imageWithAltSchema = z.object({
-  alt: z.string().min(1),
+  alt: z.string().nullable().optional(),
   image: mediaSchema,
 });
 const seoSchema = z.object({
@@ -56,6 +58,7 @@ const seoSchema = z.object({
   image: z
     .object({
       url: z.string().min(1),
+      updatedAt: z.iso.datetime(),
     })
     .nullable()
     .optional(),
@@ -74,7 +77,7 @@ const productDetailRecordSchema = z.object({
   currency: z.literal("RUB"),
   stock: z.number().int().nonnegative(),
   cardExcerpt: z.string().min(1),
-  story: z.string().min(1),
+  story: z.unknown().optional(),
   articles: z
     .array(
       z.object({
@@ -115,7 +118,7 @@ export type ProductDetail = {
   stock: number;
   inStock: boolean;
   excerpt: string;
-  story: string;
+  story: RichContentBlock[];
   seo?: {
     title: string;
     description: string;
@@ -125,23 +128,21 @@ export type ProductDetail = {
   images: ProductDetailImage[];
 };
 
-function getMediaUrl(path: string, publicBase: string) {
-  if (URL.canParse(path)) return path;
-  return new URL(path, publicBase).toString();
-}
-
 function mapImage(
   value: z.infer<typeof imageWithAltSchema>,
   publicBase: string,
 ): ProductDetailImage {
-  const display =
-    value.image.formats?.large ?? value.image.formats?.medium ?? value.image;
+  const display = value.image;
   const thumbnail =
     value.image.formats?.thumbnail ?? value.image.formats?.small ?? display;
 
   return {
-    url: getMediaUrl(display.url, publicBase),
-    thumbnailUrl: getMediaUrl(thumbnail.url, publicBase),
+    url: versionCmsMediaUrl(display.url, publicBase, value.image.updatedAt),
+    thumbnailUrl: versionCmsMediaUrl(
+      thumbnail.url,
+      publicBase,
+      value.image.updatedAt,
+    ),
     sources: [
       value.image.formats?.thumbnail,
       value.image.formats?.small,
@@ -150,10 +151,19 @@ function mapImage(
       value.image,
     ].flatMap((source) =>
       source
-        ? [{ url: getMediaUrl(source.url, publicBase), width: source.width }]
+        ? [
+            {
+              url: versionCmsMediaUrl(
+                source.url,
+                publicBase,
+                value.image.updatedAt,
+              ),
+              width: source.width,
+            },
+          ]
         : [],
     ),
-    alt: value.alt,
+    alt: value.alt?.trim() ?? "",
     width: display.width,
     height: display.height,
   };
@@ -193,7 +203,7 @@ export function mapProductDetailPayload(
     stock: record.stock,
     inStock: record.stock > 0,
     excerpt: record.cardExcerpt,
-    story: record.story,
+    story: normalizeStrapiBlocks(record.story, publicBase),
     ...(record.seo
       ? {
           seo: {
@@ -201,7 +211,11 @@ export function mapProductDetailPayload(
             description: record.seo.description,
             ...(record.seo.image
               ? {
-                  imageUrl: getMediaUrl(record.seo.image.url, publicBase),
+                  imageUrl: versionCmsMediaUrl(
+                    record.seo.image.url,
+                    publicBase,
+                    record.seo.image.updatedAt,
+                  ),
                 }
               : {}),
           },

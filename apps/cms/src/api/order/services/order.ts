@@ -22,6 +22,8 @@ import {
   getOrderNumberPrefix,
 } from "./order-number";
 import { notifyOrderCreation } from "./order-notification";
+import { runStockMutationWithRevalidation } from "./order-stock-revalidation";
+import { createCacheRevalidationSenderFromEnv } from "../../../cache-revalidation/index.js";
 
 const ORDER_UID = "api::order.order" as const;
 const PRODUCT_TABLE = "products";
@@ -56,6 +58,13 @@ type StoredOrderRow = {
   updatedAt: string | Date;
 };
 
+type ProductStockRow = Record<string, unknown> & {
+  id: number;
+  document_id: string;
+  stock: number;
+  published_at?: string | Date | null;
+};
+
 const toIsoTimestamp = (value: string | Date) =>
   value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 
@@ -84,6 +93,88 @@ const mapStoredOrder = (row: StoredOrderRow): StoredOrder => ({
   updatedAt: toIsoTimestamp(row.updatedAt),
 });
 
+async function lockProductRows(
+  strapi: any,
+  trx: DatabaseTransaction["trx"],
+  productIds: string[],
+): Promise<ProductStockRow[]> {
+  const stableProductIds = [...new Set(productIds)].sort();
+  if (stableProductIds.length === 0) return [];
+
+  return strapi.db
+    .connection(PRODUCT_TABLE)
+    .select([
+      "id",
+      "document_id",
+      "slug",
+      "display_name",
+      "package_label",
+      "price",
+      "currency",
+      "stock",
+      "published_at",
+    ])
+    .whereIn("document_id", stableProductIds)
+    .orderBy("document_id", "asc")
+    .orderBy("id", "asc")
+    .forUpdate()
+    .transacting(trx);
+}
+
+function findPublishedProduct(rows: ProductStockRow[]) {
+  return rows.find((row) => row.published_at != null);
+}
+
+async function setProductStock(
+  strapi: any,
+  trx: DatabaseTransaction["trx"],
+  productId: string,
+  stock: number,
+) {
+  const updated = await strapi.db
+    .connection(PRODUCT_TABLE)
+    .where({ document_id: productId })
+    .update({ stock })
+    .transacting(trx);
+  return Number(updated) > 0;
+}
+
+async function decrementProductStock(
+  strapi: any,
+  trx: DatabaseTransaction["trx"],
+  productId: string,
+  quantity: number,
+) {
+  const rows = await lockProductRows(strapi, trx, [productId]);
+  const published = findPublishedProduct(rows);
+  if (!published || Number(published.stock) < quantity) return false;
+
+  return setProductStock(
+    strapi,
+    trx,
+    productId,
+    Number(published.stock) - quantity,
+  );
+}
+
+async function restoreProductStock(
+  strapi: any,
+  trx: DatabaseTransaction["trx"],
+  productId: string,
+  quantity: number,
+) {
+  const rows = await lockProductRows(strapi, trx, [productId]);
+  const current = findPublishedProduct(rows) ?? rows[0];
+  if (!current) return false;
+
+  return setProductStock(
+    strapi,
+    trx,
+    productId,
+    Number(current.stock) + quantity,
+  );
+}
+
 function createPersistence(strapi: any): OrderPersistence {
   return {
     async transaction<T>(
@@ -106,23 +197,9 @@ function createPersistence(strapi: any): OrderPersistence {
             },
 
             async lockProducts(productIds) {
-              const rows = await strapi.db
-                .connection(PRODUCT_TABLE)
-                .select([
-                  "id",
-                  "document_id",
-                  "slug",
-                  "display_name",
-                  "package_label",
-                  "price",
-                  "currency",
-                  "stock",
-                  "published_at",
-                ])
-                .whereIn("document_id", productIds)
-                .whereNotNull("published_at")
-                .forUpdate()
-                .transacting(trx);
+              const rows = (
+                await lockProductRows(strapi, trx, productIds)
+              ).filter((row) => row.published_at != null);
 
               return rows.map(
                 (row: Record<string, unknown>): LockedProduct => ({
@@ -139,14 +216,8 @@ function createPersistence(strapi: any): OrderPersistence {
               );
             },
 
-            async decrementStock(recordId, quantity) {
-              const updated = await strapi.db
-                .connection(PRODUCT_TABLE)
-                .where({ id: recordId })
-                .where("stock", ">=", quantity)
-                .decrement("stock", quantity)
-                .transacting(trx);
-              return Number(updated) > 0;
+            async decrementStock(productId, quantity) {
+              return decrementProductStock(strapi, trx, productId, quantity);
             },
 
             async insertOrder(draft) {
@@ -225,13 +296,13 @@ function createStatusPersistence(strapi: any): OrderStatusPersistence {
               return row ? mapStoredOrder(row as StoredOrderRow) : null;
             },
 
-            async restoreStock(recordId, quantity) {
-              const updated = await strapi.db
-                .connection(PRODUCT_TABLE)
-                .where({ id: recordId })
-                .increment("stock", quantity)
-                .transacting(trx);
-              return Number(updated) > 0;
+            async lockExistingProductIds(productIds) {
+              const rows = await lockProductRows(strapi, trx, productIds);
+              return [...new Set(rows.map((row) => String(row.document_id)))];
+            },
+
+            async restoreStock(productId, quantity) {
+              return restoreProductStock(strapi, trx, productId, quantity);
             },
 
             async updateStatus(id, status, statusHistory) {
@@ -278,24 +349,9 @@ function createEditPersistence(strapi: any): OrderEditPersistence {
             },
 
             async lockProducts(productIds) {
-              if (productIds.length === 0) return [];
-              const rows = await strapi.db
-                .connection(PRODUCT_TABLE)
-                .select([
-                  "id",
-                  "document_id",
-                  "slug",
-                  "display_name",
-                  "package_label",
-                  "price",
-                  "currency",
-                  "stock",
-                  "published_at",
-                ])
-                .whereIn("document_id", productIds)
-                .whereNotNull("published_at")
-                .forUpdate()
-                .transacting(trx);
+              const rows = (
+                await lockProductRows(strapi, trx, productIds)
+              ).filter((row) => row.published_at != null);
 
               return rows.map(
                 (row: Record<string, unknown>): LockedProduct => ({
@@ -312,23 +368,12 @@ function createEditPersistence(strapi: any): OrderEditPersistence {
               );
             },
 
-            async decrementStock(recordId, quantity) {
-              const updated = await strapi.db
-                .connection(PRODUCT_TABLE)
-                .where({ id: recordId })
-                .where("stock", ">=", quantity)
-                .decrement("stock", quantity)
-                .transacting(trx);
-              return Number(updated) > 0;
+            async decrementStock(productId, quantity) {
+              return decrementProductStock(strapi, trx, productId, quantity);
             },
 
-            async restoreStock(recordId, quantity) {
-              const updated = await strapi.db
-                .connection(PRODUCT_TABLE)
-                .where({ id: recordId })
-                .increment("stock", quantity)
-                .transacting(trx);
-              return Number(updated) > 0;
+            async restoreStock(productId, quantity) {
+              return restoreProductStock(strapi, trx, productId, quantity);
             },
 
             async updateOrder(id, patch: OrderEditPatch) {
@@ -348,57 +393,81 @@ function createEditPersistence(strapi: any): OrderEditPersistence {
   };
 }
 
-export default factories.createCoreService(ORDER_UID, ({ strapi }) => ({
-  async createFromInput(rawInput: unknown) {
-    const settings = await strapi
-      .documents("api::global-setting.global-setting")
-      .findFirst({
-        status: "published",
-        fields: [
-          "orderNotificationEmail",
-          "pickupAddress",
-          "pickupDiscountPercent",
-        ],
-      });
-    const pickupDiscountPercent = settings?.pickupDiscountPercent;
-    const checkoutSettings: OrderCheckoutSettings = {
-      pickupAddress: String(settings?.pickupAddress ?? ""),
-      pickupDiscountPercent:
-        typeof pickupDiscountPercent === "number"
-          ? pickupDiscountPercent
-          : null,
-    };
-    const creation = await createOrderWithMeta(
-      rawInput,
-      createPersistence(strapi),
-      checkoutSettings,
-    );
+export default factories.createCoreService(ORDER_UID, ({ strapi }) => {
+  const stockRevalidationSender = createCacheRevalidationSenderFromEnv(
+    {
+      CACHE_REVALIDATION_URL: process.env.CACHE_REVALIDATION_URL,
+      CACHE_REVALIDATION_SECRET: process.env.CACHE_REVALIDATION_SECRET,
+      CACHE_REVALIDATION_TIMEOUT_MS: process.env.CACHE_REVALIDATION_TIMEOUT_MS,
+    },
+    { logger: strapi.log },
+  );
 
-    if (creation.created) {
-      void notifyOrderCreation({
-        creation,
-        recipient: String(settings?.orderNotificationEmail ?? ""),
-        strapi,
-      });
-    }
+  return {
+    async createFromInput(rawInput: unknown) {
+      const settings = await strapi
+        .documents("api::global-setting.global-setting")
+        .findFirst({
+          status: "published",
+          fields: [
+            "orderNotificationEmail",
+            "pickupAddress",
+            "pickupDiscountPercent",
+          ],
+        });
+      const pickupDiscountPercent = settings?.pickupDiscountPercent;
+      const checkoutSettings: OrderCheckoutSettings = {
+        pickupAddress: String(settings?.pickupAddress ?? ""),
+        pickupDiscountPercent:
+          typeof pickupDiscountPercent === "number"
+            ? pickupDiscountPercent
+            : null,
+      };
+      const creation = await createOrderWithMeta(
+        rawInput,
+        createPersistence(strapi),
+        checkoutSettings,
+      );
 
-    return creation.result;
-  },
+      if (creation.created) {
+        void notifyOrderCreation({
+          creation,
+          recipient: String(settings?.orderNotificationEmail ?? ""),
+          strapi,
+        });
+      }
 
-  async transitionStatus(
-    orderId: string,
-    nextStatus: unknown,
-    actor?: OrderDraft["statusHistory"][number]["actor"],
-  ) {
-    return transitionOrderStatus(
-      orderId,
-      nextStatus,
-      createStatusPersistence(strapi),
-      actor,
-    );
-  },
+      return creation.result;
+    },
 
-  async editFromAdmin(orderId: string, rawInput: unknown) {
-    return editOrder(orderId, rawInput, createEditPersistence(strapi));
-  },
-}));
+    async transitionStatus(
+      orderId: string,
+      nextStatus: unknown,
+      actor?: OrderDraft["statusHistory"][number]["actor"],
+    ) {
+      const transition = () =>
+        transitionOrderStatus(
+          orderId,
+          nextStatus,
+          createStatusPersistence(strapi),
+          actor,
+        );
+
+      return nextStatus === "cancelled"
+        ? runStockMutationWithRevalidation(
+            transition,
+            stockRevalidationSender,
+            strapi.log,
+          )
+        : transition();
+    },
+
+    async editFromAdmin(orderId: string, rawInput: unknown) {
+      return runStockMutationWithRevalidation(
+        () => editOrder(orderId, rawInput, createEditPersistence(strapi)),
+        stockRevalidationSender,
+        strapi.log,
+      );
+    },
+  };
+});

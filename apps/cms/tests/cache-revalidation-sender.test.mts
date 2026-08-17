@@ -145,6 +145,10 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     uid: "api::home-page.home-page",
     entry: { publishedAt: "2026-07-29T00:00:00.000Z" },
   });
+  await subscriber?.("entry.publish", {
+    uid: "api::rituals-page.rituals-page",
+    entry: {},
+  });
   await subscriber?.("entry.update", {
     uid: "api::product.product",
     entry: {
@@ -164,6 +168,10 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
   });
   await subscriber?.("user.update", {});
 
+  await subscriber?.("media.update", {
+    media: { id: 42, updatedAt: "2026-08-16T12:34:56.000Z" },
+  });
+
   assert.deepEqual(sent, [
     {
       event: "product",
@@ -175,6 +183,8 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
       },
     },
     { event: "home", action: "update" },
+    { event: "products", action: "publish" },
     { event: "global", action: "unpublish" },
+    { event: "media", action: "update" },
   ]);
 });

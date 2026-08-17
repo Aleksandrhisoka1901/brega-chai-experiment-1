@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import type { CheckoutSettings } from "../../../server/cms/global-mapper";
 
 import { IconButton } from "../../../components/icon-button";
+import { MoneyAmount } from "../../../components/money-amount";
 import { ScrollArea } from "../../../components/scroll-area";
 import { bindShortRussianWords } from "../../../lib/typography";
 import { fetchCartStock } from "../availability-client";
@@ -21,12 +22,6 @@ import {
 } from "./cart-drawer-model";
 import { cartDrawerStore, useCartDrawer } from "./cart-drawer-store";
 import styles from "./cart-drawer.module.css";
-
-const priceFormatter = new Intl.NumberFormat("ru-RU", {
-  style: "currency",
-  currency: "RUB",
-  maximumFractionDigits: 0,
-});
 
 const availabilityText = {
   insufficient: "Остаток уменьшился. Снизьте количество для оформления.",
@@ -173,10 +168,14 @@ export function CartDrawer({
               </span>
               <nav aria-label="Перейти к каталогу">
                 <Dialog.Close asChild>
-                  <Link href="/#nabory">К ритуалам</Link>
+                  <Link href="/nabory">
+                    {bindShortRussianWords("К ритуалам")}
+                  </Link>
                 </Dialog.Close>
                 <Dialog.Close asChild>
-                  <Link href="/tovary">К сортам</Link>
+                  <Link href="/tovary">
+                    {bindShortRussianWords("К сортам")}
+                  </Link>
                 </Dialog.Close>
               </nav>
             </div>
@@ -223,9 +222,10 @@ export function CartDrawer({
                               <p>{bindShortRussianWords(item.packageLabel)}</p>
                             </div>
                             <strong>
-                              {priceFormatter.format(
-                                item.unitPriceSnapshot * item.quantity,
-                              )}
+                              <MoneyAmount
+                                rubles={item.unitPriceSnapshot * item.quantity}
+                                variant="line"
+                              />
                             </strong>
                           </div>
 
@@ -294,7 +294,10 @@ export function CartDrawer({
                 <div>
                   <span>Итого</span>
                   <strong>
-                    {priceFormatter.format(getCartSubtotal(cart))}
+                    <MoneyAmount
+                      rubles={getCartSubtotal(cart)}
+                      variant="total"
+                    />
                   </strong>
                 </div>
                 <p>
@@ -313,9 +316,11 @@ export function CartDrawer({
                   onClick={() => void openCheckout()}
                   type="button"
                 >
-                  {isCheckingStock
-                    ? "Проверяем наличие…"
-                    : "Перейти к оформлению"}
+                  {bindShortRussianWords(
+                    isCheckingStock
+                      ? "Проверяем наличие…"
+                      : "Перейти к оформлению",
+                  )}
                 </button>
               </footer>
             </>

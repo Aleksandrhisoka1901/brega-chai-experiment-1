@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
   workflow_call:
 
 permissions:
@@ -63,6 +60,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+      - name: Validate CI trigger contract
+        run: node scripts/test-ci-triggers.mjs
       - name: Validate shell and Compose configuration
         run: |
           sh -n \

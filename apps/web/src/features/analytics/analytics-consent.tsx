@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { bindShortRussianWords } from "@/lib/typography";
+
 import styles from "./analytics-consent.module.css";
 import {
   ANALYTICS_CONSENT_STORAGE_KEY,
@@ -69,8 +71,9 @@ export function AnalyticsConsent() {
           </p>
           <div className={styles.content}>
             <p className={styles.text}>
-              Мы используем файлы cookie и аналитические сервисы, чтобы
-              понимать, как пользуются сайтом, и делать его удобнее.
+              {bindShortRussianWords(
+                "Мы используем файлы cookie и аналитические сервисы, чтобы понимать, как пользуются сайтом, и делать его удобнее.",
+              )}
             </p>
             <div className={styles.actions}>
               <a

@@ -41,6 +41,17 @@ export default ({ env }) => {
             defaultReplyTo: emailReplyTo,
           },
         };
+  const responsiveUploadConfig = {
+    breakpoints: {
+      xlarge: 1920,
+      large: 1280,
+      medium: 960,
+      small: 640,
+      xsmall: 320,
+    },
+    responsiveDimensions: true,
+    sizeOptimization: true,
+  };
   const plugins = {
     "better-blocks": {
       enabled: true,
@@ -55,6 +66,9 @@ export default ({ env }) => {
     email: {
       config: emailConfig,
     },
+    upload: {
+      config: responsiveUploadConfig,
+    },
   };
 
   if (provider !== "aws-s3") {
@@ -65,6 +79,7 @@ export default ({ env }) => {
     ...plugins,
     upload: {
       config: {
+        ...responsiveUploadConfig,
         provider: "aws-s3",
         providerOptions: {
           baseUrl: env("MEDIA_PUBLIC_URL"),

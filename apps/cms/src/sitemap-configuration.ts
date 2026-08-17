@@ -23,6 +23,7 @@ export const DEFAULT_SITEMAP_COLLECTION = {
 export const DEFAULT_SITEMAP_URLS = [
   { slug: "/", priority: 1, frequency: "weekly" },
   { slug: "/tovary", priority: 0.9, frequency: "weekly" },
+  { slug: "/nabory", priority: 0.9, frequency: "weekly" },
 ] as const;
 
 export function normalizeSitemapOrigin(value: string): string {

@@ -3,6 +3,9 @@ import test from "node:test";
 
 import { mapGlobalSettingsPayload } from "./global-mapper.ts";
 
+const mediaUpdatedAt = "2026-08-16T12:34:56.000Z";
+const mediaVersion = "?v=2026-08-16T12%3A34%3A56.000Z";
+
 test("maps storefront identity, contacts, navigation and legal details", () => {
   assert.deepEqual(
     mapGlobalSettingsPayload(
@@ -16,6 +19,7 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
             url: "/uploads/logo.png",
             width: 600,
             height: 180,
+            updatedAt: mediaUpdatedAt,
           },
           email: "hello@brega.test",
           telegramUrl: "https://t.me/brega",
@@ -64,7 +68,7 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
       pickupDiscountPercent: 10,
       courierDeliveryNote: "До 1000 руб.",
       logo: {
-        url: "http://localhost:9000/uploads/logo.png",
+        url: `http://localhost:9000/uploads/logo.png${mediaVersion}`,
         width: 600,
         height: 180,
         sources: [],

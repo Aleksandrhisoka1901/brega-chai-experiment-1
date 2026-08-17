@@ -5,11 +5,13 @@ import {
 import { z } from "zod";
 
 import { CmsValidationError } from "./errors.ts";
+import { versionCmsMediaUrl } from "./media-url.ts";
 
 const mediaSchema = z.object({
   url: z.string().min(1),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
+  updatedAt: z.iso.datetime(),
   alternativeText: z.string().nullable().optional(),
   formats: z
     .object({
@@ -50,7 +52,7 @@ const productRecordSchema = z.object({
   cardExcerpt: z.string().min(1),
   mainImage: z
     .object({
-      alt: z.string().min(1),
+      alt: z.string().nullable().optional(),
       image: mediaSchema.nullable().optional(),
     })
     .nullable()
@@ -61,22 +63,22 @@ const productsResponseSchema = z.object({
   data: z.array(productRecordSchema),
 });
 
-function getMediaUrl(path: string, publicBase: string) {
-  if (URL.canParse(path)) return path;
-  return new URL(path, publicBase).toString();
-}
+const catalogProductsResponseSchema = productsResponseSchema.extend({
+  meta: z.object({
+    pagination: z.object({
+      start: z.number().int().nonnegative(),
+      limit: z.number().int().positive(),
+      total: z.number().int().nonnegative(),
+    }),
+  }),
+});
 
 function mapProduct(
   record: z.infer<typeof productRecordSchema>,
   publicBase: string,
 ): ProductSummary {
   const image = record.mainImage?.image;
-  const cardImage = image
-    ? (image.formats?.small ??
-      image.formats?.medium ??
-      image.formats?.thumbnail ??
-      image)
-    : undefined;
+  const cardImage = image;
   const imageSources = image
     ? [
         image.formats?.thumbnail,
@@ -85,7 +87,16 @@ function mapProduct(
         image,
       ].flatMap((source) =>
         source
-          ? [{ url: getMediaUrl(source.url, publicBase), width: source.width }]
+          ? [
+              {
+                url: versionCmsMediaUrl(
+                  source.url,
+                  publicBase,
+                  image.updatedAt,
+                ),
+                width: source.width,
+              },
+            ]
           : [],
       )
     : [];
@@ -99,8 +110,12 @@ function mapProduct(
     priceRubles: record.price,
     excerpt: record.cardExcerpt,
     inStock: record.stock > 0,
-    imageUrl: cardImage ? getMediaUrl(cardImage.url, publicBase) : undefined,
-    imageAlt: record.mainImage?.alt ?? image?.alternativeText ?? undefined,
+    imageUrl: cardImage
+      ? versionCmsMediaUrl(cardImage.url, publicBase, image?.updatedAt)
+      : undefined,
+    imageAlt: image
+      ? (record.mainImage?.alt?.trim() ?? image.alternativeText?.trim() ?? "")
+      : undefined,
     imageSources: imageSources.length > 0 ? imageSources : undefined,
   });
 }
@@ -116,4 +131,20 @@ export function mapProductsPayload(
   }
 
   return parsed.data.data.map((record) => mapProduct(record, publicBase));
+}
+
+export function mapCatalogProductsPayload(
+  payload: unknown,
+  publicBase: string,
+) {
+  const parsed = catalogProductsResponseSchema.safeParse(payload);
+
+  if (!parsed.success) {
+    throw new CmsValidationError(parsed.error.message);
+  }
+
+  return {
+    products: parsed.data.data.map((record) => mapProduct(record, publicBase)),
+    totalItems: parsed.data.meta.pagination.total,
+  };
 }

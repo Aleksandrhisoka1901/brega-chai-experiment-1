@@ -7,11 +7,7 @@ export interface HomeCatalogPreview extends Struct.ComponentSchema {
     displayName: "\u0410\u043D\u043E\u043D\u0441 \u0441\u043E\u0440\u0442\u043E\u0432";
   };
   attributes: {
-    eyebrow: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    eyebrow: Schema.Attribute.String;
     linkLabel: Schema.Attribute.String;
     subtitle: Schema.Attribute.Text;
     title: Schema.Attribute.String &
@@ -31,11 +27,7 @@ export interface HomeEditorialSection extends Struct.ComponentSchema {
   attributes: {
     backgroundColor: Schema.Attribute.String &
       Schema.Attribute.CustomField<"plugin::color-picker.color">;
-    eyebrow: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    eyebrow: Schema.Attribute.String;
     spacing: Schema.Attribute.Enumeration<["S", "M", "L", "XL"]> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"L">;
@@ -54,18 +46,14 @@ export interface HomeEditorialSection extends Struct.ComponentSchema {
 export interface HomeHero extends Struct.ComponentSchema {
   collectionName: "components_home_heroes";
   info: {
-    description: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0438 alt \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B \u0434\u043B\u044F \u0432\u0441\u0435\u0445 \u043C\u0430\u043A\u0435\u0442\u043E\u0432, \u043A\u0440\u043E\u043C\u0435 100/0";
+    description: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E \u0434\u043B\u044F \u043C\u0430\u043A\u0435\u0442\u043E\u0432 50/50 \u0438 40/60; alt \u043C\u043E\u0436\u043D\u043E \u043E\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u043F\u0443\u0441\u0442\u044B\u043C \u0434\u043B\u044F \u0434\u0435\u043A\u043E\u0440\u0430\u0442\u0438\u0432\u043D\u043E\u0433\u043E \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F";
     displayName: "\u041F\u0435\u0440\u0432\u044B\u0439 \u044D\u043A\u0440\u0430\u043D";
   };
   attributes: {
     backgroundColor: Schema.Attribute.String &
       Schema.Attribute.CustomField<"plugin::color-picker.color">;
     cta: Schema.Attribute.Component<"shared.link", false>;
-    eyebrow: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    eyebrow: Schema.Attribute.String;
     image: Schema.Attribute.Component<"shared.image-with-alt", false>;
     layout: Schema.Attribute.Enumeration<["50/50", "40/60", "100/0"]> &
       Schema.Attribute.Required &
@@ -92,11 +80,8 @@ export interface HomeRitualsPreview extends Struct.ComponentSchema {
     displayName: "\u0410\u043D\u043E\u043D\u0441 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432";
   };
   attributes: {
-    eyebrow: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    eyebrow: Schema.Attribute.String;
+    linkLabel: Schema.Attribute.String;
     subtitle: Schema.Attribute.Text;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
@@ -122,15 +107,11 @@ export interface ProductArticle extends Struct.ComponentSchema {
 export interface ProductGalleryImage extends Struct.ComponentSchema {
   collectionName: "components_product_gallery_images";
   info: {
-    description: "\u0414\u043B\u044F \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u043D\u0443\u0436\u0435\u043D \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.";
+    description: "\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 alt \u0434\u043B\u044F \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0433\u043E \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0438\u043B\u0438 \u043E\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u043F\u043E\u043B\u0435 \u043F\u0443\u0441\u0442\u044B\u043C, \u0435\u0441\u043B\u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0434\u0435\u043A\u043E\u0440\u0430\u0442\u0438\u0432\u043D\u043E\u0435. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.";
     displayName: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0433\u0430\u043B\u0435\u0440\u0435\u0438";
   };
   attributes: {
-    alt: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    alt: Schema.Attribute.String;
     image: Schema.Attribute.Media<"images"> & Schema.Attribute.Required;
   };
 }
@@ -138,15 +119,11 @@ export interface ProductGalleryImage extends Struct.ComponentSchema {
 export interface SharedImageWithAlt extends Struct.ComponentSchema {
   collectionName: "components_shared_images_with_alt";
   info: {
-    description: "\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0438 \u0434\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.";
+    description: "\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt \u0438\u043B\u0438 \u043E\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u043F\u043E\u043B\u0435 \u043F\u0443\u0441\u0442\u044B\u043C, \u0435\u0441\u043B\u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0434\u0435\u043A\u043E\u0440\u0430\u0442\u0438\u0432\u043D\u043E\u0435. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.";
     displayName: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0441 alt";
   };
   attributes: {
-    alt: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    alt: Schema.Attribute.String;
     image: Schema.Attribute.Media<"images"> & Schema.Attribute.Required;
   };
 }

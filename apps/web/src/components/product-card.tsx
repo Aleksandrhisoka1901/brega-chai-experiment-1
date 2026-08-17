@@ -4,8 +4,7 @@ import Link from "next/link";
 import { bindShortRussianWords } from "@/lib/typography";
 
 import { CardMedia } from "./card-media";
-
-const priceFormatter = new Intl.NumberFormat("ru-RU");
+import { MoneyAmount } from "./money-amount";
 
 export function ProductCard({
   brandName,
@@ -21,21 +20,22 @@ export function ProductCard({
   product: ProductSummary;
 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
+  const route = product.type === "nabor" ? "nabory" : "tovary";
 
   return (
     <article className="product-card">
-      <Link className="product-card__link" href={`/tovary/${product.slug}`}>
+      <Link className="product-card__link" href={`/${route}/${product.slug}`}>
         <CardMedia
           alt={product.imageAlt}
           className="product-card__media"
           fallback={
             <div className="product-placeholder" aria-hidden="true">
-              <span>{brandName}</span>
-              <small>{imagePlaceholder}</small>
+              <span>{bindShortRussianWords(brandName)}</span>
+              <small>{bindShortRussianWords(imagePlaceholder)}</small>
             </div>
           }
           imageUrl={product.imageUrl}
-          sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 25vw"
+          sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 368px"
           sources={product.imageSources}
         />
         <div className="product-card__body">
@@ -54,9 +54,11 @@ export function ProductCard({
                   : "product-card__unavailable"
               }
             >
-              {product.inStock
-                ? `${priceFormatter.format(product.priceRubles)} ₽`
-                : outOfStock}
+              {product.inStock ? (
+                <MoneyAmount rubles={product.priceRubles} variant="card" />
+              ) : (
+                bindShortRussianWords(outOfStock)
+              )}
             </strong>
           </div>
         </div>

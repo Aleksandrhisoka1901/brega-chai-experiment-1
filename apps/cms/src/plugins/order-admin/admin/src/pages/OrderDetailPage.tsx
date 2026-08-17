@@ -32,6 +32,7 @@ import {
   getStatusActionLabel,
   getStatusConfirmation,
   getStatusPresentation,
+  getOrderTransitionErrorMessage,
   type OrderStatus,
 } from "../view-model";
 
@@ -82,7 +83,7 @@ export function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const [transitionError, setTransitionError] = useState(false);
+  const [transitionError, setTransitionError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<OrderStatus | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [editOpen, setEditOpen] = useState(false);
@@ -106,7 +107,7 @@ export function OrderDetailPage() {
 
   async function applyTransition(status: OrderStatus) {
     setTransitioning(true);
-    setTransitionError(false);
+    setTransitionError(null);
     try {
       const updatedOrder = await api.transition(documentId, status);
       setOrder(updatedOrder);
@@ -115,8 +116,8 @@ export function OrderDetailPage() {
       );
       setConfirmation(null);
       transitionTriggerRef.current?.focus();
-    } catch {
-      setTransitionError(true);
+    } catch (error) {
+      setTransitionError(getOrderTransitionErrorMessage(error));
     } finally {
       setTransitioning(false);
     }
@@ -194,13 +195,13 @@ export function OrderDetailPage() {
           <Box paddingBottom={4}>
             <Alert
               action={
-                <Button onClick={() => setTransitionError(false)}>OK</Button>
+                <Button onClick={() => setTransitionError(null)}>OK</Button>
               }
               closeLabel="Закрыть"
               title="Статус не изменён"
               variant="danger"
             >
-              Обновите страницу и повторите действие.
+              {transitionError}
             </Alert>
           </Box>
         )}

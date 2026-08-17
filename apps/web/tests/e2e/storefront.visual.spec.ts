@@ -10,15 +10,22 @@ async function openStablePage(page: Page, path: string) {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(path);
   await expect(page.getByRole("main")).toBeVisible();
-  await expect
-    .poll(() =>
-      page
-        .locator("img")
-        .evaluateAll((images) =>
-          images.every((image) => (image as HTMLImageElement).complete),
+
+  const images = page.locator("img");
+  for (let index = 0; index < (await images.count()); index += 1) {
+    const image = images.nth(index);
+    await image.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        image.evaluate(
+          (element) =>
+            (element as HTMLImageElement).complete &&
+            (element as HTMLImageElement).naturalWidth > 0,
         ),
-    )
-    .toBe(true);
+      )
+      .toBe(true);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
 }
 
 for (const viewport of viewports) {

@@ -9,16 +9,20 @@ export function HomeSliderControls({
   atStart,
   onNext,
   onPrevious,
+  prominent = false,
   subject,
 }: {
   atEnd: boolean;
   atStart: boolean;
   onNext: () => void;
   onPrevious: () => void;
+  prominent?: boolean;
   subject: string;
 }) {
   return (
-    <div className={styles.controls}>
+    <div
+      className={`${styles.controls} ${prominent ? styles.controlsProminent : ""}`}
+    >
       <div>
         <button
           aria-label={`Предыдущие ${subject}`}

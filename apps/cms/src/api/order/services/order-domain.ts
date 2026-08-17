@@ -31,11 +31,17 @@ export type OrderServiceErrorCode =
 
 export class OrderServiceError extends Error {
   readonly code: OrderServiceErrorCode;
+  readonly details?: { productId?: string };
 
-  constructor(code: OrderServiceErrorCode, message: string) {
+  constructor(
+    code: OrderServiceErrorCode,
+    message: string,
+    details?: { productId?: string },
+  ) {
     super(message);
     this.name = "OrderServiceError";
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -138,7 +144,7 @@ export interface OrderCreation {
 export interface TransactionRepository {
   findOrderByIdempotencyKey(key: string): Promise<StoredOrder | null>;
   lockProducts(productIds: string[]): Promise<LockedProduct[]>;
-  decrementStock(recordId: number, quantity: number): Promise<boolean>;
+  decrementStock(productId: string, quantity: number): Promise<boolean>;
   insertOrder(draft: OrderDraft): Promise<StoredOrder>;
 }
 
@@ -151,7 +157,8 @@ export interface OrderPersistence {
 
 export interface OrderStatusTransactionRepository {
   lockOrder(orderId: string): Promise<StoredOrder | null>;
-  restoreStock(recordId: number, quantity: number): Promise<boolean>;
+  lockExistingProductIds(productIds: string[]): Promise<string[]>;
+  restoreStock(productId: string, quantity: number): Promise<boolean>;
   updateStatus(
     orderId: string,
     status: OrderStatus,
@@ -177,8 +184,8 @@ export interface OrderEditPatch {
 export interface OrderEditTransactionRepository {
   lockOrder(orderId: string): Promise<StoredOrder | null>;
   lockProducts(productIds: string[]): Promise<LockedProduct[]>;
-  decrementStock(recordId: number, quantity: number): Promise<boolean>;
-  restoreStock(recordId: number, quantity: number): Promise<boolean>;
+  decrementStock(productId: string, quantity: number): Promise<boolean>;
+  restoreStock(productId: string, quantity: number): Promise<boolean>;
   updateOrder(
     orderId: string,
     patch: OrderEditPatch,
@@ -334,7 +341,7 @@ export async function createOrderWithMeta(
       if (
         !product ||
         !(await repository.decrementStock(
-          product.recordId,
+          product.productId,
           input.items[index]!.quantity,
         ))
       ) {
@@ -516,10 +523,7 @@ export async function editOrder(
       const quantityToRestore = existing.quantity - desiredQuantity;
       if (
         quantityToRestore > 0 &&
-        !(await repository.restoreStock(
-          existing.stockRecordId,
-          quantityToRestore,
-        ))
+        !(await repository.restoreStock(existing.productId, quantityToRestore))
       ) {
         throw new OrderServiceError(
           "STOCK_RESTORE_FAILED",
@@ -533,10 +537,7 @@ export async function editOrder(
       const quantityToReserve = line.quantity - existingQuantity;
       if (
         quantityToReserve > 0 &&
-        !(await repository.decrementStock(
-          line.stockRecordId,
-          quantityToReserve,
-        ))
+        !(await repository.decrementStock(line.productId, quantityToReserve))
       ) {
         throw new OrderServiceError(
           "INSUFFICIENT_STOCK",
@@ -589,16 +590,29 @@ export async function transitionOrderStatus(
       );
     }
 
+    if (nextStatus.data === "confirmed") {
+      const existingProductIds = new Set(
+        await repository.lockExistingProductIds(
+          order.lines.map((line) => line.productId),
+        ),
+      );
+      const missingLine = order.lines.find(
+        (line) => !existingProductIds.has(line.productId),
+      );
+      if (missingLine) {
+        throw new OrderServiceError(
+          "PRODUCT_NOT_FOUND",
+          `Product ${missingLine.productId} was deleted before confirmation`,
+          { productId: missingLine.productId },
+        );
+      }
+    }
+
     if (nextStatus.data === "cancelled") {
       for (const line of order.lines) {
-        if (
-          !(await repository.restoreStock(line.stockRecordId, line.quantity))
-        ) {
-          throw new OrderServiceError(
-            "STOCK_RESTORE_FAILED",
-            `Could not restore stock for product ${line.productId}`,
-          );
-        }
+        // A deleted catalog document must not make an operational order
+        // impossible to cancel. Database failures still throw and roll back.
+        await repository.restoreStock(line.productId, line.quantity);
       }
     }
 

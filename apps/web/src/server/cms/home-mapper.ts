@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 import { CmsValidationError } from "./errors.ts";
+import { versionCmsMediaUrl } from "./media-url.ts";
 import { mapProductsPayload } from "./product-mapper.ts";
 
 const mediaSchema = z.object({
   url: z.string().min(1),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
+  updatedAt: z.iso.datetime(),
   formats: z
     .record(
       z.string(),
@@ -18,17 +20,21 @@ const mediaSchema = z.object({
     .nullable()
     .optional(),
 });
-const imageSchema = z.object({ alt: z.string().min(1), image: mediaSchema });
+const imageSchema = z.object({
+  alt: z.string().nullable().optional(),
+  image: mediaSchema,
+});
 const linkSchema = z.object({
   label: z.string().min(1),
   url: z.string().min(1),
 });
+const optionalEyebrowSchema = z.string().nullable().optional();
 export const DEFAULT_HERO_COLORS = {
   background: "#AFB094",
   text: "#24251E",
 } as const;
 const previewSchema = z.object({
-  eyebrow: z.string().min(1),
+  eyebrow: optionalEyebrowSchema,
   title: z.string().min(1),
   subtitle: z.string().min(1).nullable().optional(),
   linkLabel: z.string().min(1).nullable().optional(),
@@ -37,7 +43,7 @@ const seoSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   image: z
-    .object({ url: z.string().min(1) })
+    .object({ url: z.string().min(1), updatedAt: z.iso.datetime() })
     .nullable()
     .optional(),
 });
@@ -45,7 +51,7 @@ const responseSchema = z.object({
   data: z.object({
     seo: seoSchema.nullable().optional(),
     hero: z.object({
-      eyebrow: z.string().min(1),
+      eyebrow: optionalEyebrowSchema,
       title: z.string().min(1),
       text: z.string().min(1),
       layout: z.enum(["50/50", "40/60", "100/0"]),
@@ -55,7 +61,7 @@ const responseSchema = z.object({
       cta: linkSchema.nullable().optional(),
     }),
     about: z.object({
-      eyebrow: z.string().min(1),
+      eyebrow: optionalEyebrowSchema,
       title: z.string().min(1),
       textBlock1: z.string().nullable().optional(),
       textBlock2: z.string().nullable().optional(),
@@ -83,7 +89,7 @@ export type HomePageContent = {
     imageUrl?: string;
   };
   hero: {
-    eyebrow: string;
+    eyebrow?: string;
     title: string;
     text: string;
     layout: "50/50" | "40/60" | "100/0";
@@ -93,7 +99,7 @@ export type HomePageContent = {
     cta?: { label: string; url: string };
   };
   about: {
-    eyebrow: string;
+    eyebrow?: string;
     title: string;
     textBlocks: string[];
     backgroundColor?: string;
@@ -101,12 +107,13 @@ export type HomePageContent = {
     spacing: "S" | "M" | "L" | "XL";
   };
   naboryPreview: {
-    eyebrow: string;
+    eyebrow?: string;
     title: string;
     subtitle?: string;
+    linkLabel: string;
   };
   tovaryPreview: {
-    eyebrow: string;
+    eyebrow?: string;
     title: string;
     subtitle?: string;
     linkLabel: string;
@@ -140,18 +147,19 @@ export function mapHomeCollectionsPayload(
   };
 }
 
-function mediaUrl(path: string, base: string) {
-  return URL.canParse(path) ? path : new URL(path, base).toString();
+function optionalEyebrow(value: string | null | undefined) {
+  const eyebrow = value?.trim();
+  return eyebrow ? { eyebrow } : {};
 }
 
 function mapImage(value: z.infer<typeof imageSchema>, base: string): HomeImage {
   const sources = Object.values(value.image.formats ?? {}).map((format) => ({
-    url: mediaUrl(format.url, base),
+    url: versionCmsMediaUrl(format.url, base, value.image.updatedAt),
     width: format.width,
   }));
   return {
-    url: mediaUrl(value.image.url, base),
-    alt: value.alt,
+    url: versionCmsMediaUrl(value.image.url, base, value.image.updatedAt),
+    alt: value.alt?.trim() ? value.alt : "",
     width: value.image.width,
     height: value.image.height,
     sources,
@@ -173,13 +181,19 @@ export function mapHomePagePayload(
             title: seo.title,
             description: seo.description,
             ...(seo.image
-              ? { imageUrl: mediaUrl(seo.image.url, publicBase) }
+              ? {
+                  imageUrl: versionCmsMediaUrl(
+                    seo.image.url,
+                    publicBase,
+                    seo.image.updatedAt,
+                  ),
+                }
               : {}),
           },
         }
       : {}),
     hero: {
-      eyebrow: hero.eyebrow,
+      ...optionalEyebrow(hero.eyebrow),
       title: hero.title,
       text: hero.text,
       layout: hero.layout,
@@ -191,7 +205,7 @@ export function mapHomePagePayload(
       ...(hero.cta ? { cta: hero.cta } : {}),
     },
     about: {
-      eyebrow: about.eyebrow,
+      ...optionalEyebrow(about.eyebrow),
       title: about.title,
       textBlocks: [about.textBlock1, about.textBlock2].flatMap((text) =>
         text?.trim() ? [text.trim()] : [],
@@ -203,12 +217,13 @@ export function mapHomePagePayload(
       spacing: about.spacing,
     },
     naboryPreview: {
-      eyebrow: naboryPreview.eyebrow,
+      ...optionalEyebrow(naboryPreview.eyebrow),
       title: naboryPreview.title,
       ...(naboryPreview.subtitle ? { subtitle: naboryPreview.subtitle } : {}),
+      linkLabel: naboryPreview.linkLabel?.trim() || "Все ритуалы",
     },
     tovaryPreview: {
-      eyebrow: tovaryPreview.eyebrow,
+      ...optionalEyebrow(tovaryPreview.eyebrow),
       title: tovaryPreview.title,
       ...(tovaryPreview.subtitle ? { subtitle: tovaryPreview.subtitle } : {}),
       linkLabel: tovaryPreview.linkLabel,

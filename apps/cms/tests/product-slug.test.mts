@@ -5,6 +5,7 @@ import {
   assertSlugImmutable,
   generateUniqueSlug,
   normalizeSlugBase,
+  shouldRegenerateDraftSlug,
   shouldGenerateSlug,
   transliterateCatalogTitle,
 } from "../src/api/product/content-types/product/slug.ts";
@@ -54,5 +55,36 @@ test("rejects a changed slug but permits an omitted or unchanged value", () => {
 test("generates a slug only when create data does not already carry one", () => {
   assert.equal(shouldGenerateSlug(undefined), true);
   assert.equal(shouldGenerateSlug(""), true);
+  assert.equal(shouldGenerateSlug("product"), false);
   assert.equal(shouldGenerateSlug("tea-a1b2c3"), false);
+});
+
+test("regenerates from a changed draft display name before first publish", () => {
+  assert.equal(
+    shouldRegenerateDraftSlug({
+      currentDisplayName: "Утро без слов",
+      nextDisplayName: "Тихое утро",
+      hasPublishedVersion: false,
+    }),
+    true,
+  );
+  assert.equal(
+    shouldRegenerateDraftSlug({
+      currentDisplayName: "Утро без слов",
+      nextDisplayName: "Утро без слов",
+      hasPublishedVersion: false,
+    }),
+    false,
+  );
+});
+
+test("never follows display-name changes after the document was published", () => {
+  assert.equal(
+    shouldRegenerateDraftSlug({
+      currentDisplayName: "Утро без слов",
+      nextDisplayName: "Тихое утро",
+      hasPublishedVersion: true,
+    }),
+    false,
+  );
 });

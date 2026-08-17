@@ -24,8 +24,7 @@
     },
     "eyebrow": {
       "type": "string",
-      "required": true,
-      "minLength": 1
+      "required": false
     },
     "emptyStateText": {
       "type": "text",

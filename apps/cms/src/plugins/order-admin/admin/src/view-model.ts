@@ -105,20 +105,28 @@ export function calculateEditedOrderTotals(
   };
 }
 
-export function getOrderEditErrorMessage(error: unknown) {
+function getApiErrorMessage(error: unknown, fallback: string) {
   if (!error || typeof error !== "object") {
-    return "Не удалось сохранить изменения";
+    return fallback;
   }
   const response = "response" in error ? error.response : null;
   if (!response || typeof response !== "object" || !("data" in response)) {
-    return "Не удалось сохранить изменения";
+    return fallback;
   }
   const data = response.data;
   if (!data || typeof data !== "object" || !("error" in data)) {
-    return "Не удалось сохранить изменения";
+    return fallback;
   }
   const apiError = data.error;
   return apiError && typeof apiError === "object" && "message" in apiError
     ? String(apiError.message)
-    : "Не удалось сохранить изменения";
+    : fallback;
+}
+
+export function getOrderEditErrorMessage(error: unknown) {
+  return getApiErrorMessage(error, "Не удалось сохранить изменения");
+}
+
+export function getOrderTransitionErrorMessage(error: unknown) {
+  return getApiErrorMessage(error, "Обновите страницу и повторите действие.");
 }

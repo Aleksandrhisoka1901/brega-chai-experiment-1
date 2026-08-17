@@ -4,15 +4,10 @@ import { bindShortRussianWords } from "@/lib/typography";
 import { ProductDetailGallery } from "./product-detail-gallery";
 import { ProductDetailPurchase } from "./product-detail-purchase";
 import { Breadcrumbs, type BreadcrumbItem } from "./breadcrumbs";
+import { MoneyAmount } from "./money-amount";
 import { RichContent } from "./rich-content/rich-content";
 import styles from "./product-detail.module.css";
 import type { RichContentBlock } from "./rich-content/model";
-
-const priceFormatter = new Intl.NumberFormat("ru-RU", {
-  style: "currency",
-  currency: "RUB",
-  maximumFractionDigits: 0,
-});
 
 export function ProductDetail({
   brandName,
@@ -30,7 +25,7 @@ export function ProductDetail({
   product: ProductDetailData;
 }) {
   return (
-    <article className={styles.page}>
+    <article className={`${styles.page} content-frame`} data-content-frame>
       <Breadcrumbs items={breadcrumbs} />
       <div className={styles.top}>
         <ProductDetailGallery
@@ -56,7 +51,7 @@ export function ProductDetail({
             {bindShortRussianWords(product.packageLabel)}
           </p>
           <p className={styles.price}>
-            {priceFormatter.format(product.priceRubles)}
+            <MoneyAmount rubles={product.priceRubles} variant="detail" />
           </p>
 
           <ProductDetailPurchase
@@ -86,12 +81,21 @@ export function ProductDetail({
             <div className={styles.boutiqueStory}>
               <RichContent content={boutiqueStory} />
             </div>
-            <p>{bindShortRussianWords(product.story)}</p>
+            <div
+              className={styles.productStory}
+              data-rich-content-scope="product-story"
+            >
+              <RichContent content={product.story} />
+            </div>
           </div>
         </div>
       </div>
       {product.articles.map((content, index) => (
-        <section className={styles.articleContent} key={index}>
+        <section
+          className={styles.articleContent}
+          data-rich-content-scope="article"
+          key={index}
+        >
           <RichContent content={content} />
         </section>
       ))}

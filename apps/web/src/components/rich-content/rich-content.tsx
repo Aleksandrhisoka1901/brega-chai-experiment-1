@@ -77,7 +77,7 @@ function renderBlock(block: RichContentBlock, key: number): ReactNode {
           <ResponsiveImage
             alt={block.alt}
             height={block.height}
-            sizes="(max-width: 767px) 100vw, 72vw"
+            sizes="(max-width: 767px) calc(100vw - 2.5rem), 736px"
             sources={block.sources}
             src={block.url}
             width={block.width}

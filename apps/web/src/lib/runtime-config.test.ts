@@ -14,6 +14,7 @@ test("exposes only the explicit public runtime allowlist", () => {
       NEXT_PUBLIC_CMS_URL: "https://admin.brega.example",
       NEXT_PUBLIC_MEDIA_URL: "https://media.brega.example/storefront",
       CMS_INTERNAL_URL: "http://cms:1337",
+      DEV_IMAGE_UPSTREAM: "http://rustfs:9000",
       CHECKOUT_FORM_SECRET: "checkout-secret",
       STRAPI_ORDER_TOKEN: "order-token",
       CACHE_REVALIDATION_SECRET: "revalidation-secret",

@@ -1,3 +1,5 @@
+import { versionCmsMediaUrl } from "../../server/cms/media-url.ts";
+
 type RecordValue = Record<string, unknown>;
 
 export type RichText = {
@@ -152,14 +154,18 @@ function normalizeContainer(value: RecordValue): RichInline[] | null {
   return hasVisibleText(children) ? children : null;
 }
 
-function normalizeImageUrl(value: string, publicBase?: string): string | null {
+function normalizeImageUrl(
+  value: string,
+  publicBase?: string,
+  updatedAt?: string,
+): string | null {
   const path = value.trim();
   if (!path) return null;
 
   try {
     const url = publicBase ? new URL(path, publicBase) : new URL(path);
     return url.protocol === "http:" || url.protocol === "https:"
-      ? url.toString()
+      ? versionCmsMediaUrl(url.toString(), url.origin, updatedAt)
       : null;
   } catch {
     return null;
@@ -186,7 +192,11 @@ function normalizeImage(
   const alt = rawAlt.trim();
   const url =
     typeof media.url === "string"
-      ? normalizeImageUrl(media.url, publicBase)
+      ? normalizeImageUrl(
+          media.url,
+          publicBase,
+          typeof media.updatedAt === "string" ? media.updatedAt : undefined,
+        )
       : null;
   const width = media.width;
   const height = media.height;
@@ -229,7 +239,11 @@ function normalizeImage(
         ) {
           return [];
         }
-        const sourceUrl = normalizeImageUrl(format.url, publicBase);
+        const sourceUrl = normalizeImageUrl(
+          format.url,
+          publicBase,
+          typeof media.updatedAt === "string" ? media.updatedAt : undefined,
+        );
         return sourceUrl ? [{ url: sourceUrl, width: format.width }] : [];
       })
     : [];

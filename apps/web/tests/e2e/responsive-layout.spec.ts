@@ -26,11 +26,16 @@ for (const viewport of viewports) {
   }) => {
     await page.setViewportSize(viewport);
 
-    for (const path of ["/", "/tovary", "/tovary/published-product"]) {
+    for (const path of [
+      "/",
+      "/tovary",
+      "/nabory",
+      "/tovary/published-product",
+    ]) {
       await page.goto(path);
       await expectNoPageOverflow(page, viewport.width);
 
-      if (path === "/" || path === "/tovary") {
+      if (path === "/" || path === "/tovary" || path === "/nabory") {
         const grid = page.locator(".product-grid").first();
         const styles = await grid.evaluate((element) => {
           const computed = getComputedStyle(element);
@@ -50,7 +55,9 @@ for (const viewport of viewports) {
 
       if (path === "/" && viewport.width > 520) {
         for (const sectionId of ["nabory", "tovary"]) {
-          const header = page.locator(`#${sectionId} > header`);
+          const header = page.locator(
+            `#${sectionId} > [data-content-frame] > header`,
+          );
           const titleBox = await header.getByRole("heading").boundingBox();
           const descriptionBox = await header.locator("p").nth(1).boundingBox();
 
@@ -80,10 +87,9 @@ for (const viewport of viewports) {
           .locator('[data-home-card="nabor"]')
           .first()
           .locator("..");
-        const nextNabory = nabory.getByRole("button", {
-          name: "Следующие ритуалы",
-        });
-        await expect(nextNabory).toBeHidden();
+        await expect(
+          nabory.getByRole("button", { name: /ритуалы/u }),
+        ).toBeHidden();
         const before = await naborTrack.evaluate(
           (element) => element.scrollLeft,
         );
@@ -105,10 +111,9 @@ for (const viewport of viewports) {
         if (viewport.width <= 520) {
           const products = page.locator("#tovary");
           const productTrack = products.locator(".product-grid");
-          const nextProducts = products.getByRole("button", {
-            name: "Следующие сорта",
-          });
-          await expect(nextProducts).toBeHidden();
+          await expect(
+            products.getByRole("button", { name: /сорта/u }),
+          ).toBeHidden();
           const beforeProducts = await productTrack.evaluate(
             (element) => element.scrollLeft,
           );

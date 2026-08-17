@@ -8,6 +8,7 @@ import {
   formatRubles,
   getDeliveryMethodPresentation,
   getOrderEditErrorMessage,
+  getOrderTransitionErrorMessage,
   getStatusActionLabel,
   getStatusConfirmation,
   getStatusPresentation,
@@ -58,6 +59,25 @@ test("edit error prefers the safe API message", () => {
   assert.equal(
     getOrderEditErrorMessage(new Error("private database details")),
     "Не удалось сохранить изменения",
+  );
+});
+
+test("status error exposes a safe operational API message", () => {
+  assert.equal(
+    getOrderTransitionErrorMessage({
+      response: {
+        data: {
+          error: {
+            message: "Нельзя подтвердить заказ: товар «Долгий вечер» удалён",
+          },
+        },
+      },
+    }),
+    "Нельзя подтвердить заказ: товар «Долгий вечер» удалён",
+  );
+  assert.equal(
+    getOrderTransitionErrorMessage(new Error("private database details")),
+    "Обновите страницу и повторите действие.",
   );
 });
 

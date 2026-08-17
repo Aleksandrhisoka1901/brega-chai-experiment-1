@@ -14,3 +14,25 @@ export function updateProductQuantity(
   if (maximum === 0) return 0;
   return Math.min(maximum, Math.max(1, current + delta));
 }
+
+export function resolveProductQuantityChange({
+  selectedQuantity,
+  cartQuantity,
+  delta,
+  maximum,
+}: {
+  selectedQuantity: number;
+  cartQuantity?: number;
+  delta: -1 | 1;
+  maximum: number;
+}) {
+  return {
+    quantity: updateProductQuantity(
+      cartQuantity ?? selectedQuantity,
+      delta,
+      maximum,
+    ),
+    target:
+      cartQuantity === undefined ? ("selection" as const) : ("cart" as const),
+  };
+}

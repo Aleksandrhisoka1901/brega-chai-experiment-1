@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { AnalyticsConsent } from "@/features/analytics/analytics-consent";
 import { siteOrigin } from "@/lib/seo/metadata";
+import { bindShortRussianWords } from "@/lib/typography";
 import {
   organizationStructuredData,
   websiteStructuredData,
@@ -74,7 +75,7 @@ export default async function RootLayout({
           )}
         />
         <a className="skip-link" href="#main-content">
-          К содержимому
+          {bindShortRussianWords("К содержимому")}
         </a>
         <SiteHeader
           brandName={settings?.brandName}

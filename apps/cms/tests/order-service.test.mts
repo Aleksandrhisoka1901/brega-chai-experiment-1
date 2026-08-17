@@ -71,10 +71,8 @@ class MemoryPersistence implements OrderPersistence {
           const value = products.get(id);
           return value ? [{ ...value }] : [];
         }),
-      decrementStock: async (recordId, quantity) => {
-        const entry = [...products.values()].find(
-          (candidate) => candidate.recordId === recordId,
-        );
+      decrementStock: async (productId, quantity) => {
+        const entry = products.get(productId);
         if (!entry || entry.stock < quantity) return false;
         entry.stock -= quantity;
         return true;
@@ -133,18 +131,14 @@ class MemoryEditPersistence implements OrderEditPersistence {
           const value = products.get(id);
           return value?.published ? [{ ...value }] : [];
         }),
-      decrementStock: async (recordId, quantity) => {
-        const entry = [...products.values()].find(
-          (candidate) => candidate.recordId === recordId,
-        );
+      decrementStock: async (productId, quantity) => {
+        const entry = products.get(productId);
         if (!entry || entry.stock < quantity) return false;
         entry.stock -= quantity;
         return true;
       },
-      restoreStock: async (recordId, quantity) => {
-        const entry = [...products.values()].find(
-          (candidate) => candidate.recordId === recordId,
-        );
+      restoreStock: async (productId, quantity) => {
+        const entry = products.get(productId);
         if (!entry) return false;
         entry.stock += quantity;
         return true;
@@ -196,10 +190,10 @@ class MemoryStatusPersistence implements OrderStatusPersistence {
     const repository: OrderStatusTransactionRepository = {
       lockOrder: async (orderId) =>
         [...orders.values()].find((order) => order.orderId === orderId) ?? null,
-      restoreStock: async (recordId, quantity) => {
-        const entry = [...products.values()].find(
-          (candidate) => candidate.recordId === recordId,
-        );
+      lockExistingProductIds: async (productIds) =>
+        productIds.filter((productId) => products.has(productId)),
+      restoreStock: async (productId, quantity) => {
+        const entry = products.get(productId);
         if (!entry) return false;
         entry.stock += quantity;
         return true;
@@ -513,6 +507,56 @@ test("cancelling restores every line exactly once", async () => {
       error.code === "INVALID_STATUS_TRANSITION",
   );
   assert.equal(persistence.products.get("product-1")?.stock, 3);
+});
+
+test("cancellation follows the stable product id after a published row changes", async () => {
+  const persistence = new MemoryPersistence();
+  const created = await createOrder(request, persistence, checkoutSettings);
+  persistence.products.get("product-1")!.recordId = 99;
+
+  const cancelled = await transitionOrderStatus(
+    created.orderId,
+    "cancelled",
+    new MemoryStatusPersistence(persistence),
+  );
+
+  assert.equal(cancelled.status, "cancelled");
+  assert.equal(persistence.products.get("product-1")?.stock, 3);
+});
+
+test("cancellation bypasses stock restore for a fully deleted product", async () => {
+  const persistence = new MemoryPersistence();
+  const created = await createOrder(request, persistence, checkoutSettings);
+  persistence.products.delete("product-1");
+
+  const cancelled = await transitionOrderStatus(
+    created.orderId,
+    "cancelled",
+    new MemoryStatusPersistence(persistence),
+  );
+
+  assert.equal(cancelled.status, "cancelled");
+  assert.equal(
+    [...persistence.orders.values()][0]?.statusHistory.at(-1)?.to,
+    "cancelled",
+  );
+});
+
+test("confirmation rejects an order containing a deleted product", async () => {
+  const persistence = new MemoryPersistence();
+  const created = await createOrder(request, persistence, checkoutSettings);
+  persistence.products.delete("product-1");
+
+  await assert.rejects(
+    transitionOrderStatus(
+      created.orderId,
+      "confirmed",
+      new MemoryStatusPersistence(persistence),
+    ),
+    (error) =>
+      error instanceof OrderServiceError && error.code === "PRODUCT_NOT_FOUND",
+  );
+  assert.equal([...persistence.orders.values()][0]?.status, "new");
 });
 
 test("allows only approved status transitions and rolls back failed restore", async () => {

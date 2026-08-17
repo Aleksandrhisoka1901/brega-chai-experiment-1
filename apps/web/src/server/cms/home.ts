@@ -23,10 +23,12 @@ export async function getHomePage(): Promise<HomePageData> {
     "populate[seo][fields][0]": "title",
     "populate[seo][fields][1]": "description",
     "populate[seo][populate][image][fields][0]": "url",
+    "populate[seo][populate][image][fields][1]": "updatedAt",
     "populate[hero][populate][image][populate][image][fields][0]": "url",
     "populate[hero][populate][image][populate][image][fields][1]": "width",
     "populate[hero][populate][image][populate][image][fields][2]": "height",
     "populate[hero][populate][image][populate][image][fields][3]": "formats",
+    "populate[hero][populate][image][populate][image][fields][4]": "updatedAt",
     "populate[hero][populate][cta]": "true",
     "populate[about]": "true",
     "populate[naboryPreview]": "true",
@@ -58,6 +60,7 @@ export async function getHomePage(): Promise<HomePageData> {
       "formats",
       "width",
       "height",
+      "updatedAt",
     ].entries()) {
       homeQuery.set(
         `populate[${relation}][populate][mainImage][populate][image][fields][${index}]`,

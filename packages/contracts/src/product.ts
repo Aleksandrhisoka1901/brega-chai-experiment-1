@@ -12,7 +12,7 @@ export const productSummarySchema = z.object({
   excerpt: z.string().min(1),
   inStock: z.boolean(),
   imageUrl: z.url().optional(),
-  imageAlt: z.string().min(1).optional(),
+  imageAlt: z.string().optional(),
   imageSources: z
     .array(
       z.object({

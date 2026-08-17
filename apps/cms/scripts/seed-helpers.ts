@@ -34,6 +34,7 @@ export const PUBLIC_STOREFRONT_ACTIONS = [
   "api::product.product.find",
   "api::product.product.findOne",
   "api::products-page.products-page.find",
+  "api::rituals-page.rituals-page.find",
 ] as const;
 
 export function assertSeedAllowed(

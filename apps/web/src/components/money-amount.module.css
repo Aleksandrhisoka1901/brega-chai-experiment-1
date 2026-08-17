@@ -1,0 +1,27 @@
+.money {
+  display: inline-block;
+  font-family: var(--font-interface);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.card {
+  font-size: 1.125rem;
+}
+
+.detail {
+  font-size: clamp(1.375rem, 2.25vw, 1.75rem);
+}
+
+.line {
+  font-size: 1rem;
+}
+
+.previousTotal {
+  font-size: 1rem;
+}
+
+.total {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+}

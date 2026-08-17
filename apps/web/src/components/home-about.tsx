@@ -14,14 +14,20 @@ export function HomeAbout({ about }: { about: HomePageContent["about"] }) {
         color: about.textColor,
       }}
     >
-      <div className={styles.aboutTitle}>
-        <p className={styles.chapter}>{bindShortRussianWords(about.eyebrow)}</p>
-        <h2>{bindShortRussianWords(about.title)}</h2>
-      </div>
-      <div className={styles.aboutCopy}>
-        {about.textBlocks.map((paragraph) => (
-          <p key={paragraph}>{bindShortRussianWords(paragraph)}</p>
-        ))}
+      <div className={`${styles.aboutInner} content-frame`} data-content-frame>
+        <div className={styles.aboutTitle}>
+          {about.eyebrow ? (
+            <p className={styles.chapter}>
+              {bindShortRussianWords(about.eyebrow)}
+            </p>
+          ) : null}
+          <h2>{bindShortRussianWords(about.title)}</h2>
+        </div>
+        <div className={styles.aboutCopy}>
+          {about.textBlocks.map((paragraph) => (
+            <p key={paragraph}>{bindShortRussianWords(paragraph)}</p>
+          ))}
+        </div>
       </div>
     </section>
   );

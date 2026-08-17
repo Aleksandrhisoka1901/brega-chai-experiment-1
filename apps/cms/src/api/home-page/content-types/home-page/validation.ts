@@ -5,6 +5,6 @@ export interface HeroInput {
 
 export function validateHeroImage(hero: HeroInput | null | undefined): void {
   if (hero?.layout && hero.layout !== "100/0" && !hero.image) {
-    throw new Error("Hero image and alt are required for split layouts");
+    throw new Error("Hero image is required for split layouts");
   }
 }

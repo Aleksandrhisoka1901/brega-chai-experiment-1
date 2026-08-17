@@ -29,8 +29,10 @@ test("product schema enforces price, stock, currency and publication constraints
   assert.equal(product.attributes.stock.min, 0);
   assert.equal(product.attributes.stock.default, 0);
   assert.deepEqual(product.attributes.currency.enum, ["RUB"]);
+  assert.equal(product.attributes.slug.type, "string");
   assert.equal(product.attributes.slug.unique, true);
-  assert.equal(product.attributes.slug.targetField, "displayName");
+  assert.equal(product.attributes.slug.required, false);
+  assert.equal(product.attributes.slug.targetField, undefined);
   assert.equal(product.attributes.slug.minLength, 1);
   assert.equal(product.attributes.active, undefined);
   assert.equal(product.attributes.sortOrder, undefined);
@@ -132,24 +134,33 @@ test("home and catalog schemas expose every agreed editable text", async () => {
   const page = await schema(
     "src/api/products-page/content-types/products-page/schema.json",
   );
+  const ritualsPage = await schema(
+    "src/api/rituals-page/content-types/rituals-page/schema.json",
+  );
 
-  assert.equal(hero.attributes.eyebrow.required, true);
-  assert.equal(about.attributes.eyebrow.required, true);
+  assert.equal(hero.attributes.eyebrow.required, false);
+  assert.equal(hero.attributes.eyebrow.minLength, undefined);
+  assert.equal(about.attributes.eyebrow.required, false);
+  assert.equal(about.attributes.eyebrow.minLength, undefined);
   assert.equal(about.attributes.title.required, true);
   assert.equal(about.attributes.text, undefined);
   assert.equal(about.attributes.textBlock1.required, false);
   assert.equal(about.attributes.textBlock2.required, false);
   assert.equal(about.attributes.image, undefined);
-  assert.equal(preview.attributes.eyebrow.required, true);
+  assert.equal(preview.attributes.eyebrow.required, false);
+  assert.equal(preview.attributes.eyebrow.minLength, undefined);
   assert.equal(preview.attributes.linkLabel.required, false);
-  assert.equal(ritualsPreview.attributes.eyebrow.required, true);
-  assert.equal(ritualsPreview.attributes.linkLabel, undefined);
-  assert.equal(page.attributes.eyebrow.required, true);
+  assert.equal(ritualsPreview.attributes.eyebrow.required, false);
+  assert.equal(ritualsPreview.attributes.eyebrow.minLength, undefined);
+  assert.equal(ritualsPreview.attributes.linkLabel.required, false);
+  assert.equal(page.attributes.eyebrow.required, false);
+  assert.equal(page.attributes.eyebrow.minLength, undefined);
   assert.equal(page.attributes.emptyStateText.required, true);
   assert.equal(page.attributes.emptyStateLinkLabel.required, true);
   assert.equal(page.attributes.intro.type, "text");
   assert.equal(page.attributes.intro.required, true);
   assert.equal(page.attributes.image, undefined);
+  assert.deepEqual(ritualsPage.attributes, page.attributes);
 });
 
 test("global checkout settings are bounded and the order email stays private", async () => {
@@ -168,15 +179,44 @@ test("global checkout settings are bounded and the order email stays private", a
   assert.equal(global.attributes.logo.required, false);
 });
 
-test("main image is optional while an attached image requires alt text", async () => {
+test("product requires a main image while media alt text stays optional", async () => {
   const product = await schema(
     "src/api/product/content-types/product/schema.json",
   );
+  const hero = await schema("src/components/home/hero.json");
   const image = await schema("src/components/shared/image-with-alt.json");
+  const galleryImage = await schema(
+    "src/components/product/gallery-image.json",
+  );
 
-  assert.equal(product.attributes.mainImage.required, false);
+  assert.equal(product.attributes.mainImage.required, true);
+  assert.equal(product.attributes.gallery.required, false);
+  assert.deepEqual(product.attributes.slugLocked, {
+    type: "boolean",
+    default: false,
+    private: true,
+    configurable: false,
+  });
+  assert.equal(product.config.attributes.slugLocked.hidden, true);
+  assert.match(String(hero.info.description), /alt можно оставить пустым/u);
   assert.equal(image.attributes.image.required, true);
-  assert.equal(image.attributes.alt.required, true);
+  for (const component of [image, galleryImage]) {
+    assert.equal(component.attributes.alt.required, false);
+    assert.equal(component.attributes.alt.minLength, undefined);
+    assert.match(String(component.attributes.alt.description), /декоратив/u);
+  }
+});
+
+test("product story uses native Strapi Blocks independently of articles", async () => {
+  const product = await schema(
+    "src/api/product/content-types/product/schema.json",
+  );
+
+  assert.equal(product.attributes.story.type, "blocks");
+  assert.equal(product.attributes.story.required, true);
+  assert.equal(product.attributes.story.minLength, undefined);
+  assert.equal(product.attributes.story.customField, undefined);
+  assert.equal(product.attributes.articles.component, "product.article");
 });
 
 test("product supports ordered repeatable rich-content articles", async () => {
@@ -203,6 +243,7 @@ test("public page entities use the optional shared SEO component", async () => {
   for (const path of [
     "src/api/home-page/content-types/home-page/schema.json",
     "src/api/products-page/content-types/products-page/schema.json",
+    "src/api/rituals-page/content-types/rituals-page/schema.json",
     "src/api/product/content-types/product/schema.json",
   ]) {
     const contentType = await schema(path);

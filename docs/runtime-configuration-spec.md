@@ -50,22 +50,31 @@ script-breaking символов.
 Эти значения не являются browser config, даже если отдельные из них не дают
 прямого доступа к данным.
 
-| Переменная                         | Контейнеры          | Назначение                                                     |
-| ---------------------------------- | ------------------- | -------------------------------------------------------------- |
-| `CMS_INTERNAL_URL`                 | web                 | Внутренний адрес Strapi для Server Components, BFF и readiness |
-| `CHECKOUT_FORM_SECRET`             | web                 | Подпись и проверка серверного токена checkout-формы            |
-| `STRAPI_ORDER_TOKEN`               | web                 | Least-privilege токен создания заказа в Strapi                 |
-| `CACHE_REVALIDATION_URL`           | cms                 | Внутренний Next endpoint для cache revalidation                |
-| `CACHE_REVALIDATION_SECRET`        | web, cms            | HMAC-подпись cache revalidation                                |
-| `CACHE_REVALIDATION_TIMEOUT_MS`    | cms                 | Таймаут отправки revalidation                                  |
-| `STRAPI_URL`                       | cms                 | Публичный HTTPS origin Strapi для абсолютных URL               |
-| `DATABASE_HOST/PORT/NAME/USERNAME` | cms, служебные jobs | Параметры соединения с PostgreSQL                              |
-| `S3_ENDPOINT/REGION/BUCKET`        | cms, служебные jobs | Внутренние параметры object storage                            |
-| `MEDIA_PUBLIC_URL`                 | cms                 | Публичная база URL, которую Strapi записывает для media        |
+| Переменная                         | Контейнеры          | Назначение                                                         |
+| ---------------------------------- | ------------------- | ------------------------------------------------------------------ |
+| `CMS_INTERNAL_URL`                 | web                 | Внутренний адрес Strapi для Server Components, BFF и readiness     |
+| `DEV_IMAGE_UPSTREAM`               | web development     | Внутренний upstream локального loopback-forwarder для `next/image` |
+| `CHECKOUT_FORM_SECRET`             | web                 | Подпись и проверка серверного токена checkout-формы                |
+| `STRAPI_ORDER_TOKEN`               | web                 | Least-privilege токен создания заказа в Strapi                     |
+| `CACHE_REVALIDATION_URL`           | cms                 | Внутренний Next endpoint для cache revalidation                    |
+| `CACHE_REVALIDATION_SECRET`        | web, cms            | HMAC-подпись cache revalidation                                    |
+| `CACHE_REVALIDATION_TIMEOUT_MS`    | cms                 | Таймаут отправки revalidation                                      |
+| `STRAPI_URL`                       | cms                 | Публичный HTTPS origin Strapi для абсолютных URL                   |
+| `DATABASE_HOST/PORT/NAME/USERNAME` | cms, служебные jobs | Параметры соединения с PostgreSQL                                  |
+| `S3_ENDPOINT/REGION/BUCKET`        | cms, служебные jobs | Внутренние параметры object storage                                |
+| `MEDIA_PUBLIC_URL`                 | cms                 | Публичная база URL, которую Strapi записывает для media            |
 
 `CMS_INTERNAL_URL`, внутренние S3/DB endpoints и служебные timeout не являются
 криптографическими секретами, но раскрывают топологию или не нужны клиенту.
 Поэтому они остаются server-only.
+
+`DEV_IMAGE_UPSTREAM` используется только development stage web-контейнера.
+Loopback-forwarder принимает на `127.0.0.1:9000` только `GET`/`HEAD` для
+`/storefront/**` и передаёт их в `http://rustfs:9000`. Это сохраняет публичный
+`NEXT_PUBLIC_MEDIA_URL=http://localhost:9000` в HTML, metadata и админке, хотя
+для самого web-контейнера `localhost` означает его собственный network
+namespace. Переменная не входит в browser allowlist и отсутствует в production
+stage.
 
 ## 4. Секреты и credentials
 

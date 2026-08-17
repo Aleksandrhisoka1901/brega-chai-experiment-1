@@ -189,6 +189,26 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       intro: { list: { searchable: false, sortable: false } },
     },
   },
+  "api::rituals-page.rituals-page": {
+    layouts: {
+      edit: [
+        [
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
+        ],
+        [{ name: "intro", size: 12 }],
+        [
+          { name: "emptyStateText", size: 8 },
+          { name: "emptyStateLinkLabel", size: 4 },
+        ],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "title", "eyebrow", "updatedAt"],
+    },
+    metadatas: {
+      intro: { list: { searchable: false, sortable: false } },
+    },
+  },
   "home.catalog-preview": {
     layouts: {
       edit: [
@@ -253,9 +273,12 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
           { name: "eyebrow", size: 4 },
           { name: "title", size: 8 },
         ],
-        [{ name: "subtitle", size: 12 }],
+        [
+          { name: "subtitle", size: 8 },
+          { name: "linkLabel", size: 4 },
+        ],
       ],
-      list: ["id", "title", "subtitle", "eyebrow"],
+      list: ["id", "title", "subtitle", "eyebrow", "linkLabel"],
     },
     settings: { mainField: "title", defaultSortBy: "title" },
   },
@@ -495,6 +518,13 @@ export const configureOrderReadOnlyFields = (
   ),
 });
 
+export const configureSingleTypeMainField = (
+  configuration: ContentManagerConfiguration,
+): ContentManagerConfiguration => ({
+  ...configuration,
+  settings: { ...configuration.settings, mainField: "id" },
+});
+
 export const syncAdminContentManager = async (
   strapi: any,
   translations: AdminTranslations,
@@ -510,12 +540,16 @@ export const syncAdminContentManager = async (
       uid,
       await contentTypeService.findConfiguration(schema),
     );
-    const configured =
+    const fieldConfigured =
       uid === PRODUCT_UID
         ? configureProductFields(configuration)
         : uid === ORDER_UID
           ? configureOrderReadOnlyFields(configuration)
           : configuration;
+    const configured =
+      schema.kind === "singleType" && uid.startsWith("api::")
+        ? configureSingleTypeMainField(fieldConfigured)
+        : fieldConfigured;
     await contentTypeService.updateConfiguration(
       schema,
       applyRussianFieldLabels(configured, labels),

@@ -8,13 +8,14 @@ import {
   useCartDrawer,
 } from "@/features/cart/components/cart-drawer-store";
 import { cartStore, useCart } from "@/features/cart";
+import { fetchCartStock } from "@/features/cart/availability-client";
 import type { CartProduct } from "@/features/cart";
 import { bindShortRussianWords } from "@/lib/typography";
 
 import {
   getInitialProductQuantity,
   getMaximumProductQuantity,
-  updateProductQuantity,
+  resolveProductQuantityChange,
 } from "./product-detail-model";
 import styles from "./product-detail.module.css";
 
@@ -36,7 +37,34 @@ export function ProductDetailPurchase({
   const [cartReady, setCartReady] = useState(false);
   useEffect(() => setCartReady(true), []);
   useEffect(() => {
-    cartDrawerStore.registerStock(product.productId, product.stock);
+    const knownStock =
+      cartDrawerStore.getSnapshot().stockByProductId[product.productId];
+    if (knownStock === undefined) {
+      cartDrawerStore.registerStock(product.productId, product.stock);
+    }
+
+    let active = true;
+    let requestId = 0;
+    const refreshLiveStock = async () => {
+      const currentRequestId = ++requestId;
+      try {
+        const stocks = await fetchCartStock([{ productId: product.productId }]);
+        if (active && currentRequestId === requestId) {
+          cartDrawerStore.registerStocks(stocks);
+        }
+      } catch {
+        // Keep the cached server value as a graceful fallback. Checkout still
+        // performs a mandatory no-store stock check before showing the form.
+      }
+    };
+    const handleFocus = () => void refreshLiveStock();
+
+    void refreshLiveStock();
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [product.productId, product.stock]);
   useEffect(() => {
     setQuantity((current) =>
@@ -44,9 +72,30 @@ export function ProductDetailPurchase({
     );
   }, [maximum]);
   const inStock = maximum > 0;
-  const inCart = cart.items.some(
+  const cartItem = cart.items.find(
     (item) => item.productId === product.productId,
   );
+  const inCart = cartItem !== undefined;
+  const displayedQuantity = cartItem?.quantity ?? quantity;
+
+  const changeQuantity = (delta: -1 | 1) => {
+    const change = resolveProductQuantityChange({
+      selectedQuantity: quantity,
+      cartQuantity: cartItem?.quantity,
+      delta,
+      maximum,
+    });
+
+    if (change.target === "cart") {
+      cartStore.updateQuantity(
+        product.productId,
+        change.quantity,
+        currentStock,
+      );
+    } else {
+      setQuantity(change.quantity);
+    }
+  };
 
   return (
     <div className={styles.purchase}>
@@ -60,27 +109,19 @@ export function ProductDetailPurchase({
           >
             <button
               aria-label="Уменьшить количество"
-              disabled={inCart || quantity <= 1}
-              onClick={() =>
-                setQuantity((current) =>
-                  updateProductQuantity(current, -1, maximum),
-                )
-              }
+              disabled={displayedQuantity <= 1}
+              onClick={() => changeQuantity(-1)}
               type="button"
             >
               <Minus aria-hidden="true" />
             </button>
             <output aria-live="polite" aria-atomic="true">
-              {quantity}
+              {displayedQuantity}
             </output>
             <button
               aria-label="Увеличить количество"
-              disabled={inCart || quantity >= maximum}
-              onClick={() =>
-                setQuantity((current) =>
-                  updateProductQuantity(current, 1, maximum),
-                )
-              }
+              disabled={displayedQuantity >= maximum}
+              onClick={() => changeQuantity(1)}
               type="button"
             >
               <Plus aria-hidden="true" />

@@ -413,3 +413,46 @@ test("edit controller maps version conflicts without logging customer data", asy
   assert.equal(JSON.stringify(logs).includes("Секрет клиента"), false);
   assert.equal(JSON.stringify(logs).includes("private@example.test"), false);
 });
+
+test("status controller explains a deleted product without exposing internals", async () => {
+  const warnings: unknown[] = [];
+  const controller = controllerModule.createOrderAdminController({
+    strapi: {
+      log: { warn: (...args: unknown[]) => warnings.push(args) },
+      plugin: () => ({
+        service: () => ({
+          findOne: async () => ({
+            documentId: "order-1",
+            status: "new",
+            lines: [
+              {
+                productId: "product-1",
+                title: "Долгий вечер",
+              },
+            ],
+          }),
+          transition: async () => {
+            throw {
+              code: "PRODUCT_NOT_FOUND",
+              details: { productId: "product-1" },
+            };
+          },
+        }),
+      }),
+    },
+  });
+  const conflicts: string[] = [];
+  const context: any = {
+    params: { documentId: "order-1" },
+    request: { body: { status: "confirmed" } },
+    state: { user: { id: 42 } },
+    conflict: (message: string) => conflicts.push(message),
+  };
+
+  await controller.transition(context);
+
+  assert.deepEqual(conflicts, [
+    "Нельзя подтвердить заказ: товар «Долгий вечер» удалён",
+  ]);
+  assert.equal(JSON.stringify(warnings).includes("product-1"), false);
+});

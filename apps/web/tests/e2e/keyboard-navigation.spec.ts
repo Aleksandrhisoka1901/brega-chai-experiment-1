@@ -25,3 +25,40 @@ test("header, catalog cards, and breadcrumbs support keyboard navigation", async
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL("/tovary");
 });
+
+test("ritual navigation, catalog cards, empty cart and breadcrumbs use the landing", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const ritualsNavigation = page
+    .getByRole("navigation", { name: "Основная навигация" })
+    .getByRole("link", { name: "Ритуалы" });
+  await expect(ritualsNavigation).toHaveAttribute("href", "/nabory");
+  await ritualsNavigation.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL("/nabory");
+
+  const firstRitual = page.getByRole("main").getByRole("article").first();
+  await expect(firstRitual.getByRole("link")).toHaveAttribute(
+    "href",
+    /^\/nabory\//,
+  );
+
+  await page.getByRole("button", { name: /Открыть корзину/ }).click();
+  const emptyCart = page.getByRole("navigation", {
+    name: "Перейти к каталогу",
+  });
+  await expect(
+    emptyCart.getByRole("link", { name: "К ритуалам" }),
+  ).toHaveAttribute("href", "/nabory");
+  await page.keyboard.press("Escape");
+
+  await page.goto("/nabory/ritual-one");
+  const catalogBreadcrumb = page
+    .getByRole("navigation", { name: "Хлебные крошки" })
+    .getByRole("link", { name: "Ритуалы" });
+  await catalogBreadcrumb.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL("/nabory");
+});

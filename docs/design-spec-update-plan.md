@@ -88,7 +88,7 @@ Production-компоненты storefront не входят в этот пла�
 2. semantic — назначение;
 3. component — только уникальные параметры компонента.
 
-Breakpoints: `768`, `1024`, `1440px`. QA-viewports не являются breakpoints. Fluid typography интерполируется между `320` и `1440px`. Page shell ограничен `1600px`, обычный контент — `1440px`, текст — `68ch`.
+Breakpoints: `768`, `1024`, `1440px`. QA-viewports не являются breakpoints. Fluid typography интерполируется между `320` и `1440px`. Page shell и обычный контент ограничены `1600px`, текст — `68ch`.
 
 ## 3. Описать состояния компонентов
 
@@ -183,13 +183,13 @@ Checkout остаётся вторым состоянием cart drawer. Чер�
 
 Зафиксировать требования для каждого типа изображения:
 
-| Слот | Aspect ratio | Минимальный размер | Crop | Загрузка |
-| --- | --- | --- | --- | --- |
-| Hero | адаптивный split | рекомендация 2400×1600 | focal point, mobile crop опционален | priority |
-| Карточка | `4:5` | рекомендация 1600×2000 | cover + focal point | lazy |
-| Галерея товара | `4:5`, thumbnail `1:1` | рекомендация 1600×2000 | contain по умолчанию | mixed |
-| Rich content | широкий editorial slot | рекомендация в help text | без ручного wide-toggle | lazy |
-| OG image | `1.91:1` | 1200×630 | safe area | server |
+| Слот           | Aspect ratio           | Минимальный размер       | Crop                                | Загрузка |
+| -------------- | ---------------------- | ------------------------ | ----------------------------------- | -------- |
+| Hero           | адаптивный split       | рекомендация 2400×1600   | focal point, mobile crop опционален | priority |
+| Карточка       | `4:5`                  | рекомендация 1600×2000   | cover + focal point                 | lazy     |
+| Галерея товара | `4:5`, thumbnail `1:1` | рекомендация 1600×2000   | contain по умолчанию                | mixed    |
+| Rich content   | широкий editorial slot | рекомендация в help text | без ручного wide-toggle             | lazy     |
+| OG image       | `1.91:1`               | 1200×630                 | safe area                           | server   |
 
 Дополнительно определить:
 

@@ -457,7 +457,8 @@ async function upsertSingle(
   uid:
     | "api::global-setting.global-setting"
     | "api::home-page.home-page"
-    | "api::products-page.products-page",
+    | "api::products-page.products-page"
+    | "api::rituals-page.rituals-page",
   data: Record<string, unknown>,
 ) {
   const existing = await strapi.documents(uid).findFirst();
@@ -601,6 +602,7 @@ async function run() {
         eyebrow: "Глава 02",
         title: "Ритуалы",
         subtitle: "Всё необходимое для готового чайного сценария.",
+        linkLabel: "Все ритуалы",
       },
       tovaryPreview: {
         eyebrow: "Глава 03",
@@ -623,6 +625,19 @@ async function run() {
         "Исследуйте чай через происхождение, аромат и собственный ритм заваривания.",
     });
 
+    await upsertSingle(strapi, "api::rituals-page.rituals-page", {
+      eyebrow: "Глава 02",
+      seo: {
+        title: "Чайные ритуалы — Brega Tea",
+        description: "Готовые чайные наборы Brega Tea.",
+      },
+      title: "Ритуалы",
+      emptyStateText: "Ритуалы скоро появятся.",
+      emptyStateLinkLabel: "Вернуться на главную",
+      intro:
+        "Готовые чайные сценарии, в которых всё необходимое уже собрано вместе.",
+    });
+
     const productDocuments = strapi.documents("api::product.product");
     const existingProducts = await productDocuments.findMany();
     const existingBySeedKey = existingProducts.flatMap((product) => {
@@ -643,6 +658,7 @@ async function run() {
     for (const operation of planSeed(products, existingBySeedKey)) {
       const productData: Record<string, unknown> = {
         ...operation.record,
+        story: paragraph(operation.record.story),
         title: `${operation.record.type === "nabor" ? "Ритуал" : "Сорт"}: ${operation.record.title}`,
         displayName: operation.record.title,
         seedKey: operation.record.key,

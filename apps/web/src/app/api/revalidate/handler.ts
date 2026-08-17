@@ -23,7 +23,7 @@ export interface RevalidationDependencies {
 type RevalidationEvent =
   | {
       id: string;
-      event: "home" | "global" | "products";
+      event: "home" | "global" | "products" | "media";
       action: "publish" | "update" | "unpublish";
       occurredAt: string;
     }
@@ -93,7 +93,8 @@ function parseEvent(value: unknown): RevalidationEvent | undefined {
   if (
     body.event === "home" ||
     body.event === "global" ||
-    body.event === "products"
+    body.event === "products" ||
+    body.event === "media"
   ) {
     return hasExactKeys(body, ["action", "event", "id", "occurredAt"])
       ? {
@@ -165,9 +166,22 @@ function invalidate(
     revalidatePath("/", "layout");
     return;
   }
+  if (event.event === "media") {
+    revalidateTag("home");
+    revalidateTag("global");
+    revalidateTag("products");
+    revalidatePath("/", "layout");
+    revalidatePath("/", "page");
+    revalidatePath("/tovary", "page");
+    revalidatePath("/nabory", "page");
+    revalidatePath("/tovary/[slug]", "page");
+    revalidatePath("/nabory/[slug]", "page");
+    return;
+  }
 
   revalidateTag("products");
   revalidatePath("/tovary", "page");
+  revalidatePath("/nabory", "page");
   if (event.event === "product") {
     revalidateTag(`product-slug:${event.product.type}:${event.product.slug}`);
     revalidatePath(

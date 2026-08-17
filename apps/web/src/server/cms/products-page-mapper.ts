@@ -4,6 +4,12 @@ import { z } from "zod";
 import { CmsValidationError } from "./errors.ts";
 
 const nonEmptyString = z.string().trim().min(1);
+const optionalEyebrow = z
+  .string()
+  .trim()
+  .nullable()
+  .optional()
+  .transform((value) => value || undefined);
 const seoSchema = z.object({
   title: nonEmptyString,
   description: nonEmptyString,
@@ -16,7 +22,7 @@ const seoSchema = z.object({
 });
 const responseSchema = z.object({
   data: z.object({
-    eyebrow: nonEmptyString,
+    eyebrow: optionalEyebrow,
     title: nonEmptyString,
     emptyStateText: nonEmptyString,
     emptyStateLinkLabel: nonEmptyString,
@@ -26,7 +32,7 @@ const responseSchema = z.object({
 });
 
 export type ProductsPageContent = {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   emptyStateText: string;
   emptyStateLinkLabel: string;
@@ -60,7 +66,7 @@ export function mapProductsPagePayload(
     parsed.data.data;
 
   return {
-    eyebrow,
+    ...(eyebrow ? { eyebrow } : {}),
     title,
     emptyStateText,
     emptyStateLinkLabel,

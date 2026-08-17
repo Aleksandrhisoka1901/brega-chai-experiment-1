@@ -19,7 +19,7 @@ Registry и история не изменялись.
 ## Что уже находится в репозитории
 
 - `.github/workflows/ci.yml` — полный quality/build/integration/E2E gate для PR
-  и `main`, а также reusable gate для release;
+  и reusable gate для release; merge в `main` не запускает его повторно;
 - `.github/workflows/release.yml` — проверка `release-X.Y.Z`, публикация web/CMS
   images по commit SHA в GHCR, container smoke и production deploy;
 - `.github/workflows/tls-renew.yml` — ежедневный TLS renewal в 02:17 UTC
@@ -84,7 +84,7 @@ backup также проверяет читаемость PostgreSQL dump и а�
 - требовать успешные checks `Format`, `Contracts`, `Web`, `CMS`, `Production
 config`, `Commerce integration`, `Web build`, `CMS build`, `Web E2E`;
 - включить requirement актуальности ветки перед merge при приемлемой стоимости
-  повторного CI.
+  повторной проверки PR после изменения `main`.
 
 Для тегов `release-*`:
 
@@ -107,4 +107,6 @@ git remote -v
 
 CI, releases, GHCR и production automation работают только через GitHub.
 Production deploy по-прежнему запускается исключительно тегом
-`release-X.Y.Z`; обычный push или merge в `main` выполняет только CI.
+`release-X.Y.Z`. Обычный push или merge в `main` не запускает повторный полный
+CI и не выполняет deploy: итоговый commit защищён обязательными PR checks, а
+release workflow заново вызывает reusable quality gate перед публикацией.

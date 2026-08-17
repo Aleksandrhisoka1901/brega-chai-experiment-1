@@ -1,6 +1,11 @@
 import { createHmac, randomUUID } from "node:crypto";
 
-export type RevalidationEventName = "home" | "global" | "products" | "product";
+export type RevalidationEventName =
+  | "home"
+  | "global"
+  | "products"
+  | "product"
+  | "media";
 export type RevalidationAction = "publish" | "update" | "unpublish";
 
 export type RevalidationEvent =

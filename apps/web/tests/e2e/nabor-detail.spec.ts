@@ -21,7 +21,7 @@ for (const nabor of [
     });
     await expect(
       breadcrumbs.getByRole("link", { name: "Ритуалы" }),
-    ).toHaveAttribute("href", "/#nabory");
+    ).toHaveAttribute("href", "/nabory");
     await expect(breadcrumbs.getByText(nabor.title)).toHaveAttribute(
       "aria-current",
       "page",

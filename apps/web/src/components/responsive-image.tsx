@@ -1,4 +1,5 @@
-import type { CSSProperties, ImgHTMLAttributes } from "react";
+import Image from "next/image";
+import type { ComponentProps } from "react";
 
 export type ResponsiveImageSource = {
   url: string;
@@ -6,8 +7,8 @@ export type ResponsiveImageSource = {
 };
 
 type ResponsiveImageProps = Omit<
-  ImgHTMLAttributes<HTMLImageElement>,
-  "alt" | "height" | "loading" | "sizes" | "src" | "srcSet" | "width"
+  ComponentProps<typeof Image>,
+  "alt" | "fill" | "height" | "loading" | "quality" | "sizes" | "src" | "width"
 > & {
   alt: string;
   fill?: boolean;
@@ -26,48 +27,23 @@ export function ResponsiveImage({
   height,
   priority = false,
   sizes,
-  sources = [],
+  sources: _sources = [],
   src,
   style,
   width,
   ...imageProps
 }: ResponsiveImageProps) {
-  const candidates = new Map<number, string>();
-  for (const source of sources) {
-    candidates.set(source.width, source.url);
-  }
-  if (!sources.some((source) => source.url === src)) {
-    candidates.set(width, src);
-  }
-  const srcSet = [...candidates]
-    .sort(([left], [right]) => left - right)
-    .map(([candidateWidth, url]) => `${url} ${candidateWidth}w`)
-    .join(", ");
-  const hasResponsiveCandidates = candidates.size > 1;
-  const fillStyle: CSSProperties | undefined = fill
-    ? {
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        ...style,
-      }
-    : style;
-
   return (
-    <img
+    <Image
       {...imageProps}
       alt={alt}
       className={className}
-      decoding="async"
-      fetchPriority={priority ? "high" : "auto"}
-      height={height}
-      loading={priority ? "eager" : "lazy"}
-      sizes={hasResponsiveCandidates ? sizes : undefined}
+      {...(fill ? { fill: true } : { height, width })}
+      priority={priority}
+      quality={75}
+      sizes={sizes}
       src={src}
-      srcSet={hasResponsiveCandidates ? srcSet : undefined}
-      style={fillStyle}
-      width={width}
+      style={style}
     />
   );
 }

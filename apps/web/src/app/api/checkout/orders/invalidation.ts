@@ -14,6 +14,7 @@ export function invalidateOrderStock(
   dependencies.revalidateTag("products");
   dependencies.revalidatePath("/", "page");
   dependencies.revalidatePath("/tovary", "page");
+  dependencies.revalidatePath("/nabory", "page");
 
   const slugs = new Set(order.lines.map((line) => line.slug));
   for (const slug of slugs) {

@@ -6,12 +6,16 @@ import {
   mapHomePagePayload,
 } from "./home-mapper.ts";
 
+const mediaUpdatedAt = "2026-08-16T12:34:56.000Z";
+const mediaVersion = "?v=2026-08-16T12%3A34%3A56.000Z";
+
 const image = {
   alt: "Чайная посуда",
   image: {
     url: "/storefront/hero.png",
     width: 1200,
     height: 900,
+    updatedAt: mediaUpdatedAt,
     formats: {
       small: { url: "/storefront/small_hero.png", width: 500 },
     },
@@ -43,6 +47,7 @@ test("maps editable home sections and resolves media URLs", () => {
           eyebrow: "Глава 02",
           title: "Ритуалы",
           subtitle: "Готовые сценарии.",
+          linkLabel: "Все ритуалы",
         },
         tovaryPreview: {
           eyebrow: "Глава 03",
@@ -61,14 +66,18 @@ test("maps editable home sections and resolves media URLs", () => {
 
   assert.equal(
     home.hero.image?.url,
-    "http://localhost:9000/storefront/hero.png",
+    `http://localhost:9000/storefront/hero.png${mediaVersion}`,
   );
   assert.deepEqual(home.hero.image?.sources, [
-    { url: "http://localhost:9000/storefront/small_hero.png", width: 500 },
+    {
+      url: `http://localhost:9000/storefront/small_hero.png${mediaVersion}`,
+      width: 500,
+    },
   ]);
   assert.deepEqual(home.about.textBlocks, ["Второй абзац."]);
   assert.equal(home.about.title, "Первый абзац.");
   assert.equal(home.hero.cta?.url, "#tovary");
+  assert.equal(home.naboryPreview.linkLabel, "Все ритуалы");
   assert.equal(home.tovaryPreview.linkLabel, "Все сорта");
   assert.equal(home.about.spacing, "L");
   assert.equal(home.seo?.title, "Чайный бутик");
@@ -94,7 +103,10 @@ test("100/0 hero ignores an image and optional CTA", () => {
           textColor: null,
           spacing: "M",
         },
-        naboryPreview: { eyebrow: "02", title: "Ритуалы" },
+        naboryPreview: {
+          eyebrow: "02",
+          title: "Ритуалы",
+        },
         tovaryPreview: {
           eyebrow: "03",
           title: "Сорта",
@@ -112,6 +124,76 @@ test("100/0 hero ignores an image and optional CTA", () => {
   assert.equal(home.about.backgroundColor, undefined);
   assert.equal(home.about.textColor, undefined);
   assert.deepEqual(home.about.textBlocks, ["Единственный заполненный блок."]);
+  assert.equal(home.naboryPreview.linkLabel, "Все ритуалы");
+});
+
+for (const [label, alt] of [
+  ["missing", undefined],
+  ["blank", "   "],
+] as const) {
+  test(`maps ${label} shared hero alt text to an empty string`, () => {
+    const home = mapHomePagePayload(
+      {
+        data: {
+          hero: {
+            eyebrow: null,
+            title: "Чайная посуда",
+            text: "Декоративное изображение.",
+            layout: "50/50",
+            image: { ...image, alt },
+          },
+          about: {
+            title: "О проекте.",
+            textBlock1: null,
+            textBlock2: null,
+            spacing: "M",
+          },
+          naboryPreview: { title: "Ритуалы", linkLabel: "Все ритуалы" },
+          tovaryPreview: { title: "Сорта", linkLabel: "Все сорта" },
+        },
+      },
+      "http://localhost:9000",
+    );
+
+    assert.equal(home.hero.image?.alt, "");
+  });
+}
+
+test("maps absent and empty home eyebrows without placeholder content", () => {
+  const home = mapHomePagePayload(
+    {
+      data: {
+        hero: {
+          eyebrow: null,
+          title: "Текстовый герой",
+          text: "Без надстрочника.",
+          layout: "100/0",
+        },
+        about: {
+          title: "О проекте.",
+          textBlock1: null,
+          textBlock2: null,
+          spacing: "M",
+        },
+        naboryPreview: {
+          eyebrow: "",
+          title: "Ритуалы",
+          linkLabel: "Все ритуалы",
+        },
+        tovaryPreview: {
+          eyebrow: "   ",
+          title: "Сорта",
+          linkLabel: "Все сорта",
+        },
+      },
+    },
+    "http://localhost:9000",
+  );
+
+  assert.equal(home.hero.eyebrow, undefined);
+  assert.equal(home.about.eyebrow, undefined);
+  assert.equal(home.naboryPreview.eyebrow, undefined);
+  assert.equal(home.tovaryPreview.eyebrow, undefined);
 });
 
 test("maps curated home collections in the order returned by Strapi", () => {

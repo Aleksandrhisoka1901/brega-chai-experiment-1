@@ -53,10 +53,27 @@ export function assertSlugImmutable(
   nextSlug: unknown,
 ): void {
   if (nextSlug !== undefined && nextSlug !== currentSlug) {
-    throw new Error("Catalog item slug cannot be changed after creation");
+    throw new Error("Catalog item slug cannot be changed after publication");
   }
 }
 
 export function shouldGenerateSlug(slug: unknown): boolean {
   return typeof slug !== "string" || slug.trim().length === 0;
+}
+
+export function shouldRegenerateDraftSlug({
+  currentDisplayName,
+  nextDisplayName,
+  hasPublishedVersion,
+}: {
+  currentDisplayName: string;
+  nextDisplayName: unknown;
+  hasPublishedVersion: boolean;
+}): boolean {
+  return (
+    !hasPublishedVersion &&
+    typeof nextDisplayName === "string" &&
+    nextDisplayName.trim().length > 0 &&
+    nextDisplayName !== currentDisplayName
+  );
 }

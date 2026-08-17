@@ -692,7 +692,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       "api::product.product"
     > &
       Schema.Attribute.Private;
-    mainImage: Schema.Attribute.Component<"shared.image-with-alt", false>;
+    mainImage: Schema.Attribute.Component<"shared.image-with-alt", false> &
+      Schema.Attribute.Required;
     originalTitle: Schema.Attribute.String;
     packageLabel: Schema.Attribute.String &
       Schema.Attribute.Required &
@@ -712,13 +713,15 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private &
       Schema.Attribute.Unique;
     seo: Schema.Attribute.Component<"shared.seo", false>;
-    slug: Schema.Attribute.UID<"displayName"> &
-      Schema.Attribute.Required &
+    slug: Schema.Attribute.String &
       Schema.Attribute.Unique &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 180;
         minLength: 1;
       }>;
+    slugLocked: Schema.Attribute.Boolean &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<false>;
     stock: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -728,11 +731,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
         number
       > &
       Schema.Attribute.DefaultTo<0>;
-    story: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    story: Schema.Attribute.Blocks & Schema.Attribute.Required;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -771,11 +770,7 @@ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
-    eyebrow: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
+    eyebrow: Schema.Attribute.String;
     intro: Schema.Attribute.Text &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -800,11 +795,61 @@ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiRitualsPageRitualsPage extends Struct.SingleTypeSchema {
+  collectionName: "rituals_pages";
+  info: {
+    description: "\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0447\u0430\u0439\u043D\u044B\u0445 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432";
+    displayName: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432";
+    pluralName: "rituals-pages";
+    singularName: "rituals-page";
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+    emptyStateLinkLabel: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    emptyStateText: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    eyebrow: Schema.Attribute.String;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::rituals-page.rituals-page"
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<"shared.seo", false>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiRobotsTxtRobotsTxt extends Struct.SingleTypeSchema {
   collectionName: "robots_txts";
   info: {
     description: "\u041F\u0440\u0430\u0432\u0438\u043B\u0430 \u0438\u043D\u0434\u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u0441\u0430\u0439\u0442\u0430 \u0434\u043B\u044F \u043F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0445 \u0440\u043E\u0431\u043E\u0442\u043E\u0432";
-    displayName: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 robots.txt";
+    displayName: "robots.txt";
     pluralName: "robots-txts";
     singularName: "robots-txt";
   };
@@ -1478,6 +1523,7 @@ declare module "@strapi/strapi" {
       "api::order.order": ApiOrderOrder;
       "api::product.product": ApiProductProduct;
       "api::products-page.products-page": ApiProductsPageProductsPage;
+      "api::rituals-page.rituals-page": ApiRitualsPageRitualsPage;
       "api::robots-txt.robots-txt": ApiRobotsTxtRobotsTxt;
       "plugin::content-releases.release": PluginContentReleasesRelease;
       "plugin::content-releases.release-action": PluginContentReleasesReleaseAction;

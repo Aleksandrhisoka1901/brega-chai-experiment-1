@@ -1,17 +1,23 @@
 import { createServer } from "node:http";
 
-const png =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+const png = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVR4nGNgGAWjYBQwQAEAAxAAAXyL/2UAAAAASUVORK5CYII=",
+  "base64",
+);
+const mediaUpdatedAt = "2026-08-16T12:00:00.000Z";
 const port = Number(process.env.CMS_FIXTURE_PORT ?? 14338);
 let orderRequests = 0;
 const initialStock = new Map([
   ["published-product", 12],
   ["last-product", 1],
+  ["ritual-one", 6],
+  ["ritual-two", 6],
 ]);
 let stockBySlug = new Map(initialStock);
 
 function product(slug, stock) {
   const title = stock > 0 ? "Да Хун Пао" : "Шу Пуэр";
+  const hasOnlyMainImage = slug === "main-image-only";
   return {
     documentId: `document-${slug}`,
     slug,
@@ -26,7 +32,91 @@ function product(slug, stock) {
     currency: "RUB",
     stock,
     cardExcerpt: "Минеральный утёсный улун.",
-    story: "Чай для долгого тихого вечера.",
+    story: [
+      {
+        type: "heading",
+        level: 1,
+        children: [{ type: "text", text: "Описание сорта" }],
+      },
+      {
+        type: "paragraph",
+        children: [
+          { type: "text", text: "Полужирный", bold: true },
+          { type: "text", text: ", " },
+          { type: "text", text: "курсив", italic: true },
+          { type: "text", text: ", " },
+          { type: "text", text: "подчёркнутый", underline: true },
+          { type: "text", text: ", " },
+          { type: "text", text: "зачёркнутый", strikethrough: true },
+          { type: "text", text: ". " },
+          {
+            type: "link",
+            url: "https://example.com/story",
+            children: [{ type: "text", text: "Подробнее о сорте" }],
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        children: [{ type: "text", text: "Второй абзац описания." }],
+      },
+      {
+        type: "heading",
+        level: 3,
+        children: [{ type: "text", text: "Заваривание" }],
+      },
+      {
+        type: "list",
+        format: "unordered",
+        children: [
+          {
+            type: "list-item",
+            children: [{ type: "text", text: "Прогреть посуду" }],
+          },
+          {
+            type: "list-item",
+            children: [{ type: "text", text: "Сделать короткий пролив" }],
+          },
+        ],
+      },
+      {
+        type: "heading",
+        level: 4,
+        children: [{ type: "text", text: "Детали" }],
+      },
+      {
+        type: "list",
+        format: "ordered",
+        children: [
+          {
+            type: "list-item",
+            children: [{ type: "text", text: "Первый настой" }],
+          },
+        ],
+      },
+      {
+        type: "quote",
+        children: [{ type: "text", text: "Дайте чаю раскрыться." }],
+      },
+      {
+        type: "paragraph",
+        children: [
+          { type: "text", text: "Температура " },
+          { type: "text", text: "90 °C", code: true },
+        ],
+      },
+      {
+        type: "image",
+        image: {
+          url: `/storefront/${slug}-story.png`,
+          alternativeText: "Чай в гайвани",
+          caption: "Описание: подпись изображения",
+          width: 800,
+          height: 600,
+        },
+        children: [{ type: "text", text: "" }],
+      },
+    ],
     seo: {
       title: `${title} — сорт чая Brega Tea`,
       description: "Минеральный утёсный улун.",
@@ -42,8 +132,77 @@ function product(slug, stock) {
           {
             type: "paragraph",
             children: [
-              { type: "text", text: "Заваривайте короткими проливами." },
+              { type: "text", text: "Полужирный", bold: true },
+              { type: "text", text: ", " },
+              { type: "text", text: "курсив", italic: true },
+              { type: "text", text: ", " },
+              { type: "text", text: "подчёркнутый", underline: true },
+              { type: "text", text: ", " },
+              { type: "text", text: "зачёркнутый", strikethrough: true },
+              { type: "text", text: ". " },
+              {
+                type: "link",
+                url: "https://example.com/article",
+                children: [{ type: "text", text: "Подробнее о проливах" }],
+              },
             ],
+          },
+          {
+            type: "paragraph",
+            children: [{ type: "text", text: "Второй абзац статьи." }],
+          },
+          {
+            type: "heading",
+            level: 3,
+            children: [{ type: "text", text: "Температура воды" }],
+          },
+          {
+            type: "list",
+            format: "unordered",
+            children: [
+              {
+                type: "list-item",
+                children: [{ type: "text", text: "Нагреть воду" }],
+              },
+            ],
+          },
+          {
+            type: "heading",
+            level: 4,
+            children: [{ type: "text", text: "Посуда" }],
+          },
+          {
+            type: "list",
+            format: "ordered",
+            children: [
+              {
+                type: "list-item",
+                children: [{ type: "text", text: "Выбрать гайвань" }],
+              },
+            ],
+          },
+          {
+            type: "quote",
+            children: [{ type: "text", text: "Следите за ароматом." }],
+          },
+          {
+            type: "paragraph",
+            children: [
+              { type: "text", text: "Температура " },
+              { type: "text", text: "90 °C", code: true },
+            ],
+          },
+          {
+            type: "image",
+            imageAlign: "center",
+            image: {
+              url: `/storefront/${slug}-article.png`,
+              alternativeText: "Пролив чая",
+              caption: "Статья: подпись изображения",
+              width: 800,
+              height: 600,
+            },
+            children: [{ type: "text", text: "" }],
           },
         ],
       },
@@ -67,31 +226,57 @@ function product(slug, stock) {
       },
     ],
     mainImage: {
-      alt: "Пачка чая",
+      alt: hasOnlyMainImage ? "" : "Пачка чая",
       image: {
-        url: png,
+        url: `/storefront/${slug}-main.png`,
+        updatedAt: mediaUpdatedAt,
         width: 800,
         height: 1000,
+        formats: {
+          thumbnail: {
+            url: `/storefront/${slug}-main-thumbnail.png`,
+            width: 125,
+            height: 156,
+          },
+        },
       },
     },
-    gallery: [
-      {
-        alt: "Сухой чайный лист",
-        image: {
-          url: png,
-          width: 800,
-          height: 800,
-        },
-      },
-      {
-        alt: "Чай в пиале",
-        image: {
-          url: png,
-          width: 800,
-          height: 800,
-        },
-      },
-    ],
+    gallery: hasOnlyMainImage
+      ? []
+      : [
+          {
+            alt: "Сухой чайный лист",
+            image: {
+              url: `/storefront/${slug}-gallery-1.png`,
+              updatedAt: mediaUpdatedAt,
+              width: 800,
+              height: 800,
+              formats: {
+                thumbnail: {
+                  url: `/storefront/${slug}-gallery-1-thumbnail.png`,
+                  width: 125,
+                  height: 125,
+                },
+              },
+            },
+          },
+          {
+            alt: "Чай в пиале",
+            image: {
+              url: `/storefront/${slug}-gallery-2.png`,
+              updatedAt: mediaUpdatedAt,
+              width: 800,
+              height: 800,
+              formats: {
+                thumbnail: {
+                  url: `/storefront/${slug}-gallery-2-thumbnail.png`,
+                  width: 125,
+                  height: 125,
+                },
+              },
+            },
+          },
+        ],
   };
 }
 
@@ -107,6 +292,15 @@ const cms = createServer((request, response) => {
 
   if (url.pathname === "/api/health/readiness") {
     response.writeHead(204).end();
+    return;
+  }
+
+  if (/^\/storefront\/[a-z0-9-]+\.png$/.test(url.pathname)) {
+    response.writeHead(200, {
+      "Cache-Control": "public, max-age=3600",
+      "Content-Type": "image/png",
+    });
+    response.end(png);
     return;
   }
 
@@ -256,7 +450,8 @@ const cms = createServer((request, response) => {
             image: {
               alt: "Чайная посуда",
               image: {
-                url: png,
+                url: "/storefront/home-hero.png",
+                updatedAt: mediaUpdatedAt,
                 width: 800,
                 height: 1000,
               },
@@ -275,6 +470,7 @@ const cms = createServer((request, response) => {
             eyebrow: "Глава 02",
             title: "Ритуалы",
             subtitle: "Готовые сценарии для чайной паузы.",
+            linkLabel: "Все ритуалы",
           },
           tovaryPreview: {
             eyebrow: "Глава 03",
@@ -383,16 +579,63 @@ const cms = createServer((request, response) => {
     return;
   }
 
-  if (!slug && type === "nabor") {
+  if (url.pathname === "/api/rituals-page") {
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(
       JSON.stringify({
-        data: [
-          { ...product("ritual-one", 12), type: "nabor" },
-          { ...product("ritual-two", 12), type: "nabor" },
-          { ...product("ritual-three", 12), type: "nabor" },
-          { ...product("ritual-four", 12), type: "nabor" },
-        ],
+        data: {
+          eyebrow: "Глава 02",
+          title: "Ритуалы",
+          emptyStateText: "Ритуалы скоро появятся.",
+          emptyStateLinkLabel: "Вернуться на главную",
+          intro: "Готовые чайные сценарии.",
+          seo: {
+            title: "Чайные ритуалы — Brega Tea",
+            description: "Готовые чайные наборы Brega Tea.",
+          },
+        },
+      }),
+    );
+    return;
+  }
+
+  if (!slug && type === "nabor") {
+    const products = [
+      ...Array.from({ length: 10 }, (_, index) => ({
+        ...product(`ritual-${index + 1}`, 12),
+        type: "nabor",
+        displayName: `Ритуал ${String(index + 1).padStart(2, "0")}`,
+      })),
+      ...Array.from({ length: 2 }, (_, index) => ({
+        ...product(`unavailable-ritual-${index + 1}`, 0),
+        type: "nabor",
+        displayName: `Нет в наличии ${String(index + 1).padStart(2, "0")}`,
+      })),
+    ];
+    const availableOnly = url.searchParams.has("filters[stock][$gt]");
+    const unavailableOnly = url.searchParams.has("filters[stock][$eq]");
+    const start = Number(url.searchParams.get("pagination[start]") ?? 0);
+    const limit = Number(
+      url.searchParams.get("pagination[limit]") ?? products.length,
+    );
+    const filtered = products
+      .filter((entry) =>
+        availableOnly
+          ? entry.stock > 0
+          : unavailableOnly
+            ? entry.stock === 0
+            : true,
+      )
+      .sort(
+        (left, right) =>
+          left.displayName.localeCompare(right.displayName, "ru") ||
+          left.slug.localeCompare(right.slug),
+      );
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(
+      JSON.stringify({
+        data: filtered.slice(start, start + limit),
+        meta: { pagination: { start, limit, total: filtered.length } },
       }),
     );
     return;
@@ -415,25 +658,43 @@ const cms = createServer((request, response) => {
 
   if (!slug && type === "tovar") {
     const products = [
-      stockedProduct("published-product", 12),
-      product("green-tea", 0),
-      product("aged-tea", 12),
-      product("evening-tea", 12),
-      product("white-tea", 12),
-      product("red-tea", 12),
+      {
+        ...stockedProduct("published-product", 12),
+        displayName: "Да Хун Пао",
+      },
+      ...Array.from({ length: 22 }, (_, index) => ({
+        ...product(`available-tea-${index + 1}`, 12),
+        displayName: `Сорт ${String(index + 1).padStart(2, "0")}`,
+      })),
+      ...Array.from({ length: 22 }, (_, index) => ({
+        ...product(`unavailable-tea-${index + 1}`, 0),
+        displayName: `Нет в наличии ${String(index + 1).padStart(2, "0")}`,
+      })),
     ];
     const availableOnly = url.searchParams.has("filters[stock][$gt]");
     const unavailableOnly = url.searchParams.has("filters[stock][$eq]");
+    const start = Number(url.searchParams.get("pagination[start]") ?? 0);
+    const limit = Number(
+      url.searchParams.get("pagination[limit]") ?? products.length,
+    );
+    const filtered = products
+      .filter((entry) =>
+        availableOnly
+          ? entry.stock > 0
+          : unavailableOnly
+            ? entry.stock === 0
+            : true,
+      )
+      .sort(
+        (left, right) =>
+          left.displayName.localeCompare(right.displayName, "ru") ||
+          left.slug.localeCompare(right.slug),
+      );
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(
       JSON.stringify({
-        data: products.filter((entry) =>
-          availableOnly
-            ? entry.stock > 0
-            : unavailableOnly
-              ? entry.stock === 0
-              : true,
-        ),
+        data: filtered.slice(start, start + limit),
+        meta: { pagination: { start, limit, total: filtered.length } },
       }),
     );
     return;
@@ -474,7 +735,9 @@ const cms = createServer((request, response) => {
   }
 
   const data =
-    slug === "published-product" || slug === "last-product"
+    slug === "published-product" ||
+    slug === "last-product" ||
+    slug === "main-image-only"
       ? [stockedProduct(slug, slug === "last-product" ? 1 : 12)]
       : slug === "out-of-stock-product"
         ? [product(slug, 0)]

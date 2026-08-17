@@ -119,12 +119,12 @@ class PostgresOrderPersistence
             }),
           );
         },
-        decrementStock: async (recordId: number, quantity: number) => {
+        decrementStock: async (productId: string, quantity: number) => {
           const result = await client.query(
             `UPDATE ${qualified("products")}
              SET stock = stock - $2
-             WHERE record_id = $1 AND stock >= $2`,
-            [recordId, quantity],
+             WHERE product_id = $1 AND stock >= $2`,
+            [productId, quantity],
           );
           return result.rowCount === 1;
         },
@@ -174,12 +174,22 @@ class PostgresOrderPersistence
           );
           return result.rows[0] ? mapOrder(result.rows[0]) : null;
         },
-        restoreStock: async (recordId: number, quantity: number) => {
+        lockExistingProductIds: async (productIds: string[]) => {
+          const result = await client.query(
+            `SELECT product_id FROM ${qualified("products")}
+             WHERE product_id = ANY($1::text[])
+             ORDER BY product_id
+             FOR UPDATE`,
+            [productIds],
+          );
+          return result.rows.map((row) => String(row.product_id));
+        },
+        restoreStock: async (productId: string, quantity: number) => {
           const result = await client.query(
             `UPDATE ${qualified("products")}
              SET stock = stock + $2
-             WHERE record_id = $1`,
-            [recordId, quantity],
+             WHERE product_id = $1`,
+            [productId, quantity],
           );
           return result.rowCount === 1;
         },
@@ -380,6 +390,66 @@ test("cancellation restores stock once", async () => {
     `SELECT stock FROM ${qualified("products")} WHERE product_id = 'product-1'`,
   );
   assert.equal(unchanged.rows[0].stock, 5);
+});
+
+test("cancellation survives a changed physical product record id", async () => {
+  const created = await createOrder(
+    orderInput(),
+    persistence,
+    checkoutSettings,
+  );
+  await pool.query(
+    `UPDATE ${qualified("products")} SET record_id = 99
+     WHERE product_id = 'product-1'`,
+  );
+
+  await transitionOrderStatus(created.orderId, "cancelled", persistence);
+
+  const result = await pool.query(
+    `SELECT stock FROM ${qualified("products")} WHERE product_id = 'product-1'`,
+  );
+  assert.equal(result.rows[0].stock, 5);
+});
+
+test("cancellation completes when a product was fully deleted", async () => {
+  const created = await createOrder(
+    orderInput(),
+    persistence,
+    checkoutSettings,
+  );
+  await pool.query(
+    `DELETE FROM ${qualified("products")} WHERE product_id = 'product-1'`,
+  );
+
+  await transitionOrderStatus(created.orderId, "cancelled", persistence);
+
+  const order = await pool.query(
+    `SELECT status FROM ${qualified("orders")} WHERE order_id = $1`,
+    [created.orderId],
+  );
+  assert.equal(order.rows[0].status, "cancelled");
+});
+
+test("confirmation rejects a fully deleted product", async () => {
+  const created = await createOrder(
+    orderInput(),
+    persistence,
+    checkoutSettings,
+  );
+  await pool.query(
+    `DELETE FROM ${qualified("products")} WHERE product_id = 'product-1'`,
+  );
+
+  await assert.rejects(
+    transitionOrderStatus(created.orderId, "confirmed", persistence),
+    (error) =>
+      error instanceof OrderServiceError && error.code === "PRODUCT_NOT_FOUND",
+  );
+  const order = await pool.query(
+    `SELECT status FROM ${qualified("orders")} WHERE order_id = $1`,
+    [created.orderId],
+  );
+  assert.equal(order.rows[0].status, "new");
 });
 
 test("admin edit atomically replaces lines and recalculates stock", async () => {

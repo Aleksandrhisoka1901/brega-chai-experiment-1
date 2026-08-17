@@ -119,6 +119,8 @@ const adminApp = {
           "SEO-настройки",
         "content-manager.content-types.api::product.product.slug":
           "URL-идентификатор",
+        "content-manager.content-types.api::product.product.slugLocked":
+          "Системная блокировка URL",
         "content-manager.content-types.api::product.product.stock":
           "Остаток на складе",
         "content-manager.content-types.api::product.product.story":
@@ -141,6 +143,19 @@ const adminApp = {
         "content-manager.content-types.api::products-page.products-page.title":
           "Заголовок",
 
+        "content-manager.content-types.api::rituals-page.rituals-page.eyebrow":
+          "Надстрочник",
+        "content-manager.content-types.api::rituals-page.rituals-page.emptyStateText":
+          "Текст пустого каталога",
+        "content-manager.content-types.api::rituals-page.rituals-page.emptyStateLinkLabel":
+          "Текст ссылки пустого каталога",
+        "content-manager.content-types.api::rituals-page.rituals-page.intro":
+          "Вступление",
+        "content-manager.content-types.api::rituals-page.rituals-page.seo":
+          "SEO-настройки",
+        "content-manager.content-types.api::rituals-page.rituals-page.title":
+          "Заголовок",
+
         "content-manager.content-types.api::robots-txt.robots-txt.content":
           "Содержимое robots.txt",
 
@@ -156,6 +171,8 @@ const adminApp = {
         "content-manager.components.home.catalog-preview.subtitle":
           "Краткий анонс",
         "content-manager.components.home.catalog-preview.title": "Заголовок",
+        "content-manager.components.home.rituals-preview.linkLabel":
+          "Текст ссылки на каталог",
         "content-manager.components.home.editorial-section.backgroundColor":
           "Цвет фона",
         "content-manager.components.home.editorial-section.eyebrow":

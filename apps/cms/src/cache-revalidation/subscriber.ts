@@ -9,11 +9,13 @@ const EVENT_BY_UID: Readonly<Record<string, RevalidationEventName>> = {
   "api::home-page.home-page": "home",
   "api::global-setting.global-setting": "global",
   "api::products-page.products-page": "products",
+  "api::rituals-page.rituals-page": "products",
   "api::product.product": "product",
 };
 
 interface StrapiPublicationEvent {
   uid?: string;
+  media?: unknown;
   entry?: {
     documentId?: unknown;
     slug?: unknown;
@@ -74,6 +76,11 @@ export function registerCacheRevalidationSubscriber(
   sender: CacheRevalidationSender,
 ) {
   return strapi.eventHub.subscribe(async (eventName, event) => {
+    if (eventName === "media.update") {
+      await sender.send({ event: "media", action: "update" });
+      return;
+    }
+
     const action = eventName.startsWith("entry.")
       ? (eventName.slice("entry.".length) as RevalidationAction)
       : undefined;

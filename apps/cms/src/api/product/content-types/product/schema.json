@@ -14,6 +14,9 @@
     "attributes": {
       "seedKey": {
         "hidden": true
+      },
+      "slugLocked": {
+        "hidden": true
       }
     }
   },
@@ -38,12 +41,18 @@
       "configurable": false
     },
     "slug": {
-      "type": "uid",
-      "targetField": "displayName",
-      "required": true,
+      "type": "string",
+      "required": false,
       "unique": true,
       "minLength": 1,
-      "maxLength": 180
+      "maxLength": 180,
+      "description": "Генерируется автоматически из названия на витрине и не редактируется вручную."
+    },
+    "slugLocked": {
+      "type": "boolean",
+      "default": false,
+      "private": true,
+      "configurable": false
     },
     "type": {
       "type": "enumeration",
@@ -92,7 +101,7 @@
       "type": "component",
       "component": "shared.image-with-alt",
       "repeatable": false,
-      "required": false
+      "required": true
     },
     "gallery": {
       "type": "component",
@@ -106,9 +115,9 @@
       "minLength": 1
     },
     "story": {
-      "type": "text",
+      "type": "blocks",
       "required": true,
-      "minLength": 1
+      "description": "Форматируемое описание товара: используйте абзацы, списки, выделение и ссылки. Заголовок H1 на витрине отображается как H2; остальные уровни также понижаются на один. Неподдерживаемое или исполняемое содержимое не выводится."
     },
     "articles": {
       "type": "component",

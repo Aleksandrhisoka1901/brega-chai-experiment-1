@@ -151,12 +151,14 @@ function createOrderAdminController({ strapi }) {
         });
         ctx.body = { data: order };
       } catch (error) {
+        const errorCode =
+          error && typeof error === "object" && "code" in error
+            ? error.code
+            : null;
         if (
-          error &&
-          typeof error === "object" &&
-          "code" in error &&
-          (error.code === "INVALID_STATUS_TRANSITION" ||
-            error.code === "ORDER_NOT_FOUND")
+          errorCode === "INVALID_STATUS_TRANSITION" ||
+          errorCode === "ORDER_NOT_FOUND" ||
+          errorCode === "PRODUCT_NOT_FOUND"
         ) {
           strapi.log?.warn?.("Order admin status transition", {
             documentId,
@@ -164,11 +166,23 @@ function createOrderAdminController({ strapi }) {
             to: command.status,
             administratorId: actorFromUser(ctx.state?.user)?.id ?? null,
             result: "rejected",
-            errorCode: error.code,
+            errorCode,
           });
-          return error.code === "ORDER_NOT_FOUND"
-            ? ctx.notFound("Заказ не найден")
-            : ctx.conflict("Статус заказа уже изменился");
+          if (errorCode === "ORDER_NOT_FOUND") {
+            return ctx.notFound("Заказ не найден");
+          }
+          if (errorCode === "PRODUCT_NOT_FOUND") {
+            const missingProductId = error.details?.productId;
+            const missingLine = currentOrder.lines?.find(
+              (line) => line.productId === missingProductId,
+            );
+            return ctx.conflict(
+              missingLine?.title
+                ? `Нельзя подтвердить заказ: товар «${missingLine.title}» удалён`
+                : "Нельзя подтвердить заказ: один из товаров удалён",
+            );
+          }
+          return ctx.conflict("Статус заказа уже изменился");
         }
         throw error;
       }

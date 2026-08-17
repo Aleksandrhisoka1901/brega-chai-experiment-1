@@ -15,7 +15,7 @@ RUN yarn install --immutable
 FROM dependencies AS development
 COPY . .
 EXPOSE 3000
-CMD ["yarn", "workspace", "@brega-chai/web", "dev"]
+CMD ["node", "apps/web/scripts/dev-with-media-proxy.mjs"]
 
 FROM dependencies AS build
 COPY . .

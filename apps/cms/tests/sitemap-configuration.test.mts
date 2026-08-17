@@ -25,6 +25,10 @@ test("normalizes the public sitemap origin", () => {
 });
 
 test("creates the minimal sitemap configuration and public permission", async () => {
+  assert.deepEqual(
+    DEFAULT_SITEMAP_URLS.map(({ slug }) => slug),
+    ["/", "/tovary", "/nabory"],
+  );
   const creates = new Map<string, unknown[]>();
   const query = (uid: string) => ({
     async findMany() {

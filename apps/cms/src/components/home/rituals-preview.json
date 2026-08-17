@@ -7,8 +7,7 @@
   "attributes": {
     "eyebrow": {
       "type": "string",
-      "required": true,
-      "minLength": 1
+      "required": false
     },
     "title": {
       "type": "string",
@@ -17,6 +16,10 @@
     },
     "subtitle": {
       "type": "text",
+      "required": false
+    },
+    "linkLabel": {
+      "type": "string",
       "required": false
     }
   }
