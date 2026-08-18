@@ -17,7 +17,7 @@ hydration устанавливает:
 window.__APP_CONFIG__ = {
   SITE_URL: "https://brega-chai.example",
   NEXT_PUBLIC_CMS_URL: "https://admin.brega-chai.example",
-  NEXT_PUBLIC_MEDIA_URL: "https://media.brega-chai.example/storefront",
+  NEXT_PUBLIC_MEDIA_URL: "https://media.brega-chai.example",
 };
 ```
 
@@ -27,11 +27,11 @@ allowlist `PUBLIC_RUNTIME_CONFIG_KEYS`.
 
 ## 2. Публичный allowlist
 
-| Переменная              | Потребитель                             | Назначение                                                                | Пример                                        |
-| ----------------------- | --------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------- |
-| `SITE_URL`              | Next server, CMS и browser config       | Origin storefront для canonical URL, Open Graph, sitemap и JSON-LD        | `https://brega-chai.example`                  |
-| `NEXT_PUBLIC_CMS_URL`   | Next server и при необходимости браузер | Публичный origin Strapi; fallback для публичных CMS media URL             | `https://admin.brega-chai.example`            |
-| `NEXT_PUBLIC_MEDIA_URL` | Next server и browser config            | Публичный origin RustFS/CDN, из которого посетитель загружает изображения | `https://media.brega-chai.example/storefront` |
+| Переменная              | Потребитель                             | Назначение                                                             | Пример                             |
+| ----------------------- | --------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------- |
+| `SITE_URL`              | Next server, CMS и browser config       | Origin storefront для canonical URL, Open Graph, sitemap и JSON-LD     | `https://brega-chai.example`       |
+| `NEXT_PUBLIC_CMS_URL`   | Next server и при необходимости браузер | Публичный origin Strapi; fallback для публичных CMS media URL          | `https://admin.brega-chai.example` |
+| `NEXT_PUBLIC_MEDIA_URL` | Next server и browser config            | Публичная база RustFS/CDN, из которой посетитель загружает изображения | `https://media.brega-chai.example` |
 
 Значения:
 
@@ -39,6 +39,12 @@ allowlist `PUBLIC_RUNTIME_CONFIG_KEYS`.
 - не содержат username/password;
 - меняются через runtime env без rebuild;
 - могут быть без риска показаны любому посетителю.
+
+Allowlist `next/image` сохраняет путь из `NEXT_PUBLIC_MEDIA_URL`: корневая база
+`https://media.brega-chai.example` разрешает `/**` только на этом origin, а база
+`https://media.brega-chai.example/storefront` — только `/storefront/**`.
+Query-параметр версии изображения не ограничивается, потому что меняется при
+Replace media и является частью ключа кеша.
 
 `/runtime-config.js` возвращает `Cache-Control: no-store`,
 `Content-Type: application/javascript; charset=utf-8` и

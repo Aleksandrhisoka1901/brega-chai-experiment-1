@@ -1,11 +1,13 @@
 import type { NextConfig } from "next";
 
+import { createMediaRemotePattern } from "./src/lib/image-remote-pattern.ts";
+
 const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
   {
     protocol: "https",
     hostname: "media.bregalliance.ru",
     port: "",
-    pathname: "/storefront/**",
+    pathname: "/**",
   },
   {
     protocol: "http",
@@ -23,15 +25,7 @@ const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
 
 const configuredMediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL;
 if (configuredMediaUrl) {
-  const url = new URL(configuredMediaUrl);
-  const mediaPath = url.pathname.replace(/\/$/, "") || "/storefront";
-  const pathname = `${mediaPath}/**`;
-  const pattern = {
-    protocol: url.protocol.slice(0, -1) as "http" | "https",
-    hostname: url.hostname,
-    port: url.port,
-    pathname,
-  };
+  const pattern = createMediaRemotePattern(configuredMediaUrl);
   const duplicate = remotePatterns.some(
     (candidate) =>
       !(candidate instanceof URL) &&

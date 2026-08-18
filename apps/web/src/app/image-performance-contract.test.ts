@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import nextConfig from "../../next.config.ts";
+import { createMediaRemotePattern } from "../lib/image-remote-pattern.ts";
 
 test("Next image optimization has exact media origins and a one-hour floor", () => {
   assert.equal(nextConfig.images?.minimumCacheTTL, 3600);
@@ -12,7 +13,7 @@ test("Next image optimization has exact media origins and a one-hour floor", () 
       protocol: "https",
       hostname: "media.bregalliance.ru",
       port: "",
-      pathname: "/storefront/**",
+      pathname: "/**",
     },
     {
       protocol: "http",
@@ -27,6 +28,24 @@ test("Next image optimization has exact media origins and a one-hour floor", () 
       pathname: "/uploads/**",
     },
   ]);
+});
+
+test("configured media origins preserve their actual path scope", () => {
+  assert.deepEqual(createMediaRemotePattern("https://media.bregalliance.ru"), {
+    protocol: "https",
+    hostname: "media.bregalliance.ru",
+    port: "",
+    pathname: "/**",
+  });
+  assert.deepEqual(
+    createMediaRemotePattern("https://cdn.example.test/storefront/"),
+    {
+      protocol: "https",
+      hostname: "cdn.example.test",
+      port: "",
+      pathname: "/storefront/**",
+    },
+  );
 });
 
 test("Docker development forwards public media without changing browser URLs", async () => {
