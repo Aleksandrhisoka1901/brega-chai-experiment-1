@@ -248,6 +248,59 @@ test("four home cards fill the desktop content width", async ({ page }) => {
   }
 });
 
+test("home collections use article cards with equal three-column geometry", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 900 });
+  await page.goto("/");
+
+  for (const section of [page.locator("#nabory"), page.locator("#tovary")]) {
+    const track = section.locator("[data-collection-layout]");
+
+    await track.evaluate((element) => {
+      for (const child of [...element.children].slice(3)) child.remove();
+      element.setAttribute("data-card-count", "3");
+      element.setAttribute("data-collection-layout", "fixed");
+      (element as HTMLElement).style.setProperty("--home-card-count", "3");
+      (element as HTMLElement).style.setProperty("--home-track-width", "75%");
+    });
+
+    const cards = track.locator(":scope > article");
+    await expect(cards).toHaveCount(3);
+
+    for (const card of await cards.all()) {
+      await expect(card.locator(":scope > a")).toHaveCount(1);
+    }
+
+    const mediaWidths = await cards.evaluateAll((elements) =>
+      elements.map((element) => {
+        const media = element.querySelector<HTMLElement>(
+          '[class*="cardMedia"], .product-card__media',
+        );
+
+        if (!media) throw new Error("Card media is missing");
+        return media.getBoundingClientRect().width;
+      }),
+    );
+
+    expect(Math.max(...mediaWidths) - Math.min(...mediaWidths)).toBeLessThan(
+      0.1,
+    );
+  }
+
+  for (const path of ["/tovary", "/nabory"]) {
+    await page.goto(path);
+    const grid = page.locator(".product-grid");
+    const directChildren = grid.locator(":scope > *");
+    const articles = grid.locator(":scope > article");
+
+    await expect(articles).toHaveCount(await directChildren.count());
+    for (const card of await articles.all()) {
+      await expect(card.locator(":scope > a")).toHaveCount(1);
+    }
+  }
+});
+
 test("desktop hero title keeps its position without an eyebrow", async ({
   page,
 }) => {

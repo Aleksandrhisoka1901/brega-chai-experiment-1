@@ -76,30 +76,34 @@ export function HomeNabory({
           }
         >
           {products.map((product, index) => (
-            <Link
+            <article
               className={styles.naborCard}
               data-home-card="nabor"
-              href={`/nabory/${product.slug}`}
               key={product.id}
             >
-              <CardMedia
-                alt={product.imageAlt}
-                className={styles.cardMedia}
-                fallback={
-                  <span>{bindShortRussianWords(imagePlaceholder)}</span>
-                }
-                imageUrl={product.imageUrl}
-                sizes="(max-width: 520px) 82vw, (max-width: 1023px) 50vw, 368px"
-                sources={product.imageSources}
-              />
-              <div className={styles.cardCopy}>
-                <span className={styles.cardNumber}>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3>{bindShortRussianWords(product.title)}</h3>
-                <p>{bindShortRussianWords(product.excerpt)}</p>
-              </div>
-            </Link>
+              <Link
+                className={styles.naborCardLink}
+                href={`/nabory/${product.slug}`}
+              >
+                <CardMedia
+                  alt={product.imageAlt}
+                  className={styles.cardMedia}
+                  fallback={
+                    <span>{bindShortRussianWords(imagePlaceholder)}</span>
+                  }
+                  imageUrl={product.imageUrl}
+                  sizes="(max-width: 520px) 82vw, (max-width: 1023px) 50vw, 368px"
+                  sources={product.imageSources}
+                />
+                <div className={styles.cardCopy}>
+                  <span className={styles.cardNumber}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3>{bindShortRussianWords(product.title)}</h3>
+                  <p>{bindShortRussianWords(product.excerpt)}</p>
+                </div>
+              </Link>
+            </article>
           ))}
         </div>
         {slider.canScroll ? (

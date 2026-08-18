@@ -323,7 +323,8 @@
   grid-auto-columns: 25%;
   grid-auto-flow: column;
   overflow-x: auto;
-  border: 1px solid var(--border-default);
+  border-top: 1px solid var(--border-default);
+  border-left: 1px solid var(--border-default);
   background: transparent;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -347,20 +348,22 @@
   margin-top: 1.25rem;
 }
 
-.naborCard,
-.productCard {
+.naborCard {
   min-width: 0;
   display: block;
   border-right: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
   color: inherit;
   background: var(--surface-page);
   scroll-snap-align: start;
-  text-decoration: none;
 }
 
-.naborCard:last-child,
-.productCard:last-child {
-  border-right: 0;
+.naborCardLink {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
 }
 
 .cardMedia > span {
