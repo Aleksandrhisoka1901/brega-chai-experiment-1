@@ -348,6 +348,8 @@ test("every public block stays inside the shared content frame", async ({
 test("every hero mode stays aligned across responsive breakpoints", async ({
   page,
 }) => {
+  const clamp = (minimum: number, value: number, maximum: number) =>
+    Math.min(maximum, Math.max(minimum, value));
   const modes = [
     { layout: "40/60", copyFraction: 0.4, hasMedia: true },
     { layout: "50/50", copyFraction: 0.5, hasMedia: true },
@@ -410,6 +412,7 @@ test("every hero mode stays aligned across responsive breakpoints", async ({
         return {
           copyBackground: getComputedStyle(copy).backgroundColor,
           copyBottom: copyRect.bottom,
+          copyContentFits: copy.scrollHeight <= Math.ceil(copy.clientHeight),
           copyHeight: copyRect.height,
           copyRight: copyRect.right,
           copyWidth: copyRect.width,
@@ -418,11 +421,13 @@ test("every hero mode stays aligned across responsive breakpoints", async ({
           frameLeft: frameRect.left,
           frameWidth: frameRect.width,
           heroBackground: getComputedStyle(element).backgroundColor,
+          heroHeight: heroRect.height,
           heroWidth: heroRect.width,
           introColumns:
             getComputedStyle(intro).gridTemplateColumns.split(" ").length,
           leftBackground: background.backgroundColor,
           mediaTop: mediaRect?.top,
+          mediaHeight: mediaRect?.height ?? 0,
           mediaWidth: mediaRect?.width ?? 0,
           splitFromBackground:
             heroRect.left + Number.parseFloat(background.width),
@@ -443,6 +448,10 @@ test("every hero mode stays aligned across responsive breakpoints", async ({
         metrics.copyWithoutOverflow,
         `${mode.layout} at ${viewport.width}`,
       ).toBe(true);
+      expect(
+        metrics.copyContentFits,
+        `${mode.layout} at ${viewport.width}x${viewport.height}`,
+      ).toBe(true);
       expect(metrics.introColumns, `${mode.layout} at ${viewport.width}`).toBe(
         viewport.width < 1440 ? 1 : 2,
       );
@@ -453,6 +462,26 @@ test("every hero mode stays aligned across responsive breakpoints", async ({
           `${mode.layout} at ${viewport.width}`,
         ).toBeCloseTo(expectedFrameWidth, 0);
         if (mode.hasMedia) {
+          const narrowMobile = viewport.width <= 520;
+          const expectedCopyHeight = narrowMobile
+            ? clamp(512, viewport.height * 0.65, 672)
+            : clamp(480, viewport.height * 0.58, 640);
+          const expectedMediaHeight = narrowMobile
+            ? clamp(352, viewport.height * 0.5, 480)
+            : clamp(416, viewport.height * 0.52, 576);
+
+          expect(
+            metrics.copyHeight,
+            `${mode.layout} copy at ${viewport.width}x${viewport.height}`,
+          ).toBeCloseTo(expectedCopyHeight, 0);
+          expect(
+            metrics.mediaHeight,
+            `${mode.layout} media at ${viewport.width}x${viewport.height}`,
+          ).toBeCloseTo(expectedMediaHeight, 0);
+          expect(
+            metrics.heroHeight,
+            `${mode.layout} at ${viewport.width}x${viewport.height}`,
+          ).toBeCloseTo(expectedCopyHeight + expectedMediaHeight, 0);
           expect(
             metrics.mediaWidth,
             `${mode.layout} at ${viewport.width}`,
@@ -462,12 +491,34 @@ test("every hero mode stays aligned across responsive breakpoints", async ({
             `${mode.layout} at ${viewport.width}`,
           ).toBeCloseTo(metrics.copyBottom, 0);
         } else {
+          const expectedHeroHeight = clamp(576, viewport.height - 76, 768);
+
+          expect(
+            metrics.heroHeight,
+            `${mode.layout} at ${viewport.width}x${viewport.height}`,
+          ).toBeCloseTo(expectedHeroHeight, 0);
           expect(
             metrics.copyHeight,
             `${mode.layout} at ${viewport.width}`,
           ).toBeCloseTo(metrics.frameHeight, 0);
         }
       } else {
+        const expectedHeroHeight = clamp(672, viewport.height - 76, 960);
+
+        expect(
+          metrics.heroHeight,
+          `${mode.layout} at ${viewport.width}x${viewport.height}`,
+        ).toBeCloseTo(expectedHeroHeight, 0);
+        expect(
+          metrics.copyHeight,
+          `${mode.layout} copy at ${viewport.width}x${viewport.height}`,
+        ).toBeCloseTo(expectedHeroHeight, 0);
+        if (mode.hasMedia) {
+          expect(
+            metrics.mediaHeight,
+            `${mode.layout} media at ${viewport.width}x${viewport.height}`,
+          ).toBeCloseTo(expectedHeroHeight, 0);
+        }
         expect(
           metrics.copyWidth / expectedFrameWidth,
           `${mode.layout} at ${viewport.width}`,

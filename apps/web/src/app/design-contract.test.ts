@@ -81,6 +81,35 @@ test("semantic typography and structural frame tokens drive public layouts", asy
   assert.match(homeStyles, /\.catalogInner\s*\{[^}]*padding:/s);
 });
 
+test("home hero uses balanced responsive height limits", async () => {
+  const homeStyles = await readFile(homeStylesUrl, "utf8");
+
+  assert.match(
+    homeStyles,
+    /\.hero\s*\{[^}]*height:\s*clamp\(42rem,\s*calc\(100svh - 4\.75rem\),\s*60rem\);/s,
+  );
+  assert.match(
+    homeStyles,
+    /@media \(max-width: 1023px\)[\s\S]*?\.heroCopy\s*\{[^}]*height:\s*clamp\(30rem,\s*58svh,\s*40rem\);/,
+  );
+  assert.match(
+    homeStyles,
+    /@media \(max-width: 1023px\)[\s\S]*?\.heroMedia\s*\{[^}]*height:\s*clamp\(26rem,\s*52svh,\s*36rem\);/,
+  );
+  assert.match(
+    homeStyles,
+    /@media \(max-width: 1023px\)[\s\S]*?\.hero\[data-layout="100\/0"\]\s*\{[^}]*height:\s*clamp\(36rem,\s*calc\(100svh - 4\.75rem\),\s*48rem\);/,
+  );
+  assert.match(
+    homeStyles,
+    /@media \(max-width: 520px\)[\s\S]*?\.heroCopy\s*\{[^}]*height:\s*clamp\(32rem,\s*65svh,\s*42rem\);/,
+  );
+  assert.match(
+    homeStyles,
+    /@media \(max-width: 520px\)[\s\S]*?\.heroMedia\s*\{[^}]*height:\s*clamp\(22rem,\s*50svh,\s*30rem\);/,
+  );
+});
+
 test("responsive image hints follow the 1600px content frame", async () => {
   const [heroLayout, homeNabory, productCard] = await Promise.all([
     readFile(heroLayoutUrl, "utf8"),
