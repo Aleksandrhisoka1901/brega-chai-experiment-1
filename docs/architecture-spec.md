@@ -978,7 +978,9 @@ images tagged commit и только после всех зелёных пров
 - GitHub ruleset разрешает создание `release-*` только владельцам репозитория; workflow валидирует SemVer и наличие tagged commit в `main`, остальные теги deploy не запускают;
 - отдельного staging нет;
 - deploy job зависит от успешного завершения всех lint, typecheck, test, build, container smoke/a11y jobs и публикации images;
+- target images скачиваются до остановки production-сервисов; ошибка registry pull завершает deploy без backup и downtime;
 - дополнительный backup PostgreSQL и RustFS перед production-deploy;
+- pre-deploy backup перезапускает сервисы только на предыдущих immutable image refs и не может активировать target image;
 - health/readiness checks;
 - автоматический deploy допускает только backward-compatible schema changes;
 - удаление, переименование или смена типа поля требуют отдельного migration script, backup и явного подтверждения в release PR;

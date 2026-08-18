@@ -31,12 +31,16 @@ else
   initial_deploy=0
 fi
 
+if ! docker compose $compose_files pull web cms; then
+  echo "Target image pull failed; running services were not changed." >&2
+  exit 1
+fi
+
 if [ "$initial_deploy" -eq 0 ]; then
-  ./scripts/backup.sh
+  WEB_IMAGE=$previous_web CMS_IMAGE=$previous_cms ./scripts/backup.sh
 else
   echo "Initial deploy detected; skipping backup because no application containers exist yet."
 fi
-docker compose $compose_files pull web cms
 docker compose $compose_files up -d postgres rustfs rustfs-init
 docker compose $compose_files up -d cms
 

@@ -29,10 +29,13 @@ GitHub ruleset тег `release-{semver}` на коммите из `main`. Deploy
 self-hosted GitHub Actions runner и исходный build toolchain на VPS не
 устанавливаются.
 
-Перед deploy создаётся backup PostgreSQL и RustFS. После запуска выполняются
-healthcheck и smoke-check. При ошибке healthcheck pipeline возвращает предыдущие
-web/CMS images; данные и schema автоматически не откатываются. Автоматический
-deploy принимает только backward-compatible schema changes.
+До остановки сервисов VPS скачивает все target images. Ошибка registry pull
+завершает deploy, не запуская backup и не меняя работающий stack. После
+успешного pull создаётся backup PostgreSQL и RustFS; backup перезапускает сервисы
+строго на предыдущих immutable image refs. После rollout выполняются healthcheck
+и smoke-check. При последующей ошибке pipeline возвращает предыдущие web/CMS
+images; данные и schema автоматически не откатываются. Автоматический deploy
+принимает только backward-compatible schema changes.
 
 Ежедневный локальный backup хранит только последнюю копию на отдельном
 persistent path того же VPS. Новая копия перед deploy заменяет предыдущую.
