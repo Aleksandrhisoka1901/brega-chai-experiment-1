@@ -691,7 +691,10 @@ GitHub Actions собирает и проверяет production images один
 
 ### 10.3. Кэширование контента
 
-После publish/update/unpublish Strapi вызывает защищённый webhook Next.js с tag-based revalidation. Контент обновляется без ручного production-deploy.
+После publish/update/unpublish Strapi вызывает защищённый webhook Next.js с
+tag-based revalidation. Физическое удаление опубликованной записи
+`entry.delete` нормализуется в `unpublish` и сбрасывает те же cache boundaries.
+Контент обновляется без ручного production-deploy.
 
 ## 11. Аналитика и наблюдаемость
 

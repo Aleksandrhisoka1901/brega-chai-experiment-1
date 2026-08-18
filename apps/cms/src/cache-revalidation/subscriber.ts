@@ -81,9 +81,12 @@ export function registerCacheRevalidationSubscriber(
       return;
     }
 
-    const action = eventName.startsWith("entry.")
-      ? (eventName.slice("entry.".length) as RevalidationAction)
-      : undefined;
+    const action =
+      eventName === "entry.delete"
+        ? "unpublish"
+        : eventName.startsWith("entry.")
+          ? (eventName.slice("entry.".length) as RevalidationAction)
+          : undefined;
 
     if (action !== "publish" && action !== "update" && action !== "unpublish") {
       return;

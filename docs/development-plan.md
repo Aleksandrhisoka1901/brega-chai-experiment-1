@@ -130,7 +130,8 @@ Manager подтвердила `new → confirmed → cancelled`, изменен
 
 - использовать Next Data Cache с резервным TTL `300s` и смысловыми tags;
 - отправлять из Strapi `publish`, `update` и `unpublish` для storefront-контента;
-  сохранение draft не должно отправлять событие;
+  физическое `entry.delete` нормализовать в `unpublish`, а сохранение draft не
+  должно отправлять событие;
 - подписывать точное JSON-тело через HMAC-SHA256 и проверять подпись до разбора
   payload;
 - строго проверять allowlisted envelope и ограничение размера body; cache

@@ -116,6 +116,49 @@ test("is disabled safely when endpoint configuration is incomplete", async () =>
   assert.equal(called, false);
 });
 
+test("subscriber invalidates a physically deleted product as unpublished", async () => {
+  let subscriber:
+    | ((eventName: string, event: unknown) => Promise<void>)
+    | undefined;
+  const sent: unknown[] = [];
+  const strapi = {
+    eventHub: {
+      subscribe(value: typeof subscriber) {
+        subscriber = value;
+        return () => {};
+      },
+    },
+  };
+
+  registerCacheRevalidationSubscriber(strapi, {
+    send: async (event) => {
+      sent.push(event);
+      return { ok: true as const, eventId: "id" };
+    },
+  });
+
+  await subscriber?.("entry.delete", {
+    uid: "api::product.product",
+    entry: {
+      documentId: "deleted-document",
+      slug: "sort-1234",
+      type: "tovar",
+    },
+  });
+
+  assert.deepEqual(sent, [
+    {
+      event: "product",
+      action: "unpublish",
+      product: {
+        documentId: "deleted-document",
+        slug: "sort-1234",
+        type: "tovar",
+      },
+    },
+  ]);
+});
+
 test("subscriber routes allowlisted publication events and ignores others", async () => {
   let subscriber:
     | ((eventName: string, event: unknown) => Promise<void>)

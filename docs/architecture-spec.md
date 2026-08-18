@@ -325,7 +325,10 @@ server-only secret; подпись, secret и payload не логируются.
 Разрешены `home`, `global`, `products`, `product` и действия `publish`,
 `update`, `unpublish`. Сохранение draft не отправляет событие. Для product
 обязательны `documentId`, `type` и `slug`; произвольные tags/paths и лишние поля
-не принимаются.
+не принимаются. Нативное событие Strapi `entry.delete` нормализуется CMS
+subscriber-ом в `unpublish`: удалённая entry ещё содержит прежние `documentId`,
+`type` и `slug`, поэтому инвалидируются каталоги, главная и прежний detail-route
+без расширения публичного webhook-протокола действием `delete`.
 
 | Event      | Tags                                     | Paths                                                 |
 | ---------- | ---------------------------------------- | ----------------------------------------------------- |
