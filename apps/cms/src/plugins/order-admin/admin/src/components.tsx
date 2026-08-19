@@ -1,4 +1,4 @@
-import { Badge, Box, Flex, Typography } from "@strapi/design-system";
+import { Badge, Box, Flex, Modal, Typography } from "@strapi/design-system";
 import styled from "styled-components";
 
 import type { OrderStatus } from "./view-model";
@@ -8,6 +8,10 @@ const DataValue = styled(Box)`
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
+`;
+
+export const ConfirmationModalContent = styled(Modal.Content)`
+  max-width: 43rem;
 `;
 
 export function StatusBadge({ status }: { status: OrderStatus }) {

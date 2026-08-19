@@ -27,6 +27,7 @@ test("global content migration fills missing components for draft and published 
       documentId: "settings-draft",
       status: "draft",
       data: {
+        maxItemQuantity: 5,
         sectionBreadcrumbs: [
           { route: "tovary", label: "Сорта" },
           { route: "nabory", label: "Ритуалы" },
@@ -41,6 +42,7 @@ test("global content migration fills missing components for draft and published 
       documentId: "settings-published",
       status: "published",
       data: {
+        maxItemQuantity: 5,
         sectionBreadcrumbs: [
           { route: "tovary", label: "Сорта" },
           { route: "nabory", label: "Ритуалы" },
@@ -63,6 +65,7 @@ test("global content migration leaves complete settings untouched", async () => 
           return [
             {
               documentId: "settings",
+              maxItemQuantity: 8,
               sectionBreadcrumbs: [
                 { route: "tovary", label: "Каталог" },
                 { route: "nabory", label: "Коллекции" },

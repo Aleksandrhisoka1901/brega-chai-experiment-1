@@ -18,11 +18,12 @@ export interface CartStore {
   getServerSnapshot(): Cart;
   subscribe(listener: Listener): () => void;
   hydrate(): void;
-  add(product: CartProduct, quantity: number): void;
+  add(product: CartProduct, quantity: number, maxItemQuantity?: number): void;
   updateQuantity(
     productId: string,
     quantity: number,
     currentStock: number,
+    maxItemQuantity?: number,
   ): void;
   remove(productId: string): void;
   clear(): void;
@@ -64,12 +65,18 @@ export function createCartStore(
       publish(persistence.load(), false);
       persistence.subscribe((externalCart) => publish(externalCart, false));
     },
-    add(product, quantity) {
-      publish(addItem(cart, product, quantity), true);
+    add(product, quantity, maxItemQuantity) {
+      publish(addItem(cart, product, quantity, maxItemQuantity), true);
     },
-    updateQuantity(productId, quantity, currentStock) {
+    updateQuantity(productId, quantity, currentStock, maxItemQuantity) {
       publish(
-        updateItemQuantity(cart, productId, quantity, currentStock),
+        updateItemQuantity(
+          cart,
+          productId,
+          quantity,
+          currentStock,
+          maxItemQuantity,
+        ),
         true,
       );
     },

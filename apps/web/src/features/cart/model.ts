@@ -1,14 +1,19 @@
 import { CART_VERSION } from "./types.ts";
 import type { Cart, CartItem, CartProduct } from "./types.ts";
+import { DEFAULT_MAX_ITEM_QUANTITY } from "@brega-chai/contracts";
 
-export const MAX_ITEM_QUANTITY = 5;
+export const MAX_ITEM_QUANTITY = DEFAULT_MAX_ITEM_QUANTITY;
 
 export function createEmptyCart(): Cart {
   return { version: CART_VERSION, items: [] };
 }
 
-function assertQuantity(quantity: number, stock: number): void {
-  const maximum = Math.min(MAX_ITEM_QUANTITY, stock);
+function assertQuantity(
+  quantity: number,
+  stock: number,
+  maxItemQuantity: number,
+): void {
+  const maximum = Math.min(maxItemQuantity, stock);
 
   if (
     !Number.isInteger(quantity) ||
@@ -26,12 +31,13 @@ export function addItem(
   cart: Cart,
   product: CartProduct,
   quantity: number,
+  maxItemQuantity = MAX_ITEM_QUANTITY,
 ): Cart {
   if (cart.items.some((item) => item.productId === product.productId)) {
     return cart;
   }
 
-  assertQuantity(quantity, product.stock);
+  assertQuantity(quantity, product.stock, maxItemQuantity);
   const { stock: _, ...item } = product;
 
   return {
@@ -45,6 +51,7 @@ export function updateItemQuantity(
   productId: string,
   quantity: number,
   currentStock: number,
+  maxItemQuantity = MAX_ITEM_QUANTITY,
 ): Cart {
   const index = cart.items.findIndex((item) => item.productId === productId);
 
@@ -57,15 +64,16 @@ export function updateItemQuantity(
     return cart;
   }
 
+  const currentMaximum = Math.min(currentStock, maxItemQuantity);
   const isDownwardCorrection =
     currentQuantity !== undefined &&
-    currentQuantity > currentStock &&
+    currentQuantity > currentMaximum &&
     quantity >= 1 &&
     Number.isInteger(quantity) &&
     quantity < currentQuantity;
 
   if (!isDownwardCorrection) {
-    assertQuantity(quantity, currentStock);
+    assertQuantity(quantity, currentStock, maxItemQuantity);
   }
 
   return {

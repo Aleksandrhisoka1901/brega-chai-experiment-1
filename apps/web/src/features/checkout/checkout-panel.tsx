@@ -346,9 +346,7 @@ export function CheckoutPanel({
               Товары, {cart.items.reduce((sum, item) => sum + item.quantity, 0)}{" "}
               шт.
             </span>
-            <strong
-              className={pricing.hasDiscount ? styles.standardTotal : undefined}
-            >
+            <strong>
               <MoneyAmount
                 rubles={standardTotal}
                 variant={pricing.hasDiscount ? "previous-total" : "total"}

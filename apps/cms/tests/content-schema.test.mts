@@ -173,6 +173,10 @@ test("global checkout settings are bounded and the order email stays private", a
   assert.equal(global.attributes.pickupDiscountPercent.default, undefined);
   assert.equal(global.attributes.pickupDiscountPercent.min, 0);
   assert.equal(global.attributes.pickupDiscountPercent.max, 100);
+  assert.equal(global.attributes.maxItemQuantity.required, true);
+  assert.equal(global.attributes.maxItemQuantity.default, 5);
+  assert.equal(global.attributes.maxItemQuantity.min, 1);
+  assert.equal(global.attributes.maxItemQuantity.max, 100);
   assert.equal(global.attributes.courierDeliveryNote.required, true);
   assert.equal(global.attributes.orderNotificationEmail.required, true);
   assert.equal(global.attributes.orderNotificationEmail.private, true);

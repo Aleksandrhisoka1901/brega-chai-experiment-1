@@ -4,7 +4,9 @@ import {
   canTransitionOrderStatus,
   calculateDiscountedTotalRubles,
   createOrderInputSchema,
+  DEFAULT_MAX_ITEM_QUANTITY,
   isOrderQuantityAvailable,
+  maxItemQuantitySchema,
   orderResultSchema,
   orderStatusSchema,
   type CreateOrderInput,
@@ -106,7 +108,7 @@ const editOrderInputSchema = z
         z
           .object({
             productId: z.string().trim().min(1).max(100),
-            quantity: z.number().int().min(1).max(5),
+            quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
           })
           .strict(),
       )
@@ -133,6 +135,7 @@ export type EditOrderInput = z.infer<typeof editOrderInputSchema>;
 export interface OrderCheckoutSettings {
   pickupAddress: string;
   pickupDiscountPercent?: number | null;
+  maxItemQuantity?: number | null;
 }
 
 export interface OrderCreation {
@@ -199,6 +202,19 @@ export interface OrderEditPersistence {
   ): Promise<T>;
 }
 
+export interface OrderDeletionTransactionRepository {
+  lockOrder(orderId: string): Promise<StoredOrder | null>;
+  restoreStock(productId: string, quantity: number): Promise<boolean>;
+  deleteOrder(orderId: string): Promise<boolean>;
+}
+
+export interface OrderDeletionPersistence {
+  transaction<T>(
+    orderId: string,
+    operation: (repository: OrderDeletionTransactionRepository) => Promise<T>,
+  ): Promise<T>;
+}
+
 function fingerprintRequest(input: CreateOrderInput): string {
   const canonicalInput = {
     ...input,
@@ -229,9 +245,10 @@ function toResult(order: StoredOrder): OrderResult {
 }
 
 function validateCheckoutSettings(settings: OrderCheckoutSettings): Required<
-  Omit<OrderCheckoutSettings, "pickupDiscountPercent">
+  Omit<OrderCheckoutSettings, "pickupDiscountPercent" | "maxItemQuantity">
 > & {
   pickupDiscountPercent: number;
+  maxItemQuantity: number;
 } {
   const pickupAddress = settings.pickupAddress.trim();
   if (!pickupAddress) {
@@ -251,9 +268,17 @@ function validateCheckoutSettings(settings: OrderCheckoutSettings): Required<
       "Pickup discount is not configured",
     );
   }
+  const maxItemQuantity = settings.maxItemQuantity ?? DEFAULT_MAX_ITEM_QUANTITY;
+  if (!maxItemQuantitySchema.safeParse(maxItemQuantity).success) {
+    throw new OrderServiceError(
+      "ORDER_CONFIGURATION_UNAVAILABLE",
+      "Maximum item quantity is not configured",
+    );
+  }
   return {
     pickupAddress,
     pickupDiscountPercent,
+    maxItemQuantity,
   };
 }
 
@@ -269,6 +294,9 @@ export async function createOrderWithMeta(
 
   const input = parsedInput.data;
   const settings = validateCheckoutSettings(rawSettings);
+  if (input.items.some((item) => item.quantity > settings.maxItemQuantity)) {
+    throw new OrderServiceError("INVALID_INPUT", "Invalid order payload");
+  }
   const requestFingerprint = fingerprintRequest(input);
 
   return persistence.transaction(input.idempotencyKey, async (repository) => {
@@ -316,7 +344,13 @@ export async function createOrderWithMeta(
           `Product ${item.productId} has invalid commercial data`,
         );
       }
-      if (!isOrderQuantityAvailable(item.quantity, product.stock)) {
+      if (
+        !isOrderQuantityAvailable(
+          item.quantity,
+          product.stock,
+          settings.maxItemQuantity,
+        )
+      ) {
         throw new OrderServiceError(
           "INSUFFICIENT_STOCK",
           `Insufficient stock for product ${item.productId}`,
@@ -409,7 +443,6 @@ export async function editOrder(
   if (!parsedInput.success) {
     throw new OrderServiceError("INVALID_INPUT", "Invalid order edit payload");
   }
-
   const input = parsedInput.data;
   return persistence.transaction(orderId, async (repository) => {
     const order = await repository.lockOrder(orderId);
@@ -464,7 +497,11 @@ export async function editOrder(
               `Product ${item.productId} is unavailable`,
             );
           }
-          if (product.stock < item.quantity - existing.quantity) {
+          if (
+            !Number.isSafeInteger(product.stock) ||
+            product.stock < 0 ||
+            product.stock < item.quantity - existing.quantity
+          ) {
             throw new OrderServiceError(
               "INSUFFICIENT_STOCK",
               `Insufficient stock for product ${item.productId}`,
@@ -490,14 +527,16 @@ export async function editOrder(
         !product.published ||
         product.currency !== "RUB" ||
         !Number.isSafeInteger(product.priceRubles) ||
-        product.priceRubles <= 0
+        product.priceRubles <= 0 ||
+        !Number.isSafeInteger(product.stock) ||
+        product.stock < 0
       ) {
         throw new OrderServiceError(
           "PRODUCT_UNAVAILABLE",
           `Product ${item.productId} is unavailable`,
         );
       }
-      if (!isOrderQuantityAvailable(item.quantity, product.stock)) {
+      if (item.quantity > product.stock) {
         throw new OrderServiceError(
           "INSUFFICIENT_STOCK",
           `Insufficient stock for product ${item.productId}`,
@@ -564,6 +603,33 @@ export async function editOrder(
       throw new OrderServiceError("ORDER_NOT_FOUND", "Order was not found");
     }
     return updated;
+  });
+}
+
+export async function deleteOrder(
+  orderId: string,
+  persistence: OrderDeletionPersistence,
+): Promise<{ orderId: string; stockChanged: boolean }> {
+  return persistence.transaction(orderId, async (repository) => {
+    const order = await repository.lockOrder(orderId);
+    if (!order) {
+      throw new OrderServiceError("ORDER_NOT_FOUND", "Order was not found");
+    }
+
+    const stockChanged = order.status !== "cancelled";
+    if (stockChanged) {
+      for (const line of order.lines) {
+        // Deleting an operational record must remain possible after a catalog
+        // product was removed. Existing products are restored atomically.
+        await repository.restoreStock(line.productId, line.quantity);
+      }
+    }
+
+    if (!(await repository.deleteOrder(orderId))) {
+      throw new OrderServiceError("ORDER_NOT_FOUND", "Order was not found");
+    }
+
+    return { orderId, stockChanged };
   });
 }
 

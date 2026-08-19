@@ -2,6 +2,7 @@ type DocumentStatus = "draft" | "published";
 
 type GlobalSettingDocument = {
   documentId: string;
+  maxItemQuantity?: number | null;
   sectionBreadcrumbs?: Array<{ route: "tovary" | "nabory"; label: string }>;
   storefrontTexts?: {
     imagePlaceholder?: string;
@@ -30,6 +31,9 @@ export async function ensureGlobalContentDefaults(strapi: any) {
 
     for (const setting of settings) {
       const data: Partial<GlobalSettingDocument> = {};
+      if (!setting.maxItemQuantity) {
+        data.maxItemQuantity = 5;
+      }
       if (!setting.sectionBreadcrumbs?.length) {
         data.sectionBreadcrumbs = DEFAULT_BREADCRUMBS;
       }

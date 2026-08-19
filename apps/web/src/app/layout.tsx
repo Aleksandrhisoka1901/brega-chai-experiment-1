@@ -93,6 +93,7 @@ export default async function RootLayout({
                   courierDeliveryNote: settings.courierDeliveryNote,
                   pickupAddress: settings.pickupAddress,
                   pickupDiscountPercent: settings.pickupDiscountPercent,
+                  maxItemQuantity: settings.maxItemQuantity,
                 }
               : undefined
           }

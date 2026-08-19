@@ -14,6 +14,7 @@ export function ProductDetail({
   breadcrumbs,
   boutiqueStory,
   imagePlaceholder,
+  maxItemQuantity,
   outOfStock,
   product,
 }: {
@@ -21,6 +22,7 @@ export function ProductDetail({
   breadcrumbs: BreadcrumbItem[];
   boutiqueStory: RichContentBlock[];
   imagePlaceholder: string;
+  maxItemQuantity: number;
   outOfStock: string;
   product: ProductDetailData;
 }) {
@@ -55,6 +57,7 @@ export function ProductDetail({
           </p>
 
           <ProductDetailPurchase
+            maxItemQuantity={maxItemQuantity}
             outOfStock={outOfStock}
             product={{
               productId: product.id,

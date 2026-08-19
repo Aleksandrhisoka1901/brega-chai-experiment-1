@@ -1,9 +1,12 @@
-import { Layouts, Page } from "@strapi/admin/strapi-admin";
+import { Layouts, Page, useRBAC } from "@strapi/admin/strapi-admin";
 import {
+  Alert,
   Box,
   Button,
   Field,
   Flex,
+  IconButton,
+  Modal,
   SingleSelect,
   SingleSelectOption,
   Table,
@@ -13,14 +16,15 @@ import {
   Thead,
   Tr,
   Typography,
+  VisuallyHidden,
 } from "@strapi/design-system";
-import { Search } from "@strapi/icons";
+import { Search, Trash } from "@strapi/icons";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { useOrderAdminApi } from "../api";
-import { StatusBadge } from "../components";
-import type { OrderListResponse } from "../types";
+import { ConfirmationModalContent, StatusBadge } from "../components";
+import type { OrderListItem, OrderListResponse } from "../types";
 import {
   buildListSearch,
   formatOrderDate,
@@ -29,6 +33,9 @@ import {
 } from "../view-model";
 
 const PAGE_SIZE = 25;
+const deletePermission = [
+  { action: "plugin::order-admin.delete", subject: null },
+];
 
 function toBoundary(value: string, end = false) {
   if (!value) return undefined;
@@ -37,6 +44,8 @@ function toBoundary(value: string, end = false) {
 
 export function OrderListPage() {
   const api = useOrderAdminApi();
+  const { allowedActions, isLoading: permissionsLoading } =
+    useRBAC(deletePermission);
   const [urlSearch, setUrlSearch] = useSearchParams();
   const page = Math.max(1, Number(urlSearch.get("page")) || 1);
   const [search, setSearch] = useState(urlSearch.get("search") ?? "");
@@ -48,6 +57,10 @@ export function OrderListPage() {
   const [result, setResult] = useState<OrderListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] =
+    useState<OrderListItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   const requestSearch = useMemo(
     () =>
@@ -93,6 +106,22 @@ export function OrderListPage() {
     if (nextPage > 1) next.set("page", String(nextPage));
     else next.delete("page");
     setUrlSearch(next);
+  }
+
+  async function deleteOrder() {
+    if (!deleteConfirmation || deleting) return;
+    setDeleting(true);
+    setDeleteError(false);
+    try {
+      await api.delete(deleteConfirmation.documentId);
+      setDeleteConfirmation(null);
+      if (result?.data.length === 1 && page > 1) changePage(page - 1);
+      else await load();
+    } catch {
+      setDeleteError(true);
+    } finally {
+      setDeleting(false);
+    }
   }
 
   if (failed) {
@@ -181,7 +210,7 @@ export function OrderListPage() {
           <Page.Loading>Загружаем заказы</Page.Loading>
         ) : result && result.data.length > 0 ? (
           <>
-            <Table colCount={7} rowCount={result.data.length}>
+            <Table colCount={8} rowCount={result.data.length}>
               <Thead>
                 <Tr>
                   <Th>
@@ -204,6 +233,9 @@ export function OrderListPage() {
                   </Th>
                   <Th>
                     <Typography variant="sigma">Сумма</Typography>
+                  </Th>
+                  <Th>
+                    <VisuallyHidden>Действия</VisuallyHidden>
                   </Th>
                 </Tr>
               </Thead>
@@ -242,6 +274,20 @@ export function OrderListPage() {
                         {formatRubles(order.discountedTotalRubles)}
                       </Typography>
                     </Td>
+                    <Td>
+                      {!permissionsLoading && allowedActions.canDelete ? (
+                        <IconButton
+                          label={`Удалить заказ ${order.orderNumber}`}
+                          variant="ghost"
+                          onClick={() => {
+                            setDeleteError(false);
+                            setDeleteConfirmation(order);
+                          }}
+                        >
+                          <Trash />
+                        </IconButton>
+                      ) : null}
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -277,6 +323,53 @@ export function OrderListPage() {
           <Page.NoData content="Заказы по заданным условиям не найдены" />
         )}
       </Layouts.Content>
+      <Modal.Root
+        open={deleteConfirmation !== null}
+        onOpenChange={(open) => {
+          if (!open && !deleting) {
+            setDeleteConfirmation(null);
+            setDeleteError(false);
+          }
+        }}
+      >
+        <ConfirmationModalContent>
+          <Modal.Header closeLabel="Закрыть">
+            <Modal.Title>Удалить заказ?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Flex alignItems="stretch" direction="column" gap={4}>
+              <Typography>
+                {deleteConfirmation
+                  ? `Заказ ${deleteConfirmation.orderNumber} будет удалён без возможности восстановления.`
+                  : ""}
+              </Typography>
+              {deleteError ? (
+                <Alert
+                  closeLabel="Закрыть"
+                  title="Заказ не удалён"
+                  variant="danger"
+                >
+                  Обновите список и повторите действие.
+                </Alert>
+              ) : null}
+            </Flex>
+          </Modal.Body>
+          <Modal.Footer>
+            <Modal.Close>
+              <Button disabled={deleting} variant="tertiary">
+                Отмена
+              </Button>
+            </Modal.Close>
+            <Button
+              loading={deleting}
+              variant="danger"
+              onClick={() => void deleteOrder()}
+            >
+              Удалить заказ
+            </Button>
+          </Modal.Footer>
+        </ConfirmationModalContent>
+      </Modal.Root>
     </Page.Main>
   );
 }

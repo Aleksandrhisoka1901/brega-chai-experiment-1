@@ -60,8 +60,9 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
         [{ name: "navigation", size: 12 }],
         [{ name: "storefrontTexts", size: 12 }],
         [
-          { name: "pickupAddress", size: 8 },
+          { name: "pickupAddress", size: 4 },
           { name: "pickupDiscountPercent", size: 4 },
+          { name: "maxItemQuantity", size: 4 },
         ],
         [
           { name: "courierDeliveryNote", size: 6 },

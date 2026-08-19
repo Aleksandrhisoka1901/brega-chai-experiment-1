@@ -18,11 +18,14 @@ const orderUpdate = (status: unknown = "confirmed") => ({
   },
 });
 
+const deletionDependency = async () => undefined;
+
 test("routes an admin status change through the transactional service", async () => {
   const context = orderUpdate();
   const transitions: Array<[string, unknown]> = [];
   let nextCalls = 0;
   const middleware = createOrderStatusMiddleware({
+    deleteOrder: deletionDependency,
     findStatus: async () => "new",
     transitionStatus: async (orderId, status) => {
       transitions.push([orderId, status]);
@@ -42,6 +45,7 @@ test("does not transition when Content Manager resubmits the current status", as
   const context = orderUpdate("new");
   let transitions = 0;
   const middleware = createOrderStatusMiddleware({
+    deleteOrder: deletionDependency,
     findStatus: async () => "new",
     transitionStatus: async () => {
       transitions += 1;
@@ -60,6 +64,7 @@ test("does not call the direct update after a rejected transition", async () => 
   const expected = new Error("invalid transition");
   let nextCalls = 0;
   const middleware = createOrderStatusMiddleware({
+    deleteOrder: deletionDependency,
     findStatus: async () => "new",
     transitionStatus: async () => {
       throw expected;
@@ -84,6 +89,7 @@ test("rejects a status update without a stable order document id", async () => {
   };
   let nextCalls = 0;
   const middleware = createOrderStatusMiddleware({
+    deleteOrder: deletionDependency,
     findStatus: async () => "new",
     transitionStatus: async () => undefined,
   });
@@ -101,6 +107,7 @@ test("ignores other document actions and content types", async () => {
   let dependencyCalls = 0;
   let nextCalls = 0;
   const middleware = createOrderStatusMiddleware({
+    deleteOrder: deletionDependency,
     findStatus: async () => {
       dependencyCalls += 1;
       return "new";
@@ -133,6 +140,52 @@ test("ignores other document actions and content types", async () => {
   assert.equal(nextCalls, 3);
 });
 
+test("routes Content Manager deletion through the transactional service", async () => {
+  const deletions: string[] = [];
+  let nextCalls = 0;
+  const middleware = createOrderStatusMiddleware({
+    deleteOrder: async (orderId) => {
+      deletions.push(orderId);
+    },
+    findStatus: async () => "new",
+    transitionStatus: async () => undefined,
+  });
+
+  await middleware(
+    {
+      uid: "api::order.order",
+      action: "delete",
+      params: { documentId: "order-1" },
+    },
+    async () => {
+      nextCalls += 1;
+    },
+  );
+
+  assert.deepEqual(deletions, ["order-1"]);
+  assert.equal(nextCalls, 0);
+});
+
+test("rejects Content Manager deletion without a stable order id", async () => {
+  let deletions = 0;
+  const middleware = createOrderStatusMiddleware({
+    deleteOrder: async () => {
+      deletions += 1;
+    },
+    findStatus: async () => "new",
+    transitionStatus: async () => undefined,
+  });
+
+  await assert.rejects(
+    middleware(
+      { uid: "api::order.order", action: "delete", params: {} },
+      async () => undefined,
+    ),
+    /document id/i,
+  );
+  assert.equal(deletions, 0);
+});
+
 test("registers the guard on the Strapi document service boundary", () => {
   let registered: unknown;
   registerOrderStatusMiddleware({
@@ -140,6 +193,13 @@ test("registers the guard on the Strapi document service boundary", () => {
       use(middleware: unknown) {
         registered = middleware;
       },
+    },
+    service: () => ({
+      deleteFromAdmin: deletionDependency,
+      transitionStatus: async () => undefined,
+    }),
+    db: {
+      query: () => ({ findOne: async () => ({ orderStatus: "new" }) }),
     },
   });
 

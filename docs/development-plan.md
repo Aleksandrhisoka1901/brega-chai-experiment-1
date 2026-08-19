@@ -59,7 +59,7 @@ production-контент и внешний release-readiness.
 
 - cart domain и versioned `localStorage`;
 - Radix cart drawer;
-- quantity `1–min(5, stock)`;
+- quantity `1–min(globalSettings.maxItemQuantity, stock)`;
 - changed/insufficient/unavailable stock states;
 - checkout внутри drawer;
 - телефон через `libphonenumber-js`;

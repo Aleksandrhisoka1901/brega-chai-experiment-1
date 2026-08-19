@@ -534,7 +534,8 @@ Radix Dialog является основой drawer-поведения:
 3. BFF вызывает закрытый Strapi endpoint с scoped server token;
 4. Strapi начинает одну DB transaction и проверяет idempotency key;
 5. внутри той же transaction читает и блокирует строки продуктов по стабильным ID;
-6. проверяет publication/availability и `1 ≤ quantity ≤ min(5, stock)`;
+6. проверяет publication/availability и
+   `1 ≤ quantity ≤ min(globalSettings.maxItemQuantity, stock)`;
 7. берёт цены только из заблокированных серверных записей;
 8. атомарно списывает остаток, создаёт исходный server-owned order snapshot и
    сохраняет заказ;

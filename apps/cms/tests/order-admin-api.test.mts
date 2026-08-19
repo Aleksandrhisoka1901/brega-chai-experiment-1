@@ -101,6 +101,11 @@ test("admin routes require exact read and transition scopes", () => {
         path: "/orders/:documentId/status",
         scope: ["plugin::order-admin.transition"],
       },
+      {
+        method: "DELETE",
+        path: "/orders/:documentId",
+        scope: ["plugin::order-admin.delete"],
+      },
     ],
   );
 });
@@ -124,7 +129,7 @@ test("bootstrap registers independent read and transition permissions", async ()
 
   assert.deepEqual(
     registrations.map((registration: any) => registration.uid),
-    ["read", "transition", "edit"],
+    ["read", "transition", "edit", "delete"],
   );
 });
 
@@ -294,6 +299,26 @@ test("status service delegates to domain transition before re-reading detail", a
     "completed",
     "cancelled",
   ]);
+});
+
+test("delete service delegates to the transactional order deletion", async () => {
+  const deletions: unknown[][] = [];
+  const service = serviceModule.createOrderAdminService({
+    strapi: {
+      db: { query: () => ({ findOne: async () => rawOrder }) },
+      service: () => ({
+        deleteFromAdmin: async (...args: unknown[]) => {
+          deletions.push(args);
+          return { orderId: "order-1", stockChanged: true };
+        },
+      }),
+    },
+  });
+
+  const result = await service.delete("order-1");
+
+  assert.deepEqual(deletions, [["order-1"]]);
+  assert.deepEqual(result, { documentId: "order-1" });
 });
 
 test("controller rejects invalid input and maps missing orders", async () => {

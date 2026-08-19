@@ -812,7 +812,7 @@ Breakpoints: `768`, `1024`, `1440px`. QA-viewports `320`, `390`, `1024`, `1920px
 | Button         | default, hover, focus-visible, pressed, disabled, loading; loading сохраняет текст/ширину и добавляет spinner |
 | Link           | default, hover, focus-visible, pressed; disabled-link запрещён                                                |
 | Product card   | одна ссылка на всю карточку; без вложенных действий                                                           |
-| Quantity       | диапазон `1–5` и остаток; при `1` minus disabled, удаление отдельное                                          |
+| Quantity       | диапазон `1–maxItemQuantity` и остаток; при `1` minus disabled, удаление отдельное                            |
 | Field/checkbox | default, focus-visible, valid, error, disabled, loading где применимо                                         |
 | Gallery        | выбранная thumbnail обозначена визуально и семантически; смена только click/Enter/Space                       |
 | Carousel       | конечная, без loop/autoplay; controls disabled на границах                                                    |
@@ -829,7 +829,8 @@ Button variants: primary, secondary и ghost. Ghost используется д�
 - CTA добавляет выбранное количество и открывает drawer.
 - После добавления quantity `−/+` блокируются, CTA становится active secondary «В корзине».
 - Повторный CTA открывает drawer и не меняет количество.
-- В корзине количество меняется до `min(5, stock)`.
+- В корзине количество меняется до `min(maxItemQuantity, stock)`; настройка
+  берётся из опубликованных общих настроек CMS.
 - При `stock = 0` карточка остаётся видимой, CTA disabled с текстом «Нет в наличии», quantity скрыт.
 - Если остаток корзины уменьшился, checkout блокируется до ручного исправления; позиция не удаляется автоматически.
 

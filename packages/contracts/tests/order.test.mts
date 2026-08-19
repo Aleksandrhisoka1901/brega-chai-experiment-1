@@ -4,6 +4,8 @@ import test from "node:test";
 import {
   canTransitionOrderStatus,
   createOrderInputSchema,
+  DEFAULT_MAX_ITEM_QUANTITY,
+  MAX_ORDER_ITEM_QUANTITY,
   isOrderQuantityAvailable,
   orderResultSchema,
   orderStatusSchema,
@@ -84,8 +86,8 @@ test("requires both accepted consent versions", () => {
   );
 });
 
-test("accepts only integer quantities from one to five", () => {
-  for (const quantity of [0, 1.5, 6]) {
+test("accepts integer quantities up to the hard transport safety limit", () => {
+  for (const quantity of [0, 1.5, MAX_ORDER_ITEM_QUANTITY + 1]) {
     assert.equal(
       createOrderInputSchema.safeParse({
         ...validInput,
@@ -95,7 +97,11 @@ test("accepts only integer quantities from one to five", () => {
     );
   }
 
-  for (const quantity of [1, 5]) {
+  for (const quantity of [
+    1,
+    DEFAULT_MAX_ITEM_QUANTITY,
+    MAX_ORDER_ITEM_QUANTITY,
+  ]) {
     assert.equal(
       createOrderInputSchema.safeParse({
         ...validInput,
@@ -115,6 +121,8 @@ test("checks quantity against a non-negative integer server stock", () => {
   assert.equal(isOrderQuantityAvailable(2, 1), false);
   assert.equal(isOrderQuantityAvailable(5, 10), true);
   assert.equal(isOrderQuantityAvailable(6, 10), false);
+  assert.equal(isOrderQuantityAvailable(6, 10, 8), true);
+  assert.equal(isOrderQuantityAvailable(9, 10, 8), false);
 });
 
 test("rejects browser-supplied commercial values and duplicate products", () => {

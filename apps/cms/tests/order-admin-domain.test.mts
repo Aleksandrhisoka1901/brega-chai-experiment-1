@@ -87,6 +87,23 @@ test("detail DTO removes stock and request internals but keeps immutable snapsho
   assert.equal(JSON.stringify(result).includes("idempotencyKey"), false);
 });
 
+test("detail DTO accepts quantities above the public cart limit", () => {
+  const result = domain.mapOrderDetail({
+    ...order,
+    lines: [
+      {
+        ...order.lines[0],
+        quantity: 250,
+        lineTotalRubles: 400000,
+      },
+    ],
+    totalRubles: 400000,
+    discountedTotalRubles: 360000,
+  });
+
+  assert.equal(result.lines[0].quantity, 250);
+});
+
 test("detail DTO exposes the administrator snapshot in status history", () => {
   const actor = { id: "7", name: "Анна Менеджер" };
   const result = domain.mapOrderDetail({
@@ -122,7 +139,7 @@ test("terminal states have no available transitions", () => {
   );
 });
 
-test("edit command is strict, bounded and requires unique products", () => {
+test("edit command ignores the public cart limit and requires unique products", () => {
   const command = {
     expectedUpdatedAt: "2026-08-03T10:00:00.000Z",
     deliveryAddress: "Москва, ул. Новая, 2",
@@ -130,6 +147,13 @@ test("edit command is strict, bounded and requires unique products", () => {
     items: [{ productId: "product-1", quantity: 2 }],
   };
   assert.deepEqual(domain.parseEditCommand(command), command);
+  assert.equal(
+    domain.parseEditCommand({
+      ...command,
+      items: [{ productId: "product-1", quantity: 250 }],
+    }).items[0].quantity,
+    250,
+  );
   assert.throws(() =>
     domain.parseEditCommand({
       ...command,

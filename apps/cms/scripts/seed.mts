@@ -549,6 +549,7 @@ async function run() {
       orderNotificationEmail: "orders@example.test",
       pickupAddress: "г. Москва, ул. Чайная, д. 1. Ежедневно с 10:00 до 22:00.",
       pickupDiscountPercent: 10,
+      maxItemQuantity: 5,
       courierDeliveryNote:
         "Стоимость рассчитывается в день отправки, до 1000 руб.",
       telegramUrl: "https://t.me/brega_chai",

@@ -17,11 +17,15 @@ export function getCartItemAvailability(
   return "available";
 }
 
-export function getQuantityControlState(item: CartItem, currentStock?: number) {
+export function getQuantityControlState(
+  item: CartItem,
+  currentStock?: number,
+  maxItemQuantity = MAX_ITEM_QUANTITY,
+) {
   const maximum =
     currentStock === undefined
-      ? MAX_ITEM_QUANTITY
-      : Math.min(MAX_ITEM_QUANTITY, currentStock);
+      ? maxItemQuantity
+      : Math.min(maxItemQuantity, currentStock);
 
   return {
     canDecrease: item.quantity > 1,

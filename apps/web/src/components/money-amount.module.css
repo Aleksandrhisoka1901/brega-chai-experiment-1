@@ -20,6 +20,9 @@
 
 .previousTotal {
   font-size: 1rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
 }
 
 .total {

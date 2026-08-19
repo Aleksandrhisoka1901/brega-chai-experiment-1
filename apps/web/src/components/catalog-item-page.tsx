@@ -106,6 +106,7 @@ export async function CatalogItemPage(options: CatalogItemPageOptions) {
           boutiqueStory={settings.defaultProductStory}
           breadcrumbs={breadcrumbs}
           imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+          maxItemQuantity={settings.maxItemQuantity}
           outOfStock={settings.storefrontTexts.outOfStock}
           product={product}
         />

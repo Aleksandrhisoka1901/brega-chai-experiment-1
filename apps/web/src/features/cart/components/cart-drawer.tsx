@@ -56,6 +56,7 @@ export function CartDrawer({
   const [isCheckingStock, setIsCheckingStock] = useState(false);
   const [stockCheckError, setStockCheckError] = useState<string>();
   const hasStockIssue = cart.items.some((item) => {
+    if (item.quantity > checkoutSettings.maxItemQuantity) return true;
     const availability = getCartItemAvailability(
       item,
       drawer.stockByProductId[item.productId],
@@ -76,7 +77,9 @@ export function CartDrawer({
     try {
       const stockByProductId = await refreshStock();
       const hasLiveStockIssue = cart.items.some(
-        (item) => (stockByProductId[item.productId] ?? 0) < item.quantity,
+        (item) =>
+          item.quantity > checkoutSettings.maxItemQuantity ||
+          (stockByProductId[item.productId] ?? 0) < item.quantity,
       );
       if (hasLiveStockIssue) {
         setStockCheckError("Остатки изменились. Проверьте позиции в корзине.");
@@ -197,7 +200,10 @@ export function CartDrawer({
                     const controls = getQuantityControlState(
                       item,
                       currentStock,
+                      checkoutSettings.maxItemQuantity,
                     );
+                    const exceedsConfiguredLimit =
+                      item.quantity > checkoutSettings.maxItemQuantity;
 
                     return (
                       <li className={styles.item} key={item.productId}>
@@ -237,6 +243,13 @@ export function CartDrawer({
                               )}
                             </p>
                           ) : null}
+                          {exceedsConfiguredLimit ? (
+                            <p className={styles.warning} role="status">
+                              {bindShortRussianWords(
+                                `Теперь можно выбрать не больше ${checkoutSettings.maxItemQuantity} шт. Снизьте количество.`,
+                              )}
+                            </p>
+                          ) : null}
 
                           <div className={styles.actions}>
                             <div
@@ -251,7 +264,9 @@ export function CartDrawer({
                                   cartStore.updateQuantity(
                                     item.productId,
                                     item.quantity - 1,
-                                    currentStock ?? 5,
+                                    currentStock ??
+                                      checkoutSettings.maxItemQuantity,
+                                    checkoutSettings.maxItemQuantity,
                                   )
                                 }
                                 type="button"
@@ -268,7 +283,9 @@ export function CartDrawer({
                                   cartStore.updateQuantity(
                                     item.productId,
                                     item.quantity + 1,
-                                    currentStock ?? 5,
+                                    currentStock ??
+                                      checkoutSettings.maxItemQuantity,
+                                    checkoutSettings.maxItemQuantity,
                                   )
                                 }
                                 type="button"

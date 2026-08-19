@@ -49,6 +49,15 @@ module.exports = {
           policies: ["admin::isAuthenticatedAdmin"],
         },
       },
+      {
+        method: "DELETE",
+        path: "/orders/:documentId",
+        handler: "orders.delete",
+        config: {
+          auth: { scope: ["plugin::order-admin.delete"] },
+          policies: ["admin::isAuthenticatedAdmin"],
+        },
+      },
     ],
   },
 };

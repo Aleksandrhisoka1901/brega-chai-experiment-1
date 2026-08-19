@@ -1,5 +1,5 @@
-export function getMaximumProductQuantity(stock: number) {
-  return Math.min(5, Math.max(0, stock));
+export function getMaximumProductQuantity(stock: number, maxItemQuantity = 5) {
+  return Math.min(maxItemQuantity, Math.max(0, stock));
 }
 
 export function getInitialProductQuantity(stock: number) {

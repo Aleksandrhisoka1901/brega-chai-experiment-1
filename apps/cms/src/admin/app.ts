@@ -41,6 +41,8 @@ const adminApp = {
           "Адрес самовывоза",
         "content-manager.content-types.api::global-setting.global-setting.pickupDiscountPercent":
           "Скидка за самовывоз, %",
+        "content-manager.content-types.api::global-setting.global-setting.maxItemQuantity":
+          "Максимум одной позиции",
         "content-manager.content-types.api::global-setting.global-setting.courierDeliveryNote":
           "Условия курьерской доставки",
         "content-manager.content-types.api::global-setting.global-setting.navigation":

@@ -7,6 +7,7 @@ import {
   formatOrderDate,
   formatRubles,
   getDeliveryMethodPresentation,
+  getEditableLineMaximum,
   getOrderEditErrorMessage,
   getOrderTransitionErrorMessage,
   getStatusActionLabel,
@@ -14,6 +15,14 @@ import {
   getStatusPresentation,
   unwrapDetailResponse,
 } from "../src/plugins/order-admin/admin/src/view-model.ts";
+import { productCacheTags } from "../src/plugins/order-admin/admin/src/product-cache-model.ts";
+
+test("stock mutations invalidate only product list and detail caches", () => {
+  assert.deepEqual(productCacheTags, [
+    { type: "Document", id: "api::product.product_LIST" },
+    { type: "Document", id: "api::product.product_ALL_ITEMS" },
+  ]);
+});
 
 test("order statuses have concise Russian operational labels", () => {
   assert.deepEqual(getStatusPresentation("new"), {
@@ -45,6 +54,12 @@ test("edit preview recalculates standard and discounted totals", () => {
     ),
     { totalRubles: 4100, discountedTotalRubles: 3690 },
   );
+});
+
+test("admin quantity maximum includes stock already reserved by this order", () => {
+  assert.equal(getEditableLineMaximum(8, 2), 10);
+  assert.equal(getEditableLineMaximum(8, 0), 8);
+  assert.equal(getEditableLineMaximum(undefined, 2), undefined);
 });
 
 test("edit error prefers the safe API message", () => {

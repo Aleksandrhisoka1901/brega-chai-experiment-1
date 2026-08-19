@@ -10,11 +10,13 @@ interface DocumentUpdateContext {
 }
 
 interface OrderStatusMiddlewareDependencies {
+  deleteOrder(orderId: string): Promise<unknown>;
   findStatus(orderId: string): Promise<unknown>;
   transitionStatus(orderId: string, nextStatus: unknown): Promise<unknown>;
 }
 
 export function createOrderStatusMiddleware({
+  deleteOrder,
   findStatus,
   transitionStatus,
 }: OrderStatusMiddlewareDependencies) {
@@ -22,6 +24,15 @@ export function createOrderStatusMiddleware({
     context: DocumentUpdateContext,
     next: () => Promise<unknown>,
   ) => {
+    if (context.uid === ORDER_UID && context.action === "delete") {
+      const orderId = context.params?.documentId;
+      if (!orderId) {
+        throw new Error("Order deletion requires a document id");
+      }
+
+      return deleteOrder(orderId);
+    }
+
     const data = context.params?.data;
     if (
       context.uid !== ORDER_UID ||
@@ -52,6 +63,9 @@ export function createOrderStatusMiddleware({
 export function registerOrderStatusMiddleware(strapi: any) {
   strapi.documents.use(
     createOrderStatusMiddleware({
+      async deleteOrder(orderId) {
+        await strapi.service(ORDER_UID).deleteFromAdmin(orderId);
+      },
       async findStatus(orderId) {
         const order = await strapi.db.query(ORDER_UID).findOne({
           where: { documentId: orderId },

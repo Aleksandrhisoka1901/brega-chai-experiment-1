@@ -16,7 +16,7 @@ const storedLineSchema = z
     title: z.string().min(1),
     packageLabel: z.string().min(1),
     unitPriceRubles: z.number().int().positive(),
-    quantity: z.number().int().min(1).max(5),
+    quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
     lineTotalRubles: z.number().int().positive(),
     currency: z.literal("RUB"),
     stockRecordId: z.number().int().positive(),
@@ -108,7 +108,7 @@ const editCommandSchema = z
         z
           .object({
             productId: z.string().trim().min(1).max(100),
-            quantity: z.number().int().min(1).max(5),
+            quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
           })
           .strict(),
       )

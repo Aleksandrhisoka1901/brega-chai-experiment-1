@@ -105,6 +105,24 @@ export function calculateEditedOrderTotals(
   };
 }
 
+export function getEditableLineMaximum(
+  currentStock: number | undefined,
+  reservedQuantity: number,
+) {
+  if (
+    !Number.isSafeInteger(currentStock) ||
+    currentStock === undefined ||
+    currentStock < 0 ||
+    !Number.isSafeInteger(reservedQuantity) ||
+    reservedQuantity < 0
+  ) {
+    return undefined;
+  }
+
+  const maximum = currentStock + reservedQuantity;
+  return Number.isSafeInteger(maximum) ? maximum : undefined;
+}
+
 function getApiErrorMessage(error: unknown, fallback: string) {
   if (!error || typeof error !== "object") {
     return fallback;

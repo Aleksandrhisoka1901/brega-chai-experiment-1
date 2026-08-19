@@ -88,16 +88,19 @@ function createOrderAdminService({ strapi }) {
 
     async edit(documentId, command) {
       await strapi.service(ORDER_UID).editFromAdmin(documentId, command);
-      const order = await findRawOrder(documentId);
-      return order ? mapOrderDetail(order) : null;
+      return this.findOne(documentId);
     },
 
     async transition(documentId, status, actor) {
       await strapi
         .service(ORDER_UID)
         .transitionStatus(documentId, status, actor);
-      const order = await findRawOrder(documentId);
-      return order ? mapOrderDetail(order) : null;
+      return this.findOne(documentId);
+    },
+
+    async delete(documentId) {
+      await strapi.service(ORDER_UID).deleteFromAdmin(documentId);
+      return { documentId };
     },
   };
 }

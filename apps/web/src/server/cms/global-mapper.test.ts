@@ -14,6 +14,7 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
           brandName: "Brega Chai",
           pickupAddress: "Москва, Чайная улица, 1",
           pickupDiscountPercent: 10,
+          maxItemQuantity: 8,
           courierDeliveryNote: "До 1000 руб.",
           logo: {
             url: "/uploads/logo.png",
@@ -66,6 +67,7 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
       brandName: "Brega Chai",
       pickupAddress: "Москва, Чайная улица, 1",
       pickupDiscountPercent: 10,
+      maxItemQuantity: 8,
       courierDeliveryNote: "До 1000 руб.",
       logo: {
         url: `http://localhost:9000/uploads/logo.png${mediaVersion}`,
@@ -206,4 +208,5 @@ test("maps an unfilled pickup discount to an explicit no-discount value", () => 
   );
 
   assert.equal(settings.pickupDiscountPercent, null);
+  assert.equal(settings.maxItemQuantity, 5);
 });

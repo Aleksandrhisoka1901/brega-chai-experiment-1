@@ -16,6 +16,7 @@ export async function getGlobalSettings(): Promise<GlobalSettings> {
     "fields[5]": "pickupAddress",
     "fields[6]": "pickupDiscountPercent",
     "fields[7]": "courierDeliveryNote",
+    "fields[8]": "maxItemQuantity",
     "populate[navigation]": "true",
     "populate[sectionBreadcrumbs]": "true",
     "populate[storefrontTexts]": "true",

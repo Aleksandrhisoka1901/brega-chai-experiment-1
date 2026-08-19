@@ -485,6 +485,16 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     logo: Schema.Attribute.Media<"images">;
+    maxItemQuantity: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 100;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<5>;
     navigation: Schema.Attribute.Component<"shared.navigation-labels", false> &
       Schema.Attribute.Required;
     orderNotificationEmail: Schema.Attribute.Email &

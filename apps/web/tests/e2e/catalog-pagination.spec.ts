@@ -1,4 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function expectCanonical(page: Page, path: string) {
+  const href = new URL(path, page.url()).toString();
+  const canonical = page.locator(`link[rel="canonical"][href="${href}"]`);
+
+  await expect(canonical).toHaveCount(1);
+}
 
 test("catalog pagination uses canonical URLs and navigates every boundary", async ({
   page,
@@ -18,10 +25,7 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
   await expect(
     pagination.getByRole("link", { name: "Страница 2" }),
   ).toHaveAttribute("href", "/tovary?page=2");
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    "href",
-    /\/tovary$/,
-  );
+  await expectCanonical(page, "/tovary");
 
   await pagination.getByRole("link", { name: "Страница 2" }).click();
   await expect(page).toHaveURL(/\/tovary\?page=2$/);
@@ -34,10 +38,7 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
   await expect(
     pagination.getByRole("link", { name: "Вперёд" }),
   ).toHaveAttribute("href", "/tovary?page=3");
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    "href",
-    /\/tovary\?page=2$/,
-  );
+  await expectCanonical(page, "/tovary?page=2");
 
   await pagination.getByRole("link", { name: "Страница 3" }).click();
   await expect(page).toHaveURL(/\/tovary\?page=3$/);
@@ -92,20 +93,14 @@ test("rituals use their own landing content, product routes and pagination", asy
     "href",
     /^\/nabory\//,
   );
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    "href",
-    /\/nabory$/,
-  );
+  await expectCanonical(page, "/nabory");
 
   await page
     .getByRole("navigation", { name: "Пагинация каталога" })
     .getByRole("link", { name: "Страница 2" })
     .click();
   await expect(page).toHaveURL(/\/nabory\?page=2$/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    "href",
-    /\/nabory\?page=2$/,
-  );
+  await expectCanonical(page, "/nabory?page=2");
 });
 
 for (const viewport of [

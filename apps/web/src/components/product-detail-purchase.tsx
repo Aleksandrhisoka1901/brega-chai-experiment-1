@@ -21,16 +21,18 @@ import styles from "./product-detail.module.css";
 
 export function ProductDetailPurchase({
   outOfStock,
+  maxItemQuantity,
   product,
 }: {
   outOfStock: string;
+  maxItemQuantity: number;
   product: CartProduct;
 }) {
   const cart = useCart();
   const drawer = useCartDrawer();
   const currentStock =
     drawer.stockByProductId[product.productId] ?? product.stock;
-  const maximum = getMaximumProductQuantity(currentStock);
+  const maximum = getMaximumProductQuantity(currentStock, maxItemQuantity);
   const [quantity, setQuantity] = useState(() =>
     getInitialProductQuantity(product.stock),
   );
@@ -91,6 +93,7 @@ export function ProductDetailPurchase({
         product.productId,
         change.quantity,
         currentStock,
+        maxItemQuantity,
       );
     } else {
       setQuantity(change.quantity);
@@ -136,7 +139,11 @@ export function ProductDetailPurchase({
         disabled={!inStock}
         onClick={(event) => {
           if (!inCart) {
-            cartStore.add({ ...product, stock: currentStock }, quantity);
+            cartStore.add(
+              { ...product, stock: currentStock },
+              quantity,
+              maxItemQuantity,
+            );
             cartDrawerStore.registerStock(product.productId, currentStock);
           }
           cartDrawerStore.open(event.currentTarget);

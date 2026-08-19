@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  DEFAULT_MAX_ITEM_QUANTITY,
+  maxItemQuantitySchema,
+} from "@brega-chai/contracts";
 
 import {
   normalizeStrapiBlocks,
@@ -49,6 +53,9 @@ const responseSchema = z.object({
       .max(100)
       .nullish()
       .transform((value) => value ?? null),
+    maxItemQuantity: maxItemQuantitySchema
+      .nullish()
+      .transform((value) => value ?? DEFAULT_MAX_ITEM_QUANTITY),
     courierDeliveryNote: z.string().trim().min(1),
     logo: mediaSchema.nullable().optional(),
     email: z.email(),
@@ -116,7 +123,10 @@ export type GlobalSettings = Omit<
 
 export type CheckoutSettings = Pick<
   GlobalSettings,
-  "courierDeliveryNote" | "pickupAddress" | "pickupDiscountPercent"
+  | "courierDeliveryNote"
+  | "pickupAddress"
+  | "pickupDiscountPercent"
+  | "maxItemQuantity"
 >;
 
 function mediaUrl(path: string, base: string) {

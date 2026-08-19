@@ -26,20 +26,23 @@ test("distinguishes unknown, available, insufficient and unavailable stock", () 
   assert.equal(getCartItemAvailability(item, 0), "unavailable");
 });
 
-test("quantity controls respect one, five and current stock", () => {
-  assert.deepEqual(getQuantityControlState({ ...item, quantity: 1 }, 4), {
+test("quantity controls respect one, the configured limit and current stock", () => {
+  assert.deepEqual(getQuantityControlState({ ...item, quantity: 1 }, 4, 8), {
     canDecrease: false,
     canIncrease: true,
     maximum: 4,
   });
-  assert.deepEqual(getQuantityControlState({ ...item, quantity: 4 }, 4), {
+  assert.deepEqual(getQuantityControlState({ ...item, quantity: 4 }, 4, 8), {
     canDecrease: true,
     canIncrease: false,
     maximum: 4,
   });
-  assert.deepEqual(getQuantityControlState({ ...item, quantity: 5 }), {
-    canDecrease: true,
-    canIncrease: false,
-    maximum: 5,
-  });
+  assert.deepEqual(
+    getQuantityControlState({ ...item, quantity: 8 }, undefined, 8),
+    {
+      canDecrease: true,
+      canIncrease: false,
+      maximum: 8,
+    },
+  );
 });

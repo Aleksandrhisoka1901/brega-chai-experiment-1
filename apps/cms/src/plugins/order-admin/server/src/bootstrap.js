@@ -20,5 +20,11 @@ module.exports = async ({ strapi }) => {
       uid: "edit",
       pluginName: "order-admin",
     },
+    {
+      section: "plugins",
+      displayName: "Удаление заказа",
+      uid: "delete",
+      pluginName: "order-admin",
+    },
   ]);
 };

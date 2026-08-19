@@ -11,6 +11,13 @@ export const checkoutFieldLimits = {
 } as const;
 export const deliveryMethodSchema = z.enum(["pickup", "courier"]);
 export const pickupDiscountPercentSchema = z.number().int().min(0).max(100);
+export const DEFAULT_MAX_ITEM_QUANTITY = 5;
+export const MAX_ORDER_ITEM_QUANTITY = 100;
+export const maxItemQuantitySchema = z
+  .number()
+  .int()
+  .min(1)
+  .max(MAX_ORDER_ITEM_QUANTITY);
 const rubleAmountSchema = z
   .number()
   .int()
@@ -20,7 +27,11 @@ const positiveRubleAmountSchema = rubleAmountSchema.refine(
   (amount) => amount > 0,
   "Price must be greater than zero",
 );
-const orderQuantitySchema = z.number().int().min(1).max(5);
+const orderQuantitySchema = z
+  .number()
+  .int()
+  .min(1)
+  .max(MAX_ORDER_ITEM_QUANTITY);
 export const stockSchema = z
   .number()
   .int()
@@ -104,10 +115,13 @@ export const createOrderInputSchema = z
 export function isOrderQuantityAvailable(
   quantity: number,
   stock: number,
+  maxItemQuantity = DEFAULT_MAX_ITEM_QUANTITY,
 ): boolean {
   return (
     orderQuantitySchema.safeParse(quantity).success &&
     stockSchema.safeParse(stock).success &&
+    maxItemQuantitySchema.safeParse(maxItemQuantity).success &&
+    quantity <= maxItemQuantity &&
     quantity <= stock
   );
 }

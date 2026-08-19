@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_ORDER_ITEM_QUANTITY } from "@brega-chai/contracts";
 
 import { createEmptyCart } from "./model.ts";
 import { CART_VERSION } from "./types.ts";
@@ -23,7 +24,7 @@ const cartItemSchema = z
     unitPriceSnapshot: z.number().int().positive(),
     currency: z.literal("RUB"),
     image: cartImageSchema,
-    quantity: z.number().int().min(1).max(5),
+    quantity: z.number().int().min(1).max(MAX_ORDER_ITEM_QUANTITY),
   })
   .strict();
 

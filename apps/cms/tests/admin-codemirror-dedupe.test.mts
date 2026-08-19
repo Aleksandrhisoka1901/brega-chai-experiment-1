@@ -234,6 +234,7 @@ test("covers every editable storefront schema with a canonical layout", () => {
       "storefrontTexts",
       "pickupAddress",
       "pickupDiscountPercent",
+      "maxItemQuantity",
       "courierDeliveryNote",
       "orderNotificationEmail",
       "defaultProductStory",

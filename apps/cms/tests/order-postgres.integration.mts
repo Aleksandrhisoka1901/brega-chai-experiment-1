@@ -6,6 +6,7 @@ import pg from "pg";
 
 import {
   createOrder,
+  deleteOrder,
   editOrder,
   OrderServiceError,
   transitionOrderStatus,
@@ -14,6 +15,8 @@ import {
   type OrderEditPatch,
   type OrderEditPersistence,
   type OrderEditTransactionRepository,
+  type OrderDeletionPersistence,
+  type OrderDeletionTransactionRepository,
   type OrderPersistence,
   type OrderStatusHistoryEntry,
   type OrderStatusPersistence,
@@ -72,7 +75,11 @@ const mapOrder = (row: Record<string, unknown>): StoredOrder => ({
 });
 
 class PostgresOrderPersistence
-  implements OrderPersistence, OrderStatusPersistence, OrderEditPersistence
+  implements
+    OrderPersistence,
+    OrderStatusPersistence,
+    OrderEditPersistence,
+    OrderDeletionPersistence
 {
   forceInsertFailure = false;
 
@@ -81,7 +88,8 @@ class PostgresOrderPersistence
     operation:
       | ((repository: TransactionRepository) => Promise<T>)
       | ((repository: OrderStatusTransactionRepository) => Promise<T>)
-      | ((repository: OrderEditTransactionRepository) => Promise<T>),
+      | ((repository: OrderEditTransactionRepository) => Promise<T>)
+      | ((repository: OrderDeletionTransactionRepository) => Promise<T>),
   ): Promise<T> {
     const client = await pool.connect();
     try {
@@ -225,6 +233,13 @@ class PostgresOrderPersistence
             ],
           );
           return result.rows[0] ? mapOrder(result.rows[0]) : null;
+        },
+        deleteOrder: async (orderId: string) => {
+          const result = await client.query(
+            `DELETE FROM ${qualified("orders")} WHERE order_id = $1`,
+            [orderId],
+          );
+          return result.rowCount === 1;
         },
       };
 
@@ -392,6 +407,42 @@ test("cancellation restores stock once", async () => {
   assert.equal(unchanged.rows[0].stock, 5);
 });
 
+test("deleting an active order restores stock in the same transaction", async () => {
+  const created = await createOrder(
+    orderInput(),
+    persistence,
+    checkoutSettings,
+  );
+
+  await deleteOrder(created.orderId, persistence);
+
+  const product = await pool.query(
+    `SELECT stock FROM ${qualified("products")} WHERE product_id = 'product-1'`,
+  );
+  const order = await pool.query(
+    `SELECT count(*)::int AS count FROM ${qualified("orders")} WHERE order_id = $1`,
+    [created.orderId],
+  );
+  assert.equal(product.rows[0].stock, 5);
+  assert.equal(order.rows[0].count, 0);
+});
+
+test("deleting a cancelled order does not restore stock twice", async () => {
+  const created = await createOrder(
+    orderInput(),
+    persistence,
+    checkoutSettings,
+  );
+  await transitionOrderStatus(created.orderId, "cancelled", persistence);
+
+  await deleteOrder(created.orderId, persistence);
+
+  const product = await pool.query(
+    `SELECT stock FROM ${qualified("products")} WHERE product_id = 'product-1'`,
+  );
+  assert.equal(product.rows[0].stock, 5);
+});
+
 test("cancellation survives a changed physical product record id", async () => {
   const created = await createOrder(
     orderInput(),
@@ -490,4 +541,36 @@ test("admin edit atomically replaces lines and recalculates stock", async () => 
     { product_id: "product-1", stock: 5 },
     { product_id: "product-2", stock: 2 },
   ]);
+});
+
+test("admin edit may reserve all stock above the public cart limit", async () => {
+  await pool.query(
+    `UPDATE ${qualified("products")} SET stock = 250 WHERE product_id = 'product-1'`,
+  );
+  const created = await createOrder(
+    orderInput(),
+    persistence,
+    checkoutSettings,
+  );
+  const current = await pool.query(
+    `SELECT updated_at FROM ${qualified("orders")} WHERE order_id = $1`,
+    [created.orderId],
+  );
+
+  const updated = await editOrder(
+    created.orderId,
+    {
+      expectedUpdatedAt: new Date(current.rows[0].updated_at).toISOString(),
+      deliveryAddress: "Москва, ул. Чайная, д. 1",
+      managerComment: null,
+      items: [{ productId: "product-1", quantity: 250 }],
+    },
+    persistence,
+  );
+
+  const product = await pool.query(
+    `SELECT stock FROM ${qualified("products")} WHERE product_id = 'product-1'`,
+  );
+  assert.equal(updated.lines[0]?.quantity, 250);
+  assert.equal(product.rows[0].stock, 0);
 });

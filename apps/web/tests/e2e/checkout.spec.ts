@@ -101,6 +101,7 @@ test("cart and checkout money use compact interface typography", async ({
   await expect(discountedTotal).toHaveText("1 440 ₽");
   await expect(previousTotal).toHaveCSS("font-family", /Manrope/);
   await expect(previousTotal).toHaveCSS("font-size", "16px");
+  await expect(previousTotal).toHaveCSS("text-decoration-line", "line-through");
   await expect(discountedTotal).toHaveCSS("font-family", /Manrope/);
   await expect(discountedTotal).toHaveCSS("font-size", "24px");
 });

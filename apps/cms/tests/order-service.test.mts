@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   createOrder,
+  deleteOrder,
   editOrder,
   OrderServiceError,
   transitionOrderStatus,
@@ -11,6 +12,8 @@ import {
   type OrderEditPatch,
   type OrderEditPersistence,
   type OrderEditTransactionRepository,
+  type OrderDeletionPersistence,
+  type OrderDeletionTransactionRepository,
   type OrderStatusPersistence,
   type OrderStatusTransactionRepository,
   type StoredOrder,
@@ -220,6 +223,45 @@ class MemoryStatusPersistence implements OrderStatusPersistence {
   }
 }
 
+class MemoryDeletionPersistence implements OrderDeletionPersistence {
+  private readonly state: MemoryPersistence;
+
+  constructor(state: MemoryPersistence) {
+    this.state = state;
+  }
+
+  async transaction<T>(
+    _orderId: string,
+    operation: (repository: OrderDeletionTransactionRepository) => Promise<T>,
+  ): Promise<T> {
+    const products = new Map(
+      [...this.state.products].map(([id, value]) => [id, { ...value }]),
+    );
+    const orders = new Map(this.state.orders);
+    const repository: OrderDeletionTransactionRepository = {
+      lockOrder: async (orderId) =>
+        [...orders.values()].find((order) => order.orderId === orderId) ?? null,
+      restoreStock: async (productId, quantity) => {
+        const entry = products.get(productId);
+        if (!entry) return false;
+        entry.stock += quantity;
+        return true;
+      },
+      deleteOrder: async (orderId) => {
+        const entry = [...orders.entries()].find(
+          ([, order]) => order.orderId === orderId,
+        );
+        return entry ? orders.delete(entry[0]) : false;
+      },
+    };
+
+    const result = await operation(repository);
+    this.state.products = products;
+    this.state.orders = orders;
+    return result;
+  }
+}
+
 test("creates RUB snapshots from locked server products and decrements stock", async () => {
   const persistence = new MemoryPersistence();
   const result = await createOrder(request, persistence, checkoutSettings);
@@ -364,6 +406,34 @@ test("rejects missing, unpublished and insufficient products", async () => {
   }
 });
 
+test("uses the published maximum quantity instead of a hard-coded five", async () => {
+  const persistence = new MemoryPersistence();
+  persistence.products.get("product-1")!.stock = 10;
+  const largerOrder = {
+    ...request,
+    items: [{ productId: "product-1", quantity: 8 }],
+  };
+
+  const result = await createOrder(largerOrder, persistence, {
+    ...checkoutSettings,
+    maxItemQuantity: 8,
+  });
+
+  assert.equal(result.lines[0]?.quantity, 8);
+  assert.equal(persistence.products.get("product-1")?.stock, 2);
+
+  const rejectedPersistence = new MemoryPersistence();
+  rejectedPersistence.products.get("product-1")!.stock = 10;
+  await assert.rejects(
+    createOrder(largerOrder, rejectedPersistence, {
+      ...checkoutSettings,
+      maxItemQuantity: 5,
+    }),
+    (error) =>
+      error instanceof OrderServiceError && error.code === "INVALID_INPUT",
+  );
+});
+
 test("rejects invalid server prices and currency before decrementing stock", async () => {
   for (const candidate of [
     { ...product, priceRubles: 1600.5 },
@@ -448,6 +518,26 @@ test("admin edit preserves snapshot price for an existing line", async () => {
   assert.equal(updated.lines[0]?.unitPriceRubles, 1600);
   assert.equal(updated.lines[0]?.lineTotalRubles, 4800);
   assert.equal(updated.totalRubles, 4800);
+  assert.equal(persistence.products.get("product-1")?.stock, 0);
+});
+
+test("admin edit may reserve every available item above the public limit", async () => {
+  const persistence = new MemoryPersistence();
+  persistence.products.get("product-1")!.stock = 250;
+  const created = await createOrder(request, persistence, checkoutSettings);
+
+  const updated = await editOrder(
+    created.orderId,
+    {
+      expectedUpdatedAt: "2026-08-03T10:00:00.000Z",
+      deliveryAddress: request.deliveryAddress,
+      managerComment: null,
+      items: [{ productId: "product-1", quantity: 250 }],
+    },
+    new MemoryEditPersistence(persistence),
+  );
+
+  assert.equal(updated.lines[0]?.quantity, 250);
   assert.equal(persistence.products.get("product-1")?.stock, 0);
 });
 
@@ -540,6 +630,52 @@ test("cancellation bypasses stock restore for a fully deleted product", async ()
     [...persistence.orders.values()][0]?.statusHistory.at(-1)?.to,
     "cancelled",
   );
+});
+
+test("deleting an active order restores existing product stock before removal", async () => {
+  const persistence = new MemoryPersistence();
+  const created = await createOrder(request, persistence, checkoutSettings);
+
+  const deleted = await deleteOrder(
+    created.orderId,
+    new MemoryDeletionPersistence(persistence),
+  );
+
+  assert.deepEqual(deleted, { orderId: created.orderId, stockChanged: true });
+  assert.equal(persistence.products.get("product-1")?.stock, 3);
+  assert.equal(persistence.orders.size, 0);
+});
+
+test("deleting a cancelled order never restores product stock twice", async () => {
+  const persistence = new MemoryPersistence();
+  const created = await createOrder(request, persistence, checkoutSettings);
+  await transitionOrderStatus(
+    created.orderId,
+    "cancelled",
+    new MemoryStatusPersistence(persistence),
+  );
+
+  const deleted = await deleteOrder(
+    created.orderId,
+    new MemoryDeletionPersistence(persistence),
+  );
+
+  assert.deepEqual(deleted, { orderId: created.orderId, stockChanged: false });
+  assert.equal(persistence.products.get("product-1")?.stock, 3);
+  assert.equal(persistence.orders.size, 0);
+});
+
+test("a deleted product does not block order deletion", async () => {
+  const persistence = new MemoryPersistence();
+  const created = await createOrder(request, persistence, checkoutSettings);
+  persistence.products.delete("product-1");
+
+  await deleteOrder(
+    created.orderId,
+    new MemoryDeletionPersistence(persistence),
+  );
+
+  assert.equal(persistence.orders.size, 0);
 });
 
 test("confirmation rejects an order containing a deleted product", async () => {

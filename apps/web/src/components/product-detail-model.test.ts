@@ -16,11 +16,11 @@ test("quantity starts at one and cannot exceed stock below five", () => {
   assert.equal(updateProductQuantity(3, 1, maximum), 3);
 });
 
-test("quantity is capped at five when stock is higher", () => {
-  const maximum = getMaximumProductQuantity(12);
+test("quantity is capped at the configured limit when stock is higher", () => {
+  const maximum = getMaximumProductQuantity(12, 8);
 
-  assert.equal(maximum, 5);
-  assert.equal(updateProductQuantity(4, 1, maximum), 5);
+  assert.equal(maximum, 8);
+  assert.equal(updateProductQuantity(8, 1, maximum), 8);
 });
 
 test("quantity cannot fall below one for an available product", () => {

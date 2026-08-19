@@ -187,6 +187,43 @@ function createOrderAdminController({ strapi }) {
         throw error;
       }
     },
+
+    async delete(ctx) {
+      let documentId;
+      try {
+        documentId = parseDocumentId(ctx.params.documentId);
+      } catch (error) {
+        if (error instanceof ZodError)
+          return ctx.badRequest("Некорректный идентификатор заказа");
+        throw error;
+      }
+
+      const actor = actorFromUser(ctx.state?.user);
+      try {
+        const result = await service().delete(documentId);
+        strapi.log?.info("Order admin delete", {
+          documentId,
+          administratorId: actor?.id ?? null,
+          result: "success",
+        });
+        ctx.body = { data: result };
+      } catch (error) {
+        const code =
+          error && typeof error === "object" && "code" in error
+            ? error.code
+            : null;
+        if (code === "ORDER_NOT_FOUND") {
+          return ctx.notFound("Заказ не найден");
+        }
+        strapi.log?.warn?.("Order admin delete", {
+          documentId,
+          administratorId: actor?.id ?? null,
+          result: "rejected",
+          errorCode: code,
+        });
+        throw error;
+      }
+    },
   };
 }
 

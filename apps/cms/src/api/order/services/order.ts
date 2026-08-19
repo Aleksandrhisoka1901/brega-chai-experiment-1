@@ -2,11 +2,14 @@ import { factories } from "@strapi/strapi";
 
 import {
   createOrderWithMeta,
+  deleteOrder,
   editOrder,
   transitionOrderStatus,
   type OrderEditPersistence,
   type OrderEditPatch,
   type OrderEditTransactionRepository,
+  type OrderDeletionPersistence,
+  type OrderDeletionTransactionRepository,
   type LockedProduct,
   type OrderDraft,
   type OrderCheckoutSettings,
@@ -393,6 +396,52 @@ function createEditPersistence(strapi: any): OrderEditPersistence {
   };
 }
 
+function createDeletionPersistence(strapi: any): OrderDeletionPersistence {
+  return {
+    async transaction<T>(
+      orderId: string,
+      operation: (repository: OrderDeletionTransactionRepository) => Promise<T>,
+    ) {
+      return strapi.db.transaction(
+        async ({ trx }: DatabaseTransaction): Promise<T> => {
+          const repository: OrderDeletionTransactionRepository = {
+            async lockOrder(id) {
+              const locked = await strapi.db
+                .connection("orders")
+                .select("id")
+                .where("document_id", id)
+                .first()
+                .forUpdate()
+                .transacting(trx);
+              if (!locked) return null;
+
+              const row = await strapi.db.query(ORDER_UID).findOne({
+                where: { documentId: id },
+                transacting: trx,
+              });
+              return row ? mapStoredOrder(row as StoredOrderRow) : null;
+            },
+
+            async restoreStock(productId, quantity) {
+              return restoreProductStock(strapi, trx, productId, quantity);
+            },
+
+            async deleteOrder(id) {
+              const deleted = await strapi.db.query(ORDER_UID).delete({
+                where: { documentId: id },
+                transacting: trx,
+              });
+              return Boolean(deleted);
+            },
+          };
+
+          return operation(repository);
+        },
+      );
+    },
+  };
+}
+
 export default factories.createCoreService(ORDER_UID, ({ strapi }) => {
   const stockRevalidationSender = createCacheRevalidationSenderFromEnv(
     {
@@ -413,6 +462,7 @@ export default factories.createCoreService(ORDER_UID, ({ strapi }) => {
             "orderNotificationEmail",
             "pickupAddress",
             "pickupDiscountPercent",
+            "maxItemQuantity",
           ],
         });
       const pickupDiscountPercent = settings?.pickupDiscountPercent;
@@ -421,6 +471,10 @@ export default factories.createCoreService(ORDER_UID, ({ strapi }) => {
         pickupDiscountPercent:
           typeof pickupDiscountPercent === "number"
             ? pickupDiscountPercent
+            : null,
+        maxItemQuantity:
+          typeof settings?.maxItemQuantity === "number"
+            ? settings.maxItemQuantity
             : null,
       };
       const creation = await createOrderWithMeta(
@@ -465,6 +519,14 @@ export default factories.createCoreService(ORDER_UID, ({ strapi }) => {
     async editFromAdmin(orderId: string, rawInput: unknown) {
       return runStockMutationWithRevalidation(
         () => editOrder(orderId, rawInput, createEditPersistence(strapi)),
+        stockRevalidationSender,
+        strapi.log,
+      );
+    },
+
+    async deleteFromAdmin(orderId: string) {
+      return runStockMutationWithRevalidation(
+        () => deleteOrder(orderId, createDeletionPersistence(strapi)),
         stockRevalidationSender,
         strapi.log,
       );

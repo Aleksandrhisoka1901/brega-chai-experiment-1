@@ -60,6 +60,51 @@ test.describe("order admin live flow", () => {
       .toEqual({ sameLeftEdge: true, sameWidth: true, stacked: true });
   });
 
+  test("keeps the quantity hint inside its product row", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openFirstOrder(page);
+
+    await page.getByRole("button", { name: "Редактировать заказ" }).click();
+    const dialog = page.getByRole("dialog", {
+      name: /Редактировать заказ/,
+    });
+    await expect(dialog).toBeVisible();
+
+    const quantity = dialog.getByLabel(/Количество:/).first();
+    const hint = dialog.getByText(/^Доступно:/).first();
+    const productRow = quantity.locator("xpath=ancestor::tr");
+    const cells = productRow.getByRole("gridcell");
+
+    await expect(quantity).toBeVisible();
+    await expect(hint).toBeVisible();
+    await expect(productRow).toHaveCount(1);
+    await expect(cells).toHaveCount(6);
+    await expect
+      .poll(async () => {
+        const [rowBox, hintBox] = await Promise.all([
+          productRow.boundingBox(),
+          hint.boundingBox(),
+        ]);
+        if (!rowBox || !hintBox) return null;
+        return Math.round(
+          rowBox.y + rowBox.height - (hintBox.y + hintBox.height),
+        );
+      })
+      .toBeGreaterThanOrEqual(8);
+    await expect
+      .poll(async () => {
+        const contentBoxes = await Promise.all(
+          Array.from({ length: 6 }, (_, index) =>
+            cells.nth(index).locator(":scope > *").first().boundingBox(),
+          ),
+        );
+        if (contentBoxes.some((box) => box === null)) return null;
+        const centers = contentBoxes.map((box) => box!.y + box!.height / 2);
+        return Math.max(...centers) - Math.min(...centers);
+      })
+      .toBeLessThanOrEqual(1);
+  });
+
   test("manager edits an order and restores its original values", async ({
     page,
   }) => {
@@ -93,12 +138,12 @@ test.describe("order admin live flow", () => {
       const originalManagerComment = await managerComment.inputValue();
       const originalQuantity = Number(await quantity.inputValue());
       const stockHint = await dialog
-        .getByText(/На складе ещё/)
+        .getByText(/^Доступно:/)
         .first()
         .textContent();
-      const availableStock = Number(stockHint?.match(/\d+/)?.[0] ?? 0);
+      const availableQuantity = Number(stockHint?.match(/\d+/)?.[0] ?? 0);
       const changedQuantity =
-        originalQuantity < 5 && availableStock > 0
+        originalQuantity < availableQuantity
           ? originalQuantity + 1
           : originalQuantity - 1;
       expect(changedQuantity).toBeGreaterThan(0);

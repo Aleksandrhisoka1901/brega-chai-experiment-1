@@ -22,7 +22,12 @@ import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { useOrderAdminApi } from "../api";
-import { DataPair, DataSection, StatusBadge } from "../components";
+import {
+  ConfirmationModalContent,
+  DataPair,
+  DataSection,
+  StatusBadge,
+} from "../components";
 import { OrderEditModal } from "../OrderEditModal";
 import type { OrderDetail } from "../types";
 import {
@@ -66,10 +71,6 @@ const ContentGrid = styled(Grid.Root)`
 
 const NumericText = styled(Typography)`
   font-variant-numeric: tabular-nums;
-`;
-
-const ConfirmationModalContent = styled(Modal.Content)`
-  max-width: 43rem;
 `;
 
 export function OrderDetailPage() {

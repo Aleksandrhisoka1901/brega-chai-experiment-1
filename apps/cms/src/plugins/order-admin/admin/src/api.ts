@@ -8,9 +8,11 @@ import type {
   OrderProductOption,
 } from "./types";
 import { unwrapDetailResponse } from "./view-model";
+import { useInvalidateProductCache } from "./product-cache";
 
 export function useOrderAdminApi() {
-  const { get, post, put } = useFetchClient();
+  const { del, get, post, put } = useFetchClient();
+  const invalidateProductCache = useInvalidateProductCache();
 
   return useMemo(
     () => ({
@@ -40,16 +42,27 @@ export function useOrderAdminApi() {
           `/order-admin/orders/${encodeURIComponent(documentId)}`,
           command,
         );
-        return unwrapDetailResponse(response.data);
+        const order = unwrapDetailResponse(response.data);
+        invalidateProductCache();
+        return order;
       },
       async transition(documentId: string, status: OrderDetail["status"]) {
         const response = await post<{ data: OrderDetail }>(
           `/order-admin/orders/${encodeURIComponent(documentId)}/status`,
           { status },
         );
-        return unwrapDetailResponse(response.data);
+        const order = unwrapDetailResponse(response.data);
+        if (status === "cancelled") invalidateProductCache();
+        return order;
+      },
+      async delete(documentId: string) {
+        const response = await del<{ data: { documentId: string } }>(
+          `/order-admin/orders/${encodeURIComponent(documentId)}`,
+        );
+        invalidateProductCache();
+        return response.data.data;
       },
     }),
-    [get, post, put],
+    [del, get, invalidateProductCache, post, put],
   );
 }

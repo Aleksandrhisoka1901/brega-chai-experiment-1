@@ -1,4 +1,6 @@
 export {
+  DEFAULT_MAX_ITEM_QUANTITY,
+  MAX_ORDER_ITEM_QUANTITY,
   canTransitionOrderStatus,
   calculateDiscountedTotalRubles,
   checkoutFieldLimits,
@@ -12,6 +14,7 @@ export {
   orderResultSchema,
   orderStatusSchema,
   pickupDiscountPercentSchema,
+  maxItemQuantitySchema,
   stockSchema,
 } from "./order.js";
 export type {

@@ -48,13 +48,13 @@ test("round-trips a valid versioned cart", () => {
   assert.deepEqual(persistence.load(), validCart);
 });
 
-test("resets corrupted, old, excessive and PII-bearing payloads", () => {
+test("resets corrupted, old, unsafe and PII-bearing payloads", () => {
   const invalidPayloads = [
     "{broken",
     JSON.stringify({ ...validCart, version: 0 }),
     JSON.stringify({
       ...validCart,
-      items: [{ ...validCart.items[0], quantity: 6 }],
+      items: [{ ...validCart.items[0], quantity: 101 }],
     }),
     JSON.stringify({ ...validCart, email: "person@example.test" }),
   ];
@@ -67,6 +67,19 @@ test("resets corrupted, old, excessive and PII-bearing payloads", () => {
     assert.deepEqual(persistence.load(), createEmptyCart());
     assert.equal(storage.getItem(CART_STORAGE_KEY), null);
   }
+});
+
+test("keeps quantities above the default for a larger published limit", () => {
+  const storage = new MemoryStorage();
+  const persistence = createCartPersistence({ storage });
+  const cart = {
+    ...validCart,
+    items: [{ ...validCart.items[0]!, quantity: 8 }],
+  };
+
+  persistence.save(cart);
+
+  assert.deepEqual(persistence.load(), cart);
 });
 
 test("works without browser storage during SSR", () => {

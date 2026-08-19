@@ -2,12 +2,12 @@ import {
   Alert,
   Box,
   Button,
+  Combobox,
+  ComboboxOption,
   Divider,
   Field,
   Flex,
   Modal,
-  SingleSelect,
-  SingleSelectOption,
   Table,
   Tbody,
   Td,
@@ -25,6 +25,7 @@ import type { OrderDetail, OrderProductOption } from "./types";
 import {
   calculateEditedOrderTotals,
   formatRubles,
+  getEditableLineMaximum,
   getOrderEditErrorMessage,
 } from "./view-model";
 
@@ -37,12 +38,35 @@ type EditableLine = {
 };
 
 const EditModalContent = styled(Modal.Content)`
-  width: min(96vw, 72rem);
-  max-width: 72rem;
+  width: min(96vw, 90rem);
+  max-width: 90rem;
 `;
 
 const NumericText = styled(Typography)`
   font-variant-numeric: tabular-nums;
+`;
+
+const QuantityField = styled(Field.Root)`
+  position: relative;
+  width: 9rem;
+`;
+
+const QuantityHint = styled(Box)`
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  white-space: nowrap;
+`;
+
+const ProductRow = styled(Tr)`
+  & > td {
+    padding-bottom: ${({ theme }) => theme.spaces[7]};
+  }
+
+  && > td:first-of-type {
+    padding-top: ${({ theme }) => theme.spaces[4]};
+    padding-bottom: ${({ theme }) => theme.spaces[7]};
+  }
 `;
 
 function toEditableLines(order: OrderDetail): EditableLine[] {
@@ -107,10 +131,22 @@ export function OrderEditModal({
       ),
     [existingProductIds, products],
   );
-  const productStock = useMemo(
+  const reservedQuantity = useMemo(
+    () => new Map(order.lines.map((line) => [line.productId, line.quantity])),
+    [order.lines],
+  );
+  const maximumQuantity = useMemo(
     () =>
-      new Map(products.map((product) => [product.productId, product.stock])),
-    [products],
+      new Map(
+        products.map((product) => [
+          product.productId,
+          getEditableLineMaximum(
+            product.stock,
+            reservedQuantity.get(product.productId) ?? 0,
+          ),
+        ]),
+      ),
+    [products, reservedQuantity],
   );
   const totals = calculateEditedOrderTotals(lines, order.pickupDiscountPercent);
 
@@ -139,13 +175,19 @@ export function OrderEditModal({
 
   function changeQuantity(productId: string, value: string) {
     const quantity = Number(value);
+    const maximum = maximumQuantity.get(productId);
     setLines((current) =>
       current.map((line) =>
         line.productId === productId
           ? {
               ...line,
               quantity: Number.isInteger(quantity)
-                ? Math.max(1, Math.min(5, quantity))
+                ? Math.max(
+                    1,
+                    maximum === undefined
+                      ? quantity
+                      : Math.min(maximum, quantity),
+                  )
                 : line.quantity,
             }
           : line,
@@ -243,7 +285,7 @@ export function OrderEditModal({
                 </Thead>
                 <Tbody>
                   {lines.map((line) => (
-                    <Tr key={line.productId}>
+                    <ProductRow key={line.productId}>
                       <Td>
                         <Typography fontWeight="semiBold">
                           {line.title}
@@ -258,27 +300,24 @@ export function OrderEditModal({
                         </NumericText>
                       </Td>
                       <Td>
-                        <Box width="8rem">
-                          <Field.Root
-                            hint={`На складе ещё ${productStock.get(line.productId) ?? "—"}`}
-                            name={`quantity-${line.productId}`}
-                          >
-                            <Field.Input
-                              aria-label={`Количество: ${line.title}`}
-                              max={5}
-                              min={1}
-                              type="number"
-                              value={line.quantity}
-                              onChange={(event) =>
-                                changeQuantity(
-                                  line.productId,
-                                  event.target.value,
-                                )
-                              }
-                            />
+                        <QuantityField
+                          hint={`Доступно: ${maximumQuantity.get(line.productId) ?? "—"}`}
+                          name={`quantity-${line.productId}`}
+                        >
+                          <Field.Input
+                            aria-label={`Количество: ${line.title}`}
+                            max={maximumQuantity.get(line.productId)}
+                            min={1}
+                            type="number"
+                            value={line.quantity}
+                            onChange={(event) =>
+                              changeQuantity(line.productId, event.target.value)
+                            }
+                          />
+                          <QuantityHint>
                             <Field.Hint />
-                          </Field.Root>
-                        </Box>
+                          </QuantityHint>
+                        </QuantityField>
                       </Td>
                       <Td>
                         <NumericText fontWeight="semiBold">
@@ -302,7 +341,7 @@ export function OrderEditModal({
                           Удалить
                         </Button>
                       </Td>
-                    </Tr>
+                    </ProductRow>
                   ))}
                 </Tbody>
               </Table>
@@ -312,27 +351,34 @@ export function OrderEditModal({
               <Box minWidth="30rem">
                 <Field.Root name="new-product">
                   <Field.Label>Добавить товар</Field.Label>
-                  <SingleSelect
+                  <Combobox
+                    autocomplete={{ filter: "contains", type: "list" }}
                     aria-label="Добавить товар"
+                    clearLabel="Очистить выбранный товар"
                     disabled={productsLoading}
+                    loading={productsLoading}
+                    noOptionsMessage={() => "Товары не найдены"}
                     placeholder={
-                      productsLoading ? "Загружаем каталог…" : "Выберите товар"
+                      productsLoading
+                        ? "Загружаем каталог…"
+                        : "Найдите товар по названию"
                     }
-                    value={selectedProductId || null}
+                    value={selectedProductId || undefined}
                     onChange={(value) => setSelectedProductId(String(value))}
                     onClear={() => setSelectedProductId("")}
                   >
                     {availableProducts.map((product) => (
-                      <SingleSelectOption
+                      <ComboboxOption
                         key={product.productId}
+                        textValue={`${product.technicalName} ${product.displayName}`}
                         value={product.productId}
                       >
                         {product.technicalName} · {product.packageLabel} ·{" "}
                         {formatRubles(product.priceRubles)} · остаток{" "}
                         {product.stock}
-                      </SingleSelectOption>
+                      </ComboboxOption>
                     ))}
-                  </SingleSelect>
+                  </Combobox>
                 </Field.Root>
               </Box>
               <Button

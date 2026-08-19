@@ -48,6 +48,7 @@ const defaultNavigation = {
 };
 
 const defaultCheckoutSettings: CheckoutSettings = {
+  maxItemQuantity: 5,
   pickupAddress: "г. Москва, ул. Чайная, д. 1. Ежедневно с 10:00 до 22:00.",
   pickupDiscountPercent: null,
   courierDeliveryNote: "Стоимость рассчитывается в день отправки, до 1000 руб.",

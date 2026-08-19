@@ -22,8 +22,8 @@ const product: CartProduct = {
   stock: 3,
 };
 
-test("adds a selected quantity within both stock and the 1–5 limit", () => {
-  const cart = addItem(createEmptyCart(), product, 3);
+test("adds a selected quantity within both stock and the configured limit", () => {
+  const cart = addItem(createEmptyCart(), product, 3, 8);
 
   assert.equal(cart.items.length, 1);
   assert.equal(cart.items[0]?.quantity, 3);
@@ -48,7 +48,7 @@ test("rejects unavailable, excessive, fractional and zero quantities", () => {
     [1, 0],
   ] as const) {
     assert.throws(
-      () => addItem(createEmptyCart(), { ...product, stock }, candidate),
+      () => addItem(createEmptyCart(), { ...product, stock }, candidate, 5),
       RangeError,
     );
   }
@@ -71,6 +71,24 @@ test("allows only downward corrections when stored quantity exceeds current stoc
     2,
   );
   assert.equal(corrected.items[0]?.quantity, 2);
+});
+
+test("allows a configured per-item limit above the default", () => {
+  const cart = addItem(createEmptyCart(), { ...product, stock: 12 }, 8, 8);
+
+  assert.equal(cart.items[0]?.quantity, 8);
+  assert.throws(
+    () => updateItemQuantity(cart, product.productId, 9, 12, 8),
+    RangeError,
+  );
+});
+
+test("allows stepwise correction after the configured limit decreases", () => {
+  const cart = addItem(createEmptyCart(), { ...product, stock: 12 }, 8, 8);
+
+  const corrected = updateItemQuantity(cart, product.productId, 7, 12, 5);
+
+  assert.equal(corrected.items[0]?.quantity, 7);
 });
 
 test("removes one item or clears the complete cart", () => {
