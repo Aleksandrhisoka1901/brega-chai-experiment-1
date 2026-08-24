@@ -1,0 +1,2040 @@
+[1mdiff --git a/apps/cms/types/generated/components.d.ts b/apps/cms/types/generated/components.d.ts[m
+[1mindex a6b456f..5c36f1b 100644[m
+[1m--- a/apps/cms/types/generated/components.d.ts[m
+[1m+++ b/apps/cms/types/generated/components.d.ts[m
+[36m@@ -1,10 +1,10 @@[m
+[31m-import type { Schema, Struct } from "@strapi/strapi";[m
+[32m+[m[32mimport type { Schema, Struct } from '@strapi/strapi';[m
+ [m
+ export interface HomeCatalogPreview extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_home_catalog_previews";[m
+[32m+[m[32m  collectionName: 'components_home_catalog_previews';[m
+   info: {[m
+[31m-    description: "\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A, \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0430\u043D\u043E\u043D\u0441 \u0438 \u0441\u0441\u044B\u043B\u043A\u0430 \u043D\u0430 \u043A\u0430\u0442\u0430\u043B\u043E\u0433 \u0441\u043E\u0440\u0442\u043E\u0432.";[m
+[31m-    displayName: "\u0410\u043D\u043E\u043D\u0441 \u0441\u043E\u0440\u0442\u043E\u0432";[m
+[32m+[m[32m    description: '\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A, \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0430\u043D\u043E\u043D\u0441 \u0438 \u0441\u0441\u044B\u043B\u043A\u0430 \u043D\u0430 \u043A\u0430\u0442\u0430\u043B\u043E\u0433 \u0441\u043E\u0440\u0442\u043E\u0432.';[m
+[32m+[m[32m    displayName: '\u0410\u043D\u043E\u043D\u0441 \u0441\u043E\u0440\u0442\u043E\u0432';[m
+   };[m
+   attributes: {[m
+     eyebrow: Schema.Attribute.String &[m
+[36m@@ -23,26 +23,26 @@[m [mexport interface HomeCatalogPreview extends Struct.ComponentSchema {[m
+ }[m
+ [m
+ export interface HomeEditorialSection extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_home_editorial_sections";[m
+[32m+[m[32m  collectionName: 'components_home_editorial_sections';[m
+   info: {[m
+[31m-    description: "\u0422\u0435\u043A\u0441\u0442\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0434\u0435\u043B \u00AB\u041E \u043F\u0440\u043E\u0435\u043A\u0442\u0435\u00BB \u0441 \u043D\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u043C\u044B\u043C\u0438 \u0446\u0432\u0435\u0442\u0430\u043C\u0438";[m
+[31m-    displayName: "\u0420\u0435\u0434\u0430\u043A\u0446\u0438\u043E\u043D\u043D\u044B\u0439 \u0440\u0430\u0437\u0434\u0435\u043B";[m
+[32m+[m[32m    description: '\u0422\u0435\u043A\u0441\u0442\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0434\u0435\u043B \u00AB\u041E \u043F\u0440\u043E\u0435\u043A\u0442\u0435\u00BB \u0441 \u043D\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u043C\u044B\u043C\u0438 \u0446\u0432\u0435\u0442\u0430\u043C\u0438';[m
+[32m+[m[32m    displayName: '\u0420\u0435\u0434\u0430\u043A\u0446\u0438\u043E\u043D\u043D\u044B\u0439 \u0440\u0430\u0437\u0434\u0435\u043B';[m
+   };[m
+   attributes: {[m
+     backgroundColor: Schema.Attribute.String &[m
+[31m-      Schema.Attribute.CustomField<"plugin::color-picker.color">;[m
+[32m+[m[32m      Schema.Attribute.CustomField<'plugin::color-picker.color'>;[m
+     eyebrow: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    spacing: Schema.Attribute.Enumeration<["S", "M", "L", "XL"]> &[m
+[32m+[m[32m    spacing: Schema.Attribute.Enumeration<['S', 'M', 'L', 'XL']> &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"L">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'L'>;[m
+     textBlock1: Schema.Attribute.Text;[m
+     textBlock2: Schema.Attribute.Text;[m
+     textColor: Schema.Attribute.String &[m
+[31m-      Schema.Attribute.CustomField<"plugin::color-picker.color">;[m
+[32m+[m[32m      Schema.Attribute.CustomField<'plugin::color-picker.color'>;[m
+     title: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+[36m@@ -52,31 +52,31 @@[m [mexport interface HomeEditorialSection extends Struct.ComponentSchema {[m
+ }[m
+ [m
+ export interface HomeHero extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_home_heroes";[m
+[32m+[m[32m  collectionName: 'components_home_heroes';[m
+   info: {[m
+[31m-    description: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0438 alt \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B \u0434\u043B\u044F \u0432\u0441\u0435\u0445 \u043C\u0430\u043A\u0435\u0442\u043E\u0432, \u043A\u0440\u043E\u043C\u0435 100/0";[m
+[31m-    displayName: "\u041F\u0435\u0440\u0432\u044B\u0439 \u044D\u043A\u0440\u0430\u043D";[m
+[32m+[m[32m    description: '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0438 alt \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B \u0434\u043B\u044F \u0432\u0441\u0435\u0445 \u043C\u0430\u043A\u0435\u0442\u043E\u0432, \u043A\u0440\u043E\u043C\u0435 100/0';[m
+[32m+[m[32m    displayName: '\u041F\u0435\u0440\u0432\u044B\u0439 \u044D\u043A\u0440\u0430\u043D';[m
+   };[m
+   attributes: {[m
+     backgroundColor: Schema.Attribute.String &[m
+[31m-      Schema.Attribute.CustomField<"plugin::color-picker.color">;[m
+[31m-    cta: Schema.Attribute.Component<"shared.link", false>;[m
+[32m+[m[32m      Schema.Attribute.CustomField<'plugin::color-picker.color'>;[m
+[32m+[m[32m    cta: Schema.Attribute.Component<'shared.link', false>;[m
+     eyebrow: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    image: Schema.Attribute.Component<"shared.image-with-alt", false>;[m
+[31m-    layout: Schema.Attribute.Enumeration<["50/50", "40/60", "100/0"]> &[m
+[32m+[m[32m    image: Schema.Attribute.Component<'shared.image-with-alt', false>;[m
+[32m+[m[32m    layout: Schema.Attribute.Enumeration<['50/50', '40/60', '100/0']> &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"50/50">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'50/50'>;[m
+     text: Schema.Attribute.Text &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+     textColor: Schema.Attribute.String &[m
+[31m-      Schema.Attribute.CustomField<"plugin::color-picker.color">;[m
+[32m+[m[32m      Schema.Attribute.CustomField<'plugin::color-picker.color'>;[m
+     title: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+[36m@@ -86,10 +86,10 @@[m [mexport interface HomeHero extends Struct.ComponentSchema {[m
+ }[m
+ [m
+ export interface HomeRitualsPreview extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_home_rituals_previews";[m
+[32m+[m[32m  collectionName: 'components_home_rituals_previews';[m
+   info: {[m
+[31m-    description: "\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A \u0438 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0430\u043D\u043E\u043D\u0441 \u0440\u0430\u0437\u0434\u0435\u043B\u0430 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432.";[m
+[31m-    displayName: "\u0410\u043D\u043E\u043D\u0441 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432";[m
+[32m+[m[32m    description: '\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A \u0438 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0430\u043D\u043E\u043D\u0441 \u0440\u0430\u0437\u0434\u0435\u043B\u0430 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432.';[m
+[32m+[m[32m    displayName: '\u0410\u043D\u043E\u043D\u0441 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432';[m
+   };[m
+   attributes: {[m
+     eyebrow: Schema.Attribute.String &[m
+[36m@@ -107,23 +107,23 @@[m [mexport interface HomeRitualsPreview extends Struct.ComponentSchema {[m
+ }[m
+ [m
+ export interface ProductArticle extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_product_articles";[m
+[32m+[m[32m  collectionName: 'components_product_articles';[m
+   info: {[m
+[31m-    description: "\u0423\u043F\u043E\u0440\u044F\u0434\u043E\u0447\u0435\u043D\u043D\u0430\u044F \u0441\u0442\u0430\u0442\u044C\u044F \u0432 \u043D\u0438\u0436\u043D\u0435\u0439 \u043A\u043E\u043D\u0442\u0435\u043D\u0442\u043D\u043E\u0439 \u0437\u043E\u043D\u0435 \u0442\u043E\u0432\u0430\u0440\u0430";[m
+[31m-    displayName: "\u0421\u0442\u0430\u0442\u044C\u044F";[m
+[32m+[m[32m    description: '\u0423\u043F\u043E\u0440\u044F\u0434\u043E\u0447\u0435\u043D\u043D\u0430\u044F \u0441\u0442\u0430\u0442\u044C\u044F \u0432 \u043D\u0438\u0436\u043D\u0435\u0439 \u043A\u043E\u043D\u0442\u0435\u043D\u0442\u043D\u043E\u0439 \u0437\u043E\u043D\u0435 \u0442\u043E\u0432\u0430\u0440\u0430';[m
+[32m+[m[32m    displayName: '\u0421\u0442\u0430\u0442\u044C\u044F';[m
+   };[m
+   attributes: {[m
+     content: Schema.Attribute.JSON &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.CustomField<"plugin::better-blocks.better-blocks">;[m
+[32m+[m[32m      Schema.Attribute.CustomField<'plugin::better-blocks.better-blocks'>;[m
+   };[m
+ }[m
+ [m
+ export interface ProductGalleryImage extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_product_gallery_images";[m
+[32m+[m[32m  collectionName: 'components_product_gallery_images';[m
+   info: {[m
+[31m-    description: "\u0414\u043B\u044F \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u043D\u0443\u0436\u0435\u043D \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.";[m
+[31m-    displayName: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0433\u0430\u043B\u0435\u0440\u0435\u0438";[m
+[32m+[m[32m    description: '\u0414\u043B\u044F \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u043D\u0443\u0436\u0435\u043D \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.';[m
+[32m+[m[32m    displayName: '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0433\u0430\u043B\u0435\u0440\u0435\u0438';[m
+   };[m
+   attributes: {[m
+     alt: Schema.Attribute.String &[m
+[36m@@ -131,15 +131,15 @@[m [mexport interface ProductGalleryImage extends Struct.ComponentSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    image: Schema.Attribute.Media<"images"> & Schema.Attribute.Required;[m
+[32m+[m[32m    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;[m
+   };[m
+ }[m
+ [m
+ export interface SharedImageWithAlt extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_images_with_alt";[m
+[32m+[m[32m  collectionName: 'components_shared_images_with_alt';[m
+   info: {[m
+[31m-    description: "\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0438 \u0434\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.";[m
+[31m-    displayName: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0441 alt";[m
+[32m+[m[32m    description: '\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0438 \u0434\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 alt. \u0420\u0430\u0437\u043C\u0435\u0440\u044B \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435, \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u043B\u044C\u043A\u043E \u0432\u0435\u0441 \u0444\u0430\u0439\u043B\u0430.';[m
+[32m+[m[32m    displayName: '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0441 alt';[m
+   };[m
+   attributes: {[m
+     alt: Schema.Attribute.String &[m
+[36m@@ -147,27 +147,27 @@[m [mexport interface SharedImageWithAlt extends Struct.ComponentSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    image: Schema.Attribute.Media<"images"> & Schema.Attribute.Required;[m
+[32m+[m[32m    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;[m
+   };[m
+ }[m
+ [m
+ export interface SharedLegalDocuments extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_legal_documents";[m
+[32m+[m[32m  collectionName: 'components_shared_legal_documents';[m
+   info: {[m
+[31m-    description: "PDF-\u0444\u0430\u0439\u043B\u044B, \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u044B\u0435 \u043F\u043E \u043F\u043E\u0441\u0442\u043E\u044F\u043D\u043D\u044B\u043C \u0430\u0434\u0440\u0435\u0441\u0430\u043C \u0432 \u0440\u0430\u0437\u0434\u0435\u043B\u0435 /legal";[m
+[31m-    displayName: "\u042E\u0440\u0438\u0434\u0438\u0447\u0435\u0441\u043A\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B";[m
+[32m+[m[32m    description: 'PDF-\u0444\u0430\u0439\u043B\u044B, \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u044B\u0435 \u043F\u043E \u043F\u043E\u0441\u0442\u043E\u044F\u043D\u043D\u044B\u043C \u0430\u0434\u0440\u0435\u0441\u0430\u043C \u0432 \u0440\u0430\u0437\u0434\u0435\u043B\u0435 /legal';[m
+[32m+[m[32m    displayName: '\u042E\u0440\u0438\u0434\u0438\u0447\u0435\u0441\u043A\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B';[m
+   };[m
+   attributes: {[m
+[31m-    deliveryAndReturns: Schema.Attribute.Media<"files">;[m
+[31m-    privacyPolicy: Schema.Attribute.Media<"files">;[m
+[31m-    terms: Schema.Attribute.Media<"files">;[m
+[32m+[m[32m    deliveryAndReturns: Schema.Attribute.Media<'files'>;[m
+[32m+[m[32m    privacyPolicy: Schema.Attribute.Media<'files'>;[m
+[32m+[m[32m    terms: Schema.Attribute.Media<'files'>;[m
+   };[m
+ }[m
+ [m
+ export interface SharedLink extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_links";[m
+[32m+[m[32m  collectionName: 'components_shared_links';[m
+   info: {[m
+[31m-    displayName: "\u0421\u0441\u044B\u043B\u043A\u0430";[m
+[32m+[m[32m    displayName: '\u0421\u0441\u044B\u043B\u043A\u0430';[m
+   };[m
+   attributes: {[m
+     label: Schema.Attribute.String &[m
+[36m@@ -185,9 +185,9 @@[m [mexport interface SharedLink extends Struct.ComponentSchema {[m
+ }[m
+ [m
+ export interface SharedNavigationLabels extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_navigation_labels";[m
+[32m+[m[32m  collectionName: 'components_shared_navigation_labels';[m
+   info: {[m
+[31m-    displayName: "\u041F\u043E\u0434\u043F\u0438\u0441\u0438 \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u0438";[m
+[32m+[m[32m    displayName: '\u041F\u043E\u0434\u043F\u0438\u0441\u0438 \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u0438';[m
+   };[m
+   attributes: {[m
+     about: Schema.Attribute.String & Schema.Attribute.Required;[m
+[36m@@ -198,10 +198,10 @@[m [mexport interface SharedNavigationLabels extends Struct.ComponentSchema {[m
+ }[m
+ [m
+ export interface SharedSectionBreadcrumb extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_section_breadcrumbs";[m
+[32m+[m[32m  collectionName: 'components_shared_section_breadcrumbs';[m
+   info: {[m
+[31m-    description: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u0430\u044F \u043F\u043E\u0434\u043F\u0438\u0441\u044C \u0440\u0430\u0437\u0434\u0435\u043B\u0430 \u0434\u043B\u044F \u0445\u043B\u0435\u0431\u043D\u044B\u0445 \u043A\u0440\u043E\u0448\u0435\u043A";[m
+[31m-    displayName: "\u0425\u043B\u0435\u0431\u043D\u0430\u044F \u043A\u0440\u043E\u0448\u043A\u0430 \u0440\u0430\u0437\u0434\u0435\u043B\u0430";[m
+[32m+[m[32m    description: '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u0430\u044F \u043F\u043E\u0434\u043F\u0438\u0441\u044C \u0440\u0430\u0437\u0434\u0435\u043B\u0430 \u0434\u043B\u044F \u0445\u043B\u0435\u0431\u043D\u044B\u0445 \u043A\u0440\u043E\u0448\u0435\u043A';[m
+[32m+[m[32m    displayName: '\u0425\u043B\u0435\u0431\u043D\u0430\u044F \u043A\u0440\u043E\u0448\u043A\u0430 \u0440\u0430\u0437\u0434\u0435\u043B\u0430';[m
+   };[m
+   attributes: {[m
+     label: Schema.Attribute.String &[m
+[36m@@ -209,29 +209,29 @@[m [mexport interface SharedSectionBreadcrumb extends Struct.ComponentSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    route: Schema.Attribute.Enumeration<["tovary", "nabory"]> &[m
+[32m+[m[32m    route: Schema.Attribute.Enumeration<['tovary', 'nabory']> &[m
+       Schema.Attribute.Required;[m
+   };[m
+ }[m
+ [m
+ export interface SharedSeo extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_seos";[m
+[32m+[m[32m  collectionName: 'components_shared_seos';[m
+   info: {[m
+[31m-    description: "\u041F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0435 \u043C\u0435\u0442\u0430\u0434\u0430\u043D\u043D\u044B\u0435. \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A \u0438 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0434\u043E\u043B\u0436\u043D\u044B \u0431\u044B\u0442\u044C \u043A\u0440\u0430\u0442\u043A\u0438\u043C\u0438; \u044D\u0442\u043E \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0446\u0438\u0438, \u0430 \u043D\u0435 \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u044F.";[m
+[31m-    displayName: "SEO-\u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438";[m
+[32m+[m[32m    description: '\u041F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0435 \u043C\u0435\u0442\u0430\u0434\u0430\u043D\u043D\u044B\u0435. \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A \u0438 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0434\u043E\u043B\u0436\u043D\u044B \u0431\u044B\u0442\u044C \u043A\u0440\u0430\u0442\u043A\u0438\u043C\u0438; \u044D\u0442\u043E \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0446\u0438\u0438, \u0430 \u043D\u0435 \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u044F.';[m
+[32m+[m[32m    displayName: 'SEO-\u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438';[m
+   };[m
+   attributes: {[m
+     description: Schema.Attribute.Text & Schema.Attribute.Required;[m
+[31m-    image: Schema.Attribute.Media<"images">;[m
+[32m+[m[32m    image: Schema.Attribute.Media<'images'>;[m
+     title: Schema.Attribute.String & Schema.Attribute.Required;[m
+   };[m
+ }[m
+ [m
+ export interface SharedStorefrontTexts extends Struct.ComponentSchema {[m
+[31m-  collectionName: "components_shared_storefront_texts";[m
+[32m+[m[32m  collectionName: 'components_shared_storefront_texts';[m
+   info: {[m
+[31m-    description: "\u041E\u0431\u0449\u0438\u0435 \u043F\u043E\u0434\u043F\u0438\u0441\u0438 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A \u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u0442\u043E\u0432\u0430\u0440\u043E\u0432 \u0438 \u043D\u0430\u0431\u043E\u0440\u043E\u0432";[m
+[31m-    displayName: "\u0422\u0435\u043A\u0441\u0442\u044B \u0432\u0438\u0442\u0440\u0438\u043D\u044B";[m
+[32m+[m[32m    description: '\u041E\u0431\u0449\u0438\u0435 \u043F\u043E\u0434\u043F\u0438\u0441\u0438 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A \u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u0442\u043E\u0432\u0430\u0440\u043E\u0432 \u0438 \u043D\u0430\u0431\u043E\u0440\u043E\u0432';[m
+[32m+[m[32m    displayName: '\u0422\u0435\u043A\u0441\u0442\u044B \u0432\u0438\u0442\u0440\u0438\u043D\u044B';[m
+   };[m
+   attributes: {[m
+     imagePlaceholder: Schema.Attribute.String &[m
+[36m@@ -247,22 +247,22 @@[m [mexport interface SharedStorefrontTexts extends Struct.ComponentSchema {[m
+   };[m
+ }[m
+ [m
+[31m-declare module "@strapi/strapi" {[m
+[32m+[m[32mdeclare module '@strapi/strapi' {[m
+   export module Public {[m
+     export interface ComponentSchemas {[m
+[31m-      "home.catalog-preview": HomeCatalogPreview;[m
+[31m-      "home.editorial-section": HomeEditorialSection;[m
+[31m-      "home.hero": HomeHero;[m
+[31m-      "home.rituals-preview": HomeRitualsPreview;[m
+[31m-      "product.article": ProductArticle;[m
+[31m-      "product.gallery-image": ProductGalleryImage;[m
+[31m-      "shared.image-with-alt": SharedImageWithAlt;[m
+[31m-      "shared.legal-documents": SharedLegalDocuments;[m
+[31m-      "shared.link": SharedLink;[m
+[31m-      "shared.navigation-labels": SharedNavigationLabels;[m
+[31m-      "shared.section-breadcrumb": SharedSectionBreadcrumb;[m
+[31m-      "shared.seo": SharedSeo;[m
+[31m-      "shared.storefront-texts": SharedStorefrontTexts;[m
+[32m+[m[32m      'home.catalog-preview': HomeCatalogPreview;[m
+[32m+[m[32m      'home.editorial-section': HomeEditorialSection;[m
+[32m+[m[32m      'home.hero': HomeHero;[m
+[32m+[m[32m      'home.rituals-preview': HomeRitualsPreview;[m
+[32m+[m[32m      'product.article': ProductArticle;[m
+[32m+[m[32m      'product.gallery-image': ProductGalleryImage;[m
+[32m+[m[32m      'shared.image-with-alt': SharedImageWithAlt;[m
+[32m+[m[32m      'shared.legal-documents': SharedLegalDocuments;[m
+[32m+[m[32m      'shared.link': SharedLink;[m
+[32m+[m[32m      'shared.navigation-labels': SharedNavigationLabels;[m
+[32m+[m[32m      'shared.section-breadcrumb': SharedSectionBreadcrumb;[m
+[32m+[m[32m      'shared.seo': SharedSeo;[m
+[32m+[m[32m      'shared.storefront-texts': SharedStorefrontTexts;[m
+     }[m
+   }[m
+ }[m
+[1mdiff --git a/apps/cms/types/generated/contentTypes.d.ts b/apps/cms/types/generated/contentTypes.d.ts[m
+[1mindex 25f9a7e..d116798 100644[m
+[1m--- a/apps/cms/types/generated/contentTypes.d.ts[m
+[1m+++ b/apps/cms/types/generated/contentTypes.d.ts[m
+[36m@@ -1,22 +1,22 @@[m
+[31m-import type { Schema, Struct } from "@strapi/strapi";[m
+[32m+[m[32mimport type { Schema, Struct } from '@strapi/strapi';[m
+ [m
+ export interface AdminApiToken extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_api_tokens";[m
+[32m+[m[32m  collectionName: 'strapi_api_tokens';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Api Token";[m
+[31m-    name: "Api Token";[m
+[31m-    pluralName: "api-tokens";[m
+[31m-    singularName: "api-token";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Api Token';[m
+[32m+[m[32m    name: 'Api Token';[m
+[32m+[m[32m    pluralName: 'api-tokens';[m
+[32m+[m[32m    singularName: 'api-token';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -27,30 +27,30 @@[m [mexport interface AdminApiToken extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     adminPermissions: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "admin::permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'admin::permission'[m
+     >;[m
+[31m-    adminUserOwner: Schema.Attribute.Relation<"manyToOne", "admin::user">;[m
+[32m+[m[32m    adminUserOwner: Schema.Attribute.Relation<'manyToOne', 'admin::user'>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     description: Schema.Attribute.String &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }> &[m
+[31m-      Schema.Attribute.DefaultTo<"">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<''>;[m
+     encryptedKey: Schema.Attribute.Text &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+     expiresAt: Schema.Attribute.DateTime;[m
+[31m-    kind: Schema.Attribute.Enumeration<["content-api", "admin"]> &[m
+[32m+[m[32m    kind: Schema.Attribute.Enumeration<['content-api', 'admin']> &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"content-api">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'content-api'>;[m
+     lastUsedAt: Schema.Attribute.DateTime;[m
+     lifespan: Schema.Attribute.BigInteger;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    localizations: Schema.Attribute.Relation<"oneToMany", "admin::api-token"> &[m
+[32m+[m[32m    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::api-token'> &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -59,35 +59,35 @@[m [mexport interface AdminApiToken extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     permissions: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "admin::api-token-permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'admin::api-token-permission'[m
+     >;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    type: Schema.Attribute.Enumeration<["read-only", "full-access", "custom"]> &[m
+[31m-      Schema.Attribute.DefaultTo<"read-only">;[m
+[32m+[m[32m    type: Schema.Attribute.Enumeration<['read-only', 'full-access', 'custom']> &[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'read-only'>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface AdminApiTokenPermission extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_api_token_permissions";[m
+[32m+[m[32m  collectionName: 'strapi_api_token_permissions';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "API Token Permission";[m
+[31m-    name: "API Token Permission";[m
+[31m-    pluralName: "api-token-permissions";[m
+[31m-    singularName: "api-token-permission";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'API Token Permission';[m
+[32m+[m[32m    name: 'API Token Permission';[m
+[32m+[m[32m    pluralName: 'api-token-permissions';[m
+[32m+[m[32m    singularName: 'api-token-permission';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -98,39 +98,39 @@[m [mexport interface AdminApiTokenPermission extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "admin::api-token-permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'admin::api-token-permission'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    token: Schema.Attribute.Relation<"manyToOne", "admin::api-token">;[m
+[32m+[m[32m    token: Schema.Attribute.Relation<'manyToOne', 'admin::api-token'>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface AdminPermission extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "admin_permissions";[m
+[32m+[m[32m  collectionName: 'admin_permissions';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Permission";[m
+[31m-    name: "Permission";[m
+[31m-    pluralName: "permissions";[m
+[31m-    singularName: "permission";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Permission';[m
+[32m+[m[32m    name: 'Permission';[m
+[32m+[m[32m    pluralName: 'permissions';[m
+[32m+[m[32m    singularName: 'permission';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -141,44 +141,44 @@[m [mexport interface AdminPermission extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     actionParameters: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;[m
+[31m-    apiToken: Schema.Attribute.Relation<"manyToOne", "admin::api-token">;[m
+[32m+[m[32m    apiToken: Schema.Attribute.Relation<'manyToOne', 'admin::api-token'>;[m
+     conditions: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    localizations: Schema.Attribute.Relation<"oneToMany", "admin::permission"> &[m
+[32m+[m[32m    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::permission'> &[m
+       Schema.Attribute.Private;[m
+     properties: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    role: Schema.Attribute.Relation<"manyToOne", "admin::role">;[m
+[32m+[m[32m    role: Schema.Attribute.Relation<'manyToOne', 'admin::role'>;[m
+     subject: Schema.Attribute.String &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface AdminRole extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "admin_roles";[m
+[32m+[m[32m  collectionName: 'admin_roles';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Role";[m
+[31m-    name: "Role";[m
+[31m-    pluralName: "roles";[m
+[31m-    singularName: "role";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Role';[m
+[32m+[m[32m    name: 'Role';[m
+[32m+[m[32m    pluralName: 'roles';[m
+[32m+[m[32m    singularName: 'role';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -190,11 +190,11 @@[m [mexport interface AdminRole extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     description: Schema.Attribute.String;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    localizations: Schema.Attribute.Relation<"oneToMany", "admin::role"> &[m
+[32m+[m[32m    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::role'> &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -202,32 +202,32 @@[m [mexport interface AdminRole extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    permissions: Schema.Attribute.Relation<"oneToMany", "admin::permission">;[m
+[32m+[m[32m    permissions: Schema.Attribute.Relation<'oneToMany', 'admin::permission'>;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+[31m-    users: Schema.Attribute.Relation<"manyToMany", "admin::user">;[m
+[32m+[m[32m    users: Schema.Attribute.Relation<'manyToMany', 'admin::user'>;[m
+   };[m
+ }[m
+ [m
+ export interface AdminSession extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_sessions";[m
+[32m+[m[32m  collectionName: 'strapi_sessions';[m
+   info: {[m
+[31m-    description: "Session Manager storage";[m
+[31m-    displayName: "Session";[m
+[31m-    name: "Session";[m
+[31m-    pluralName: "sessions";[m
+[31m-    singularName: "session";[m
+[32m+[m[32m    description: 'Session Manager storage';[m
+[32m+[m[32m    displayName: 'Session';[m
+[32m+[m[32m    name: 'Session';[m
+[32m+[m[32m    pluralName: 'sessions';[m
+[32m+[m[32m    singularName: 'session';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+     i18n: {[m
+[36m@@ -238,7 +238,7 @@[m [mexport interface AdminSession extends Struct.CollectionTypeSchema {[m
+     absoluteExpiresAt: Schema.Attribute.DateTime & Schema.Attribute.Private;[m
+     childId: Schema.Attribute.String & Schema.Attribute.Private;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     deviceId: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -247,7 +247,7 @@[m [mexport interface AdminSession extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    localizations: Schema.Attribute.Relation<"oneToMany", "admin::session"> &[m
+[32m+[m[32m    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::session'> &[m
+       Schema.Attribute.Private;[m
+     origin: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -260,7 +260,7 @@[m [mexport interface AdminSession extends Struct.CollectionTypeSchema {[m
+     status: Schema.Attribute.String & Schema.Attribute.Private;[m
+     type: Schema.Attribute.String & Schema.Attribute.Private;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     userId: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -269,22 +269,22 @@[m [mexport interface AdminSession extends Struct.CollectionTypeSchema {[m
+ }[m
+ [m
+ export interface AdminTransferToken extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_transfer_tokens";[m
+[32m+[m[32m  collectionName: 'strapi_transfer_tokens';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Transfer Token";[m
+[31m-    name: "Transfer Token";[m
+[31m-    pluralName: "transfer-tokens";[m
+[31m-    singularName: "transfer-token";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Transfer Token';[m
+[32m+[m[32m    name: 'Transfer Token';[m
+[32m+[m[32m    pluralName: 'transfer-tokens';[m
+[32m+[m[32m    singularName: 'transfer-token';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -295,20 +295,20 @@[m [mexport interface AdminTransferToken extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     description: Schema.Attribute.String &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }> &[m
+[31m-      Schema.Attribute.DefaultTo<"">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<''>;[m
+     expiresAt: Schema.Attribute.DateTime;[m
+     lastUsedAt: Schema.Attribute.DateTime;[m
+     lifespan: Schema.Attribute.BigInteger;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "admin::transfer-token"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'admin::transfer-token'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+[36m@@ -318,34 +318,34 @@[m [mexport interface AdminTransferToken extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     permissions: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "admin::transfer-token-permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'admin::transfer-token-permission'[m
+     >;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface AdminTransferTokenPermission[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_transfer_token_permissions";[m
+[32m+[m[32m  collectionName: 'strapi_transfer_token_permissions';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Transfer Token Permission";[m
+[31m-    name: "Transfer Token Permission";[m
+[31m-    pluralName: "transfer-token-permissions";[m
+[31m-    singularName: "transfer-token-permission";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Transfer Token Permission';[m
+[32m+[m[32m    name: 'Transfer Token Permission';[m
+[32m+[m[32m    pluralName: 'transfer-token-permissions';[m
+[32m+[m[32m    singularName: 'transfer-token-permission';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -356,50 +356,50 @@[m [mexport interface AdminTransferTokenPermission[m
+         minLength: 1;[m
+       }>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "admin::transfer-token-permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'admin::transfer-token-permission'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    token: Schema.Attribute.Relation<"manyToOne", "admin::transfer-token">;[m
+[32m+[m[32m    token: Schema.Attribute.Relation<'manyToOne', 'admin::transfer-token'>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface AdminUser extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "admin_users";[m
+[32m+[m[32m  collectionName: 'admin_users';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "User";[m
+[31m-    name: "User";[m
+[31m-    pluralName: "users";[m
+[31m-    singularName: "user";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'User';[m
+[32m+[m[32m    name: 'User';[m
+[32m+[m[32m    pluralName: 'users';[m
+[32m+[m[32m    singularName: 'user';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+[31m-    apiTokens: Schema.Attribute.Relation<"oneToMany", "admin::api-token"> &[m
+[32m+[m[32m    apiTokens: Schema.Attribute.Relation<'oneToMany', 'admin::api-token'> &[m
+       Schema.Attribute.Private;[m
+     blocked: Schema.Attribute.Boolean &[m
+       Schema.Attribute.Private &[m
+       Schema.Attribute.DefaultTo<false>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     email: Schema.Attribute.Email &[m
+       Schema.Attribute.Required &[m
+[36m@@ -420,7 +420,7 @@[m [mexport interface AdminUser extends Struct.CollectionTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    localizations: Schema.Attribute.Relation<"oneToMany", "admin::user"> &[m
+[32m+[m[32m    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     password: Schema.Attribute.Password &[m
+       Schema.Attribute.Private &[m
+[36m@@ -431,22 +431,22 @@[m [mexport interface AdminUser extends Struct.CollectionTypeSchema {[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     registrationToken: Schema.Attribute.String & Schema.Attribute.Private;[m
+     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    roles: Schema.Attribute.Relation<"manyToMany", "admin::role"> &[m
+[32m+[m[32m    roles: Schema.Attribute.Relation<'manyToMany', 'admin::role'> &[m
+       Schema.Attribute.Private;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     username: Schema.Attribute.String;[m
+   };[m
+ }[m
+ [m
+ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {[m
+[31m-  collectionName: "global_settings";[m
+[32m+[m[32m  collectionName: 'global_settings';[m
+   info: {[m
+[31m-    description: "\u041E\u0431\u0449\u0438\u0435 \u0434\u0430\u043D\u043D\u044B\u0435, \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F \u0438 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F \u0441\u0430\u0439\u0442\u0430 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E";[m
+[31m-    displayName: "\u041E\u0431\u0449\u0438\u0435 \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438";[m
+[31m-    pluralName: "global-settings";[m
+[31m-    singularName: "global-setting";[m
+[32m+[m[32m    description: '\u041E\u0431\u0449\u0438\u0435 \u0434\u0430\u043D\u043D\u044B\u0435, \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F \u0438 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F \u0441\u0430\u0439\u0442\u0430 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E';[m
+[32m+[m[32m    displayName: '\u041E\u0431\u0449\u0438\u0435 \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438';[m
+[32m+[m[32m    pluralName: 'global-settings';[m
+[32m+[m[32m    singularName: 'global-setting';[m
+   };[m
+   options: {[m
+     draftAndPublish: true;[m
+[36m@@ -463,13 +463,13 @@[m [mexport interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+[31m-    currency: Schema.Attribute.Enumeration<["RUB"]> &[m
+[32m+[m[32m    currency: Schema.Attribute.Enumeration<['RUB']> &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"RUB">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'RUB'>;[m
+     defaultProductStory: Schema.Attribute.Blocks & Schema.Attribute.Required;[m
+[31m-    defaultSeo: Schema.Attribute.Component<"shared.seo", false> &[m
+[32m+[m[32m    defaultSeo: Schema.Attribute.Component<'shared.seo', false> &[m
+       Schema.Attribute.Required;[m
+     email: Schema.Attribute.Email & Schema.Attribute.Required;[m
+     legalDetails: Schema.Attribute.Text &[m
+[36m@@ -477,15 +477,15 @@[m [mexport interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    legalDocuments: Schema.Attribute.Component<"shared.legal-documents", false>;[m
+[32m+[m[32m    legalDocuments: Schema.Attribute.Component<'shared.legal-documents', false>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::global-setting.global-setting"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::global-setting.global-setting'[m
+     > &[m
+       Schema.Attribute.Private;[m
+[31m-    logo: Schema.Attribute.Media<"images">;[m
+[31m-    navigation: Schema.Attribute.Component<"shared.navigation-labels", false> &[m
+[32m+[m[32m    logo: Schema.Attribute.Media<'images'>;[m
+[32m+[m[32m    navigation: Schema.Attribute.Component<'shared.navigation-labels', false> &[m
+       Schema.Attribute.Required;[m
+     orderNotificationEmail: Schema.Attribute.Email &[m
+       Schema.Attribute.Required &[m
+[36m@@ -505,11 +505,11 @@[m [mexport interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {[m
+       >;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     sectionBreadcrumbs: Schema.Attribute.Component<[m
+[31m-      "shared.section-breadcrumb",[m
+[32m+[m[32m      'shared.section-breadcrumb',[m
+       true[m
+     >;[m
+     storefrontTexts: Schema.Attribute.Component<[m
+[31m-      "shared.storefront-texts",[m
+[32m+[m[32m      'shared.storefront-texts',[m
+       false[m
+     > &[m
+       Schema.Attribute.Required;[m
+[36m@@ -520,63 +520,63 @@[m [mexport interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {[m
+         minLength: 1;[m
+       }>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {[m
+[31m-  collectionName: "home_pages";[m
+[32m+[m[32m  collectionName: 'home_pages';[m
+   info: {[m
+[31m-    description: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u044B\u0435 \u0431\u043B\u043E\u043A\u0438 \u0433\u043B\u0430\u0432\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B";[m
+[31m-    displayName: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430";[m
+[31m-    pluralName: "home-pages";[m
+[31m-    singularName: "home-page";[m
+[32m+[m[32m    description: '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u044B\u0435 \u0431\u043B\u043E\u043A\u0438 \u0433\u043B\u0430\u0432\u043D\u043E\u0439 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u044B';[m
+[32m+[m[32m    displayName: '\u0413\u043B\u0430\u0432\u043D\u0430\u044F \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430';[m
+[32m+[m[32m    pluralName: 'home-pages';[m
+[32m+[m[32m    singularName: 'home-page';[m
+   };[m
+   options: {[m
+     draftAndPublish: true;[m
+   };[m
+   attributes: {[m
+[31m-    about: Schema.Attribute.Component<"home.editorial-section", false> &[m
+[32m+[m[32m    about: Schema.Attribute.Component<'home.editorial-section', false> &[m
+       Schema.Attribute.Required;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     featuredNabory: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::product.product"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::product.product'[m
+     >;[m
+     featuredTovary: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::product.product"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::product.product'[m
+     >;[m
+[31m-    hero: Schema.Attribute.Component<"home.hero", false> &[m
+[32m+[m[32m    hero: Schema.Attribute.Component<'home.hero', false> &[m
+       Schema.Attribute.Required;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::home-page.home-page"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::home-page.home-page'[m
+     > &[m
+       Schema.Attribute.Private;[m
+[31m-    naboryPreview: Schema.Attribute.Component<"home.rituals-preview", false> &[m
+[32m+[m[32m    naboryPreview: Schema.Attribute.Component<'home.rituals-preview', false> &[m
+       Schema.Attribute.Required;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    seo: Schema.Attribute.Component<"shared.seo", false>;[m
+[31m-    tovaryPreview: Schema.Attribute.Component<"home.catalog-preview", false> &[m
+[32m+[m[32m    seo: Schema.Attribute.Component<'shared.seo', false>;[m
+[32m+[m[32m    tovaryPreview: Schema.Attribute.Component<'home.catalog-preview', false> &[m
+       Schema.Attribute.Required;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "orders";[m
+[32m+[m[32m  collectionName: 'orders';[m
+   info: {[m
+[31m-    description: "\u0417\u0430\u043A\u0430\u0437 \u043F\u043E\u043A\u0443\u043F\u0430\u0442\u0435\u043B\u044F \u0438 \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u0435\u0433\u043E \u043E\u0431\u0440\u0430\u0431\u043E\u0442\u043A\u0438";[m
+[31m-    displayName: "\u0417\u0430\u043A\u0430\u0437";[m
+[31m-    pluralName: "orders";[m
+[31m-    singularName: "order";[m
+[32m+[m[32m    description: '\u0417\u0430\u043A\u0430\u0437 \u043F\u043E\u043A\u0443\u043F\u0430\u0442\u0435\u043B\u044F \u0438 \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u0435\u0433\u043E \u043E\u0431\u0440\u0430\u0431\u043E\u0442\u043A\u0438';[m
+[32m+[m[32m    displayName: '\u0417\u0430\u043A\u0430\u0437';[m
+[32m+[m[32m    pluralName: 'orders';[m
+[32m+[m[32m    singularName: 'order';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+[36m@@ -587,11 +587,11 @@[m [mexport interface ApiOrderOrder extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.Private;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+[31m-    currency: Schema.Attribute.Enumeration<["RUB"]> &[m
+[32m+[m[32m    currency: Schema.Attribute.Enumeration<['RUB']> &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"RUB">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'RUB'>;[m
+     customerEmail: Schema.Attribute.Email & Schema.Attribute.Private;[m
+     customerName: Schema.Attribute.String & Schema.Attribute.Required;[m
+     customerPhone: Schema.Attribute.String &[m
+[36m@@ -600,8 +600,8 @@[m [mexport interface ApiOrderOrder extends Struct.CollectionTypeSchema {[m
+     deliveryAddress: Schema.Attribute.Text &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.Private;[m
+[31m-    deliveryMethod: Schema.Attribute.Enumeration<["pickup", "courier"]> &[m
+[31m-      Schema.Attribute.DefaultTo<"courier">;[m
+[32m+[m[32m    deliveryMethod: Schema.Attribute.Enumeration<['pickup', 'courier']> &[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'courier'>;[m
+     discountedTotalRubles: Schema.Attribute.Integer &[m
+       Schema.Attribute.SetMinMax<[m
+         {[m
+[36m@@ -615,17 +615,17 @@[m [mexport interface ApiOrderOrder extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.Unique;[m
+     lines: Schema.Attribute.JSON & Schema.Attribute.Required;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+[31m-    localizations: Schema.Attribute.Relation<"oneToMany", "api::order.order"> &[m
+[32m+[m[32m    localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &[m
+       Schema.Attribute.Private;[m
+     managerComment: Schema.Attribute.Text & Schema.Attribute.Private;[m
+     orderNumber: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.Unique;[m
+     orderStatus: Schema.Attribute.Enumeration<[m
+[31m-      ["new", "confirmed", "completed", "cancelled"][m
+[32m+[m[32m      ['new', 'confirmed', 'completed', 'cancelled'][m
+     > &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"new">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'new'>;[m
+     pickupDiscountPercent: Schema.Attribute.Integer &[m
+       Schema.Attribute.SetMinMax<[m
+         {[m
+[36m@@ -649,24 +649,24 @@[m [mexport interface ApiOrderOrder extends Struct.CollectionTypeSchema {[m
+         number[m
+       >;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface ApiProductProduct extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "products";[m
+[32m+[m[32m  collectionName: 'products';[m
+   info: {[m
+[31m-    description: "\u0422\u043E\u0432\u0430\u0440 \u0438\u043B\u0438 \u0433\u043E\u0442\u043E\u0432\u044B\u0439 \u043D\u0430\u0431\u043E\u0440 \u0442\u043E\u0432\u0430\u0440\u043E\u0432";[m
+[31m-    displayName: "\u0422\u043E\u0432\u0430\u0440";[m
+[31m-    pluralName: "products";[m
+[31m-    singularName: "product";[m
+[32m+[m[32m    description: '\u0422\u043E\u0432\u0430\u0440 \u0438\u043B\u0438 \u0433\u043E\u0442\u043E\u0432\u044B\u0439 \u043D\u0430\u0431\u043E\u0440 \u0442\u043E\u0432\u0430\u0440\u043E\u0432';[m
+[32m+[m[32m    displayName: '\u0422\u043E\u0432\u0430\u0440';[m
+[32m+[m[32m    pluralName: 'products';[m
+[32m+[m[32m    singularName: 'product';[m
+   };[m
+   options: {[m
+     draftAndPublish: true;[m
+   };[m
+   attributes: {[m
+[31m-    articles: Schema.Attribute.Component<"product.article", true>;[m
+[32m+[m[32m    articles: Schema.Attribute.Component<'product.article', true>;[m
+     breadcrumbLabel: Schema.Attribute.String;[m
+     cardExcerpt: Schema.Attribute.Text &[m
+       Schema.Attribute.Required &[m
+[36m@@ -675,24 +675,24 @@[m [mexport interface ApiProductProduct extends Struct.CollectionTypeSchema {[m
+       }>;[m
+     categoryLabel: Schema.Attribute.String;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+[31m-    currency: Schema.Attribute.Enumeration<["RUB"]> &[m
+[32m+[m[32m    currency: Schema.Attribute.Enumeration<['RUB']> &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"RUB">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'RUB'>;[m
+     displayName: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    gallery: Schema.Attribute.Component<"product.gallery-image", true>;[m
+[32m+[m[32m    gallery: Schema.Attribute.Component<'product.gallery-image', true>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::product.product"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::product.product'[m
+     > &[m
+       Schema.Attribute.Private;[m
+[31m-    mainImage: Schema.Attribute.Component<"shared.image-with-alt", false>;[m
+[32m+[m[32m    mainImage: Schema.Attribute.Component<'shared.image-with-alt', false>;[m
+     originalTitle: Schema.Attribute.String;[m
+     packageLabel: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -711,8 +711,8 @@[m [mexport interface ApiProductProduct extends Struct.CollectionTypeSchema {[m
+     seedKey: Schema.Attribute.String &[m
+       Schema.Attribute.Private &[m
+       Schema.Attribute.Unique;[m
+[31m-    seo: Schema.Attribute.Component<"shared.seo", false>;[m
+[31m-    slug: Schema.Attribute.UID<"displayName"> &[m
+[32m+[m[32m    seo: Schema.Attribute.Component<'shared.seo', false>;[m
+[32m+[m[32m    slug: Schema.Attribute.UID<'displayName'> &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.Unique &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+[36m@@ -738,28 +738,28 @@[m [mexport interface ApiProductProduct extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    type: Schema.Attribute.Enumeration<["nabor", "tovar"]> &[m
+[32m+[m[32m    type: Schema.Attribute.Enumeration<['nabor', 'tovar']> &[m
+       Schema.Attribute.Required;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {[m
+[31m-  collectionName: "products_pages";[m
+[32m+[m[32m  collectionName: 'products_pages';[m
+   info: {[m
+[31m-    description: "\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0441\u043E\u0440\u0442\u043E\u0432";[m
+[31m-    displayName: "\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0441\u043E\u0440\u0442\u043E\u0432";[m
+[31m-    pluralName: "products-pages";[m
+[31m-    singularName: "products-page";[m
+[32m+[m[32m    description: '\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0441\u043E\u0440\u0442\u043E\u0432';[m
+[32m+[m[32m    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0441\u043E\u0440\u0442\u043E\u0432';[m
+[32m+[m[32m    pluralName: 'products-pages';[m
+[32m+[m[32m    singularName: 'products-page';[m
+   };[m
+   options: {[m
+     draftAndPublish: true;[m
+   };[m
+   attributes: {[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     emptyStateLinkLabel: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -783,30 +783,30 @@[m [mexport interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {[m
+       }>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::products-page.products-page"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::products-page.products-page'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    seo: Schema.Attribute.Component<"shared.seo", false>;[m
+[32m+[m[32m    seo: Schema.Attribute.Component<'shared.seo', false>;[m
+     title: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface ApiRobotsTxtRobotsTxt extends Struct.SingleTypeSchema {[m
+[31m-  collectionName: "robots_txts";[m
+[32m+[m[32m  collectionName: 'robots_txts';[m
+   info: {[m
+[31m-    description: "\u041F\u0440\u0430\u0432\u0438\u043B\u0430 \u0438\u043D\u0434\u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u0441\u0430\u0439\u0442\u0430 \u0434\u043B\u044F \u043F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0445 \u0440\u043E\u0431\u043E\u0442\u043E\u0432";[m
+[31m-    displayName: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 robots.txt";[m
+[31m-    pluralName: "robots-txts";[m
+[31m-    singularName: "robots-txt";[m
+[32m+[m[32m    description: '\u041F\u0440\u0430\u0432\u0438\u043B\u0430 \u0438\u043D\u0434\u0435\u043A\u0441\u0430\u0446\u0438\u0438 \u0441\u0430\u0439\u0442\u0430 \u0434\u043B\u044F \u043F\u043E\u0438\u0441\u043A\u043E\u0432\u044B\u0445 \u0440\u043E\u0431\u043E\u0442\u043E\u0432';[m
+[32m+[m[32m    displayName: 'robots.txt';[m
+[32m+[m[32m    pluralName: 'robots-txts';[m
+[32m+[m[32m    singularName: 'robots-txt';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+[36m@@ -818,54 +818,54 @@[m [mexport interface ApiRobotsTxtRobotsTxt extends Struct.SingleTypeSchema {[m
+         maxLength: 20000;[m
+         minLength: 1;[m
+       }> &[m
+[31m-      Schema.Attribute.DefaultTo<"User-agent: *\nDisallow: /\n">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'User-agent: *\nDisallow: /\n'>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "api::robots-txt.robots-txt"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'api::robots-txt.robots-txt'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginContentReleasesRelease[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_releases";[m
+[32m+[m[32m  collectionName: 'strapi_releases';[m
+   info: {[m
+[31m-    displayName: "Release";[m
+[31m-    pluralName: "releases";[m
+[31m-    singularName: "release";[m
+[32m+[m[32m    displayName: 'Release';[m
+[32m+[m[32m    pluralName: 'releases';[m
+[32m+[m[32m    singularName: 'release';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     actions: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::content-releases.release-action"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::content-releases.release-action'[m
+     >;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::content-releases.release"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::content-releases.release'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String & Schema.Attribute.Required;[m
+[36m@@ -873,90 +873,90 @@[m [mexport interface PluginContentReleasesRelease[m
+     releasedAt: Schema.Attribute.DateTime;[m
+     scheduledAt: Schema.Attribute.DateTime;[m
+     status: Schema.Attribute.Enumeration<[m
+[31m-      ["ready", "blocked", "failed", "done", "empty"][m
+[32m+[m[32m      ['ready', 'blocked', 'failed', 'done', 'empty'][m
+     > &[m
+       Schema.Attribute.Required;[m
+     timezone: Schema.Attribute.String;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginContentReleasesReleaseAction[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_release_actions";[m
+[32m+[m[32m  collectionName: 'strapi_release_actions';[m
+   info: {[m
+[31m-    displayName: "Release Action";[m
+[31m-    pluralName: "release-actions";[m
+[31m-    singularName: "release-action";[m
+[32m+[m[32m    displayName: 'Release Action';[m
+[32m+[m[32m    pluralName: 'release-actions';[m
+[32m+[m[32m    singularName: 'release-action';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     contentType: Schema.Attribute.String & Schema.Attribute.Required;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     entryDocumentId: Schema.Attribute.String;[m
+     isEntryValid: Schema.Attribute.Boolean;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::content-releases.release-action"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::content-releases.release-action'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     release: Schema.Attribute.Relation<[m
+[31m-      "manyToOne",[m
+[31m-      "plugin::content-releases.release"[m
+[32m+[m[32m      'manyToOne',[m
+[32m+[m[32m      'plugin::content-releases.release'[m
+     >;[m
+[31m-    type: Schema.Attribute.Enumeration<["publish", "unpublish"]> &[m
+[32m+[m[32m    type: Schema.Attribute.Enumeration<['publish', 'unpublish']> &[m
+       Schema.Attribute.Required;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginI18NLocale extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "i18n_locale";[m
+[32m+[m[32m  collectionName: 'i18n_locale';[m
+   info: {[m
+[31m-    collectionName: "locales";[m
+[31m-    description: "";[m
+[31m-    displayName: "Locale";[m
+[31m-    pluralName: "locales";[m
+[31m-    singularName: "locale";[m
+[32m+[m[32m    collectionName: 'locales';[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Locale';[m
+[32m+[m[32m    pluralName: 'locales';[m
+[32m+[m[32m    singularName: 'locale';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     code: Schema.Attribute.String & Schema.Attribute.Unique;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::i18n.locale"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::i18n.locale'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+[36m@@ -969,43 +969,43 @@[m [mexport interface PluginI18NLocale extends Struct.CollectionTypeSchema {[m
+       >;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginReviewWorkflowsWorkflow[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_workflows";[m
+[32m+[m[32m  collectionName: 'strapi_workflows';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Workflow";[m
+[31m-    name: "Workflow";[m
+[31m-    pluralName: "workflows";[m
+[31m-    singularName: "workflow";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Workflow';[m
+[32m+[m[32m    name: 'Workflow';[m
+[32m+[m[32m    pluralName: 'workflows';[m
+[32m+[m[32m    singularName: 'workflow';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     contentTypes: Schema.Attribute.JSON &[m
+       Schema.Attribute.Required &[m
+[31m-      Schema.Attribute.DefaultTo<"[]">;[m
+[32m+[m[32m      Schema.Attribute.DefaultTo<'[]'>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::review-workflows.workflow"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::review-workflows.workflow'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+[36m@@ -1013,96 +1013,96 @@[m [mexport interface PluginReviewWorkflowsWorkflow[m
+       Schema.Attribute.Unique;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     stageRequiredToPublish: Schema.Attribute.Relation<[m
+[31m-      "oneToOne",[m
+[31m-      "plugin::review-workflows.workflow-stage"[m
+[32m+[m[32m      'oneToOne',[m
+[32m+[m[32m      'plugin::review-workflows.workflow-stage'[m
+     >;[m
+     stages: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::review-workflows.workflow-stage"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::review-workflows.workflow-stage'[m
+     >;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginReviewWorkflowsWorkflowStage[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_workflows_stages";[m
+[32m+[m[32m  collectionName: 'strapi_workflows_stages';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Stages";[m
+[31m-    name: "Workflow Stage";[m
+[31m-    pluralName: "workflow-stages";[m
+[31m-    singularName: "workflow-stage";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Stages';[m
+[32m+[m[32m    name: 'Workflow Stage';[m
+[32m+[m[32m    pluralName: 'workflow-stages';[m
+[32m+[m[32m    singularName: 'workflow-stage';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+[31m-    version: "1.1.0";[m
+[32m+[m[32m    version: '1.1.0';[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+[31m-    color: Schema.Attribute.String & Schema.Attribute.DefaultTo<"#4945FF">;[m
+[32m+[m[32m    color: Schema.Attribute.String & Schema.Attribute.DefaultTo<'#4945FF'>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::review-workflows.workflow-stage"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::review-workflows.workflow-stage'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String;[m
+[31m-    permissions: Schema.Attribute.Relation<"manyToMany", "admin::permission">;[m
+[32m+[m[32m    permissions: Schema.Attribute.Relation<'manyToMany', 'admin::permission'>;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     workflow: Schema.Attribute.Relation<[m
+[31m-      "manyToOne",[m
+[31m-      "plugin::review-workflows.workflow"[m
+[32m+[m[32m      'manyToOne',[m
+[32m+[m[32m      'plugin::review-workflows.workflow'[m
+     >;[m
+   };[m
+ }[m
+ [m
+ export interface PluginStrapi5SitemapPluginStrapi5SitemapPluginContentType[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_5_sitemap_plugin_content_types";[m
+[32m+[m[32m  collectionName: 'strapi_5_sitemap_plugin_content_types';[m
+   info: {[m
+[31m-    displayName: "strapi-5-sitemap-plugin-content-type";[m
+[31m-    pluralName: "strapi-5-sitemap-plugin-content-types";[m
+[31m-    singularName: "strapi-5-sitemap-plugin-content-type";[m
+[32m+[m[32m    displayName: 'strapi-5-sitemap-plugin-content-type';[m
+[32m+[m[32m    pluralName: 'strapi-5-sitemap-plugin-content-types';[m
+[32m+[m[32m    singularName: 'strapi-5-sitemap-plugin-content-type';[m
+   };[m
+   options: {[m
+[31m-    comment: "";[m
+[32m+[m[32m    comment: '';[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     frequency: Schema.Attribute.String;[m
+     langcode: Schema.Attribute.String;[m
+     lastModified: Schema.Attribute.String;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     pattern: Schema.Attribute.String;[m
+[36m@@ -1112,87 +1112,87 @@[m [mexport interface PluginStrapi5SitemapPluginStrapi5SitemapPluginContentType[m
+     thumbnail: Schema.Attribute.String;[m
+     type: Schema.Attribute.String;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginStrapi5SitemapPluginStrapi5SitemapPluginContentTypeSingleUrl[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "strapi_5_sitemap_plugin_content_type_single_urls";[m
+[32m+[m[32m  collectionName: 'strapi_5_sitemap_plugin_content_type_single_urls';[m
+   info: {[m
+[31m-    displayName: "strapi-5-sitemap-plugin-content-type-single-url";[m
+[31m-    pluralName: "strapi-5-sitemap-plugin-content-type-single-urls";[m
+[31m-    singularName: "strapi-5-sitemap-plugin-content-type-single-url";[m
+[32m+[m[32m    displayName: 'strapi-5-sitemap-plugin-content-type-single-url';[m
+[32m+[m[32m    pluralName: 'strapi-5-sitemap-plugin-content-type-single-urls';[m
+[32m+[m[32m    singularName: 'strapi-5-sitemap-plugin-content-type-single-url';[m
+   };[m
+   options: {[m
+[31m-    comment: "";[m
+[32m+[m[32m    comment: '';[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     frequency: Schema.Attribute.String;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type-single-url"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type-single-url'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     priority: Schema.Attribute.Float;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     slug: Schema.Attribute.String;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginStrapi5SitemapPluginStrapi5SitemapPluginOption[m
+   extends Struct.SingleTypeSchema {[m
+[31m-  collectionName: "strapi_5_sitemap_plugin_options";[m
+[32m+[m[32m  collectionName: 'strapi_5_sitemap_plugin_options';[m
+   info: {[m
+[31m-    displayName: "strapi-5-sitemap-plugin-options";[m
+[31m-    pluralName: "strapi-5-sitemap-plugin-options";[m
+[31m-    singularName: "strapi-5-sitemap-plugin-option";[m
+[32m+[m[32m    displayName: 'strapi-5-sitemap-plugin-options';[m
+[32m+[m[32m    pluralName: 'strapi-5-sitemap-plugin-options';[m
+[32m+[m[32m    singularName: 'strapi-5-sitemap-plugin-option';[m
+   };[m
+   options: {[m
+[31m-    comment: "";[m
+[32m+[m[32m    comment: '';[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     baseUrl: Schema.Attribute.String;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     excludedUrls: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-option"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-option'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     sitemapDefinitions: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     useSitemapIndex: Schema.Attribute.Boolean &[m
+       Schema.Attribute.DefaultTo<false>;[m
+[36m@@ -1200,21 +1200,21 @@[m [mexport interface PluginStrapi5SitemapPluginStrapi5SitemapPluginOption[m
+ }[m
+ [m
+ export interface PluginUploadFile extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "files";[m
+[32m+[m[32m  collectionName: 'files';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "File";[m
+[31m-    pluralName: "files";[m
+[31m-    singularName: "file";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'File';[m
+[32m+[m[32m    pluralName: 'files';[m
+[32m+[m[32m    singularName: 'file';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+[36m@@ -1222,11 +1222,11 @@[m [mexport interface PluginUploadFile extends Struct.CollectionTypeSchema {[m
+     alternativeText: Schema.Attribute.Text;[m
+     caption: Schema.Attribute.Text;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     ext: Schema.Attribute.String;[m
+     focalPoint: Schema.Attribute.JSON;[m
+[31m-    folder: Schema.Attribute.Relation<"manyToOne", "plugin::upload.folder"> &[m
+[32m+[m[32m    folder: Schema.Attribute.Relation<'manyToOne', 'plugin::upload.folder'> &[m
+       Schema.Attribute.Private;[m
+     folderPath: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -1239,8 +1239,8 @@[m [mexport interface PluginUploadFile extends Struct.CollectionTypeSchema {[m
+     height: Schema.Attribute.Integer;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::upload.file"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::upload.file'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     mime: Schema.Attribute.String & Schema.Attribute.Required;[m
+[36m@@ -1249,10 +1249,10 @@[m [mexport interface PluginUploadFile extends Struct.CollectionTypeSchema {[m
+     provider: Schema.Attribute.String & Schema.Attribute.Required;[m
+     provider_metadata: Schema.Attribute.JSON;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+[31m-    related: Schema.Attribute.Relation<"morphToMany">;[m
+[32m+[m[32m    related: Schema.Attribute.Relation<'morphToMany'>;[m
+     size: Schema.Attribute.Decimal & Schema.Attribute.Required;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     url: Schema.Attribute.Text & Schema.Attribute.Required;[m
+     width: Schema.Attribute.Integer;[m
+[36m@@ -1260,33 +1260,33 @@[m [mexport interface PluginUploadFile extends Struct.CollectionTypeSchema {[m
+ }[m
+ [m
+ export interface PluginUploadFolder extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "upload_folders";[m
+[32m+[m[32m  collectionName: 'upload_folders';[m
+   info: {[m
+[31m-    displayName: "Folder";[m
+[31m-    pluralName: "folders";[m
+[31m-    singularName: "folder";[m
+[32m+[m[32m    displayName: 'Folder';[m
+[32m+[m[32m    pluralName: 'folders';[m
+[32m+[m[32m    singularName: 'folder';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+[31m-    children: Schema.Attribute.Relation<"oneToMany", "plugin::upload.folder">;[m
+[32m+[m[32m    children: Schema.Attribute.Relation<'oneToMany', 'plugin::upload.folder'>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+[31m-    files: Schema.Attribute.Relation<"oneToMany", "plugin::upload.file">;[m
+[32m+[m[32m    files: Schema.Attribute.Relation<'oneToMany', 'plugin::upload.file'>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::upload.folder"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::upload.folder'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+[36m@@ -1294,7 +1294,7 @@[m [mexport interface PluginUploadFolder extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.SetMinMaxLength<{[m
+         minLength: 1;[m
+       }>;[m
+[31m-    parent: Schema.Attribute.Relation<"manyToOne", "plugin::upload.folder">;[m
+[32m+[m[32m    parent: Schema.Attribute.Relation<'manyToOne', 'plugin::upload.folder'>;[m
+     path: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+       Schema.Attribute.SetMinMaxLength<{[m
+[36m@@ -1305,84 +1305,84 @@[m [mexport interface PluginUploadFolder extends Struct.CollectionTypeSchema {[m
+       Schema.Attribute.Unique;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginUsersPermissionsPermission[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "up_permissions";[m
+[32m+[m[32m  collectionName: 'up_permissions';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Permission";[m
+[31m-    name: "permission";[m
+[31m-    pluralName: "permissions";[m
+[31m-    singularName: "permission";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Permission';[m
+[32m+[m[32m    name: 'permission';[m
+[32m+[m[32m    pluralName: 'permissions';[m
+[32m+[m[32m    singularName: 'permission';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     action: Schema.Attribute.String & Schema.Attribute.Required;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::users-permissions.permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::users-permissions.permission'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     role: Schema.Attribute.Relation<[m
+[31m-      "manyToOne",[m
+[31m-      "plugin::users-permissions.role"[m
+[32m+[m[32m      'manyToOne',[m
+[32m+[m[32m      'plugin::users-permissions.role'[m
+     >;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+   };[m
+ }[m
+ [m
+ export interface PluginUsersPermissionsRole[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "up_roles";[m
+[32m+[m[32m  collectionName: 'up_roles';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "Role";[m
+[31m-    name: "role";[m
+[31m-    pluralName: "roles";[m
+[31m-    singularName: "role";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'Role';[m
+[32m+[m[32m    name: 'role';[m
+[32m+[m[32m    pluralName: 'roles';[m
+[32m+[m[32m    singularName: 'role';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+   };[m
+   pluginOptions: {[m
+[31m-    "content-manager": {[m
+[32m+[m[32m    'content-manager': {[m
+       visible: false;[m
+     };[m
+[31m-    "content-type-builder": {[m
+[32m+[m[32m    'content-type-builder': {[m
+       visible: false;[m
+     };[m
+   };[m
+   attributes: {[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     description: Schema.Attribute.String;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::users-permissions.role"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::users-permissions.role'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     name: Schema.Attribute.String &[m
+[36m@@ -1391,30 +1391,30 @@[m [mexport interface PluginUsersPermissionsRole[m
+         minLength: 3;[m
+       }>;[m
+     permissions: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::users-permissions.permission"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::users-permissions.permission'[m
+     >;[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     type: Schema.Attribute.String & Schema.Attribute.Unique;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     users: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::users-permissions.user"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::users-permissions.user'[m
+     >;[m
+   };[m
+ }[m
+ [m
+ export interface PluginUsersPermissionsUser[m
+   extends Struct.CollectionTypeSchema {[m
+[31m-  collectionName: "up_users";[m
+[32m+[m[32m  collectionName: 'up_users';[m
+   info: {[m
+[31m-    description: "";[m
+[31m-    displayName: "User";[m
+[31m-    name: "user";[m
+[31m-    pluralName: "users";[m
+[31m-    singularName: "user";[m
+[32m+[m[32m    description: '';[m
+[32m+[m[32m    displayName: 'User';[m
+[32m+[m[32m    name: 'user';[m
+[32m+[m[32m    pluralName: 'users';[m
+[32m+[m[32m    singularName: 'user';[m
+   };[m
+   options: {[m
+     draftAndPublish: false;[m
+[36m@@ -1425,7 +1425,7 @@[m [mexport interface PluginUsersPermissionsUser[m
+     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;[m
+     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;[m
+     createdAt: Schema.Attribute.DateTime;[m
+[31m-    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     email: Schema.Attribute.Email &[m
+       Schema.Attribute.Required &[m
+[36m@@ -1434,8 +1434,8 @@[m [mexport interface PluginUsersPermissionsUser[m
+       }>;[m
+     locale: Schema.Attribute.String & Schema.Attribute.Private;[m
+     localizations: Schema.Attribute.Relation<[m
+[31m-      "oneToMany",[m
+[31m-      "plugin::users-permissions.user"[m
+[32m+[m[32m      'oneToMany',[m
+[32m+[m[32m      'plugin::users-permissions.user'[m
+     > &[m
+       Schema.Attribute.Private;[m
+     password: Schema.Attribute.Password &[m
+[36m@@ -1447,11 +1447,11 @@[m [mexport interface PluginUsersPermissionsUser[m
+     publishedAt: Schema.Attribute.DateTime;[m
+     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;[m
+     role: Schema.Attribute.Relation<[m
+[31m-      "manyToOne",[m
+[31m-      "plugin::users-permissions.role"[m
+[32m+[m[32m      'manyToOne',[m
+[32m+[m[32m      'plugin::users-permissions.role'[m
+     >;[m
+     updatedAt: Schema.Attribute.DateTime;[m
+[31m-    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &[m
+[32m+[m[32m    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &[m
+       Schema.Attribute.Private;[m
+     username: Schema.Attribute.String &[m
+       Schema.Attribute.Required &[m
+[36m@@ -1462,36 +1462,36 @@[m [mexport interface PluginUsersPermissionsUser[m
+   };[m
+ }[m
+ [m
+[31m-declare module "@strapi/strapi" {[m
+[32m+[m[32mdeclare module '@strapi/strapi' {[m
+   export module Public {[m
+     export interface ContentTypeSchemas {[m
+[31m-      "admin::api-token": AdminApiToken;[m
+[31m-      "admin::api-token-permission": AdminApiTokenPermission;[m
+[31m-      "admin::permission": AdminPermission;[m
+[31m-      "admin::role": AdminRole;[m
+[31m-      "admin::session": AdminSession;[m
+[31m-      "admin::transfer-token": AdminTransferToken;[m
+[31m-      "admin::transfer-token-permission": AdminTransferTokenPermission;[m
+[31m-      "admin::user": AdminUser;[m
+[31m-      "api::global-setting.global-setting": ApiGlobalSettingGlobalSetting;[m
+[31m-      "api::home-page.home-page": ApiHomePageHomePage;[m
+[31m-      "api::order.order": ApiOrderOrder;[m
+[31m-      "api::product.product": ApiProductProduct;[m
+[31m-      "api::products-page.products-page": ApiProductsPageProductsPage;[m
+[31m-      "api::robots-txt.robots-txt": ApiRobotsTxtRobotsTxt;[m
+[31m-      "plugin::content-releases.release": PluginContentReleasesRelease;[m
+[31m-      "plugin::content-releases.release-action": PluginContentReleasesReleaseAction;[m
+[31m-      "plugin::i18n.locale": PluginI18NLocale;[m
+[31m-      "plugin::review-workflows.workflow": PluginReviewWorkflowsWorkflow;[m
+[31m-      "plugin::review-workflows.workflow-stage": PluginReviewWorkflowsWorkflowStage;[m
+[31m-      "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type": PluginStrapi5SitemapPluginStrapi5SitemapPluginContentType;[m
+[31m-      "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type-single-url": PluginStrapi5SitemapPluginStrapi5SitemapPluginContentTypeSingleUrl;[m
+[31m-      "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-option": PluginStrapi5SitemapPluginStrapi5SitemapPluginOption;[m
+[31m-      "plugin::upload.file": PluginUploadFile;[m
+[31m-      "plugin::upload.folder": PluginUploadFolder;[m
+[31m-      "plugin::users-permissions.permission": PluginUsersPermissionsPermission;[m
+[31m-      "plugin::users-permissions.role": PluginUsersPermissionsRole;[m
+[31m-      "plugin::users-permissions.user": PluginUsersPermissionsUser;[m
+[32m+[m[32m      'admin::api-token': AdminApiToken;[m
+[32m+[m[32m      'admin::api-token-permission': AdminApiTokenPermission;[m
+[32m+[m[32m      'admin::permission': AdminPermission;[m
+[32m+[m[32m      'admin::role': AdminRole;[m
+[32m+[m[32m      'admin::session': AdminSession;[m
+[32m+[m[32m      'admin::transfer-token': AdminTransferToken;[m
+[32m+[m[32m      'admin::transfer-token-permission': AdminTransferTokenPermission;[m
+[32m+[m[32m      'admin::user': AdminUser;[m
+[32m+[m[32m      'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;[m
+[32m+[m[32m      'api::home-page.home-page': ApiHomePageHomePage;[m
+[32m+[m[32m      'api::order.order': ApiOrderOrder;[m
+[32m+[m[32m      'api::product.product': ApiProductProduct;[m
+[32m+[m[32m      'api::products-page.products-page': ApiProductsPageProductsPage;[m
+[32m+[m[32m      'api::robots-txt.robots-txt': ApiRobotsTxtRobotsTxt;[m
+[32m+[m[32m      'plugin::content-releases.release': PluginContentReleasesRelease;[m
+[32m+[m[32m      'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;[m
+[32m+[m[32m      'plugin::i18n.locale': PluginI18NLocale;[m
+[32m+[m[32m      'plugin::review-workflows.workflow': PluginReviewWorkflowsWorkflow;[m
+[32m+[m[32m      'plugin::review-workflows.workflow-stage': PluginReviewWorkflowsWorkflowStage;[m
+[32m+[m[32m      'plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type': PluginStrapi5SitemapPluginStrapi5SitemapPluginContentType;[m
+[32m+[m[32m      'plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type-single-url': PluginStrapi5SitemapPluginStrapi5SitemapPluginContentTypeSingleUrl;[m
+[32m+[m[32m      'plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-option': PluginStrapi5SitemapPluginStrapi5SitemapPluginOption;[m
+[32m+[m[32m      'plugin::upload.file': PluginUploadFile;[m
+[32m+[m[32m      'plugin::upload.folder': PluginUploadFolder;[m
+[32m+[m[32m      'plugin::users-permissions.permission': PluginUsersPermissionsPermission;[m
+[32m+[m[32m      'plugin::users-permissions.role': PluginUsersPermissionsRole;[m
+[32m+[m[32m      'plugin::users-permissions.user': PluginUsersPermissionsUser;[m
+     }[m
+   }[m
+ }[m
+[1mdiff --git a/docker-compose.yml b/docker-compose.yml[m
+[1mindex 68181cf..60dd192 100644[m
+[1m--- a/docker-compose.yml[m
+[1m+++ b/docker-compose.yml[m
+[36m@@ -1,3 +1,4 @@[m
+[32m+[m
+ name: brega-chai[m
+ [m
+ services:[m
+[36m@@ -51,6 +52,7 @@[m [mservices:[m
+         required: false[m
+     environment:[m
+       NODE_ENV: development[m
+[32m+[m[32m      NODE_PATH: /workspace/node_modules:/workspace/apps/cms/node_modules[m
+     ports:[m
+       - "1337:1337"[m
+       - "5173:5173"[m
