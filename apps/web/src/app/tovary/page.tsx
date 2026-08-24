@@ -14,11 +14,11 @@ type TovaryPageProps = { searchParams: CatalogSearchParams };
 export async function generateMetadata({
   searchParams,
 }: TovaryPageProps): Promise<Metadata> {
-  const page = await resolveRequestedCatalogPage("tovary", searchParams);
-  return catalogLandingMetadata({ route: "tovary", page });
+  const query = await resolveRequestedCatalogPage("tovary", searchParams);
+  return catalogLandingMetadata({ route: "tovary", query });
 }
 
 export default async function TovaryPage({ searchParams }: TovaryPageProps) {
-  const page = await resolveRequestedCatalogPage("tovary", searchParams);
-  return <CatalogLandingPage route="tovary" page={page} />;
+  const query = await resolveRequestedCatalogPage("tovary", searchParams);
+  return <CatalogLandingPage route="tovary" query={query} />;
 }

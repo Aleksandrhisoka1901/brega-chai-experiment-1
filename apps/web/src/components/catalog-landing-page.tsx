@@ -2,6 +2,7 @@ import type { ProductSummary } from "@brega-chai/contracts";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { canonicalUrl, pageMetadata } from "@/lib/seo/metadata";
 import { breadcrumbStructuredData } from "@/lib/seo/structured-data";
@@ -19,7 +20,16 @@ import { getRitualsPage } from "@/server/cms/rituals-page";
 
 import { Breadcrumbs, type BreadcrumbItem } from "./breadcrumbs";
 import { CatalogPagination } from "./catalog-pagination";
-import { resolveCatalogPage } from "./catalog-pagination-model";
+import {
+  catalogPageHref,
+  resolveCatalogPage,
+} from "./catalog-pagination-model";
+import { CatalogPriceFilter } from "./catalog-price-filter";
+import {
+  hasCatalogPriceFilter,
+  resolveCatalogPriceFilter,
+  type CatalogPriceFilter as CatalogPriceQuery,
+} from "./catalog-price-filter-model";
 import { JsonLd } from "./json-ld";
 import { ProductGrid } from "./product-grid";
 
@@ -56,11 +66,19 @@ function assertExpectedCmsError(
   }
 }
 
-async function loadPageModel(route: CatalogLandingRoute, page: number) {
+export type CatalogLandingQuery = {
+  page: number;
+} & CatalogPriceQuery;
+
+async function loadPageModel(
+  route: CatalogLandingRoute,
+  query: CatalogLandingQuery,
+) {
+  const { page, ...priceFilter } = query;
   const config = routeConfig[route];
   const [contentResult, productsResult] = await Promise.allSettled([
     config.content(),
-    config.products(page),
+    config.products(page, priceFilter),
   ]);
 
   assertExpectedCmsError(contentResult);
@@ -81,21 +99,30 @@ async function loadPageModel(route: CatalogLandingRoute, page: number) {
 export async function resolveRequestedCatalogPage(
   route: CatalogLandingRoute,
   searchParams: CatalogSearchParams,
-) {
-  const resolved = resolveCatalogPage((await searchParams).page);
+): Promise<CatalogLandingQuery> {
+  const params = await searchParams;
+  const resolved = resolveCatalogPage(params.page);
   if (!resolved) notFound();
-  if (resolved.redirectToFirstPage) permanentRedirect(`/${route}`);
-  return resolved.page;
+  const priceFilter = resolveCatalogPriceFilter({
+    minPrice: params.minPrice,
+    maxPrice: params.maxPrice,
+  });
+  if (!priceFilter) notFound();
+  if (resolved.redirectToFirstPage) {
+    permanentRedirect(catalogPageHref(`/${route}`, 1, priceFilter));
+  }
+  return { page: resolved.page, ...priceFilter };
 }
 
 export async function catalogLandingMetadata({
-  page,
+  query,
   route,
 }: {
-  page: number;
+  query: CatalogLandingQuery;
   route: CatalogLandingRoute;
 }): Promise<Metadata> {
   const config = routeConfig[route];
+  const { page, ...priceFilter } = query;
 
   try {
     const [content, settings] = await Promise.all([
@@ -107,7 +134,7 @@ export async function catalogLandingMetadata({
       title: content.seo?.title ?? settings.defaultSeo.title ?? content.title,
       description: content.seo?.description ?? settings.defaultSeo.description,
       imageUrl: content.seo?.imageUrl ?? settings.defaultSeo.imageUrl,
-      path: page === 1 ? `/${route}` : `/${route}?page=${page}`,
+      path: catalogPageHref(`/${route}`, page, priceFilter),
     });
   } catch (error) {
     if (!(error instanceof CmsUnavailableError)) throw error;
@@ -120,14 +147,15 @@ export async function catalogLandingMetadata({
 }
 
 export async function CatalogLandingPage({
-  page,
+  query,
   route,
 }: {
-  page: number;
+  query: CatalogLandingQuery;
   route: CatalogLandingRoute;
 }) {
+  const { page, ...priceFilter } = query;
   const [pageModel, settings] = await Promise.all([
-    loadPageModel(route, page),
+    loadPageModel(route, query),
     getGlobalSettings(),
   ]);
   if (pageModel.catalog && page > pageModel.catalog.totalPages) notFound();
@@ -139,6 +167,8 @@ export async function CatalogLandingPage({
     { name: "Главная", href: "/" },
     { name: sectionLabel, href: `/${route}` },
   ];
+  const filteredEmpty =
+    products.length === 0 && hasCatalogPriceFilter(priceFilter);
 
   return (
     <main>
@@ -184,35 +214,47 @@ export async function CatalogLandingPage({
             <p>Каталог временно недоступен.</p>
             <p>Пожалуйста, попробуйте обновить страницу немного позже.</p>
           </div>
-        ) : products.length === 0 ? (
-          <div className="catalog-state">
-            <p>
-              {bindShortRussianWords(
-                content?.emptyStateText ?? "Товары скоро появятся.",
-              )}
-            </p>
-            <Link href="/">
-              {bindShortRussianWords(
-                content?.emptyStateLinkLabel ?? "Вернуться на главную",
-              )}
-            </Link>
-          </div>
         ) : (
-          <ProductGrid
-            brandName={settings.brandName}
-            headingLevel={2}
-            imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
-            outOfStock={settings.storefrontTexts.outOfStock}
-            products={products}
-          />
+          <>
+            <Suspense>
+              <CatalogPriceFilter basePath={`/${route}`} />
+            </Suspense>
+            {products.length === 0 ? (
+              <div className="catalog-state">
+                <p>
+                  {bindShortRussianWords(
+                    filteredEmpty
+                      ? "Нет товаров в выбранном диапазоне цен."
+                      : (content?.emptyStateText ?? "Товары скоро появятся."),
+                  )}
+                </p>
+                {filteredEmpty ? null : (
+                  <Link href="/">
+                    {bindShortRussianWords(
+                      content?.emptyStateLinkLabel ?? "Вернуться на главную",
+                    )}
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <ProductGrid
+                brandName={settings.brandName}
+                headingLevel={2}
+                imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+                outOfStock={settings.storefrontTexts.outOfStock}
+                products={products}
+              />
+            )}
+            {pageModel.catalog ? (
+              <CatalogPagination
+                basePath={`/${route}`}
+                currentPage={page}
+                priceFilter={priceFilter}
+                totalItems={pageModel.catalog.totalItems}
+              />
+            ) : null}
+          </>
         )}
-        {pageModel.catalog ? (
-          <CatalogPagination
-            basePath={`/${route}`}
-            currentPage={page}
-            totalItems={pageModel.catalog.totalItems}
-          />
-        ) : null}
       </section>
     </main>
   );

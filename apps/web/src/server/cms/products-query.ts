@@ -1,6 +1,7 @@
 import type { ProductSummary } from "@brega-chai/contracts";
 
 import { CATALOG_PAGE_SIZE } from "../../components/catalog-pagination-model.ts";
+import type { CatalogPriceFilter } from "../../components/catalog-price-filter-model.ts";
 
 import { mapCatalogProductsPayload } from "./product-mapper.ts";
 
@@ -23,6 +24,8 @@ const productFields = {
 type CatalogGroup = "available" | "unavailable";
 type CatalogType = "tovar" | "nabor";
 
+export type { CatalogPriceFilter };
+
 export type CatalogPage = {
   products: ProductSummary[];
   page: number;
@@ -36,11 +39,15 @@ export function catalogGroupRequest({
   availability,
   start,
   limit,
+  minPrice,
+  maxPrice,
 }: {
   type: CatalogType;
   availability: CatalogGroup;
   start: number;
   limit: number;
+  minPrice?: number;
+  maxPrice?: number;
 }) {
   const query = new URLSearchParams({
     status: "published",
@@ -58,6 +65,8 @@ export function catalogGroupRequest({
       : "filters[stock][$eq]",
     "0",
   );
+  if (minPrice != null) query.set("filters[price][$gte]", String(minPrice));
+  if (maxPrice != null) query.set("filters[price][$lte]", String(maxPrice));
 
   return { path: `/api/products?${query}`, tags: ["products"] } as const;
 }
@@ -69,14 +78,24 @@ export async function fetchCatalogPage(
     type,
     page,
     pageSize = CATALOG_PAGE_SIZE,
-  }: { type: CatalogType; page: number; pageSize?: number },
+    minPrice,
+    maxPrice,
+  }: {
+    type: CatalogType;
+    page: number;
+    pageSize?: number;
+    minPrice?: number;
+    maxPrice?: number;
+  },
 ): Promise<CatalogPage> {
   const offset = (page - 1) * pageSize;
+  const priceFilter = { minPrice, maxPrice };
   const availableRequest = catalogGroupRequest({
     type,
     availability: "available",
     start: offset,
     limit: pageSize,
+    ...priceFilter,
   });
   const availablePayload = await fetcher(availableRequest.path, {
     tags: [...availableRequest.tags],
@@ -88,6 +107,7 @@ export async function fetchCatalogPage(
     availability: "unavailable",
     start: Math.max(0, offset - available.totalItems),
     limit: Math.max(1, remaining),
+    ...priceFilter,
   });
   const unavailablePayload = await fetcher(unavailableRequest.path, {
     tags: [...unavailableRequest.tags],

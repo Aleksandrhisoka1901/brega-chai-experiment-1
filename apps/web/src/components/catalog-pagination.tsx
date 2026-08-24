@@ -4,14 +4,17 @@ import {
   catalogPageHref,
   catalogPaginationModel,
 } from "./catalog-pagination-model";
+import type { CatalogPriceFilter } from "./catalog-price-filter-model";
 
 export function CatalogPagination({
   basePath,
   currentPage,
+  priceFilter = {},
   totalItems,
 }: {
   basePath: string;
   currentPage: number;
+  priceFilter?: CatalogPriceFilter;
   totalItems: number;
 }) {
   const model = catalogPaginationModel(totalItems, currentPage);
@@ -20,7 +23,9 @@ export function CatalogPagination({
   return (
     <nav className="catalog-pagination" aria-label="Пагинация каталога">
       {model.previousPage ? (
-        <Link href={catalogPageHref(basePath, model.previousPage)}>Назад</Link>
+        <Link href={catalogPageHref(basePath, model.previousPage, priceFilter)}>
+          Назад
+        </Link>
       ) : (
         <span aria-disabled="true">Назад</span>
       )}
@@ -33,7 +38,7 @@ export function CatalogPagination({
             ) : (
               <Link
                 aria-label={`Страница ${page}`}
-                href={catalogPageHref(basePath, page)}
+                href={catalogPageHref(basePath, page, priceFilter)}
               >
                 {page}
               </Link>
@@ -43,7 +48,9 @@ export function CatalogPagination({
       </ol>
 
       {model.nextPage ? (
-        <Link href={catalogPageHref(basePath, model.nextPage)}>Вперёд</Link>
+        <Link href={catalogPageHref(basePath, model.nextPage, priceFilter)}>
+          Вперёд
+        </Link>
       ) : (
         <span aria-disabled="true">Вперёд</span>
       )}

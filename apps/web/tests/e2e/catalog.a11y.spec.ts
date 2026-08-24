@@ -34,10 +34,13 @@ for (const catalog of [
 
     const productGrid = page.locator(".product-grid");
     await expect(productGrid.getByRole("article")).toHaveCount(8);
+    await expect(
+      page.getByRole("form", { name: "Фильтр по цене" }),
+    ).toBeVisible();
     await expect(productGrid).toHaveCSS("gap", "0px");
     await expect(productGrid).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     const gridBox = await productGrid.boundingBox();
-    expect(gridBox?.y).toBeLessThan(500);
+    expect(gridBox?.y).toBeLessThan(620);
     const wordmarkBox = await page
       .getByRole("link", { name: "Brega Tea — главная" })
       .boundingBox();

@@ -56,6 +56,25 @@ test("catalog group requests published products by stock group and alphabet", ()
   assert.equal(unavailableUrl.searchParams.get("pagination[limit]"), "17");
   assert.equal(availableUrl.searchParams.has("filters[active][$eq]"), false);
   assert.equal(availableUrl.searchParams.has("sortOrder"), false);
+  assert.equal(availableUrl.searchParams.has("filters[price][$gte]"), false);
+  assert.equal(availableUrl.searchParams.has("filters[price][$lte]"), false);
+});
+
+test("catalog group requests include optional price bounds", () => {
+  const bounded = catalogGroupRequest({
+    type: "tovar",
+    availability: "available",
+    start: 0,
+    limit: 8,
+    minPrice: 1000,
+    maxPrice: 5000,
+  });
+  const url = new URL(bounded.path, "http://localhost");
+
+  assert.equal(url.searchParams.get("filters[price][$gte]"), "1000");
+  assert.equal(url.searchParams.get("filters[price][$lte]"), "5000");
+  assert.equal(url.searchParams.get("filters[type][$eq]"), "tovar");
+  assert.equal(url.searchParams.get("sort[0]"), "displayName:asc");
 });
 
 test("fetches eight globally ordered products without gaps between stock groups", async () => {
@@ -113,5 +132,33 @@ test("fetches eight globally ordered products without gaps between stock groups"
   assert.equal(
     calls.every((url) => url.searchParams.get("sort[0]") === "displayName:asc"),
     true,
+  );
+});
+
+test("forwards price bounds to both stock-group catalog queries", async () => {
+  const fetcher = async (path: string) => {
+    const url = new URL(path, "http://localhost");
+    assert.equal(url.searchParams.get("filters[price][$gte]"), "1200");
+    assert.equal(url.searchParams.get("filters[price][$lte]"), "1800");
+    return {
+      data: [],
+      meta: { pagination: { start: 0, limit: 8, total: 0 } },
+    };
+  };
+
+  const page = await fetchCatalogPage(fetcher, "http://media.test", {
+    type: "nabor",
+    page: 1,
+    minPrice: 1200,
+    maxPrice: 1800,
+  });
+
+  assert.deepEqual(
+    {
+      products: page.products,
+      totalItems: page.totalItems,
+      totalPages: page.totalPages,
+    },
+    { products: [], totalItems: 0, totalPages: 1 },
   );
 });

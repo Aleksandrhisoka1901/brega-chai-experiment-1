@@ -1,3 +1,5 @@
+import type { CatalogPriceFilter } from "./catalog-price-filter-model";
+
 export const CATALOG_PAGE_SIZE = 8;
 
 type PageParam = string | string[] | undefined;
@@ -14,8 +16,17 @@ export function resolveCatalogPage(value: PageParam) {
   return { page, redirectToFirstPage: page === 1 } as const;
 }
 
-export function catalogPageHref(basePath: string, page: number) {
-  return page === 1 ? basePath : `${basePath}?page=${page}`;
+export function catalogPageHref(
+  basePath: string,
+  page: number,
+  filter: CatalogPriceFilter = {},
+) {
+  const params = new URLSearchParams();
+  if (filter.minPrice != null) params.set("minPrice", String(filter.minPrice));
+  if (filter.maxPrice != null) params.set("maxPrice", String(filter.maxPrice));
+  if (page > 1) params.set("page", String(page));
+  const search = params.toString();
+  return search ? `${basePath}?${search}` : basePath;
 }
 
 export function catalogPaginationModel(

@@ -284,6 +284,19 @@ function stockedProduct(slug, fallback) {
   return product(slug, stockBySlug.get(slug) ?? fallback);
 }
 
+function matchesCatalogListFilters(entry, url) {
+  const availableOnly = url.searchParams.has("filters[stock][$gt]");
+  const unavailableOnly = url.searchParams.has("filters[stock][$eq]");
+  const minPrice = url.searchParams.get("filters[price][$gte]");
+  const maxPrice = url.searchParams.get("filters[price][$lte]");
+
+  if (availableOnly && entry.stock <= 0) return false;
+  if (unavailableOnly && entry.stock !== 0) return false;
+  if (minPrice != null && entry.price < Number(minPrice)) return false;
+  if (maxPrice != null && entry.price > Number(maxPrice)) return false;
+  return true;
+}
+
 const cms = createServer((request, response) => {
   const url = new URL(request.url ?? "/", "http://127.0.0.1:14338");
   const slug = url.searchParams.get("filters[slug][$eq]");
@@ -612,20 +625,12 @@ const cms = createServer((request, response) => {
         displayName: `Нет в наличии ${String(index + 1).padStart(2, "0")}`,
       })),
     ];
-    const availableOnly = url.searchParams.has("filters[stock][$gt]");
-    const unavailableOnly = url.searchParams.has("filters[stock][$eq]");
     const start = Number(url.searchParams.get("pagination[start]") ?? 0);
     const limit = Number(
       url.searchParams.get("pagination[limit]") ?? products.length,
     );
     const filtered = products
-      .filter((entry) =>
-        availableOnly
-          ? entry.stock > 0
-          : unavailableOnly
-            ? entry.stock === 0
-            : true,
-      )
+      .filter((entry) => matchesCatalogListFilters(entry, url))
       .sort(
         (left, right) =>
           left.displayName.localeCompare(right.displayName, "ru") ||
@@ -671,20 +676,12 @@ const cms = createServer((request, response) => {
         displayName: `Нет в наличии ${String(index + 1).padStart(2, "0")}`,
       })),
     ];
-    const availableOnly = url.searchParams.has("filters[stock][$gt]");
-    const unavailableOnly = url.searchParams.has("filters[stock][$eq]");
     const start = Number(url.searchParams.get("pagination[start]") ?? 0);
     const limit = Number(
       url.searchParams.get("pagination[limit]") ?? products.length,
     );
     const filtered = products
-      .filter((entry) =>
-        availableOnly
-          ? entry.stock > 0
-          : unavailableOnly
-            ? entry.stock === 0
-            : true,
-      )
+      .filter((entry) => matchesCatalogListFilters(entry, url))
       .sort(
         (left, right) =>
           left.displayName.localeCompare(right.displayName, "ru") ||
