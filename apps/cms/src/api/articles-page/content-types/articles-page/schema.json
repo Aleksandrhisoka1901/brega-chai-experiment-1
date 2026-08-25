@@ -1,0 +1,46 @@
+{
+  "kind": "singleType",
+  "collectionName": "articles_pages",
+  "info": {
+    "singularName": "articles-page",
+    "pluralName": "articles-pages",
+    "displayName": "Страница статей",
+    "description": "Вступление и SEO каталога статей"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "eyebrow": {
+      "type": "string",
+      "required": false
+    },
+    "emptyStateText": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    },
+    "emptyStateLinkLabel": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "intro": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "description": "Обычный длинный текст без форматирования. Переносы строк сохраняются на витрине."
+    }
+  }
+}

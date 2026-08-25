@@ -31,6 +31,7 @@ type SiteHeaderProps = {
     about: string;
     nabory: string;
     tovary: string;
+    stati: string;
     cart: string;
   };
   contacts?: {
@@ -44,6 +45,7 @@ const defaultNavigation = {
   about: "О проекте",
   nabory: "Ритуалы",
   tovary: "Сорта",
+  stati: "Статьи",
   cart: "Корзина",
 };
 
@@ -75,6 +77,7 @@ export function SiteHeader({
     { href: "/#about", label: navigation.about },
     { href: "/nabory", label: navigation.nabory },
     { href: "/tovary", label: navigation.tovary },
+    { href: "/stati", label: navigation.stati },
   ];
 
   return (
@@ -146,7 +149,9 @@ export function SiteHeader({
                         (link.href === "/tovary" &&
                           pathname.startsWith("/tovary")) ||
                         (link.href === "/nabory" &&
-                          pathname.startsWith("/nabory"));
+                          pathname.startsWith("/nabory")) ||
+                        (link.href === "/stati" &&
+                          pathname.startsWith("/stati"));
 
                       return (
                         <li key={link.href}>

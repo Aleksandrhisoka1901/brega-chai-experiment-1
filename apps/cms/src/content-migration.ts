@@ -3,7 +3,10 @@ type DocumentStatus = "draft" | "published";
 type GlobalSettingDocument = {
   documentId: string;
   maxItemQuantity?: number | null;
-  sectionBreadcrumbs?: Array<{ route: "tovary" | "nabory"; label: string }>;
+  sectionBreadcrumbs?: Array<{
+    route: "tovary" | "nabory" | "stati";
+    label: string;
+  }>;
   storefrontTexts?: {
     imagePlaceholder?: string;
     outOfStock?: string;

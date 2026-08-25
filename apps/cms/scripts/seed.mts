@@ -458,7 +458,8 @@ async function upsertSingle(
     | "api::global-setting.global-setting"
     | "api::home-page.home-page"
     | "api::products-page.products-page"
-    | "api::rituals-page.rituals-page",
+    | "api::rituals-page.rituals-page"
+    | "api::articles-page.articles-page",
   data: Record<string, unknown>,
 ) {
   const existing = await strapi.documents(uid).findFirst();
@@ -560,11 +561,13 @@ async function run() {
         about: "О проекте",
         nabory: "Ритуалы",
         tovary: "Сорта",
+        stati: "Статьи",
         cart: "Корзина",
       },
       sectionBreadcrumbs: [
         { route: "tovary", label: "Сорта" },
         { route: "nabory", label: "Ритуалы" },
+        { route: "stati", label: "Статьи" },
       ],
       storefrontTexts: {
         imagePlaceholder: "Изображение готовится",
@@ -637,6 +640,19 @@ async function run() {
       emptyStateLinkLabel: "Вернуться на главную",
       intro:
         "Готовые чайные сценарии, в которых всё необходимое уже собрано вместе.",
+    });
+
+    await upsertSingle(strapi, "api::articles-page.articles-page", {
+      eyebrow: "Глава 04",
+      seo: {
+        title: "Статьи — Brega Tea",
+        description: "Заметки о чае, ритуале и внимательности Brega Tea.",
+      },
+      title: "Статьи",
+      emptyStateText: "Статьи скоро появятся.",
+      emptyStateLinkLabel: "Вернуться на главную",
+      intro:
+        "Короткие тексты о заваривании, внимании и спокойном домашнем ритуале.",
     });
 
     const productDocuments = strapi.documents("api::product.product");
@@ -754,6 +770,141 @@ async function run() {
       featuredNabory: { set: relationIds("nabor") },
       featuredTovary: { set: relationIds("tovar").slice(0, 4) },
     });
+
+    const articleDocuments = strapi.documents("api::article.article");
+    const desiredArticles = [
+      {
+        key: "article-brewing-without-haste",
+        name: "Заваривание без спешки",
+        priority: 20,
+        imageAsset: "gallery-pour.png",
+        content:
+          "<p>Чай раскрывается, когда вода, посуда и внимание встречаются без спешки. Достаточно короткого пролива и паузы, чтобы увидеть, как меняется вкус.</p><p>Начните с прогрева чаши и одного спокойного пролива — этого достаточно для первого знакомства.</p>",
+      },
+      {
+        key: "article-quiet-table",
+        name: "Тихий стол",
+        priority: 10,
+        imageAsset: "gallery-cup.png",
+        content:
+          "<p>Небольшой стол, чистая ткань и одна чаша уже собирают ритуал. Не нужно много предметов, чтобы остановиться.</p>",
+        blocks: [
+          {
+            __component: "article.cards-grid",
+            title: "Три простых опоры",
+            description:
+              "<p>Этого достаточно, чтобы собрать паузу дома.</p>",
+            titleColor: "#3f3a32",
+            gridColumns: 3,
+            cards: [
+              {
+                title: "Вода",
+                titleHtmlTag: "h3",
+                description: "<p>Свежая, не кипящая дважды.</p>",
+                titleColor: "#3f3a32",
+                descriptionColor: "#6b6458",
+                bgColor: "#f7f4ec",
+                borderColor: "#e4ddd0",
+                bulletText: "01",
+                bulletPosition: "left",
+                bulletAlign: "start",
+                imagePosition: "bottom",
+                imageFit: "contain",
+                imageAlign: "center",
+                gridRowsStart: 1,
+                gridRowsSpan: 1,
+                gridColumnsStart: 1,
+                gridColumnsSpan: 1,
+              },
+              {
+                title: "Посуда",
+                titleHtmlTag: "h3",
+                description: "<p>Одна чаша, которую приятно держать.</p>",
+                titleColor: "#3f3a32",
+                descriptionColor: "#6b6458",
+                bgColor: "#f7f4ec",
+                borderColor: "#e4ddd0",
+                bulletText: "02",
+                bulletPosition: "left",
+                bulletAlign: "start",
+                imagePosition: "bottom",
+                imageFit: "contain",
+                imageAlign: "center",
+                gridRowsStart: 1,
+                gridRowsSpan: 1,
+                gridColumnsStart: 2,
+                gridColumnsSpan: 1,
+              },
+              {
+                title: "Пауза",
+                titleHtmlTag: "h3",
+                description: "<p>Минута до глотка важнее самого глотка.</p>",
+                titleColor: "#3f3a32",
+                descriptionColor: "#6b6458",
+                bgColor: "#f7f4ec",
+                borderColor: "#e4ddd0",
+                bulletText: "03",
+                bulletPosition: "left",
+                bulletAlign: "start",
+                imagePosition: "bottom",
+                imageFit: "contain",
+                imageAlign: "center",
+                gridRowsStart: 1,
+                gridRowsSpan: 1,
+                gridColumnsStart: 3,
+                gridColumnsSpan: 1,
+              },
+            ],
+          },
+        ],
+      },
+    ] as const;
+
+    const existingArticles = await articleDocuments.findMany();
+    const existingArticlesBySeedKey = existingArticles.flatMap((article) => {
+      const desired = desiredArticles.find(
+        (candidate) => candidate.key === article.seedKey,
+      );
+      return desired
+        ? [
+            {
+              key: desired.key,
+              documentId: article.documentId,
+              slug: article.slug,
+            },
+          ]
+        : [];
+    });
+
+    for (const operation of planSeed(
+      desiredArticles,
+      existingArticlesBySeedKey,
+    )) {
+      const articleData: Record<string, unknown> = {
+        ...operation.record,
+        seedKey: operation.record.key,
+        image: imageByAsset.get(operation.record.imageAsset)?.id ?? null,
+      };
+      delete articleData.key;
+      delete articleData.imageAsset;
+
+      if (operation.type === "update" && operation.slug) {
+        articleData.slug = operation.slug;
+      }
+
+      if (operation.type === "update" && operation.documentId) {
+        await articleDocuments.update({
+          documentId: operation.documentId,
+          data: articleData,
+          status: "published",
+        });
+      } else {
+        await articleDocuments.create({
+          data: articleData,
+          status: "published",
+        });
+      }
+    }
 
     await grantPublicStorefrontRead(strapi);
   } finally {

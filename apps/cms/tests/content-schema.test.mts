@@ -78,7 +78,11 @@ test("global settings expose reusable breadcrumb and storefront text components"
     "shared.storefront-texts",
   );
   assert.equal(global.attributes.storefrontTexts.required, true);
-  assert.deepEqual(breadcrumb.attributes.route.enum, ["tovary", "nabory"]);
+  assert.deepEqual(breadcrumb.attributes.route.enum, [
+    "tovary",
+    "nabory",
+    "stati",
+  ]);
   assert.equal(breadcrumb.attributes.label.required, true);
   assert.equal(storefrontTexts.attributes.imagePlaceholder.required, true);
   assert.equal(storefrontTexts.attributes.outOfStock.required, true);
@@ -137,6 +141,9 @@ test("home and catalog schemas expose every agreed editable text", async () => {
   const ritualsPage = await schema(
     "src/api/rituals-page/content-types/rituals-page/schema.json",
   );
+  const articlesPage = await schema(
+    "src/api/articles-page/content-types/articles-page/schema.json",
+  );
 
   assert.equal(hero.attributes.eyebrow.required, false);
   assert.equal(hero.attributes.eyebrow.minLength, undefined);
@@ -161,6 +168,7 @@ test("home and catalog schemas expose every agreed editable text", async () => {
   assert.equal(page.attributes.intro.required, true);
   assert.equal(page.attributes.image, undefined);
   assert.deepEqual(ritualsPage.attributes, page.attributes);
+  assert.deepEqual(articlesPage.attributes, page.attributes);
 });
 
 test("global checkout settings are bounded and the order email stays private", async () => {
@@ -248,7 +256,9 @@ test("public page entities use the optional shared SEO component", async () => {
     "src/api/home-page/content-types/home-page/schema.json",
     "src/api/products-page/content-types/products-page/schema.json",
     "src/api/rituals-page/content-types/rituals-page/schema.json",
+    "src/api/articles-page/content-types/articles-page/schema.json",
     "src/api/product/content-types/product/schema.json",
+    "src/api/article/content-types/article/schema.json",
   ]) {
     const contentType = await schema(path);
     assert.equal(contentType.attributes.seo.type, "component");
@@ -308,4 +318,27 @@ test("editorial length guidance does not create validation errors", async () => 
   ]) {
     assert.equal(attribute.maxLength, undefined);
   }
+});
+
+test("article catalog uses draft/publish, generated slug and cards-grid blocks", async () => {
+  const article = await schema(
+    "src/api/article/content-types/article/schema.json",
+  );
+  const cardsGrid = await schema("src/components/article/cards-grid.json");
+  const card = await schema("src/components/article/card.json");
+  const navigation = await schema(
+    "src/components/shared/navigation-labels.json",
+  );
+
+  assert.equal(article.options?.draftAndPublish, true);
+  assert.equal(article.attributes.name.required, true);
+  assert.equal(article.attributes.slug.unique, true);
+  assert.equal(article.attributes.slug.required, false);
+  assert.equal(article.attributes.content.type, "richtext");
+  assert.equal(article.attributes.blocks.type, "dynamiczone");
+  assert.deepEqual(article.attributes.blocks.components, ["article.cards-grid"]);
+  assert.equal(cardsGrid.attributes.cards.component, "article.card");
+  assert.equal(cardsGrid.attributes.gridColumns.default, 3);
+  assert.equal(card.attributes.titleHtmlTag.default, "h3");
+  assert.equal(navigation.attributes.stati.required, true);
 });

@@ -526,11 +526,13 @@ const cms = createServer((request, response) => {
             about: "О проекте",
             nabory: "Ритуалы",
             tovary: "Сорта",
+            stati: "Статьи",
             cart: "Корзина",
           },
           sectionBreadcrumbs: [
             { route: "nabory", label: "Ритуалы" },
             { route: "tovary", label: "Сорта" },
+            { route: "stati", label: "Статьи" },
           ],
           storefrontTexts: {
             imagePlaceholder: "Изображение готовится",
@@ -589,6 +591,105 @@ const cms = createServer((request, response) => {
         },
       }),
     );
+    return;
+  }
+
+  if (url.pathname === "/api/articles-page") {
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(
+      JSON.stringify({
+        data: {
+          eyebrow: "Глава 04",
+          title: "Статьи",
+          emptyStateText: "Статьи скоро появятся.",
+          emptyStateLinkLabel: "Вернуться на главную",
+          intro: "Короткие тексты о чае и внимательности.",
+          seo: {
+            title: "Статьи — Brega Tea",
+            description: "Заметки Brega Tea.",
+          },
+        },
+      }),
+    );
+    return;
+  }
+
+  if (url.pathname === "/api/articles") {
+    const articleSlug = url.searchParams.get("filters[slug][$eq]");
+    const articles = [
+      {
+        documentId: "document-zavariivanie-bez-speshki",
+        name: "Заваривание без спешки",
+        slug: "zavariivanie-bez-speshki",
+        priority: 20,
+        content: "<p>Чай раскрывается без спешки.</p>",
+        image: {
+          url: "/storefront/gallery-pour.png",
+          width: 800,
+          height: 1000,
+          alternativeText: "Пролив чая",
+          updatedAt: mediaUpdatedAt,
+        },
+        blocks: [],
+        seo: {
+          title: "Заваривание без спешки — Brega Tea",
+          description: "Короткий текст о проливе.",
+        },
+      },
+      {
+        documentId: "document-tihij-stol",
+        name: "Тихий стол",
+        slug: "tihij-stol",
+        priority: 10,
+        content: "<p>Небольшой стол уже собирает ритуал.</p>",
+        image: {
+          url: "/storefront/gallery-cup.png",
+          width: 800,
+          height: 1000,
+          alternativeText: "Пиала",
+          updatedAt: mediaUpdatedAt,
+        },
+        blocks: [
+          {
+            __component: "article.cards-grid",
+            title: "Три простых опоры",
+            description: "<p>Этого достаточно дома.</p>",
+            gridColumns: 3,
+            cards: [
+              {
+                title: "Вода",
+                titleHtmlTag: "h3",
+                description: "<p>Свежая, не кипящая дважды.</p>",
+                bulletText: "01",
+              },
+              {
+                title: "Посуда",
+                titleHtmlTag: "h3",
+                description: "<p>Одна чаша.</p>",
+                bulletText: "02",
+              },
+              {
+                title: "Пауза",
+                titleHtmlTag: "h3",
+                description: "<p>Минута до глотка.</p>",
+                bulletText: "03",
+              },
+            ],
+          },
+        ],
+        seo: {
+          title: "Тихий стол — Brega Tea",
+          description: "О домашнем ритуале.",
+        },
+      },
+    ];
+
+    const data = articleSlug
+      ? articles.filter((article) => article.slug === articleSlug)
+      : articles;
+
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ data }));
     return;
   }
 

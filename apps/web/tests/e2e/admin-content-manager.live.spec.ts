@@ -118,6 +118,11 @@ test.describe("admin content manager live smoke", () => {
         readyField: '[name="title"]',
       },
       {
+        label: "Страница статей",
+        uid: "api::articles-page.articles-page",
+        readyField: '[name="title"]',
+      },
+      {
         label: "Главная страница",
         uid: "api::home-page.home-page",
         readyField: '[name="hero.cta.label"]',

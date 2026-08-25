@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  DEFAULT_SITEMAP_ARTICLE_COLLECTION,
   DEFAULT_SITEMAP_COLLECTION,
   DEFAULT_SITEMAP_URLS,
   ensureSitemapConfiguration,
@@ -27,7 +28,7 @@ test("normalizes the public sitemap origin", () => {
 test("creates the minimal sitemap configuration and public permission", async () => {
   assert.deepEqual(
     DEFAULT_SITEMAP_URLS.map(({ slug }) => slug),
-    ["/", "/tovary", "/nabory"],
+    ["/", "/tovary", "/nabory", "/stati"],
   );
   const creates = new Map<string, unknown[]>();
   const query = (uid: string) => ({
@@ -70,7 +71,7 @@ test("creates the minimal sitemap configuration and public permission", async ()
     creates.get(
       "plugin::strapi-5-sitemap-plugin.strapi-5-sitemap-plugin-content-type",
     ),
-    [DEFAULT_SITEMAP_COLLECTION],
+    [DEFAULT_SITEMAP_COLLECTION, DEFAULT_SITEMAP_ARTICLE_COLLECTION],
   );
   assert.deepEqual(
     creates.get(
@@ -92,7 +93,10 @@ test("preserves editor-managed sitemap configuration", async () => {
         return [{ id: 1, baseUrl: "https://editor.example" }];
       }
       if (uid.endsWith("content-type")) {
-        return [{ type: "product", pattern: "/custom/[slug]" }];
+        return [
+          { type: "product", pattern: "/custom/[slug]" },
+          { type: "article", pattern: "/stati/[slug]" },
+        ];
       }
       return DEFAULT_SITEMAP_URLS;
     },

@@ -193,6 +193,9 @@ src/app/
 │   └── [slug]/page.tsx
 ├── rituals/
 │   └── [slug]/page.tsx
+├── articles/
+│   ├── page.tsx
+│   └── [slug]/page.tsx
 └── api/
     ├── checkout/
     │   └── orders/route.ts
@@ -262,6 +265,9 @@ Client Components только для:
 - `getProducts()`;
 - `getProductBySlug(type, slug)`;
 - `getProductSeoBySlug(type, slug)`;
+- `getArticlesPage()`;
+- `getArticles()`;
+- `getArticleBySlug(slug)`;
 
 Не экспортировать generic `get/post/put/delete` в UI-слой.
 
@@ -283,7 +289,10 @@ Client Components только для:
 - `global`;
 - `home`;
 - `products`;
-- `product-slug:{type}:{slug}`.
+- `product-slug:{type}:{slug}`;
+- `articles-page`;
+- `articles`;
+- `article-slug:{slug}`.
 
 Каталог и продуктовые страницы допускают stale-while-revalidate. Checkout, quote и order creation всегда `no-store`.
 Live-проверка остатков перед checkout также выполняется через узкий BFF endpoint
@@ -322,10 +331,10 @@ server-only secret; подпись, secret и payload не логируются.
 }
 ```
 
-Разрешены `home`, `global`, `products`, `product` и действия `publish`,
-`update`, `unpublish`. Сохранение draft не отправляет событие. Для product
-обязательны `documentId`, `type` и `slug`; произвольные tags/paths и лишние поля
-не принимаются. Нативное событие Strapi `entry.delete` нормализуется CMS
+Разрешены `home`, `global`, `products`, `product`, `articles`, `article` и
+действия `publish`, `update`, `unpublish`. Сохранение draft не отправляет
+событие. Для product обязательны `documentId`, `type` и `slug`; для article —
+`documentId` и `slug`. Произвольные tags/paths и лишние поля не принимаются. Нативное событие Strapi `entry.delete` нормализуется CMS
 subscriber-ом в `unpublish`: удалённая entry ещё содержит прежние `documentId`,
 `type` и `slug`, поэтому инвалидируются каталоги, главная и прежний detail-route
 без расширения публичного webhook-протокола действием `delete`.
@@ -336,6 +345,8 @@ subscriber-ом в `unpublish`: удалённая entry ещё содержит
 | `home`     | `home`                                   | `/`                                                   |
 | `products` | `products`                               | `/tovary`, `/nabory`                                  |
 | `product`  | `products`, `product-slug:{type}:{slug}` | `/`, `/tovary`, `/nabory` и соответствующая карточка |
+| `articles` | `articles-page`, `articles`              | `/stati`                                              |
+| `article`  | `articles`, `article-slug:{slug}`        | `/stati` и `/stati/{slug}`                            |
 
 Next.js хранит bounded in-memory registry `id → body digest`. Точный повтор
 возвращает успех без повторной invalidation, а тот же ID с другим payload
@@ -400,6 +411,12 @@ Slug продукта создаётся один раз до сохранени
   документ и узкое public-разрешение `find`; существующий редакторский документ
   и уже выданное разрешение не изменяются.
 
+`articles-page`:
+
+- тот же ограниченный контракт полей, что у `products-page`;
+- хранит собственные SEO, title, eyebrow, intro и empty-state тексты `/stati`;
+- media-поля отсутствуют.
+
 ### 10.2. Collection types
 
 `product`:
@@ -429,6 +446,16 @@ Slug продукта создаётся один раз до сохранени
 - status изменяется по разрешённым переходам;
 - технические external IDs не редактируются контент-редактором.
 
+`article`:
+
+- `name` — обязательное отображаемое название;
+- уникальный неизменяемый `slug` строится из транслитерации `name` так же, как
+  у товара, и не меняется после первой публикации;
+- опциональные `image`, `priority`, richtext `content` и dynamic zone `blocks`;
+- Draft & Publish — единственный переключатель публичной видимости;
+- listing не populate-ит `content` и `blocks`; детальная страница запрашивает
+  их явно ограниченным allowlist, включая `cards-grid` и вложенные media.
+
 ### 10.3. Components
 
 - `shared.seo`;
@@ -438,11 +465,14 @@ Slug продукта создаётся один раз до сохранени
 - `home.editorial-section`;
 - `home.catalog-preview`;
 - `product.gallery-image`;
+- `article.cards-grid`;
+- `article.card`;
 - `commerce.order-line`;
 - `commerce.customer`;
 
-`HomePage`, `ProductsPage`, `RitualsPage` и `Product` используют один опциональный
-`shared.seo`; отдельные `seoTitle`, `seoDescription` и `seoImage` запрещены.
+`HomePage`, `ProductsPage`, `RitualsPage`, `ArticlesPage`, `Product` и `Article`
+используют один опциональный `shared.seo`; отдельные `seoTitle`,
+`seoDescription` и `seoImage` запрещены.
 `GlobalSettings.defaultSeo` остаётся обязательным системным fallback.
 `HomePage.seo` имеет приоритет над global fallback для главной.
 Organization/WebSite JSON-LD получают название из `GlobalSettings.brandName`.
@@ -628,7 +658,8 @@ Payment adapter и webhook route не создаются до отдельног
 ### 14.1. Metadata
 
 - root metadata defaults из `global-setting`;
-- `generateMetadata` на `/tovary`, `/nabory` и routes товаров/наборов;
+- `generateMetadata` на `/tovary`, `/nabory`, `/stati` и routes
+  товаров/наборов/статей;
 - canonical формируется одним helper из нормализованного base URL;
 - title/description имеют fallback;
 - share image преобразуется CMS media mapper;
@@ -639,9 +670,10 @@ Payment adapter и webhook route не создаются до отдельног
 Strapi sitemap plugin:
 
 - хранит base URL, коллекции и статические URL в собственных настройках Strapi;
-- при первом запуске получает безопасную конфигурацию `/`, `/tovary`, `/nabory` и
-  `product` с шаблоном `/[type]y/[slug]`;
-- включает только опубликованные товары и наборы, добавляет `lastmod` из
+- при первом запуске получает безопасную конфигурацию `/`, `/tovary`, `/nabory`,
+  `/stati`, `product` с шаблоном `/[type]y/[slug]` и `article` с шаблоном
+  `/stati/[slug]`;
+- включает только опубликованные товары, наборы и статьи, добавляет `lastmod` из
   `updatedAt`;
 - публичный `/sitemap.xml` через runtime middleware rewrite проксируется на
   `/api/strapi-5-sitemap-plugin/sitemap.xml` внутри CMS;
@@ -669,6 +701,7 @@ Strapi sitemap plugin:
 
 - главная: `Organization` как сущность бренда/сайта без предположения о юридическом статусе продавца, `WebSite`;
 - каталог: `CollectionPage`, при необходимости `ItemList`;
+- статьи: `CollectionPage` на `/stati` и `Article` на `/stati/[slug]`;
 - товар: `Product`, `Offer`, `BreadcrumbList`;
 - schema price/availability формируется из тех же server DTO, что видимый UI;
 - фиктивные ratings/reviews запрещены.
@@ -738,6 +771,8 @@ Blocks, совместимое со структурой Strapi Blocks. Это �
 и изображение выводится на всю ширину контентной зоны. Renderer:
 
 - не рендерит raw HTML по умолчанию;
+- для editorial `article.content` и описаний `cards-grid` допускает только
+  sanitizer с allowlist тегов и нормализацией внешних ссылок;
 - нормализует внешние ссылки;
 - рендерит content `h1` как `h2`;
 - отбрасывает пустые блоки;

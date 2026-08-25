@@ -1,0 +1,80 @@
+{
+  "kind": "collectionType",
+  "collectionName": "articles",
+  "info": {
+    "singularName": "article",
+    "pluralName": "articles",
+    "displayName": "Статья",
+    "description": "Редакторская статья витрины"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "config": {
+    "attributes": {
+      "seedKey": {
+        "hidden": true
+      },
+      "slugLocked": {
+        "hidden": true
+      }
+    }
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Название статьи на витрине и в списке."
+    },
+    "seedKey": {
+      "type": "string",
+      "required": false,
+      "unique": true,
+      "private": true,
+      "configurable": false
+    },
+    "slug": {
+      "type": "string",
+      "required": false,
+      "unique": true,
+      "minLength": 1,
+      "maxLength": 180,
+      "description": "Генерируется автоматически из названия и не редактируется вручную."
+    },
+    "slugLocked": {
+      "type": "boolean",
+      "default": false,
+      "private": true,
+      "configurable": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "priority": {
+      "type": "integer",
+      "required": false,
+      "min": 0,
+      "description": "Чем больше число, тем выше статья в каталоге. Пустое значение считается нулём."
+    },
+    "content": {
+      "type": "richtext",
+      "required": false,
+      "description": "Основной текст, если блок cards-grid не задан или дополняет его. На витрине выводится только безопасный HTML."
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": ["article.cards-grid"],
+      "required": false
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    }
+  }
+}

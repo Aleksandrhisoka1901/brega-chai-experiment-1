@@ -5,12 +5,14 @@ export type RevalidationEventName =
   | "global"
   | "products"
   | "product"
+  | "articles"
+  | "article"
   | "media";
 export type RevalidationAction = "publish" | "update" | "unpublish";
 
 export type RevalidationEvent =
   | {
-      event: Exclude<RevalidationEventName, "product">;
+      event: Exclude<RevalidationEventName, "product" | "article">;
       action: RevalidationAction;
     }
   | {
@@ -19,6 +21,14 @@ export type RevalidationEvent =
       product: {
         documentId: string;
         type: "tovar" | "nabor";
+        slug: string;
+      };
+    }
+  | {
+      event: "article";
+      action: RevalidationAction;
+      article: {
+        documentId: string;
         slug: string;
       };
     };

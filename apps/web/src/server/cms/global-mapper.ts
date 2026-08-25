@@ -66,12 +66,13 @@ const responseSchema = z.object({
       about: z.string().trim().min(1),
       nabory: z.string().trim().min(1),
       tovary: z.string().trim().min(1),
+      stati: z.string().trim().min(1).optional().default("Статьи"),
       cart: z.string().trim().min(1),
     }),
     sectionBreadcrumbs: z
       .array(
         z.object({
-          route: z.enum(["tovary", "nabory"]),
+          route: z.enum(["tovary", "nabory", "stati"]),
           label: z.string().trim().min(1),
         }),
       )
@@ -115,7 +116,7 @@ export type GlobalSettings = Omit<
     description: string;
     imageUrl?: string;
   };
-  sectionBreadcrumbs: Record<"tovary" | "nabory", string>;
+  sectionBreadcrumbs: Record<"tovary" | "nabory" | "stati", string>;
   legalDocuments?: Partial<
     Record<"privacyPolicy" | "terms" | "deliveryAndReturns", string>
   >;
@@ -147,9 +148,10 @@ export function mapGlobalSettingsPayload(
     legalDocuments,
     ...settings
   } = parsed.data.data;
-  const breadcrumbLabels: Record<"tovary" | "nabory", string> = {
+  const breadcrumbLabels: Record<"tovary" | "nabory" | "stati", string> = {
     tovary: "Сорта",
     nabory: "Ритуалы",
+    stati: "Статьи",
   };
   for (const breadcrumb of sectionBreadcrumbs) {
     breadcrumbLabels[breadcrumb.route] = breadcrumb.label;

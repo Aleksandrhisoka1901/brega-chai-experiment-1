@@ -11,6 +11,8 @@ const EVENT_BY_UID: Readonly<Record<string, RevalidationEventName>> = {
   "api::products-page.products-page": "products",
   "api::rituals-page.rituals-page": "products",
   "api::product.product": "product",
+  "api::articles-page.articles-page": "articles",
+  "api::article.article": "article",
 };
 
 interface StrapiPublicationEvent {
@@ -48,8 +50,26 @@ function routeEvent(
     return undefined;
   }
 
-  if (event !== "product") {
+  if (event !== "product" && event !== "article") {
     return { event, action };
+  }
+
+  if (event === "article") {
+    if (
+      typeof value.entry?.documentId !== "string" ||
+      typeof value.entry.slug !== "string"
+    ) {
+      return undefined;
+    }
+
+    return {
+      event,
+      action,
+      article: {
+        documentId: value.entry.documentId,
+        slug: value.entry.slug,
+      },
+    };
   }
 
   if (

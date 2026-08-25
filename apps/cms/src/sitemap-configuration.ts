@@ -20,10 +20,22 @@ export const DEFAULT_SITEMAP_COLLECTION = {
   populateLinkedModels: "false",
 } as const;
 
+export const DEFAULT_SITEMAP_ARTICLE_COLLECTION = {
+  type: "article",
+  langcode: "-",
+  pattern: "/stati/[slug]",
+  priority: 0.7,
+  frequency: "weekly",
+  lastModified: "true",
+  thumbnail: "-",
+  populateLinkedModels: "false",
+} as const;
+
 export const DEFAULT_SITEMAP_URLS = [
   { slug: "/", priority: 1, frequency: "weekly" },
   { slug: "/tovary", priority: 0.9, frequency: "weekly" },
   { slug: "/nabory", priority: 0.9, frequency: "weekly" },
+  { slug: "/stati", priority: 0.9, frequency: "weekly" },
 ] as const;
 
 export function normalizeSitemapOrigin(value: string): string {
@@ -81,10 +93,16 @@ async function ensurePluginOptions(strapi: any, baseUrl: string) {
 async function ensureProductCollection(strapi: any) {
   const query = strapi.db.query(COLLECTION_UID);
   const existing = await query.findMany();
-  if (existing.some((entry: { type?: string }) => entry.type === "product")) {
-    return;
+  const types = new Set(
+    existing.map((entry: { type?: string }) => entry.type),
+  );
+
+  if (!types.has("product")) {
+    await query.create({ data: DEFAULT_SITEMAP_COLLECTION });
   }
-  await query.create({ data: DEFAULT_SITEMAP_COLLECTION });
+  if (!types.has("article")) {
+    await query.create({ data: DEFAULT_SITEMAP_ARTICLE_COLLECTION });
+  }
 }
 
 async function ensureCustomUrls(strapi: any) {

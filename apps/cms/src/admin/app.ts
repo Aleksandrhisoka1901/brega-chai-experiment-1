@@ -158,6 +158,95 @@ const adminApp = {
         "content-manager.content-types.api::rituals-page.rituals-page.title":
           "Заголовок",
 
+        "content-manager.content-types.api::articles-page.articles-page.eyebrow":
+          "Надстрочник",
+        "content-manager.content-types.api::articles-page.articles-page.emptyStateText":
+          "Текст пустого каталога",
+        "content-manager.content-types.api::articles-page.articles-page.emptyStateLinkLabel":
+          "Текст ссылки пустого каталога",
+        "content-manager.content-types.api::articles-page.articles-page.intro":
+          "Вступление",
+        "content-manager.content-types.api::articles-page.articles-page.seo":
+          "SEO-настройки",
+        "content-manager.content-types.api::articles-page.articles-page.title":
+          "Заголовок",
+
+        "content-manager.content-types.api::article.article.blocks":
+          "Блоки статьи",
+        "content-manager.content-types.api::article.article.content":
+          "Текст статьи",
+        "content-manager.content-types.api::article.article.image":
+          "Изображение",
+        "content-manager.content-types.api::article.article.name": "Название",
+        "content-manager.content-types.api::article.article.priority":
+          "Приоритет",
+        "content-manager.content-types.api::article.article.seedKey":
+          "Системный ключ",
+        "content-manager.content-types.api::article.article.seo":
+          "SEO-настройки",
+        "content-manager.content-types.api::article.article.slug":
+          "URL-идентификатор",
+        "content-manager.content-types.api::article.article.slugLocked":
+          "Системная блокировка URL",
+
+        "content-manager.components.article.card.title": "Заголовок",
+        "content-manager.components.article.card.titleHtmlTag":
+          "HTML-тег заголовка",
+        "content-manager.components.article.card.description": "Описание",
+        "content-manager.components.article.card.titleColor": "Цвет заголовка",
+        "content-manager.components.article.card.descriptionColor":
+          "Цвет описания",
+        "content-manager.components.article.card.descriptionLinksColor":
+          "Цвет ссылок описания",
+        "content-manager.components.article.card.bgColor": "Цвет фона",
+        "content-manager.components.article.card.borderColor": "Цвет рамки",
+        "content-manager.components.article.card.bulletIcon": "Иконка маркера",
+        "content-manager.components.article.card.bulletText": "Текст маркера",
+        "content-manager.components.article.card.bulletTextColor":
+          "Цвет текста маркера",
+        "content-manager.components.article.card.bulletBgColor":
+          "Цвет фона маркера",
+        "content-manager.components.article.card.bulletPosition":
+          "Положение маркера",
+        "content-manager.components.article.card.bulletAlign":
+          "Выравнивание маркера",
+        "content-manager.components.article.card.bulletScalePercent":
+          "Масштаб маркера, %",
+        "content-manager.components.article.card.bulletDisabledBg":
+          "Без фона маркера",
+        "content-manager.components.article.card.bulletDisabledPaddings":
+          "Без отступов маркера",
+        "content-manager.components.article.card.image": "Изображение",
+        "content-manager.components.article.card.imageAlt":
+          "Альтернативный текст",
+        "content-manager.components.article.card.imagePosition":
+          "Положение изображения",
+        "content-manager.components.article.card.imageFit":
+          "Вписывание изображения",
+        "content-manager.components.article.card.imageAlign":
+          "Выравнивание изображения",
+        "content-manager.components.article.card.imageScalePercent":
+          "Масштаб изображения, %",
+        "content-manager.components.article.card.disabledBg": "Без фона",
+        "content-manager.components.article.card.disabledPaddings":
+          "Без внутренних отступов",
+        "content-manager.components.article.card.gridRowsStart":
+          "Начало по строке",
+        "content-manager.components.article.card.gridRowsSpan":
+          "Высота в строках",
+        "content-manager.components.article.card.gridColumnsStart":
+          "Начало по колонке",
+        "content-manager.components.article.card.gridColumnsSpan":
+          "Ширина в колонках",
+        "content-manager.components.article.cards-grid.title": "Заголовок блока",
+        "content-manager.components.article.cards-grid.description":
+          "Описание блока",
+        "content-manager.components.article.cards-grid.titleColor":
+          "Цвет заголовка",
+        "content-manager.components.article.cards-grid.gridColumns":
+          "Число колонок",
+        "content-manager.components.article.cards-grid.cards": "Карточки",
+
         "content-manager.content-types.api::robots-txt.robots-txt.content":
           "Содержимое robots.txt",
 
@@ -221,6 +310,7 @@ const adminApp = {
         "content-manager.components.shared.navigation-labels.cart": "Корзина",
         "content-manager.components.shared.navigation-labels.tovary": "Сорта",
         "content-manager.components.shared.navigation-labels.nabory": "Ритуалы",
+        "content-manager.components.shared.navigation-labels.stati": "Статьи",
         "content-manager.components.shared.section-breadcrumb.route": "Раздел",
         "content-manager.components.shared.section-breadcrumb.label": "Подпись",
         "content-manager.components.shared.seo.description": "Meta-описание",

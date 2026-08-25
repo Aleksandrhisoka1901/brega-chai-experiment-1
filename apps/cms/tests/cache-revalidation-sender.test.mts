@@ -206,6 +206,14 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     entry: {},
   });
   await subscriber?.("entry.publish", {
+    uid: "api::article.article",
+    entry: { documentId: "article-1", slug: "tihij-stol" },
+  });
+  await subscriber?.("entry.publish", {
+    uid: "api::articles-page.articles-page",
+    entry: {},
+  });
+  await subscriber?.("entry.publish", {
     uid: "api::order.order",
     entry: {},
   });
@@ -228,6 +236,12 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     { event: "home", action: "update" },
     { event: "products", action: "publish" },
     { event: "global", action: "unpublish" },
+    {
+      event: "article",
+      action: "publish",
+      article: { documentId: "article-1", slug: "tihij-stol" },
+    },
+    { event: "articles", action: "publish" },
     { event: "media", action: "update" },
   ]);
 });

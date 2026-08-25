@@ -1,4 +1,4 @@
-type BreadcrumbRoute = "tovary" | "nabory";
+type BreadcrumbRoute = "tovary" | "nabory" | "stati";
 
 type BreadcrumbInput = {
   route?: BreadcrumbRoute;
@@ -8,6 +8,7 @@ type BreadcrumbInput = {
 const ROUTE_LABELS: Record<BreadcrumbRoute, string> = {
   tovary: "Товары",
   nabory: "Наборы",
+  stati: "Статьи",
 };
 
 export function validateUniqueBreadcrumbRoutes(

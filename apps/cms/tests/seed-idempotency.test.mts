@@ -122,6 +122,9 @@ test("seed exposes only read actions required by the storefront", () => {
     "api::product.product.findOne",
     "api::products-page.products-page.find",
     "api::rituals-page.rituals-page.find",
+    "api::articles-page.articles-page.find",
+    "api::article.article.find",
+    "api::article.article.findOne",
   ]);
   assert.equal(
     PUBLIC_STOREFRONT_ACTIONS.some((action) => action.includes("order")),

@@ -493,6 +493,14 @@ a {
   font-weight: 400;
 }
 
+.article-card .product-card__body {
+  min-height: auto;
+}
+
+.article-card .product-card__heading {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .catalog-state {
   min-height: 22rem;
   padding-block: 5rem;

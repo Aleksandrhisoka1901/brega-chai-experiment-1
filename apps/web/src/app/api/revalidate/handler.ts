@@ -23,7 +23,7 @@ export interface RevalidationDependencies {
 type RevalidationEvent =
   | {
       id: string;
-      event: "home" | "global" | "products" | "media";
+      event: "home" | "global" | "products" | "media" | "articles";
       action: "publish" | "update" | "unpublish";
       occurredAt: string;
     }
@@ -33,6 +33,13 @@ type RevalidationEvent =
       action: "publish" | "update" | "unpublish";
       occurredAt: string;
       product: { documentId: string; type: ProductType; slug: string };
+    }
+  | {
+      id: string;
+      event: "article";
+      action: "publish" | "update" | "unpublish";
+      occurredAt: string;
+      article: { documentId: string; slug: string };
     };
 
 export function createMemoryDeliveryStore(
@@ -94,7 +101,8 @@ function parseEvent(value: unknown): RevalidationEvent | undefined {
     body.event === "home" ||
     body.event === "global" ||
     body.event === "products" ||
-    body.event === "media"
+    body.event === "media" ||
+    body.event === "articles"
   ) {
     return hasExactKeys(body, ["action", "event", "id", "occurredAt"])
       ? {
@@ -105,6 +113,36 @@ function parseEvent(value: unknown): RevalidationEvent | undefined {
         }
       : undefined;
   }
+  if (body.event === "article") {
+    if (
+      !hasExactKeys(body, ["action", "event", "id", "occurredAt", "article"]) ||
+      !body.article ||
+      typeof body.article !== "object" ||
+      Array.isArray(body.article)
+    ) {
+      return;
+    }
+
+    const article = body.article as Record<string, unknown>;
+    if (
+      !hasExactKeys(article, ["documentId", "slug"]) ||
+      !isNonEmptyString(article.documentId) ||
+      !isNonEmptyString(article.slug)
+    ) {
+      return;
+    }
+    return {
+      id: body.id,
+      event: "article",
+      action: body.action,
+      occurredAt: body.occurredAt,
+      article: {
+        documentId: article.documentId,
+        slug: article.slug,
+      },
+    };
+  }
+
   if (
     body.event !== "product" ||
     !hasExactKeys(body, ["action", "event", "id", "occurredAt", "product"]) ||
@@ -176,6 +214,25 @@ function invalidate(
     revalidatePath("/nabory", "page");
     revalidatePath("/tovary/[slug]", "page");
     revalidatePath("/nabory/[slug]", "page");
+    revalidateTag("articles");
+    revalidateTag("articles-page");
+    revalidatePath("/stati", "page");
+    revalidatePath("/stati/[slug]", "page");
+    return;
+  }
+
+  if (event.event === "articles") {
+    revalidateTag("articles-page");
+    revalidateTag("articles");
+    revalidatePath("/stati", "page");
+    return;
+  }
+
+  if (event.event === "article") {
+    revalidateTag("articles");
+    revalidateTag(`article-slug:${event.article.slug}`);
+    revalidatePath("/stati", "page");
+    revalidatePath(`/stati/${event.article.slug}`, "page");
     return;
   }
 

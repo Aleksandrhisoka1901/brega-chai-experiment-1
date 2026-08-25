@@ -7,7 +7,7 @@
   "attributes": {
     "route": {
       "type": "enumeration",
-      "enum": ["tovary", "nabory"],
+      "enum": ["tovary", "nabory", "stati"],
       "required": true
     },
     "label": {

@@ -16,6 +16,10 @@
       "type": "string",
       "required": true
     },
+    "stati": {
+      "type": "string",
+      "required": true
+    },
     "cart": {
       "type": "string",
       "required": true

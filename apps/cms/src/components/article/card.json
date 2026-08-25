@@ -1,0 +1,167 @@
+{
+  "collectionName": "components_article_cards",
+  "info": {
+    "displayName": "Карточка блока",
+    "description": "Одна ячейка сетки статьи: текст, маркер и изображение"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": false
+    },
+    "titleHtmlTag": {
+      "type": "enumeration",
+      "enum": ["h2", "h3", "h4", "p"],
+      "required": true,
+      "default": "h3"
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
+    },
+    "titleColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "descriptionColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "descriptionLinksColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "bgColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "borderColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "bulletIcon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "bulletText": {
+      "type": "string",
+      "required": false
+    },
+    "bulletTextColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "bulletBgColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "bulletPosition": {
+      "type": "enumeration",
+      "enum": ["left", "right", "top", "bottom"],
+      "required": true,
+      "default": "left"
+    },
+    "bulletAlign": {
+      "type": "enumeration",
+      "enum": ["start", "center", "end"],
+      "required": true,
+      "default": "start"
+    },
+    "bulletScalePercent": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 300,
+      "default": 100
+    },
+    "bulletDisabledBg": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "bulletDisabledPaddings": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "imageAlt": {
+      "type": "string",
+      "required": false,
+      "description": "Подпись изображения. Можно оставить пустой для декоративного кадра."
+    },
+    "imagePosition": {
+      "type": "enumeration",
+      "enum": ["top", "bottom", "left", "right"],
+      "required": true,
+      "default": "bottom"
+    },
+    "imageFit": {
+      "type": "enumeration",
+      "enum": ["contain", "cover"],
+      "required": true,
+      "default": "contain"
+    },
+    "imageAlign": {
+      "type": "enumeration",
+      "enum": ["start", "center", "end"],
+      "required": true,
+      "default": "center"
+    },
+    "imageScalePercent": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 300,
+      "default": 100
+    },
+    "disabledBg": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "disabledPaddings": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "gridRowsStart": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "gridRowsSpan": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "gridColumnsStart": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "gridColumnsSpan": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    }
+  }
+}

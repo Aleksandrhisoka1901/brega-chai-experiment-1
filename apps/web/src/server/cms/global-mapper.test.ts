@@ -81,11 +81,13 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
         about: "О нас",
         nabory: "Ритуалы",
         tovary: "Сорта",
+        stati: "Статьи",
         cart: "Заказ",
       },
       sectionBreadcrumbs: {
         tovary: "Каталог чая",
         nabory: "Готовые ритуалы",
+        stati: "Статьи",
       },
       storefrontTexts: {
         imagePlaceholder: "Фото готовится",
@@ -176,6 +178,7 @@ test("fills missing breadcrumb routes with stable visible-text fallbacks", () =>
   assert.deepEqual(settings.sectionBreadcrumbs, {
     tovary: "Все сорта",
     nabory: "Ритуалы",
+    stati: "Статьи",
   });
 });
 

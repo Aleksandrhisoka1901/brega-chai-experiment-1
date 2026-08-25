@@ -65,3 +65,48 @@ export function websiteStructuredData(origin: string, brandName: string) {
     url: origin,
   };
 }
+
+export function collectionPageStructuredData({
+  name,
+  description,
+  url,
+}: {
+  name: string;
+  description?: string;
+  url: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    url,
+    ...(description ? { description } : {}),
+  };
+}
+
+export function articleStructuredData({
+  headline,
+  description,
+  url,
+  imageUrl,
+  brandName,
+}: {
+  headline: string;
+  description: string;
+  url: string;
+  imageUrl?: string;
+  brandName: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline,
+    description,
+    url,
+    ...(imageUrl ? { image: imageUrl } : {}),
+    publisher: {
+      "@type": "Organization",
+      name: brandName,
+    },
+  };
+}

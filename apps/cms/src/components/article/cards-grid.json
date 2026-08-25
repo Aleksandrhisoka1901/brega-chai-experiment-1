@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_article_cards_grids",
+  "info": {
+    "displayName": "Сетка карточек",
+    "description": "Редакторский блок статьи с настраиваемой сеткой карточек"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
+    },
+    "titleColor": {
+      "type": "string",
+      "customField": "plugin::color-picker.color",
+      "required": false
+    },
+    "gridColumns": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 6,
+      "default": 3
+    },
+    "cards": {
+      "type": "component",
+      "component": "article.card",
+      "repeatable": true,
+      "required": false
+    }
+  }
+}

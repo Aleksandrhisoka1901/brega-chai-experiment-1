@@ -170,6 +170,23 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       ],
     },
   },
+  "api::article.article": {
+    layouts: {
+      edit: [
+        [
+          { name: "name", size: 8 },
+          { name: "priority", size: 4 },
+        ],
+        [{ name: "slug", size: 12 }],
+        [{ name: "image", size: 12 }],
+        [{ name: "content", size: 12 }],
+        [{ name: "blocks", size: 12 }],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "name", "slug", "priority", "updatedAt"],
+    },
+    settings: { mainField: "name", defaultSortBy: "priority" },
+  },
   "api::products-page.products-page": {
     layouts: {
       edit: [
@@ -191,6 +208,26 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
     },
   },
   "api::rituals-page.rituals-page": {
+    layouts: {
+      edit: [
+        [
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
+        ],
+        [{ name: "intro", size: 12 }],
+        [
+          { name: "emptyStateText", size: 8 },
+          { name: "emptyStateLinkLabel", size: 4 },
+        ],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "title", "eyebrow", "updatedAt"],
+    },
+    metadatas: {
+      intro: { list: { searchable: false, sortable: false } },
+    },
+  },
+  "api::articles-page.articles-page": {
     layouts: {
       edit: [
         [
@@ -289,6 +326,82 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       list: ["id", "content"],
     },
   },
+  "article.cards-grid": {
+    layouts: {
+      edit: [
+        [
+          { name: "title", size: 8 },
+          { name: "gridColumns", size: 4 },
+        ],
+        [{ name: "titleColor", size: 12 }],
+        [{ name: "description", size: 12 }],
+        [{ name: "cards", size: 12 }],
+      ],
+      list: ["id", "title", "gridColumns"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
+  },
+  "article.card": {
+    layouts: {
+      edit: [
+        [
+          { name: "title", size: 8 },
+          { name: "titleHtmlTag", size: 4 },
+        ],
+        [{ name: "description", size: 12 }],
+        [
+          { name: "titleColor", size: 4 },
+          { name: "descriptionColor", size: 4 },
+          { name: "descriptionLinksColor", size: 4 },
+        ],
+        [
+          { name: "bgColor", size: 6 },
+          { name: "borderColor", size: 6 },
+        ],
+        [
+          { name: "bulletText", size: 6 },
+          { name: "bulletIcon", size: 6 },
+        ],
+        [
+          { name: "bulletPosition", size: 4 },
+          { name: "bulletAlign", size: 4 },
+          { name: "bulletScalePercent", size: 4 },
+        ],
+        [
+          { name: "bulletTextColor", size: 6 },
+          { name: "bulletBgColor", size: 6 },
+        ],
+        [
+          { name: "image", size: 6 },
+          { name: "imageAlt", size: 6 },
+        ],
+        [
+          { name: "imagePosition", size: 4 },
+          { name: "imageFit", size: 4 },
+          { name: "imageAlign", size: 4 },
+        ],
+        [{ name: "imageScalePercent", size: 4 }],
+        [
+          { name: "disabledBg", size: 6 },
+          { name: "disabledPaddings", size: 6 },
+        ],
+        [
+          { name: "bulletDisabledBg", size: 6 },
+          { name: "bulletDisabledPaddings", size: 6 },
+        ],
+        [
+          { name: "gridColumnsStart", size: 6 },
+          { name: "gridColumnsSpan", size: 6 },
+        ],
+        [
+          { name: "gridRowsStart", size: 6 },
+          { name: "gridRowsSpan", size: 6 },
+        ],
+      ],
+      list: ["id", "title"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
+  },
   "product.gallery-image": {
     layouts: {
       edit: [
@@ -343,11 +456,12 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
           { name: "cart", size: 6 },
         ],
         [
-          { name: "nabory", size: 6 },
-          { name: "tovary", size: 6 },
+          { name: "nabory", size: 4 },
+          { name: "tovary", size: 4 },
+          { name: "stati", size: 4 },
         ],
       ],
-      list: ["id", "about", "nabory", "tovary"],
+      list: ["id", "about", "nabory", "tovary", "stati"],
     },
   },
   "shared.section-breadcrumb": {

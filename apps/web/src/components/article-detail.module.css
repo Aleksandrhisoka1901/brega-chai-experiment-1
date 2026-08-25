@@ -1,0 +1,57 @@
+.page {
+  display: grid;
+  gap: 2rem;
+  padding-block: 2.5rem 5rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--type-heading-1);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.hero {
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+}
+
+.heroMedia {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--surface-subtle);
+}
+
+.heroMedia img {
+  object-fit: cover;
+}
+
+.content {
+  max-width: 42rem;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--type-body);
+  line-height: 1.65;
+}
+
+.content :is(p, ul, ol, blockquote) {
+  margin: 0 0 1.15rem;
+}
+
+.content :is(h2, h3, h4) {
+  margin: 2rem 0 0.85rem;
+  font-weight: 400;
+}
+
+.content a {
+  color: inherit;
+}
+
+@media (max-width: 767px) {
+  .page {
+    gap: 1.5rem;
+    padding-block: 1.5rem 3.5rem;
+  }
+}
