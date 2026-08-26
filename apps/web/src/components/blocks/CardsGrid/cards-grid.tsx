@@ -17,6 +17,10 @@ function hasMarkup(value: string) {
   return /<[a-z][\s\S]*>/i.test(value);
 }
 
+function gridPlacement(start: number | undefined, span: number) {
+  return start ? `${start} / span ${span}` : `span ${span}`;
+}
+
 function GridCard({ card }: { card: ArticleGridCard }) {
   const Heading = card.titleHtmlTag;
   const hasBullet = Boolean(card.bulletText || card.bulletIcon);
@@ -84,8 +88,8 @@ function GridCard({ card }: { card: ArticleGridCard }) {
         ...optionalColor("--card-title", card.titleColor),
         ...optionalColor("--card-copy", card.descriptionColor),
         ...optionalColor("--card-links", card.descriptionLinksColor),
-        gridColumn: `${card.gridColumnsStart} / span ${card.gridColumnsSpan}`,
-        gridRow: `${card.gridRowsStart} / span ${card.gridRowsSpan}`,
+        gridColumn: gridPlacement(card.gridColumnsStart, card.gridColumnsSpan),
+        gridRow: gridPlacement(card.gridRowsStart, card.gridRowsSpan),
       }}
     >
       {card.imagePosition === "top" ? media : null}

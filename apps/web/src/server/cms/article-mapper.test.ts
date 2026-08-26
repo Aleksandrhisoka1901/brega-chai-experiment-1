@@ -239,3 +239,36 @@ test("maps snake_case CardsGrid / BasicInfoCard fields from Strapi", () => {
   assert.equal(article?.blocks[0]?.cards[0]?.bgColor, "#ffffff");
   assert.equal(article?.blocks[0]?.cards[0]?.bulletBgColor, "#c45c4a");
 });
+
+test("preserves every grid card and lets default positions auto-flow", () => {
+  const article = mapArticleDetailPayload(
+    {
+      data: [
+        {
+          documentId: "a4",
+          name: "Три карточки",
+          slug: "tri-kartochki",
+          blocks: [
+            {
+              __component: "article.cards-grid",
+              gridColumns: 3,
+              cards: [
+                { title: "Первая", gridColumnsStart: 1, gridRowsStart: 1 },
+                { title: "Вторая", gridColumnsStart: 1, gridRowsStart: 1 },
+                { title: "Третья", gridColumnsStart: 1, gridRowsStart: 1 },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    "http://localhost:9000",
+  );
+
+  assert.deepEqual(
+    article?.blocks[0]?.cards.map((card) => card.title),
+    ["Первая", "Вторая", "Третья"],
+  );
+  assert.equal(article?.blocks[0]?.cards[0]?.gridColumnsStart, undefined);
+  assert.equal(article?.blocks[0]?.cards[1]?.gridRowsStart, undefined);
+});

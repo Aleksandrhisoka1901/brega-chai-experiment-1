@@ -66,9 +66,9 @@ export type ArticleGridCard = {
   imageScalePercent: number;
   disabledBg: boolean;
   disabledPaddings: boolean;
-  gridRowsStart: number;
+  gridRowsStart?: number;
   gridRowsSpan: number;
-  gridColumnsStart: number;
+  gridColumnsStart?: number;
   gridColumnsSpan: number;
 };
 
@@ -215,6 +215,11 @@ function asPositiveInt(value: unknown, fallback: number) {
   return Number.isInteger(numeric) && numeric > 0 ? numeric : fallback;
 }
 
+function asOptionalGridStart(value: unknown) {
+  const start = asPositiveInt(value, 1);
+  return start > 1 ? start : undefined;
+}
+
 function asBoolean(value: unknown) {
   return value === true || value === "true";
 }
@@ -323,6 +328,12 @@ function mapGridCard(value: unknown, publicBase: string): ArticleGridCard {
   );
   const imageAlt = asTrimmedString(pick(card, "imageAlt", "image_alt")) ?? "";
   const image = mapMedia(pick(card, "image"), publicBase, imageAlt);
+  const gridRowsStart = asOptionalGridStart(
+    pick(card, "gridRowsStart", "grid_rows_start"),
+  );
+  const gridColumnsStart = asOptionalGridStart(
+    pick(card, "gridColumnsStart", "grid_columns_start"),
+  );
 
   return {
     ...(title ? { title } : {}),
@@ -361,18 +372,12 @@ function mapGridCard(value: unknown, publicBase: string): ArticleGridCard {
     disabledPaddings: asBoolean(
       pick(card, "disabledPaddings", "disabled_paddings"),
     ),
-    gridRowsStart: asPositiveInt(
-      pick(card, "gridRowsStart", "grid_rows_start"),
-      1,
-    ),
+    ...(gridRowsStart ? { gridRowsStart } : {}),
     gridRowsSpan: asPositiveInt(
       pick(card, "gridRowsSpan", "grid_rows_span"),
       1,
     ),
-    gridColumnsStart: asPositiveInt(
-      pick(card, "gridColumnsStart", "grid_columns_start"),
-      1,
-    ),
+    ...(gridColumnsStart ? { gridColumnsStart } : {}),
     gridColumnsSpan: asPositiveInt(
       pick(card, "gridColumnsSpan", "grid_columns_span"),
       1,
