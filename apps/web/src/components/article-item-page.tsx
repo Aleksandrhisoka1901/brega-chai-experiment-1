@@ -44,11 +44,7 @@ export async function ArticleItemPage({ slug }: { slug: string }) {
           brandName: settings.brandName,
         })}
       />
-      <ArticleDetail
-        article={article}
-        breadcrumbs={breadcrumbs}
-        imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
-      />
+      <ArticleDetail article={article} breadcrumbs={breadcrumbs} />
     </main>
   );
 }

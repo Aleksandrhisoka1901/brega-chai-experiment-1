@@ -31,9 +31,21 @@ test("details request populates blocks and tags the slug cache", () => {
   assert.equal(url.searchParams.get("fields[3]"), "content");
   assert.equal(
     url.searchParams.get(
-      "populate[blocks][populate][cards][populate][image][fields][0]",
+      "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][0]",
     ),
     "url",
+  );
+  assert.equal(
+    url.searchParams.get(
+      "populate[blocks][on][material-templates.cards-grid][populate][cards][populate][bullet_icon][fields][0]",
+    ),
+    "url",
+  );
+  assert.equal(
+    url.searchParams.has(
+      "populate[blocks][populate][cards][populate][image][fields][0]",
+    ),
+    false,
   );
   assert.deepEqual(tags, ["articles", "article-slug:tihij-stol"]);
 });

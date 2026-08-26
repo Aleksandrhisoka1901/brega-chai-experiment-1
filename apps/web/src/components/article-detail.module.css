@@ -4,6 +4,10 @@
   padding-block: 2.5rem 5rem;
 }
 
+.header {
+  max-width: 42rem;
+}
+
 .header h1 {
   margin: 0;
   font-family: var(--font-display);
@@ -13,23 +17,9 @@
   line-height: 1.05;
 }
 
-.hero {
-  overflow: hidden;
-  border: 1px solid var(--border-default);
-}
-
-.heroMedia {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  background: var(--surface-subtle);
-}
-
-.heroMedia img {
-  object-fit: cover;
-}
-
 .content {
   max-width: 42rem;
+  padding-block: 0.25rem 1rem;
   color: var(--text-primary);
   font-family: var(--font-display);
   font-size: var(--type-body);

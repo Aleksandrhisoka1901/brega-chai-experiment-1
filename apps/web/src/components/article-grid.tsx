@@ -1,6 +1,7 @@
 import type { ArticleCard as ArticleCardData } from "@/server/cms/article-mapper";
 
 import { ArticleCard } from "./article-card";
+import styles from "./article-grid.module.css";
 
 export function ArticleGrid({
   articles,
@@ -12,7 +13,7 @@ export function ArticleGrid({
   imagePlaceholder: string;
 }) {
   return (
-    <div className="product-grid article-grid">
+    <div className={`${styles.grid} article-grid`}>
       {articles.map((article) => (
         <ArticleCard
           article={article}

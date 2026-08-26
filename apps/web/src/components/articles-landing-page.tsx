@@ -14,7 +14,6 @@ import { CmsUnavailableError } from "@/server/cms/errors";
 import { getGlobalSettings } from "@/server/cms/global";
 import type { ProductsPageContent } from "@/server/cms/products-page-mapper";
 
-import { ArticleDetail } from "./article-detail";
 import { ArticleGrid } from "./article-grid";
 import { Breadcrumbs, type BreadcrumbItem } from "./breadcrumbs";
 import { JsonLd } from "./json-ld";

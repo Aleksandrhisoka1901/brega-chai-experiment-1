@@ -23,7 +23,15 @@ export async function fetchCms(
     });
 
     if (!response.ok) {
-      throw new CmsUnavailableError(`CMS responded with ${response.status}`);
+      const detail = (await response.text().catch(() => ""))
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 240);
+      throw new CmsUnavailableError(
+        detail
+          ? `CMS responded with ${response.status}: ${detail}`
+          : `CMS responded with ${response.status}`,
+      );
     }
 
     return (await response.json()) as unknown;
