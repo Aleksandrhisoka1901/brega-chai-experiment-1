@@ -135,3 +135,14 @@ export function parseSafeHtml(html: string): SafeHtmlNode[] {
 
   return root;
 }
+
+export function safeHtmlToText(html: string): string {
+  const readNodes = (nodes: SafeHtmlNode[]): string =>
+    nodes
+      .map((node) =>
+        node.type === "text" ? node.value : readNodes(node.children),
+      )
+      .join(" ");
+
+  return readNodes(parseSafeHtml(html)).replace(/\s+/g, " ").trim();
+}

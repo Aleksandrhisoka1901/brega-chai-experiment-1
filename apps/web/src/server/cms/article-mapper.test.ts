@@ -18,7 +18,7 @@ test("lists articles with a narrow published populate and articles tag", () => {
   assert.equal(url.searchParams.get("fields[0]"), "name");
   assert.equal(url.searchParams.get("fields[1]"), "slug");
   assert.equal(url.searchParams.get("fields[2]"), "priority");
-  assert.equal(url.searchParams.has("fields[3]"), false);
+  assert.equal(url.searchParams.get("fields[3]"), "content");
   assert.equal(url.searchParams.get("sort[0]"), "priority:desc");
   assert.deepEqual(tags, ["articles"]);
 });
@@ -60,6 +60,12 @@ test("maps listing records without document attributes or blocks", () => {
             name: "Тихий стол",
             slug: "tihij-stol",
             priority: 10,
+            content: [
+              {
+                type: "paragraph",
+                children: [{ type: "text", text: "Краткое содержание." }],
+              },
+            ],
             image: {
               url: "/uploads/table.png",
               width: 800,
@@ -78,6 +84,7 @@ test("maps listing records without document attributes or blocks", () => {
         name: "Тихий стол",
         slug: "tihij-stol",
         priority: 10,
+        content: "<p>Краткое содержание.</p>",
         image: {
           url: "http://localhost:9000/uploads/table.png?v=2026-08-16T12%3A00%3A00.000Z",
           alt: "Стол",

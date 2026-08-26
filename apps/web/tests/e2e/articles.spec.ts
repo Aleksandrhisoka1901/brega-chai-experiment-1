@@ -18,6 +18,9 @@ test("/stati lists article cards with catalog composition", async ({ page }) => 
 
   const articles = page.locator(".article-grid").getByRole("article");
   await expect(articles).toHaveCount(2);
+  await expect(
+    articles.getByText("Небольшой стол уже собирает ритуал."),
+  ).toBeVisible();
   await expect(articles.getByRole("link").first()).toHaveAttribute(
     "href",
     /^\/stati\//,

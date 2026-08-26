@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { normalizeHref, parseSafeHtml } from "./safe-html.ts";
+import {
+  normalizeHref,
+  parseSafeHtml,
+  safeHtmlToText,
+} from "./safe-html.ts";
 
 test("keeps editorial markup and drops scripts", () => {
   const nodes = parseSafeHtml(
@@ -41,4 +45,13 @@ test("rejects javascript and protocol-relative hrefs", () => {
   assert.equal(normalizeHref("javascript:alert(1)"), undefined);
   assert.equal(normalizeHref("//evil.test"), undefined);
   assert.equal(normalizeHref("/stati/tea"), "/stati/tea");
+});
+
+test("extracts safe plain text for article excerpts", () => {
+  assert.equal(
+    safeHtmlToText(
+      "<p>Чай <strong>без спешки</strong></p><script>alert(1)</script><p>Продолжение.</p>",
+    ),
+    "Чай без спешки Продолжение.",
+  );
 });

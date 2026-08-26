@@ -1,10 +1,23 @@
 import Link from "next/link";
 
+import { safeHtmlToText } from "@/lib/html/safe-html";
 import { bindShortRussianWords } from "@/lib/typography";
 import type { ArticleCard as ArticleCardData } from "@/server/cms/article-mapper";
 
 import { CardMedia } from "./card-media";
 import styles from "./article-card.module.css";
+
+function articleExcerpt(content?: string) {
+  if (!content) return undefined;
+  const text = safeHtmlToText(content);
+  if (text.length <= 120) return text;
+
+  const candidate = text.slice(0, 117).trimEnd();
+  const wordBoundary = candidate.lastIndexOf(" ");
+  const excerpt =
+    wordBoundary >= 80 ? candidate.slice(0, wordBoundary) : candidate;
+  return `${excerpt}…`;
+}
 
 export function ArticleCard({
   brandName,
@@ -18,12 +31,14 @@ export function ArticleCard({
   article: ArticleCardData;
 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
+  const excerpt = articleExcerpt(article.content);
 
   return (
     <article className={styles.card}>
       <Link className={styles.link} href={`/stati/${article.slug}`}>
         <div className={styles.content}>
           <Heading>{bindShortRussianWords(article.name)}</Heading>
+          {excerpt ? <p>{bindShortRussianWords(excerpt)}</p> : null}
         </div>
         <div className={styles.media}>
           <CardMedia

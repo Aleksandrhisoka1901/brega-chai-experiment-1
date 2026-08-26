@@ -9,6 +9,7 @@ type ListingRecord = {
   slug: string;
   priority?: number | null;
   image?: unknown;
+  content?: unknown;
 };
 
 const listingRecordSchema = z.object({
@@ -17,10 +18,10 @@ const listingRecordSchema = z.object({
   slug: z.string().min(1),
   priority: z.number().int().nullable().optional(),
   image: z.unknown().optional(),
+  content: z.unknown().optional(),
 });
 
 const detailRecordSchema = listingRecordSchema.extend({
-  content: z.unknown().optional(),
   blocks: z.unknown().optional(),
   seo: z.unknown().optional(),
 });
@@ -39,6 +40,7 @@ export type ArticleCard = {
   slug: string;
   priority: number;
   image?: ArticleImage;
+  content?: string;
 };
 
 export type ArticleGridCard = {
@@ -82,7 +84,6 @@ export type ArticleCardsGrid = {
 };
 
 export type ArticleDetail = ArticleCard & {
-  content?: string;
   blocks: ArticleCardsGrid[];
   seo?: {
     title: string;
@@ -439,14 +440,16 @@ function mapBlocks(value: unknown, publicBase: string): ArticleCardsGrid[] {
 }
 
 function mapArticleCard(record: ListingRecord, publicBase: string): ArticleCard {
+  const image = mapMedia(record.image, publicBase, record.name);
+  const content = normalizeArticleHtml(record.content);
+
   return {
     id: record.documentId,
     name: record.name,
     slug: record.slug,
     priority: record.priority ?? 0,
-    ...(mapMedia(record.image, publicBase, record.name)
-      ? { image: mapMedia(record.image, publicBase, record.name) }
-      : {}),
+    ...(image ? { image } : {}),
+    ...(content ? { content } : {}),
   };
 }
 
@@ -456,6 +459,7 @@ export function articlesListRequest() {
     "fields[0]": "name",
     "fields[1]": "slug",
     "fields[2]": "priority",
+    "fields[3]": "content",
     "populate[image][fields][0]": "url",
     "populate[image][fields][1]": "width",
     "populate[image][fields][2]": "height",
