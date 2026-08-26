@@ -371,6 +371,10 @@ a {
   border-left: 1px solid var(--border-default);
 }
 
+.catalog-section > .product-grid {
+  border-top: 0;
+}
+
 .product-card {
   min-width: 0;
   border-right: 1px solid var(--border-default);
