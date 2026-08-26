@@ -468,6 +468,32 @@ export function articlesListRequest() {
   } as const;
 }
 
+const MEDIA_FIELDS = [
+  "url",
+  "width",
+  "height",
+  "formats",
+  "updatedAt",
+  "alternativeText",
+] as const;
+
+function appendMediaPopulate(query: URLSearchParams, prefix: string) {
+  MEDIA_FIELDS.forEach((field, index) => {
+    query.set(`${prefix}[fields][${index}]`, field);
+  });
+}
+
+function appendCardsGridPopulate(
+  query: URLSearchParams,
+  component: string,
+  mediaFields: readonly string[],
+) {
+  const base = `populate[blocks][on][${component}][populate][cards][populate]`;
+  for (const mediaField of mediaFields) {
+    appendMediaPopulate(query, `${base}[${mediaField}]`);
+  }
+}
+
 export function articleDetailRequest(slug: string) {
   const query = new URLSearchParams({
     status: "published",
@@ -476,44 +502,18 @@ export function articleDetailRequest(slug: string) {
     "fields[1]": "slug",
     "fields[2]": "priority",
     "fields[3]": "content",
-    "populate[image][fields][0]": "url",
-    "populate[image][fields][1]": "width",
-    "populate[image][fields][2]": "height",
-    "populate[image][fields][3]": "formats",
-    "populate[image][fields][4]": "updatedAt",
-    "populate[image][fields][5]": "alternativeText",
-    "populate[seo][fields][0]": "title",
-    "populate[seo][fields][1]": "description",
-    "populate[seo][populate][image][fields][0]": "url",
-    "populate[seo][populate][image][fields][1]": "updatedAt",
-    "populate[blocks][populate][cards][populate][image][fields][0]": "url",
-    "populate[blocks][populate][cards][populate][image][fields][1]": "width",
-    "populate[blocks][populate][cards][populate][image][fields][2]": "height",
-    "populate[blocks][populate][cards][populate][image][fields][3]": "formats",
-    "populate[blocks][populate][cards][populate][image][fields][4]": "updatedAt",
-    "populate[blocks][populate][cards][populate][image][fields][5]":
-      "alternativeText",
-    "populate[blocks][populate][cards][populate][bulletIcon][fields][0]": "url",
-    "populate[blocks][populate][cards][populate][bulletIcon][fields][1]":
-      "width",
-    "populate[blocks][populate][cards][populate][bulletIcon][fields][2]":
-      "height",
-    "populate[blocks][populate][cards][populate][bulletIcon][fields][3]":
-      "formats",
-    "populate[blocks][populate][cards][populate][bulletIcon][fields][4]":
-      "updatedAt",
-    "populate[blocks][populate][cards][populate][bullet_icon][fields][0]":
-      "url",
-    "populate[blocks][populate][cards][populate][bullet_icon][fields][1]":
-      "width",
-    "populate[blocks][populate][cards][populate][bullet_icon][fields][2]":
-      "height",
-    "populate[blocks][populate][cards][populate][bullet_icon][fields][3]":
-      "formats",
-    "populate[blocks][populate][cards][populate][bullet_icon][fields][4]":
-      "updatedAt",
     "pagination[pageSize]": "1",
   });
+  appendMediaPopulate(query, "populate[image]");
+  query.set("populate[seo][fields][0]", "title");
+  query.set("populate[seo][fields][1]", "description");
+  appendMediaPopulate(query, "populate[seo][populate][image]");
+  // Strapi 5 rejects populate[blocks][populate] on a dynamic zone; use on[uid].
+  appendCardsGridPopulate(query, "article.cards-grid", ["image", "bulletIcon"]);
+  appendCardsGridPopulate(query, "material-templates.cards-grid", [
+    "image",
+    "bullet_icon",
+  ]);
 
   return {
     path: `/api/articles?${query}`,
