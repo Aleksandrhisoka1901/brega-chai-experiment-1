@@ -13,6 +13,10 @@ function optionalColor(
   return value ? ({ [name]: value } as CSSProperties) : undefined;
 }
 
+function hasMarkup(value: string) {
+  return /<[a-z][\s\S]*>/i.test(value);
+}
+
 function GridCard({ card }: { card: ArticleGridCard }) {
   const Heading = card.titleHtmlTag;
   const hasBullet = Boolean(card.bulletText || card.bulletIcon);
@@ -60,6 +64,13 @@ function GridCard({ card }: { card: ArticleGridCard }) {
       {card.bulletText ? <span>{card.bulletText}</span> : null}
     </div>
   ) : null;
+  const title = card.title ? (
+    hasMarkup(card.title) ? (
+      <SafeHtml className={styles.cardTitle} html={card.title} />
+    ) : (
+      <Heading className={styles.cardTitle}>{card.title}</Heading>
+    )
+  ) : null;
 
   return (
     <article
@@ -84,9 +95,7 @@ function GridCard({ card }: { card: ArticleGridCard }) {
           ? bullet
           : null}
         <div className={styles.cardCopy}>
-          {card.title ? (
-            <Heading className={styles.cardTitle}>{card.title}</Heading>
-          ) : null}
+          {title}
           {card.description ? (
             <SafeHtml className={styles.cardDescription} html={card.description} />
           ) : null}
@@ -102,15 +111,25 @@ function GridCard({ card }: { card: ArticleGridCard }) {
 }
 
 export function CardsGrid({ block }: { block: ArticleCardsGrid }) {
+  const titleStyle = optionalColor("--block-title", block.titleColor);
+  const title = block.title ? (
+    hasMarkup(block.title) ? (
+      <SafeHtml className={styles.title} html={block.title} style={titleStyle} />
+    ) : (
+      <h2 className={styles.title} style={titleStyle}>
+        {block.title}
+      </h2>
+    )
+  ) : null;
+
   return (
     <section
       className={styles.block}
       style={{
-        ...optionalColor("--block-title", block.titleColor),
         ["--grid-columns" as string]: String(block.gridColumns),
       }}
     >
-      {block.title ? <h2 className={styles.title}>{block.title}</h2> : null}
+      {title}
       {block.description ? (
         <SafeHtml className={styles.description} html={block.description} />
       ) : null}

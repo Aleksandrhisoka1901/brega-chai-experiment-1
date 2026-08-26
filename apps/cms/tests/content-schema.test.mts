@@ -336,7 +336,22 @@ test("article catalog uses draft/publish, generated slug and cards-grid blocks",
   assert.equal(article.attributes.slug.required, false);
   assert.equal(article.attributes.content.type, "richtext");
   assert.equal(article.attributes.blocks.type, "dynamiczone");
-  assert.deepEqual(article.attributes.blocks.components, ["article.cards-grid"]);
+  assert.deepEqual(article.attributes.blocks.components, [
+    "article.cards-grid",
+    "material-templates.cards-grid",
+  ]);
+  const memoGrid = await schema(
+    "src/components/material-templates/cards-grid.json",
+  );
+  const memoCard = await schema(
+    "src/components/material-templates/basic-info-card.json",
+  );
+  assert.equal(
+    memoGrid.attributes.cards.component,
+    "material-templates.basic-info-card",
+  );
+  assert.equal(memoGrid.attributes.grid_columns.default, 2);
+  assert.equal(memoCard.attributes.title_html_tag.default, "h3");
   assert.equal(cardsGrid.attributes.cards.component, "article.card");
   assert.equal(cardsGrid.attributes.gridColumns.default, 3);
   assert.equal(card.attributes.titleHtmlTag.default, "h3");

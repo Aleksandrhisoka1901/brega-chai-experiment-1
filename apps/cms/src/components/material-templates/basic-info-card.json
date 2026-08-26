@@ -1,0 +1,159 @@
+{
+  "collectionName": "components_material_templates_basic_info_cards",
+  "info": {
+    "displayName": "BasicInfoCard",
+    "description": "Карточка сетки: текст, маркер и изображение"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
+    },
+    "title_color": {
+      "type": "string",
+      "required": false
+    },
+    "description_color": {
+      "type": "string",
+      "required": false
+    },
+    "description_links_color": {
+      "type": "string",
+      "required": false
+    },
+    "bg_color": {
+      "type": "string",
+      "required": false
+    },
+    "border_color": {
+      "type": "string",
+      "required": false
+    },
+    "bullet_text": {
+      "type": "string",
+      "required": false
+    },
+    "bullet_icon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "bullet_text_color": {
+      "type": "string",
+      "required": false
+    },
+    "bullet_bg_color": {
+      "type": "string",
+      "required": false
+    },
+    "bullet_position": {
+      "type": "enumeration",
+      "enum": ["left", "right", "top", "bottom"],
+      "required": false,
+      "default": "left"
+    },
+    "bullet_align": {
+      "type": "enumeration",
+      "enum": ["start", "center", "end"],
+      "required": false,
+      "default": "start"
+    },
+    "bullet_scale_percent": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 300,
+      "default": 100
+    },
+    "bullet_disabled_bg": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "bullet_disabled_paddings": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "image_alt": {
+      "type": "string",
+      "required": false
+    },
+    "image_position": {
+      "type": "enumeration",
+      "enum": ["top", "bottom", "left", "right"],
+      "required": false,
+      "default": "bottom"
+    },
+    "image_fit": {
+      "type": "enumeration",
+      "enum": ["contain", "cover"],
+      "required": false,
+      "default": "contain"
+    },
+    "image_align": {
+      "type": "enumeration",
+      "enum": ["start", "center", "end"],
+      "required": false,
+      "default": "center"
+    },
+    "image_scale_percent": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 300,
+      "default": 100
+    },
+    "title_html_tag": {
+      "type": "enumeration",
+      "enum": ["h2", "h3", "h4", "p"],
+      "required": false,
+      "default": "h3"
+    },
+    "disabled_bg": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "disabled_paddings": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "grid_rows_start": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "grid_rows_span": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "grid_columns_start": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "grid_columns_span": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    }
+  }
+}

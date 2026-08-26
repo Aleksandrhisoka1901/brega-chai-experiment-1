@@ -3,134 +3,26 @@ import { z } from "zod";
 import { CmsValidationError } from "./errors.ts";
 import { versionCmsMediaUrl } from "./media-url.ts";
 
-const optionalString = z
-  .string()
-  .nullable()
-  .optional()
-  .transform((value) => value?.trim() || undefined);
-const hexColor = z
-  .string()
-  .nullable()
-  .optional()
-  .transform((value) => {
-    const color = value?.trim();
-    return color && /^#([\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(color)
-      ? color
-      : undefined;
-  });
-const positiveInt = z
-  .number()
-  .int()
-  .positive()
-  .nullable()
-  .optional()
-  .transform((value) => value ?? undefined);
-const mediaSchema = z
-  .object({
-    url: z.string().min(1),
-    width: z.number().int().positive().optional(),
-    height: z.number().int().positive().optional(),
-    alternativeText: z.string().nullable().optional(),
-    updatedAt: z.iso.datetime().optional(),
-    formats: z
-      .record(
-        z.string(),
-        z.object({
-          url: z.string().min(1),
-          width: z.number().int().positive(),
-        }),
-      )
-      .nullable()
-      .optional(),
-  })
-  .nullable()
-  .optional();
-const seoSchema = z
-  .object({
-    title: z.string().min(1),
-    description: z.string().min(1),
-    image: z
-      .object({
-        url: z.string().min(1),
-        updatedAt: z.iso.datetime().optional(),
-      })
-      .nullable()
-      .optional(),
-  })
-  .nullable()
-  .optional();
-
-const cardSchema = z.object({
-  title: optionalString,
-  titleHtmlTag: z
-    .enum(["h2", "h3", "h4", "p"])
-    .nullish()
-    .transform((value) => value ?? "h3"),
-  description: optionalString,
-  titleColor: hexColor,
-  descriptionColor: hexColor,
-  descriptionLinksColor: hexColor,
-  bgColor: hexColor,
-  borderColor: hexColor,
-  bulletIcon: mediaSchema,
-  bulletText: optionalString,
-  bulletTextColor: hexColor,
-  bulletBgColor: hexColor,
-  bulletPosition: z
-    .enum(["left", "right", "top", "bottom"])
-    .nullish()
-    .transform((value) => value ?? "left"),
-  bulletAlign: z
-    .enum(["start", "center", "end"])
-    .nullish()
-    .transform((value) => value ?? "start"),
-  bulletScalePercent: z.number().int().min(1).max(300).nullable().optional(),
-  bulletDisabledBg: z.boolean().nullable().optional(),
-  bulletDisabledPaddings: z.boolean().nullable().optional(),
-  image: mediaSchema,
-  imageAlt: optionalString,
-  imagePosition: z
-    .enum(["top", "bottom", "left", "right"])
-    .nullish()
-    .transform((value) => value ?? "bottom"),
-  imageFit: z
-    .enum(["contain", "cover"])
-    .nullish()
-    .transform((value) => value ?? "contain"),
-  imageAlign: z
-    .enum(["start", "center", "end"])
-    .nullish()
-    .transform((value) => value ?? "center"),
-  imageScalePercent: z.number().int().min(1).max(300).nullable().optional(),
-  disabledBg: z.boolean().nullable().optional(),
-  disabledPaddings: z.boolean().nullable().optional(),
-  gridRowsStart: positiveInt,
-  gridRowsSpan: positiveInt,
-  gridColumnsStart: positiveInt,
-  gridColumnsSpan: positiveInt,
-});
-
-const cardsGridSchema = z.object({
-  __component: z.literal("article.cards-grid"),
-  title: optionalString,
-  description: optionalString,
-  titleColor: hexColor,
-  gridColumns: z.number().int().min(1).max(6).nullable().optional(),
-  cards: z.array(cardSchema).optional().default([]),
-});
+type ListingRecord = {
+  documentId: string;
+  name: string;
+  slug: string;
+  priority?: number | null;
+  image?: unknown;
+};
 
 const listingRecordSchema = z.object({
   documentId: z.string().min(1),
   name: z.string().trim().min(1),
   slug: z.string().min(1),
   priority: z.number().int().nullable().optional(),
-  image: mediaSchema,
+  image: z.unknown().optional(),
 });
 
 const detailRecordSchema = listingRecordSchema.extend({
-  content: optionalString,
-  blocks: z.array(cardsGridSchema).optional().default([]),
-  seo: seoSchema,
+  content: z.unknown().optional(),
+  blocks: z.unknown().optional(),
+  seo: z.unknown().optional(),
 });
 
 export type ArticleImage = {
@@ -181,6 +73,7 @@ export type ArticleGridCard = {
 };
 
 export type ArticleCardsGrid = {
+  component: "article.cards-grid";
   title?: string;
   description?: string;
   titleColor?: string;
@@ -198,68 +91,357 @@ export type ArticleDetail = ArticleCard & {
   };
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function unwrapData(value: unknown): unknown {
+  if (!isRecord(value) || !("data" in value)) return value;
+  return value.data;
+}
+
+function asTrimmedString(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function pick(record: Record<string, unknown>, ...keys: string[]): unknown {
+  for (const key of keys) {
+    if (record[key] !== undefined && record[key] !== null) return record[key];
+  }
+  return undefined;
+}
+
+function asTitle(value: unknown): string | undefined {
+  if (typeof value === "string") return asTrimmedString(value);
+  return normalizeArticleHtml(value);
+}
+
+function componentId(value: Record<string, unknown>) {
+  return (asTrimmedString(value.__component) ?? "").toLowerCase();
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function inlineToHtml(nodes: unknown): string {
+  if (!Array.isArray(nodes)) return "";
+
+  return nodes
+    .map((node) => {
+      if (!isRecord(node)) return "";
+      if (node.type === "text" && typeof node.text === "string") {
+        let html = escapeHtml(node.text);
+        if (node.bold === true) html = `<strong>${html}</strong>`;
+        if (node.italic === true) html = `<em>${html}</em>`;
+        if (node.underline === true) html = `<u>${html}</u>`;
+        return html;
+      }
+      if (node.type === "link") {
+        const href = asTrimmedString(node.url) ?? asTrimmedString(node.href);
+        const children = inlineToHtml(node.children);
+        return href ? `<a href="${escapeHtml(href)}">${children}</a>` : children;
+      }
+      return inlineToHtml(node.children);
+    })
+    .join("");
+}
+
+function blocksToHtml(blocks: unknown): string | undefined {
+  if (!Array.isArray(blocks)) return undefined;
+
+  const html = blocks
+    .map((block) => {
+      if (!isRecord(block)) return "";
+      const children = inlineToHtml(block.children);
+      switch (block.type) {
+        case "heading": {
+          const level = block.level === 3 || block.level === 4 ? block.level : 2;
+          return `<h${level}>${children}</h${level}>`;
+        }
+        case "list": {
+          const tag = block.format === "ordered" || block.ordered === true ? "ol" : "ul";
+          const items = Array.isArray(block.children)
+            ? block.children
+                .map((item) => `<li>${inlineToHtml(isRecord(item) ? item.children : [])}</li>`)
+                .join("")
+            : "";
+          return `<${tag}>${items}</${tag}>`;
+        }
+        case "quote":
+          return `<blockquote>${children}</blockquote>`;
+        case "paragraph":
+        default:
+          return children ? `<p>${children}</p>` : "";
+      }
+    })
+    .join("");
+
+  return html.trim() || undefined;
+}
+
+export function normalizeArticleHtml(value: unknown): string | undefined {
+  if (typeof value === "string") return asTrimmedString(value);
+  if (Array.isArray(value)) return blocksToHtml(value);
+  return undefined;
+}
+
+function asHexColor(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    const color = value.trim();
+    return /^#([\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(color)
+      ? color
+      : undefined;
+  }
+  if (isRecord(value)) {
+    return asHexColor(value.hex ?? value.color);
+  }
+  return undefined;
+}
+
+function asPositiveInt(value: unknown, fallback: number) {
+  const numeric =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim() !== ""
+        ? Number(value)
+        : Number.NaN;
+  return Number.isInteger(numeric) && numeric > 0 ? numeric : fallback;
+}
+
+function asBoolean(value: unknown) {
+  return value === true || value === "true";
+}
+
 function mapMedia(
-  value: z.infer<typeof mediaSchema>,
+  value: unknown,
   publicBase: string,
   fallbackAlt = "",
 ): ArticleImage | undefined {
-  if (!value) return undefined;
+  const media = unwrapData(value);
+  if (!isRecord(media)) return undefined;
+  const url = asTrimmedString(media.url);
+  if (!url) return undefined;
+  const updatedAt = asTrimmedString(media.updatedAt);
+  const formats = isRecord(media.formats) ? Object.values(media.formats) : [];
 
   return {
-    url: versionCmsMediaUrl(value.url, publicBase, value.updatedAt),
-    alt: value.alternativeText?.trim() || fallbackAlt,
-    ...(value.width ? { width: value.width } : {}),
-    ...(value.height ? { height: value.height } : {}),
-    sources: Object.values(value.formats ?? {}).map((format) => ({
-      url: versionCmsMediaUrl(format.url, publicBase, value.updatedAt),
-      width: format.width,
-    })),
+    url: versionCmsMediaUrl(url, publicBase, updatedAt),
+    alt: asTrimmedString(media.alternativeText) || fallbackAlt,
+    ...(typeof media.width === "number" ? { width: media.width } : {}),
+    ...(typeof media.height === "number" ? { height: media.height } : {}),
+    sources: formats.flatMap((format) => {
+      if (!isRecord(format) || typeof format.url !== "string") return [];
+      if (typeof format.width !== "number") return [];
+      return [
+        {
+          url: versionCmsMediaUrl(format.url, publicBase, updatedAt),
+          width: format.width,
+        },
+      ];
+    }),
   };
 }
 
-function mapCard(
-  card: z.infer<typeof cardSchema>,
-  publicBase: string,
-): ArticleGridCard {
+function mapSeo(value: unknown, publicBase: string) {
+  if (!isRecord(value)) return undefined;
+  const title = asTrimmedString(value.title);
+  const description = asTrimmedString(value.description);
+  if (!title || !description) return undefined;
+  const image = mapMedia(value.image, publicBase);
+
   return {
-    ...(card.title ? { title: card.title } : {}),
-    titleHtmlTag: card.titleHtmlTag,
-    ...(card.description ? { description: card.description } : {}),
-    ...(card.titleColor ? { titleColor: card.titleColor } : {}),
-    ...(card.descriptionColor
-      ? { descriptionColor: card.descriptionColor }
+    title,
+    description,
+    ...(image ? { imageUrl: image.url } : {}),
+  };
+}
+
+function mapGridCard(value: unknown, publicBase: string): ArticleGridCard {
+  const card = isRecord(value) ? value : {};
+  const titleHtmlTagRaw = pick(card, "titleHtmlTag", "title_html_tag");
+  const titleHtmlTag =
+    titleHtmlTagRaw === "h2" ||
+    titleHtmlTagRaw === "h3" ||
+    titleHtmlTagRaw === "h4" ||
+    titleHtmlTagRaw === "p"
+      ? titleHtmlTagRaw
+      : "h3";
+  const bulletPositionRaw = pick(card, "bulletPosition", "bullet_position");
+  const bulletPosition =
+    bulletPositionRaw === "right" ||
+    bulletPositionRaw === "top" ||
+    bulletPositionRaw === "bottom"
+      ? bulletPositionRaw
+      : "left";
+  const bulletAlignRaw = pick(card, "bulletAlign", "bullet_align");
+  const bulletAlign =
+    bulletAlignRaw === "center" || bulletAlignRaw === "end"
+      ? bulletAlignRaw
+      : "start";
+  const imagePositionRaw = pick(card, "imagePosition", "image_position");
+  const imagePosition =
+    imagePositionRaw === "top" ||
+    imagePositionRaw === "left" ||
+    imagePositionRaw === "right"
+      ? imagePositionRaw
+      : "bottom";
+  const imageFit =
+    pick(card, "imageFit", "image_fit") === "cover" ? "cover" : "contain";
+  const imageAlignRaw = pick(card, "imageAlign", "image_align");
+  const imageAlign =
+    imageAlignRaw === "start" || imageAlignRaw === "end"
+      ? imageAlignRaw
+      : "center";
+  const title = asTitle(pick(card, "title"));
+  const description = normalizeArticleHtml(pick(card, "description"));
+  const titleColor = asHexColor(pick(card, "titleColor", "title_color"));
+  const descriptionColor = asHexColor(
+    pick(card, "descriptionColor", "description_color"),
+  );
+  const descriptionLinksColor = asHexColor(
+    pick(card, "descriptionLinksColor", "description_links_color"),
+  );
+  const bgColor = asHexColor(pick(card, "bgColor", "bg_color"));
+  const borderColor = asHexColor(pick(card, "borderColor", "border_color"));
+  const bulletIcon = mapMedia(
+    pick(card, "bulletIcon", "bullet_icon"),
+    publicBase,
+  );
+  const bulletText = asTrimmedString(pick(card, "bulletText", "bullet_text"));
+  const bulletTextColor = asHexColor(
+    pick(card, "bulletTextColor", "bullet_text_color"),
+  );
+  const bulletBgColor = asHexColor(
+    pick(card, "bulletBgColor", "bullet_bg_color"),
+  );
+  const imageAlt = asTrimmedString(pick(card, "imageAlt", "image_alt")) ?? "";
+  const image = mapMedia(pick(card, "image"), publicBase, imageAlt);
+
+  return {
+    ...(title ? { title } : {}),
+    titleHtmlTag,
+    ...(description ? { description } : {}),
+    ...(titleColor ? { titleColor } : {}),
+    ...(descriptionColor ? { descriptionColor } : {}),
+    ...(descriptionLinksColor ? { descriptionLinksColor } : {}),
+    ...(bgColor ? { bgColor } : {}),
+    ...(borderColor ? { borderColor } : {}),
+    ...(bulletIcon ? { bulletIcon } : {}),
+    ...(bulletText ? { bulletText } : {}),
+    ...(bulletTextColor ? { bulletTextColor } : {}),
+    ...(bulletBgColor ? { bulletBgColor } : {}),
+    bulletPosition,
+    bulletAlign,
+    bulletScalePercent: asPositiveInt(
+      pick(card, "bulletScalePercent", "bullet_scale_percent"),
+      100,
+    ),
+    bulletDisabledBg: asBoolean(
+      pick(card, "bulletDisabledBg", "bullet_disabled_bg"),
+    ),
+    bulletDisabledPaddings: asBoolean(
+      pick(card, "bulletDisabledPaddings", "bullet_disabled_paddings"),
+    ),
+    ...(image ? { image } : {}),
+    imagePosition,
+    imageFit,
+    imageAlign,
+    imageScalePercent: asPositiveInt(
+      pick(card, "imageScalePercent", "image_scale_percent"),
+      100,
+    ),
+    disabledBg: asBoolean(pick(card, "disabledBg", "disabled_bg")),
+    disabledPaddings: asBoolean(
+      pick(card, "disabledPaddings", "disabled_paddings"),
+    ),
+    gridRowsStart: asPositiveInt(
+      pick(card, "gridRowsStart", "grid_rows_start"),
+      1,
+    ),
+    gridRowsSpan: asPositiveInt(
+      pick(card, "gridRowsSpan", "grid_rows_span"),
+      1,
+    ),
+    gridColumnsStart: asPositiveInt(
+      pick(card, "gridColumnsStart", "grid_columns_start"),
+      1,
+    ),
+    gridColumnsSpan: asPositiveInt(
+      pick(card, "gridColumnsSpan", "grid_columns_span"),
+      1,
+    ),
+  };
+}
+
+function isCardsGridBlock(value: unknown): value is Record<string, unknown> {
+  if (!isRecord(value)) return false;
+  const component = componentId(value);
+  return (
+    component.endsWith("cards-grid") ||
+    component.endsWith(".cardsgrid") ||
+    Array.isArray(value.cards)
+  );
+}
+
+function isBasicInfoCard(value: unknown): value is Record<string, unknown> {
+  if (!isRecord(value)) return false;
+  const component = componentId(value);
+  return (
+    component.includes("basic-info-card") ||
+    component.endsWith("basicinfocard")
+  );
+}
+
+function mapCardsGrid(
+  value: Record<string, unknown>,
+  publicBase: string,
+): ArticleCardsGrid {
+  const cards = Array.isArray(value.cards) ? value.cards : [];
+  const title = asTitle(pick(value, "title"));
+  const description = normalizeArticleHtml(pick(value, "description"));
+  const titleColor = asHexColor(pick(value, "titleColor", "title_color"));
+  return {
+    component: "article.cards-grid",
+    ...(title ? { title } : {}),
+    ...(description ? { description } : {}),
+    ...(titleColor ? { titleColor } : {}),
+    gridColumns: Math.min(
+      6,
+      asPositiveInt(pick(value, "gridColumns", "grid_columns"), 3),
+    ),
+    cards: cards.map((card) => mapGridCard(card, publicBase)),
+  };
+}
+
+function mapBlocks(value: unknown, publicBase: string): ArticleCardsGrid[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((block) => {
+    if (isCardsGridBlock(block)) return [mapCardsGrid(block, publicBase)];
+    if (isBasicInfoCard(block)) {
+      return [
+        mapCardsGrid({ cards: [block], grid_columns: 2 }, publicBase),
+      ];
+    }
+    return [];
+  });
+}
+
+function mapArticleCard(record: ListingRecord, publicBase: string): ArticleCard {
+  return {
+    id: record.documentId,
+    name: record.name,
+    slug: record.slug,
+    priority: record.priority ?? 0,
+    ...(mapMedia(record.image, publicBase, record.name)
+      ? { image: mapMedia(record.image, publicBase, record.name) }
       : {}),
-    ...(card.descriptionLinksColor
-      ? { descriptionLinksColor: card.descriptionLinksColor }
-      : {}),
-    ...(card.bgColor ? { bgColor: card.bgColor } : {}),
-    ...(card.borderColor ? { borderColor: card.borderColor } : {}),
-    ...(mapMedia(card.bulletIcon, publicBase)
-      ? { bulletIcon: mapMedia(card.bulletIcon, publicBase) }
-      : {}),
-    ...(card.bulletText ? { bulletText: card.bulletText } : {}),
-    ...(card.bulletTextColor ? { bulletTextColor: card.bulletTextColor } : {}),
-    ...(card.bulletBgColor ? { bulletBgColor: card.bulletBgColor } : {}),
-    bulletPosition: card.bulletPosition,
-    bulletAlign: card.bulletAlign,
-    bulletScalePercent: card.bulletScalePercent ?? 100,
-    bulletDisabledBg: card.bulletDisabledBg === true,
-    bulletDisabledPaddings: card.bulletDisabledPaddings === true,
-    ...(mapMedia(card.image, publicBase, card.imageAlt ?? "")
-      ? {
-          image: mapMedia(card.image, publicBase, card.imageAlt ?? ""),
-        }
-      : {}),
-    imagePosition: card.imagePosition,
-    imageFit: card.imageFit,
-    imageAlign: card.imageAlign,
-    imageScalePercent: card.imageScalePercent ?? 100,
-    disabledBg: card.disabledBg === true,
-    disabledPaddings: card.disabledPaddings === true,
-    gridRowsStart: card.gridRowsStart ?? 1,
-    gridRowsSpan: card.gridRowsSpan ?? 1,
-    gridColumnsStart: card.gridColumnsStart ?? 1,
-    gridColumnsSpan: card.gridColumnsSpan ?? 1,
   };
 }
 
@@ -304,31 +486,31 @@ export function articleDetailRequest(slug: string) {
     "populate[seo][fields][1]": "description",
     "populate[seo][populate][image][fields][0]": "url",
     "populate[seo][populate][image][fields][1]": "updatedAt",
-    "populate[blocks][on][article.cards-grid][fields][0]": "title",
-    "populate[blocks][on][article.cards-grid][fields][1]": "description",
-    "populate[blocks][on][article.cards-grid][fields][2]": "titleColor",
-    "populate[blocks][on][article.cards-grid][fields][3]": "gridColumns",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][0]":
-      "url",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][1]":
-      "width",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][2]":
-      "height",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][3]":
-      "formats",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][4]":
-      "updatedAt",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][image][fields][5]":
+    "populate[blocks][populate][cards][populate][image][fields][0]": "url",
+    "populate[blocks][populate][cards][populate][image][fields][1]": "width",
+    "populate[blocks][populate][cards][populate][image][fields][2]": "height",
+    "populate[blocks][populate][cards][populate][image][fields][3]": "formats",
+    "populate[blocks][populate][cards][populate][image][fields][4]": "updatedAt",
+    "populate[blocks][populate][cards][populate][image][fields][5]":
       "alternativeText",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][bulletIcon][fields][0]":
-      "url",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][bulletIcon][fields][1]":
+    "populate[blocks][populate][cards][populate][bulletIcon][fields][0]": "url",
+    "populate[blocks][populate][cards][populate][bulletIcon][fields][1]":
       "width",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][bulletIcon][fields][2]":
+    "populate[blocks][populate][cards][populate][bulletIcon][fields][2]":
       "height",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][bulletIcon][fields][3]":
+    "populate[blocks][populate][cards][populate][bulletIcon][fields][3]":
       "formats",
-    "populate[blocks][on][article.cards-grid][populate][cards][populate][bulletIcon][fields][4]":
+    "populate[blocks][populate][cards][populate][bulletIcon][fields][4]":
+      "updatedAt",
+    "populate[blocks][populate][cards][populate][bullet_icon][fields][0]":
+      "url",
+    "populate[blocks][populate][cards][populate][bullet_icon][fields][1]":
+      "width",
+    "populate[blocks][populate][cards][populate][bullet_icon][fields][2]":
+      "height",
+    "populate[blocks][populate][cards][populate][bullet_icon][fields][3]":
+      "formats",
+    "populate[blocks][populate][cards][populate][bullet_icon][fields][4]":
       "updatedAt",
     "pagination[pageSize]": "1",
   });
@@ -348,15 +530,7 @@ export function mapArticlesPayload(
     .safeParse(payload);
   if (!parsed.success) throw new CmsValidationError(parsed.error.message);
 
-  return parsed.data.data.map((record) => ({
-    id: record.documentId,
-    name: record.name,
-    slug: record.slug,
-    priority: record.priority ?? 0,
-    ...(mapMedia(record.image, publicBase, record.name)
-      ? { image: mapMedia(record.image, publicBase, record.name) }
-      : {}),
-  }));
+  return parsed.data.data.map((record) => mapArticleCard(record, publicBase));
 }
 
 export function mapArticleDetailPayload(
@@ -370,39 +544,13 @@ export function mapArticleDetailPayload(
 
   const record = parsed.data.data[0];
   if (!record) return null;
+  const content = normalizeArticleHtml(record.content);
+  const seo = mapSeo(record.seo, publicBase);
 
   return {
-    id: record.documentId,
-    name: record.name,
-    slug: record.slug,
-    priority: record.priority ?? 0,
-    ...(mapMedia(record.image, publicBase, record.name)
-      ? { image: mapMedia(record.image, publicBase, record.name) }
-      : {}),
-    ...(record.content ? { content: record.content } : {}),
-    blocks: record.blocks.map((block) => ({
-      ...(block.title ? { title: block.title } : {}),
-      ...(block.description ? { description: block.description } : {}),
-      ...(block.titleColor ? { titleColor: block.titleColor } : {}),
-      gridColumns: block.gridColumns ?? 3,
-      cards: block.cards.map((card) => mapCard(card, publicBase)),
-    })),
-    ...(record.seo
-      ? {
-          seo: {
-            title: record.seo.title,
-            description: record.seo.description,
-            ...(record.seo.image
-              ? {
-                  imageUrl: versionCmsMediaUrl(
-                    record.seo.image.url,
-                    publicBase,
-                    record.seo.image.updatedAt,
-                  ),
-                }
-              : {}),
-          },
-        }
-      : {}),
+    ...mapArticleCard(record, publicBase),
+    ...(content ? { content } : {}),
+    blocks: mapBlocks(record.blocks, publicBase),
+    ...(seo ? { seo } : {}),
   };
 }

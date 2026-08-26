@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_material_templates_cards_grids",
+  "info": {
+    "displayName": "CardsGrid",
+    "description": "Сетка карточек BasicInfoCard"
+  },
+  "attributes": {
+    "title": {
+      "type": "richtext",
+      "required": false
+    },
+    "description": {
+      "type": "richtext",
+      "required": false
+    },
+    "title_color": {
+      "type": "string",
+      "required": false
+    },
+    "grid_columns": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "max": 6,
+      "default": 2
+    },
+    "cards": {
+      "type": "component",
+      "component": "material-templates.basic-info-card",
+      "repeatable": true,
+      "required": false
+    }
+  }
+}

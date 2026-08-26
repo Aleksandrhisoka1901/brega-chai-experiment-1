@@ -67,7 +67,7 @@
     },
     "blocks": {
       "type": "dynamiczone",
-      "components": ["article.cards-grid"],
+      "components": ["article.cards-grid", "material-templates.cards-grid"],
       "required": false
     },
     "seo": {

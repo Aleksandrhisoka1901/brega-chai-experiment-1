@@ -247,6 +247,77 @@ const adminApp = {
           "Число колонок",
         "content-manager.components.article.cards-grid.cards": "Карточки",
 
+        "content-manager.components.material-templates.cards-grid.title":
+          "Заголовок блока",
+        "content-manager.components.material-templates.cards-grid.description":
+          "Описание блока",
+        "content-manager.components.material-templates.cards-grid.title_color":
+          "Цвет заголовка",
+        "content-manager.components.material-templates.cards-grid.grid_columns":
+          "Число колонок",
+        "content-manager.components.material-templates.cards-grid.cards":
+          "Карточки",
+        "content-manager.components.material-templates.basic-info-card.title":
+          "Заголовок",
+        "content-manager.components.material-templates.basic-info-card.description":
+          "Описание",
+        "content-manager.components.material-templates.basic-info-card.title_color":
+          "Цвет заголовка",
+        "content-manager.components.material-templates.basic-info-card.description_color":
+          "Цвет описания",
+        "content-manager.components.material-templates.basic-info-card.description_links_color":
+          "Цвет ссылок описания",
+        "content-manager.components.material-templates.basic-info-card.bg_color":
+          "Цвет фона",
+        "content-manager.components.material-templates.basic-info-card.border_color":
+          "Цвет рамки",
+        "content-manager.components.material-templates.basic-info-card.bullet_text":
+          "Текст маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_icon":
+          "Иконка маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_text_color":
+          "Цвет текста маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_bg_color":
+          "Цвет фона маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_position":
+          "Положение маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_align":
+          "Выравнивание маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_scale_percent":
+          "Масштаб маркера, %",
+        "content-manager.components.material-templates.basic-info-card.bullet_disabled_bg":
+          "Без фона маркера",
+        "content-manager.components.material-templates.basic-info-card.bullet_disabled_paddings":
+          "Без отступов маркера",
+        "content-manager.components.material-templates.basic-info-card.image":
+          "Изображение",
+        "content-manager.components.material-templates.basic-info-card.image_alt":
+          "Альтернативный текст",
+        "content-manager.components.material-templates.basic-info-card.image_position":
+          "Положение изображения",
+        "content-manager.components.material-templates.basic-info-card.image_fit":
+          "Вписывание изображения",
+        "content-manager.components.material-templates.basic-info-card.image_align":
+          "Выравнивание изображения",
+        "content-manager.components.material-templates.basic-info-card.image_scale_percent":
+          "Масштаб изображения, %",
+        "content-manager.components.material-templates.basic-info-card.title_html_tag":
+          "HTML-тег заголовка",
+        "content-manager.components.material-templates.basic-info-card.disabled_bg":
+          "Без фона",
+        "content-manager.components.material-templates.basic-info-card.disabled_paddings":
+          "Без внутренних отступов",
+        "content-manager.components.material-templates.basic-info-card.grid_rows_start":
+          "Начало по строке",
+        "content-manager.components.material-templates.basic-info-card.grid_rows_span":
+          "Высота в строках",
+        "content-manager.components.material-templates.basic-info-card.grid_columns_start":
+          "Начало по колонке",
+        "content-manager.components.material-templates.basic-info-card.grid_columns_span":
+          "Ширина в колонках",
+
+        "content-manager.content-types.api::robots-txt.robots-txt.content":
+
         "content-manager.content-types.api::robots-txt.robots-txt.content":
           "Содержимое robots.txt",
 
