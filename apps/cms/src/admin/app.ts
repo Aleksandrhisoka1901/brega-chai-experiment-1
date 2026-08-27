@@ -317,8 +317,6 @@ const adminApp = {
           "Ширина в колонках",
 
         "content-manager.content-types.api::robots-txt.robots-txt.content":
-
-        "content-manager.content-types.api::robots-txt.robots-txt.content":
           "Содержимое robots.txt",
 
         "content-manager.content-types.api::home-page.home-page.featuredNabory":

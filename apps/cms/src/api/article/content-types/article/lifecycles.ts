@@ -4,7 +4,7 @@ import {
   shouldRegenerateDraftSlug,
   shouldGenerateSlug,
   transliterateCatalogTitle,
-} from "../../product/content-types/product/slug.js";
+} from "../../../product/content-types/product/slug.js";
 
 interface ArticleEvent {
   params: {
