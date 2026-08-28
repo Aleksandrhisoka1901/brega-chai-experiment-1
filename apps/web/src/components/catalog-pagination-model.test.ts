@@ -39,15 +39,15 @@ test("rejects malformed, repeated, non-positive and unsafe page values", () => {
 });
 
 test("builds canonical catalog links and navigation boundaries", () => {
-  assert.equal(catalogPageHref("/tovary", 1), "/tovary");
-  assert.equal(catalogPageHref("/tovary", 3), "/tovary?page=3");
+  assert.equal(catalogPageHref("/stantsii", 1), "/stantsii");
+  assert.equal(catalogPageHref("/stantsii", 3), "/stantsii?page=3");
   assert.equal(
-    catalogPageHref("/tovary", 1, { minPrice: 1000, maxPrice: 5000 }),
-    "/tovary?minPrice=1000&maxPrice=5000",
+    catalogPageHref("/stantsii", 1, { minPrice: 1000, maxPrice: 5000 }),
+    "/stantsii?minPrice=1000&maxPrice=5000",
   );
   assert.equal(
-    catalogPageHref("/nabory", 2, { minPrice: 1500 }),
-    "/nabory?minPrice=1500&page=2",
+    catalogPageHref("/paneli", 2, { minPrice: 1500 }),
+    "/paneli?minPrice=1500&page=2",
   );
 
   assert.deepEqual(catalogPaginationModel(20, 2), {

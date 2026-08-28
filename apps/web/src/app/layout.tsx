@@ -26,8 +26,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(siteOrigin()),
-    title: settings?.defaultSeo.title ?? "Brega Tea",
-    description: settings?.defaultSeo.description ?? "Чай и ритуалы Brega Tea",
+    title: settings?.defaultSeo.title ?? "Brega",
+    description:
+      settings?.defaultSeo.description ??
+      "Портативные электростанции и солнечные панели для дома и резервного питания",
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
       shortcut: "/favicon.svg",
@@ -42,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#efede4",
+  themeColor: "#f5f7fa",
 };
 
 export default async function RootLayout({
@@ -65,13 +67,13 @@ export default async function RootLayout({
         <JsonLd
           data={organizationStructuredData(
             siteOrigin(),
-            settings?.brandName ?? "Brega Tea",
+            settings?.brandName ?? "Brega",
           )}
         />
         <JsonLd
           data={websiteStructuredData(
             siteOrigin(),
-            settings?.brandName ?? "Brega Tea",
+            settings?.brandName ?? "Brega",
           )}
         />
         <a className="skip-link" href="#main-content">

@@ -4,6 +4,9 @@ import { ensureRussianAdminLocale } from "./admin-localization.js";
 import { russianAdminTranslations } from "./admin/app.js";
 import { registerCacheRevalidation } from "./cache-revalidation/index.js";
 import { ensureGlobalContentDefaults } from "./content-migration.js";
+import { ensureHomeArticlesPreview } from "./home-articles-configuration.js";
+import { ensureHomeEditorialPalette } from "./home-palette-configuration.js";
+import { ensureRelatedItemsPermissions } from "./related-items-configuration.js";
 import { ensureSitemapConfiguration } from "./sitemap-configuration.js";
 import { ensureRitualsPageConfiguration } from "./rituals-page-configuration.js";
 
@@ -13,6 +16,9 @@ export default {
     await ensureRussianAdminLocale(strapi);
     await ensureGlobalContentDefaults(strapi);
     await ensureRitualsPageConfiguration(strapi);
+    await ensureRelatedItemsPermissions(strapi);
+    await ensureHomeArticlesPreview(strapi);
+    await ensureHomeEditorialPalette(strapi);
     await ensureSitemapConfiguration(strapi);
     await syncAdminContentManager(strapi, russianAdminTranslations);
     registerOrderStatusMiddleware(strapi);

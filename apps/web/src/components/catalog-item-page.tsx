@@ -3,6 +3,11 @@ import { notFound } from "next/navigation";
 
 import { canonicalUrl, pageMetadata } from "@/lib/seo/metadata";
 import {
+  catalogCollectionPath,
+  catalogItemPath,
+  type CatalogCollectionRoute,
+} from "@/lib/catalog-routes";
+import {
   breadcrumbStructuredData,
   productStructuredData,
 } from "@/lib/seo/structured-data";
@@ -15,20 +20,18 @@ import { type BreadcrumbItem } from "./breadcrumbs";
 import { ProductDetail } from "./product-detail";
 
 type CatalogItemPageOptions = {
-  route: "tovary" | "nabory";
+  route: CatalogCollectionRoute;
   slug: string;
 };
 
 const routeConfig = {
-  tovary: {
-    collectionUrl: "/tovary",
-    pathPrefix: "/tovary",
-    type: "tovar",
+  stantsii: {
+    collectionUrl: catalogCollectionPath("tovar"),
+    type: "tovar" as const,
   },
-  nabory: {
-    collectionUrl: "/nabory",
-    pathPrefix: "/nabory",
-    type: "nabor",
+  paneli: {
+    collectionUrl: catalogCollectionPath("nabor"),
+    type: "nabor" as const,
   },
 } as const;
 
@@ -36,7 +39,7 @@ export async function catalogItemMetadata({
   route,
   slug,
 }: CatalogItemPageOptions): Promise<Metadata> {
-  const { pathPrefix, type } = routeConfig[route];
+  const { collectionUrl, type } = routeConfig[route];
   try {
     const [product, settings] = await Promise.all([
       getProductBySlug(type, slug),
@@ -55,7 +58,7 @@ export async function catalogItemMetadata({
         settings.defaultSeo.description ??
         product.excerpt,
       imageUrl: product.seo?.imageUrl ?? settings.defaultSeo.imageUrl,
-      path: `${pathPrefix}/${product.slug}`,
+      path: catalogItemPath(type, product.slug),
     });
   } catch (error) {
     if (!(error instanceof CmsUnavailableError)) throw error;
@@ -69,7 +72,7 @@ export async function catalogItemMetadata({
 
 export async function CatalogItemPage(options: CatalogItemPageOptions) {
   const { route, slug } = options;
-  const { collectionUrl, pathPrefix, type } = routeConfig[route];
+  const { collectionUrl, type } = routeConfig[route];
 
   try {
     const [product, settings] = await Promise.all([
@@ -78,13 +81,13 @@ export async function CatalogItemPage(options: CatalogItemPageOptions) {
     ]);
 
     if (!product) notFound();
-    const productUrl = canonicalUrl(`${pathPrefix}/${product.slug}`);
+    const productUrl = canonicalUrl(catalogItemPath(type, product.slug));
     const breadcrumbs: BreadcrumbItem[] = [
       { name: "Главная", href: "/" },
       { name: settings.sectionBreadcrumbs[route], href: collectionUrl },
       {
         name: product.breadcrumbLabel,
-        href: `${pathPrefix}/${product.slug}`,
+        href: catalogItemPath(type, product.slug),
       },
     ];
 

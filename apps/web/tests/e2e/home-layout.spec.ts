@@ -81,7 +81,7 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
   await expect(aboutParagraphs).toHaveCount(2);
   await expect(aboutParagraphs.first()).toHaveCSS("font-size", "20px");
 
-  const nabory = page.locator("#nabory");
+  const nabory = page.locator("#paneli");
   const naborCards = nabory.locator('[data-home-card="nabor"]');
   const naborTrackBox = await nabory
     .locator('[data-home-card="nabor"]')
@@ -96,7 +96,7 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
   await naborCards.first().hover();
   await expect(firstNaborImage).not.toHaveCSS("transform", "none");
 
-  const products = page.locator("#tovary");
+  const products = page.locator("#stantsii");
   const productGrid = products.locator(".product-grid");
   const productCards = products.locator(".product-card");
   await expect(productGrid).toHaveCSS("gap", "0px");
@@ -177,7 +177,7 @@ test("catalog headings do not reserve space for an absent eyebrow", async ({
   await page.setViewportSize({ width: 600, height: 900 });
   await page.goto("/");
 
-  for (const sectionId of ["nabory", "tovary"]) {
+  for (const sectionId of ["paneli", "stantsii"]) {
     const header = page.locator(`#${sectionId} header`);
     await header.evaluate((element) => {
       element.querySelector(":scope > p")?.remove();
@@ -196,8 +196,8 @@ test("a single home card closes its tablet track", async ({ page }) => {
   await page.goto("/");
 
   for (const track of [
-    page.locator("#nabory [data-collection-layout]"),
-    page.locator("#tovary .product-grid"),
+    page.locator("#paneli [data-collection-layout]"),
+    page.locator("#stantsii .product-grid"),
   ]) {
     await expect(track).toHaveAttribute("data-card-count", "4");
     await track.evaluate((element) => {
@@ -238,7 +238,7 @@ test("four home cards fill the desktop content width", async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/");
 
-  for (const section of [page.locator("#nabory"), page.locator("#tovary")]) {
+  for (const section of [page.locator("#paneli"), page.locator("#stantsii")]) {
     const headerBox = await section.locator("header").boundingBox();
     const trackBox = await section
       .locator("[data-collection-layout]")
@@ -254,7 +254,7 @@ test("home collections use article cards with equal three-column geometry", asyn
   await page.setViewportSize({ width: 1366, height: 900 });
   await page.goto("/");
 
-  for (const section of [page.locator("#nabory"), page.locator("#tovary")]) {
+  for (const section of [page.locator("#paneli"), page.locator("#stantsii")]) {
     const track = section.locator("[data-collection-layout]");
 
     await track.evaluate((element) => {
@@ -288,7 +288,7 @@ test("home collections use article cards with equal three-column geometry", asyn
     );
   }
 
-  for (const path of ["/tovary", "/nabory"]) {
+  for (const path of ["/stantsii", "/paneli"]) {
     await page.goto(path);
     const grid = page.locator(".product-grid");
     const directChildren = grid.locator(":scope > *");
@@ -331,7 +331,7 @@ test("every public block stays inside the shared content frame", async ({
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
 
-  for (const path of ["/", "/tovary", "/nabory", "/tovary/published-product"]) {
+  for (const path of ["/", "/stantsii", "/paneli", "/stantsii/published-product"]) {
     await page.goto(path);
     const frames = page.locator("[data-content-frame]");
     expect(await frames.count(), path).toBeGreaterThanOrEqual(3);

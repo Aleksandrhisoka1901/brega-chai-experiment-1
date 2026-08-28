@@ -14,6 +14,8 @@ interface ProductEvent {
       publishedAt?: Date | string | null;
       slug?: string;
       slugLocked?: boolean;
+      type?: "nabor" | "tovar";
+      catalogRoute?: "stantsii" | "paneli";
     };
     where?: Record<string, unknown>;
   };
@@ -28,6 +30,20 @@ interface ProductDeleteEvent {
 const PRODUCT_UID = "api::product.product";
 const productQuery = () => strapi.db.query(PRODUCT_UID);
 
+function catalogRouteFromType(type?: "nabor" | "tovar") {
+  return type === "nabor" ? "paneli" : "stantsii";
+}
+
+function assignCatalogRoute(
+  data: ProductEvent["params"]["data"],
+  type?: "nabor" | "tovar",
+) {
+  const nextType = data.type ?? type;
+  if (nextType === "nabor" || nextType === "tovar") {
+    data.catalogRoute = catalogRouteFromType(nextType);
+  }
+}
+
 async function persistSlugLock(documentId: string) {
   // The low-level builder participates in Strapi's current transaction and
   // deliberately bypasses entity lifecycle hooks, avoiding recursive updates.
@@ -41,6 +57,7 @@ async function persistSlugLock(documentId: string) {
 export default {
   async beforeCreate(event: ProductEvent) {
     const data = event.params.data;
+    assignCatalogRoute(data);
     if (data.publishedAt != null) {
       data.slugLocked = true;
       if (data.documentId) {
@@ -80,8 +97,11 @@ export default {
         "publishedAt",
         "slug",
         "slugLocked",
+        "type",
       ],
     });
+
+    assignCatalogRoute(event.params.data, current?.type);
 
     if (!current?.slug || !current.displayName) {
       return;

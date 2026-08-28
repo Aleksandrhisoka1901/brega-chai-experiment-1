@@ -2,25 +2,26 @@
   color-scheme: light;
 
   /* Primitive */
-  --primitive-ink: #24251e;
-  --primitive-paper: #efede4;
-  --primitive-paper-warm: #d7cfbe;
-  --primitive-sage: #afb094;
-  --primitive-rule: #bbb9ac;
-  --primitive-muted: #626358;
-  --primitive-soft: #696a60;
-  --primitive-footer: #272820;
-  --primitive-footer-text: #e3e0d4;
-  --primitive-footer-muted: #9b9b91;
-  --primitive-success: #3f5b43;
+  --primitive-ink: #1e2329;
+  --primitive-paper: #f5f7fa;
+  --primitive-paper-warm: #eef1f4;
+  --primitive-sage: #22a06b;
+  --primitive-rule: #d5dbe3;
+  --primitive-muted: #5c6570;
+  --primitive-soft: #7a8490;
+  --primitive-footer: #1e2329;
+  --primitive-footer-text: #f5f7fa;
+  --primitive-footer-muted: #a8b0b8;
+  --primitive-success: #22a06b;
   --primitive-warning: #735b26;
-  --primitive-error: #7a3833;
+  --primitive-error: #8a4038;
   --primitive-info: #40586b;
+  --primitive-accent: #ff8a00;
 
   /* Semantic */
   --surface-page: var(--primitive-paper);
   --surface-subtle: var(--primitive-paper-warm);
-  --surface-editorial: var(--primitive-sage);
+  --surface-editorial: #e7f6ee;
   --surface-inverse: var(--primitive-footer);
   --text-primary: var(--primitive-ink);
   --text-muted: var(--primitive-muted);
@@ -31,17 +32,17 @@
   --status-warning: var(--primitive-warning);
   --status-error: var(--primitive-error);
   --status-info: var(--primitive-info);
-  --disabled-text: #818278;
-  --disabled-surface: #dedcd2;
-  --disabled-border: #c9c7bd;
-  --action-primary-hover: #34362d;
-  --action-subtle-hover: #e5e2d8;
-  --action-ghost-hover: #e9e6dd;
-  --skeleton-base: #d9d6cc;
-  --skeleton-highlight: #e8e5dc;
+  --disabled-text: #7a8490;
+  --disabled-surface: #eef1f4;
+  --disabled-border: #d5dbe3;
+  --action-primary-hover: #2a3138;
+  --action-subtle-hover: #eceff3;
+  --action-ghost-hover: #eef1f4;
+  --skeleton-base: #d5dbe3;
+  --skeleton-highlight: #eef1f4;
 
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-interface: Manrope, Arial, sans-serif;
+  --font-display: Manrope, Arial, sans-serif;
+  --font-interface: Inter, Arial, sans-serif;
   --font-display-weight: 400;
   --font-interface-weight: 400;
 
@@ -104,8 +105,8 @@
   /* Component */
   --drawer-width: 28.75rem;
   --drawer-shadow: -1.5rem 0 3rem rgb(36 37 30 / 14%);
-  --card-media-ratio: 4 / 5;
-  --gallery-media-ratio: 4 / 5;
+  --card-media-ratio: 4 / 3;
+  --gallery-media-ratio: 4 / 3;
   --gallery-thumb-ratio: 1;
 }
 

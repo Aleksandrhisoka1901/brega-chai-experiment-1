@@ -31,8 +31,8 @@ async function openStablePage(page: Page, path: string) {
 for (const viewport of viewports) {
   for (const target of [
     { name: "home", path: "/" },
-    { name: "catalog", path: "/tovary" },
-    { name: "product", path: "/tovary/published-product" },
+    { name: "catalog", path: "/stantsii" },
+    { name: "product", path: "/stantsii/published-product" },
   ] as const) {
     test(`${target.name} ${viewport.name} visual baseline @visual`, async ({
       page,
@@ -60,7 +60,7 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await openStablePage(page, "/tovary/published-product");
+    await openStablePage(page, "/stantsii/published-product");
 
     await page.getByRole("button", { name: "Добавить в корзину" }).click();
     const dialog = page.getByRole("dialog");

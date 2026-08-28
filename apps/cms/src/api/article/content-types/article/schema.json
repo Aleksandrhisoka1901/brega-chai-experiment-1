@@ -70,6 +70,15 @@
       "components": ["article.cards-grid", "material-templates.cards-grid"],
       "required": false
     },
+    "relatedMaterials": {
+      "type": "dynamiczone",
+      "components": [
+        "article.related-product",
+        "article.related-article"
+      ],
+      "required": false,
+      "description": "Статьи, товары и ритуалы для связанных блоков на витрине."
+    },
     "seo": {
       "type": "component",
       "component": "shared.seo",

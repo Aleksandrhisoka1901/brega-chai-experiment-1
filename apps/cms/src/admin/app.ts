@@ -24,7 +24,7 @@ const adminApp = {
         "content-manager.content-types.api::global-setting.global-setting.currency":
           "Валюта",
         "content-manager.content-types.api::global-setting.global-setting.defaultProductStory":
-          "Описание бутика",
+          "Описание магазина",
         "content-manager.content-types.api::global-setting.global-setting.defaultSeo":
           "SEO по умолчанию",
         "content-manager.content-types.api::global-setting.global-setting.email":
@@ -55,13 +55,15 @@ const adminApp = {
           "Ссылка на Telegram",
 
         "content-manager.content-types.api::home-page.home-page.about":
-          "О проекте",
+          "О компании",
         "content-manager.content-types.api::home-page.home-page.hero":
           "Первый экран",
         "content-manager.content-types.api::home-page.home-page.tovaryPreview":
-          "Анонс сортов",
+          "Анонс электростанций",
         "content-manager.content-types.api::home-page.home-page.naboryPreview":
-          "Анонс ритуалов",
+          "Анонс солнечных панелей",
+        "content-manager.content-types.api::home-page.home-page.articlesPreview":
+          "Анонс статей",
         "content-manager.content-types.api::home-page.home-page.seo":
           "SEO-настройки",
 
@@ -112,7 +114,7 @@ const adminApp = {
         "content-manager.content-types.api::product.product.originalTitle":
           "Оригинальное название",
         "content-manager.content-types.api::product.product.packageLabel":
-          "Тип упаковки и фасовка",
+          "Короткая подпись на карточке",
         "content-manager.content-types.api::product.product.price":
           "Цена в рублях",
         "content-manager.content-types.api::product.product.seedKey":
@@ -131,6 +133,12 @@ const adminApp = {
         "content-manager.content-types.api::product.product.displayName":
           "Отображаемое название",
         "content-manager.content-types.api::product.product.type": "Тип",
+        "content-manager.content-types.api::product.product.specs":
+          "Характеристики",
+        "content-manager.content-types.api::product.product.catalogRoute":
+          "Публичный раздел",
+        "content-manager.components.product.spec.label": "Параметр",
+        "content-manager.components.product.spec.value": "Значение",
 
         "content-manager.content-types.api::products-page.products-page.eyebrow":
           "Надстрочник",
@@ -173,6 +181,8 @@ const adminApp = {
 
         "content-manager.content-types.api::article.article.blocks":
           "Блоки статьи",
+        "content-manager.content-types.api::article.article.relatedMaterials":
+          "Связанные материалы",
         "content-manager.content-types.api::article.article.content":
           "Текст статьи",
         "content-manager.content-types.api::article.article.image":
@@ -198,6 +208,9 @@ const adminApp = {
           "Цвет описания",
         "content-manager.components.article.card.descriptionLinksColor":
           "Цвет ссылок описания",
+        "content-manager.components.article.related-product.product":
+          "Товар или ритуал",
+        "content-manager.components.article.related-article.article": "Статья",
         "content-manager.components.article.card.bgColor": "Цвет фона",
         "content-manager.components.article.card.borderColor": "Цвет рамки",
         "content-manager.components.article.card.bulletIcon": "Иконка маркера",
@@ -238,7 +251,8 @@ const adminApp = {
           "Начало по колонке",
         "content-manager.components.article.card.gridColumnsSpan":
           "Ширина в колонках",
-        "content-manager.components.article.cards-grid.title": "Заголовок блока",
+        "content-manager.components.article.cards-grid.title":
+          "Заголовок блока",
         "content-manager.components.article.cards-grid.description":
           "Описание блока",
         "content-manager.components.article.cards-grid.titleColor":
@@ -320,9 +334,19 @@ const adminApp = {
           "Содержимое robots.txt",
 
         "content-manager.content-types.api::home-page.home-page.featuredNabory":
-          "Ритуалы на главной",
+          "Панели на главной",
         "content-manager.content-types.api::home-page.home-page.featuredTovary":
-          "Сорта на главной",
+          "Станции на главной",
+        "content-manager.content-types.api::home-page.home-page.featuredArticles":
+          "Статьи на главной",
+
+        "content-manager.components.home.articles-preview.eyebrow":
+          "Надстрочник",
+        "content-manager.components.home.articles-preview.linkLabel":
+          "Текст ссылки на раздел",
+        "content-manager.components.home.articles-preview.subtitle":
+          "Краткий анонс",
+        "content-manager.components.home.articles-preview.title": "Заголовок",
 
         "content-manager.components.home.catalog-preview.eyebrow":
           "Надстрочник",
@@ -375,10 +399,12 @@ const adminApp = {
         "content-manager.components.shared.legal-documents.deliveryAndReturns":
           "Условия доставки и возврата",
         "content-manager.components.shared.navigation-labels.about":
-          "О проекте",
+          "О компании",
         "content-manager.components.shared.navigation-labels.cart": "Корзина",
-        "content-manager.components.shared.navigation-labels.tovary": "Сорта",
-        "content-manager.components.shared.navigation-labels.nabory": "Ритуалы",
+        "content-manager.components.shared.navigation-labels.tovary":
+          "Электростанции",
+        "content-manager.components.shared.navigation-labels.nabory":
+          "Солнечные панели",
         "content-manager.components.shared.navigation-labels.stati": "Статьи",
         "content-manager.components.shared.section-breadcrumb.route": "Раздел",
         "content-manager.components.shared.section-breadcrumb.label": "Подпись",

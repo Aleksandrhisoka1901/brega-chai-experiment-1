@@ -46,7 +46,7 @@
 
 .mainImage,
 .placeholder {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   background: var(--surface-subtle);
 }
 
@@ -106,7 +106,7 @@
 
 .commerce h1 {
   margin: 0;
-  max-width: 12ch;
+  max-width: 18ch;
   font-family: var(--font-display);
   font-size: var(--type-heading-1);
   font-weight: 400;
@@ -130,6 +130,62 @@
   color: var(--text-muted);
   font-family: var(--font-display);
   font-size: var(--type-body-ui);
+}
+
+.specsSection {
+  margin-top: 2.5rem;
+}
+
+.specsSection h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: var(--type-heading-3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.specs {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.specs dt,
+.specs dd {
+  margin: 0;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border-default);
+  font-family: var(--font-interface);
+  font-size: var(--type-body-ui);
+}
+
+.specs dt {
+  color: var(--text-muted);
+  font-size: var(--type-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.specs dd {
+  padding-top: 0.15rem;
+  font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  .specs {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.9fr) minmax(0, 1.4fr);
+  }
+
+  .specs dt,
+  .specs dd {
+    padding: 0.75rem 0;
+  }
+
+  .specs dt {
+    padding-right: 1rem;
+    border-bottom: 1px solid var(--border-default);
+  }
 }
 
 .price {
@@ -197,7 +253,7 @@
 }
 
 .addButton:hover:not(:disabled) {
-  background: #35372e;
+  background: var(--action-primary-hover);
 }
 
 .addButton:disabled {

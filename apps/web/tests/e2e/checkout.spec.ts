@@ -5,7 +5,7 @@ test.describe.configure({ mode: "serial" });
 const cmsFixturePort = process.env.CMS_FIXTURE_PORT ?? "14338";
 
 async function addProductAndOpenCart(page: Page, slug = "published-product") {
-  await page.goto(`/tovary/${slug}`);
+  await page.goto(`/stantsii/${slug}`);
   const add = page.getByRole("button", { name: "Добавить в корзину" });
   await expect(add).toHaveAttribute("data-cart-ready", "true");
   await add.click();
@@ -299,7 +299,7 @@ test("updates product availability after success without page navigation", async
   ).toBeVisible();
   await dialog.getByRole("button", { name: "Вернуться к покупкам" }).click();
 
-  await expect(page).toHaveURL(/\/tovary\/last-product$/);
+  await expect(page).toHaveURL(/\/stantsii\/last-product$/);
   await expect(
     page.getByRole("button", { name: "Нет в наличии" }),
   ).toBeDisabled();
@@ -328,7 +328,7 @@ test("double click creates one upstream request", async ({ page, request }) => {
 test("drawer and checkout are keyboard-operable and axe-clean @a11y", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
   const add = page.getByRole("button", { name: "Добавить в корзину" });
   await expect(add).toHaveAttribute("data-cart-ready", "true");
   await add.focus();

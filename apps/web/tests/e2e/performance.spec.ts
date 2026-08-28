@@ -113,7 +113,7 @@ test("initial client JavaScript stays within its measured budget @performance", 
 test("checkout code loads only when checkout is opened @performance", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
   const add = page.getByRole("button", { name: "Добавить в корзину" });
   await expect(add).toHaveAttribute("data-cart-ready", "true");
   await add.click();

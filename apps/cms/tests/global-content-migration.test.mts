@@ -29,8 +29,8 @@ test("global content migration fills missing components for draft and published 
       data: {
         maxItemQuantity: 5,
         sectionBreadcrumbs: [
-          { route: "tovary", label: "Сорта" },
-          { route: "nabory", label: "Ритуалы" },
+          { route: "stantsii", label: "Электростанции" },
+          { route: "paneli", label: "Солнечные панели" },
         ],
         storefrontTexts: {
           imagePlaceholder: "Изображение готовится",
@@ -44,8 +44,8 @@ test("global content migration fills missing components for draft and published 
       data: {
         maxItemQuantity: 5,
         sectionBreadcrumbs: [
-          { route: "tovary", label: "Сорта" },
-          { route: "nabory", label: "Ритуалы" },
+          { route: "stantsii", label: "Электростанции" },
+          { route: "paneli", label: "Солнечные панели" },
         ],
         storefrontTexts: {
           imagePlaceholder: "Изображение готовится",
@@ -67,8 +67,8 @@ test("global content migration leaves complete settings untouched", async () => 
               documentId: "settings",
               maxItemQuantity: 8,
               sectionBreadcrumbs: [
-                { route: "tovary", label: "Каталог" },
-                { route: "nabory", label: "Коллекции" },
+                { route: "stantsii", label: "Каталог" },
+                { route: "paneli", label: "Коллекции" },
               ],
               storefrontTexts: {
                 imagePlaceholder: "Скоро",

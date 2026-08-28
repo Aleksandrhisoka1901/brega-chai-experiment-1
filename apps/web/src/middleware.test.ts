@@ -23,7 +23,7 @@ const withCmsReadiness = async (status: number, run: () => Promise<void>) => {
 test("rewrites public pages to an honest 503 when CMS is unavailable", async () => {
   await withCmsReadiness(503, async () => {
     const response = await middleware(
-      new NextRequest("https://brega.example/tovary"),
+      new NextRequest("https://brega.example/stantsii"),
     );
 
     assert.equal(response.status, 503);
@@ -196,7 +196,7 @@ test("continues public navigation when CMS readiness is healthy", async () => {
 
   try {
     const response = await middleware(
-      new NextRequest("https://brega.example/tovary"),
+      new NextRequest("https://brega.example/stantsii"),
     );
 
     assert.equal(response.status, 200);
@@ -214,7 +214,7 @@ test("redirects supported dirty URLs to their canonical URL in one 301", async (
   const cases = [
     {
       source: "/TOVARY/DA-HUN-PAO/",
-      target: "/tovary/da-hun-pao",
+      target: "/stantsii/da-hun-pao",
     },
     { source: "/index.html", target: "/" },
     {
@@ -222,12 +222,12 @@ test("redirects supported dirty URLs to their canonical URL in one 301", async (
       target: "/?utm_source=test",
     },
     {
-      source: "/tovary/---/da-hun-pao",
-      target: "/tovary/da-hun-pao",
+      source: "/stantsii/---/da-hun-pao",
+      target: "/stantsii/da-hun-pao",
     },
     {
       source: "/NABORY/MEDLENNOE-UTRO/",
-      target: "/nabory/medlennoe-utro",
+      target: "/paneli/medlennoe-utro",
     },
   ];
 
@@ -260,9 +260,9 @@ test("redirects supported dirty URLs to their canonical URL in one 301", async (
 test("preserves canonical and unknown entity URLs for the server data layer", async () => {
   await withCmsReadiness(204, async () => {
     for (const path of [
-      "/tovary?utm_source=mail",
-      "/tovary/unknown-slug",
-      "/nabory/unknown-slug",
+      "/stantsii?utm_source=mail",
+      "/stantsii/unknown-slug",
+      "/paneli/unknown-slug",
     ]) {
       const response = await middleware(
         new NextRequest(`https://brega.example${path}`),

@@ -7,7 +7,7 @@ export function serializeJsonLd(data: unknown) {
 export function productStructuredData(
   product: ProductDetail,
   url: string,
-  brandName = "Brega Tea",
+  brandName = "Brega",
 ) {
   return {
     "@context": "https://schema.org",

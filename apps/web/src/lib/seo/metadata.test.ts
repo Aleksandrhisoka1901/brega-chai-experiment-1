@@ -32,8 +32,8 @@ test("reads the canonical origin from runtime environment", () => {
 
 test("builds lowercase canonical URLs without trailing slash", () => {
   assert.equal(
-    canonicalUrl("/tovary/DA-HONG-PAO", "https://brega.example/"),
-    "https://brega.example/tovary/da-hong-pao",
+    canonicalUrl("/stantsii/DA-HONG-PAO", "https://brega.example/"),
+    "https://brega.example/stantsii/da-hong-pao",
   );
   assert.equal(
     canonicalUrl("/", "https://brega.example"),
@@ -43,8 +43,9 @@ test("builds lowercase canonical URLs without trailing slash", () => {
 
 test("applies stable title and description fallbacks", () => {
   assert.deepEqual(metadataWithFallbacks({ title: "", description: null }), {
-    title: "Brega Tea",
-    description: "Чай и ритуалы Brega Tea",
+    title: "Brega",
+    description:
+      "Портативные электростанции и солнечные панели для дома и резервного питания",
   });
 });
 
@@ -53,7 +54,7 @@ test("adds an optional editorial image to Open Graph metadata", () => {
     title: "Да Хун Пао",
     description: "Утёсный улун.",
     imageUrl: "https://media.example.test/seo.png",
-    path: "/tovary/da-hun-pao",
+    path: "/stantsii/da-hun-pao",
   });
 
   assert.deepEqual(metadata.openGraph?.images, [

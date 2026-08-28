@@ -2,6 +2,7 @@ import type { ProductSummary } from "@brega-chai/contracts";
 import { z } from "zod";
 
 import { CmsValidationError } from "./errors.ts";
+import { versionCmsMediaUrl } from "./media-url.ts";
 
 const nonEmptyString = z.string().trim().min(1);
 const optionalEyebrow = z
@@ -52,7 +53,7 @@ export type ProductsPageModel = {
 };
 
 function mediaUrl(path: string, base: string) {
-  return URL.canParse(path) ? path : new URL(path, base).toString();
+  return versionCmsMediaUrl(path, base);
 }
 
 export function mapProductsPagePayload(

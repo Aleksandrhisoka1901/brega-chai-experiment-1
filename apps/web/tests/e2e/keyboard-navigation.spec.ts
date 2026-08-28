@@ -10,20 +10,20 @@ test("header, catalog cards, and breadcrumbs support keyboard navigation", async
     .getByRole("link", { name: "Сорта" });
   await productsNavigation.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL("/tovary");
+  await expect(page).toHaveURL("/stantsii");
 
   const firstProduct = page.locator(".product-grid").getByRole("link").first();
   await expect(firstProduct).toHaveAccessibleName(/Да\s+Хун\s+Пао/);
   await firstProduct.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL("/tovary/published-product");
+  await expect(page).toHaveURL("/stantsii/published-product");
 
   const catalogBreadcrumb = page
     .getByRole("navigation", { name: "Хлебные крошки" })
     .getByRole("link", { name: "Сорта" });
   await catalogBreadcrumb.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL("/tovary");
+  await expect(page).toHaveURL("/stantsii");
 });
 
 test("ritual navigation, catalog cards, empty cart and breadcrumbs use the landing", async ({
@@ -34,15 +34,15 @@ test("ritual navigation, catalog cards, empty cart and breadcrumbs use the landi
   const ritualsNavigation = page
     .getByRole("navigation", { name: "Основная навигация" })
     .getByRole("link", { name: "Ритуалы" });
-  await expect(ritualsNavigation).toHaveAttribute("href", "/nabory");
+  await expect(ritualsNavigation).toHaveAttribute("href", "/paneli");
   await ritualsNavigation.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL("/nabory");
+  await expect(page).toHaveURL("/paneli");
 
   const firstRitual = page.getByRole("main").getByRole("article").first();
   await expect(firstRitual.getByRole("link")).toHaveAttribute(
     "href",
-    /^\/nabory\//,
+    /^\/paneli\//,
   );
 
   await page.getByRole("button", { name: /Открыть корзину/ }).click();
@@ -51,14 +51,14 @@ test("ritual navigation, catalog cards, empty cart and breadcrumbs use the landi
   });
   await expect(
     emptyCart.getByRole("link", { name: "К ритуалам" }),
-  ).toHaveAttribute("href", "/nabory");
+  ).toHaveAttribute("href", "/paneli");
   await page.keyboard.press("Escape");
 
-  await page.goto("/nabory/ritual-one");
+  await page.goto("/paneli/ritual-one");
   const catalogBreadcrumb = page
     .getByRole("navigation", { name: "Хлебные крошки" })
     .getByRole("link", { name: "Ритуалы" });
   await catalogBreadcrumb.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL("/nabory");
+  await expect(page).toHaveURL("/paneli");
 });

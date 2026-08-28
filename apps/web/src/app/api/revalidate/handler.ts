@@ -210,10 +210,10 @@ function invalidate(
     revalidateTag("products");
     revalidatePath("/", "layout");
     revalidatePath("/", "page");
-    revalidatePath("/tovary", "page");
-    revalidatePath("/nabory", "page");
-    revalidatePath("/tovary/[slug]", "page");
-    revalidatePath("/nabory/[slug]", "page");
+    revalidatePath("/stantsii", "page");
+    revalidatePath("/paneli", "page");
+    revalidatePath("/stantsii/[slug]", "page");
+    revalidatePath("/paneli/[slug]", "page");
     revalidateTag("articles");
     revalidateTag("articles-page");
     revalidatePath("/stati", "page");
@@ -237,12 +237,12 @@ function invalidate(
   }
 
   revalidateTag("products");
-  revalidatePath("/tovary", "page");
-  revalidatePath("/nabory", "page");
+  revalidatePath("/stantsii", "page");
+  revalidatePath("/paneli", "page");
   if (event.event === "product") {
     revalidateTag(`product-slug:${event.product.type}:${event.product.slug}`);
     revalidatePath(
-      `/${event.product.type === "nabor" ? "nabory" : "tovary"}/${event.product.slug}`,
+      `/${event.product.type === "nabor" ? "paneli" : "stantsii"}/${event.product.slug}`,
       "page",
     );
     revalidatePath("/", "page");

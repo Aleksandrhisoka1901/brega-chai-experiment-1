@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 const redirectCases = [
   {
     source: "/TOVARY/PUBLISHED-PRODUCT/",
-    target: "/tovary/published-product",
+    target: "/stantsii/published-product",
   },
   { source: "/index.html", target: "/" },
   {
@@ -11,12 +11,12 @@ const redirectCases = [
     target: "/?utm_source=test",
   },
   {
-    source: "/tovary/---/published-product",
-    target: "/tovary/published-product",
+    source: "/stantsii/---/published-product",
+    target: "/stantsii/published-product",
   },
   {
     source: "/NABORY/RITUAL-ONE/",
-    target: "/nabory/ritual-one",
+    target: "/paneli/ritual-one",
   },
 ];
 
@@ -47,7 +47,7 @@ test("supported dirty URLs use one permanent redirect to canonical pages", async
 test("unknown entities stay 404 and static resources bypass canonicalization", async ({
   request,
 }) => {
-  const unknown = await request.get("/tovary/unknown-slug", {
+  const unknown = await request.get("/stantsii/unknown-slug", {
     maxRedirects: 0,
   });
   expect(unknown.status()).toBe(404);

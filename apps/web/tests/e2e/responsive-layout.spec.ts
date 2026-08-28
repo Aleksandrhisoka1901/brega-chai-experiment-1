@@ -28,14 +28,14 @@ for (const viewport of viewports) {
 
     for (const path of [
       "/",
-      "/tovary",
-      "/nabory",
-      "/tovary/published-product",
+      "/stantsii",
+      "/paneli",
+      "/stantsii/published-product",
     ]) {
       await page.goto(path);
       await expectNoPageOverflow(page, viewport.width);
 
-      if (path === "/" || path === "/tovary" || path === "/nabory") {
+      if (path === "/" || path === "/stantsii" || path === "/paneli") {
         const grid = page.locator(".product-grid").first();
         const styles = await grid.evaluate((element) => {
           const computed = getComputedStyle(element);
@@ -54,7 +54,7 @@ for (const viewport of viewports) {
       }
 
       if (path === "/" && viewport.width > 520) {
-        for (const sectionId of ["nabory", "tovary"]) {
+        for (const sectionId of ["paneli", "stantsii"]) {
           const header = page.locator(
             `#${sectionId} > [data-content-frame] > header`,
           );
@@ -82,7 +82,7 @@ for (const viewport of viewports) {
       }
 
       if (path === "/" && viewport.width <= 1023) {
-        const nabory = page.locator("#nabory");
+        const nabory = page.locator("#paneli");
         const naborTrack = nabory
           .locator('[data-home-card="nabor"]')
           .first()
@@ -103,13 +103,13 @@ for (const viewport of viewports) {
         await expect(nabory.getByText("Ритуалов: 4")).toHaveCount(0);
 
         await expect(
-          page.locator("#tovary").getByRole("link", {
+          page.locator("#stantsii").getByRole("link", {
             name: "Все сорта",
           }),
         ).toBeVisible();
 
         if (viewport.width <= 520) {
-          const products = page.locator("#tovary");
+          const products = page.locator("#stantsii");
           const productTrack = products.locator(".product-grid");
           await expect(
             products.getByRole("button", { name: /сорта/u }),

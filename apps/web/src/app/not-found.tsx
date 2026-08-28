@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { SystemState } from "@/components/system-state";
 export const metadata: Metadata = {
-  title: "Страница не найдена — Brega Tea",
+  title: "Страница не найдена — Brega",
   robots: { index: false, follow: false },
 };
 

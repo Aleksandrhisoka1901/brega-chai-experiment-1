@@ -5,26 +5,26 @@ import {
   CatalogItemPage,
 } from "@/components/catalog-item-page";
 
-type NaborPageProps = {
+type PanelPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({
   params,
-}: NaborPageProps): Promise<Metadata> {
+}: PanelPageProps): Promise<Metadata> {
   const { slug } = await params;
 
   return catalogItemMetadata({
-    route: "nabory",
+    route: "paneli",
     slug,
   });
 }
 
-export default async function NaborPage({ params }: NaborPageProps) {
+export default async function PanelPage({ params }: PanelPageProps) {
   const { slug } = await params;
 
   return CatalogItemPage({
-    route: "nabory",
+    route: "paneli",
     slug,
   });
 }

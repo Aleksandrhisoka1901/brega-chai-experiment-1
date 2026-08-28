@@ -12,7 +12,7 @@ const CUSTOM_URL_UID =
 export const DEFAULT_SITEMAP_COLLECTION = {
   type: "product",
   langcode: "-",
-  pattern: "/[type]y/[slug]",
+  pattern: "/[catalogRoute]/[slug]",
   priority: 0.8,
   frequency: "weekly",
   lastModified: "true",
@@ -33,8 +33,8 @@ export const DEFAULT_SITEMAP_ARTICLE_COLLECTION = {
 
 export const DEFAULT_SITEMAP_URLS = [
   { slug: "/", priority: 1, frequency: "weekly" },
-  { slug: "/tovary", priority: 0.9, frequency: "weekly" },
-  { slug: "/nabory", priority: 0.9, frequency: "weekly" },
+  { slug: "/stantsii", priority: 0.9, frequency: "weekly" },
+  { slug: "/paneli", priority: 0.9, frequency: "weekly" },
   { slug: "/stati", priority: 0.9, frequency: "weekly" },
 ] as const;
 
@@ -90,26 +90,47 @@ async function ensurePluginOptions(strapi: any, baseUrl: string) {
   }
 }
 
+const LEGACY_PRODUCT_SITEMAP_PATTERN = "/[type]y/[slug]";
+
+type SitemapCollectionEntry = { id: number; type?: string; pattern?: string };
+
 async function ensureProductCollection(strapi: any) {
   const query = strapi.db.query(COLLECTION_UID);
-  const existing = await query.findMany();
-  const types = new Set(
-    existing.map((entry: { type?: string }) => entry.type),
+  const existing = (await query.findMany()) as SitemapCollectionEntry[];
+  const byType = new Map(
+    existing.map((entry) => [entry.type, entry] as const),
   );
 
-  if (!types.has("product")) {
+  const productEntry = byType.get("product");
+  if (!productEntry) {
     await query.create({ data: DEFAULT_SITEMAP_COLLECTION });
+  } else if (productEntry.pattern === LEGACY_PRODUCT_SITEMAP_PATTERN) {
+    await query.update({
+      where: { id: productEntry.id },
+      data: { pattern: DEFAULT_SITEMAP_COLLECTION.pattern },
+    });
   }
-  if (!types.has("article")) {
+
+  if (!byType.has("article")) {
     await query.create({ data: DEFAULT_SITEMAP_ARTICLE_COLLECTION });
   }
 }
 
+const LEGACY_SITEMAP_SLUGS = new Set(["/tovary", "/nabory"]);
+
 async function ensureCustomUrls(strapi: any) {
   const query = strapi.db.query(CUSTOM_URL_UID);
   const existing = await query.findMany();
+
+  for (const entry of existing as Array<{ id: number; slug?: string }>) {
+    if (LEGACY_SITEMAP_SLUGS.has(entry.slug?.trim() ?? "")) {
+      await query.delete({ where: { id: entry.id } });
+    }
+  }
+
+  const remaining = await query.findMany();
   const slugs = new Set(
-    existing.map((entry: { slug?: string }) => entry.slug?.trim()),
+    remaining.map((entry: { slug?: string }) => entry.slug?.trim()),
   );
 
   for (const entry of DEFAULT_SITEMAP_URLS) {

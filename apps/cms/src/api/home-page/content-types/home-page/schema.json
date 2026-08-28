@@ -41,6 +41,12 @@
       "repeatable": false,
       "required": true
     },
+    "articlesPreview": {
+      "type": "component",
+      "component": "home.articles-preview",
+      "repeatable": false,
+      "required": false
+    },
     "featuredNabory": {
       "type": "relation",
       "relation": "oneToMany",
@@ -50,6 +56,11 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::product.product"
+    },
+    "featuredArticles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::article.article"
     }
   }
 }

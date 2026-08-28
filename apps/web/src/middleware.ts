@@ -12,6 +12,10 @@ const LEGAL_DOCUMENT_PATHS = {
 const FILE_PATH = /\.[^/]+$/;
 const INDEX_ALIAS = /^\/index\.(?:html|php)$/i;
 const GARBAGE_SEGMENT = /^[^\p{L}\p{N}]+$/u;
+const LEGACY_COLLECTION_PREFIX: Record<string, string> = {
+  tovary: "stantsii",
+  nabory: "paneli",
+};
 
 const isExcludedPath = (pathname: string) =>
   pathname === SERVICE_UNAVAILABLE_PATH ||
@@ -45,6 +49,10 @@ export const canonicalPathname = (pathname: string) => {
     .filter(Boolean)
     .filter((segment) => !GARBAGE_SEGMENT.test(segment))
     .map((segment) => segment.toLocaleLowerCase("ru"));
+
+  if (segments[0] && LEGACY_COLLECTION_PREFIX[segments[0]]) {
+    segments[0] = LEGACY_COLLECTION_PREFIX[segments[0]];
+  }
 
   return segments.length > 0 ? `/${segments.join("/")}` : "/";
 };

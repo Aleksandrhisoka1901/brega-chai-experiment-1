@@ -1,7 +1,7 @@
 {
   "collectionName": "components_material_templates_basic_info_cards",
   "info": {
-    "displayName": "BasicInfoCard",
+    "displayName": "Карточка сетки",
     "description": "Карточка сетки: текст, маркер и изображение"
   },
   "attributes": {

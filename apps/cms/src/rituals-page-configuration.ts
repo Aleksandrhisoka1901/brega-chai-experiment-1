@@ -2,15 +2,15 @@ export const RITUALS_PAGE_UID = "api::rituals-page.rituals-page";
 export const RITUALS_PAGE_PERMISSION_ACTION = `${RITUALS_PAGE_UID}.find`;
 
 export const DEFAULT_RITUALS_PAGE = {
-  eyebrow: "Глава 02",
-  title: "Ритуалы",
+  eyebrow: "Глава 03",
+  title: "Солнечные панели",
   intro:
-    "Готовые чайные сценарии, в которых всё необходимое уже собрано вместе.",
-  emptyStateText: "Ритуалы скоро появятся.",
+    "Складные панели, чтобы продлить автономность станции на даче, в поездке и при перебоях с сетью.",
+  emptyStateText: "Панели скоро появятся.",
   emptyStateLinkLabel: "Вернуться на главную",
   seo: {
-    title: "Чайные ритуалы — Brega Tea",
-    description: "Готовые чайные наборы Brega Tea.",
+    title: "Солнечные панели — Brega",
+    description: "Складные солнечные панели для зарядки портативных электростанций.",
   },
 } as const;
 

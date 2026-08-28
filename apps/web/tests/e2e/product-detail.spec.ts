@@ -14,7 +14,7 @@ async function computedStyles(locator: Locator, properties: string[]) {
 test("published product has a vertical keyboard-operable gallery @smoke", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   await expect(page).toHaveTitle(/Да Хун Пао — сорт чая Brega Tea/);
   await expect(
@@ -38,7 +38,7 @@ test("published product has a vertical keyboard-operable gallery @smoke", async 
   ).toHaveAttribute("href", "/");
   await expect(
     breadcrumbs.getByRole("link", { name: "Сорта" }),
-  ).toHaveAttribute("href", "/tovary");
+  ).toHaveAttribute("href", "/stantsii");
   await expect(breadcrumbs.getByText("Да Хун Пао")).toHaveAttribute(
     "aria-current",
     "page",
@@ -96,7 +96,7 @@ test("published product has a vertical keyboard-operable gallery @smoke", async 
 test("native product story shares article typography for common blocks", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const story = page.locator('[data-rich-content-scope="product-story"]');
   const article = page.locator('[data-rich-content-scope="article"]').first();
@@ -247,7 +247,7 @@ test("gallery optimizes only the selected full-size CMS image", async ({
     });
   });
 
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
   await expect(page.getByRole("img", { name: "Пачка чая" })).toBeVisible();
   await expect
     .poll(() => optimizedSources.some((url) => url.includes("-main.png")))
@@ -287,7 +287,7 @@ test("gallery optimizes only the selected full-size CMS image", async ({
 test("gallery crossfades two loaded layers before removing the previous one", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const mainImage = page.getByRole("group", {
     name: "Главное изображение товара",
@@ -338,7 +338,7 @@ test("gallery crossfades two loaded layers before removing the previous one", as
 test("gallery controls use neutral positional accessible names", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const gallery = page.getByRole("group", { name: "Изображения товара" });
   await expect(gallery.getByRole("button")).toHaveCount(3);
@@ -385,7 +385,7 @@ for (const viewport of [
       width: viewport.width,
       height: viewport.height,
     });
-    await page.goto("/tovary/main-image-only");
+    await page.goto("/stantsii/main-image-only");
 
     const gallery = page.getByRole("group", { name: "Изображения товара" });
     const thumbnail = gallery.getByRole("button", {
@@ -406,7 +406,7 @@ test("mobile gallery switches images with horizontal touch swipes", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const gallery = page.getByRole("group", { name: "Изображения товара" });
   const firstThumbnail = gallery.getByRole("button").first();
@@ -453,7 +453,7 @@ test("mobile gallery switches images with horizontal touch swipes", async ({
 });
 
 test("quantity starts at one and is capped at five", async ({ page }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const increase = page.getByRole("button", {
     name: "Увеличить количество",
@@ -494,7 +494,7 @@ test("quantity follows live stock on mount and when the tab regains focus", asyn
     });
   });
 
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const increase = page.getByRole("button", {
     name: "Увеличить количество",
@@ -523,12 +523,12 @@ test("quantity follows live stock on mount and when the tab regains focus", asyn
 test("out-of-stock product cannot be added or assigned a quantity", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
   const populatedSlotHeight = await page
     .locator("[data-original-title-slot]")
     .evaluate((element) => element.getBoundingClientRect().height);
 
-  await page.goto("/tovary/out-of-stock-product");
+  await page.goto("/stantsii/out-of-stock-product");
 
   const emptySlot = page.locator("[data-original-title-slot]");
   await expect(emptySlot).toHaveCSS("visibility", "hidden");
@@ -547,7 +547,7 @@ test("out-of-stock product cannot be added or assigned a quantity", async ({
 test("availability is communicated by the purchase action only", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   await expect(page.getByText("В наличии", { exact: true })).toHaveCount(0);
   await expect(
@@ -556,7 +556,7 @@ test("availability is communicated by the purchase action only", async ({
 });
 
 test("missing product returns the not-found page", async ({ page }) => {
-  const response = await page.goto("/tovary/missing-product");
+  const response = await page.goto("/stantsii/missing-product");
 
   expect(response?.status()).toBe(404);
 });
@@ -564,7 +564,7 @@ test("missing product returns the not-found page", async ({ page }) => {
 test("CMS outage renders a noindex service-unavailable state", async ({
   page,
 }) => {
-  await page.goto("/tovary/unavailable-product");
+  await page.goto("/stantsii/unavailable-product");
 
   await expect(
     page
@@ -580,7 +580,7 @@ test("CMS outage renders a noindex service-unavailable state", async ({
 test("published product has no automatically detectable a11y violations @a11y", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);

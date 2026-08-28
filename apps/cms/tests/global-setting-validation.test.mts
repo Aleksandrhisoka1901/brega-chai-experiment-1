@@ -6,8 +6,8 @@ import { validateUniqueBreadcrumbRoutes } from "../src/api/global-setting/conten
 test("accepts one breadcrumb label per configured route", () => {
   assert.doesNotThrow(() =>
     validateUniqueBreadcrumbRoutes([
-      { route: "tovary", label: "Сорта" },
-      { route: "nabory", label: "Ритуалы" },
+      { route: "stantsii", label: "Электростанции" },
+      { route: "paneli", label: "Солнечные панели" },
     ]),
   );
 });
@@ -16,10 +16,10 @@ test("rejects duplicate breadcrumb routes with an editor-facing message", () => 
   assert.throws(
     () =>
       validateUniqueBreadcrumbRoutes([
-        { route: "tovary", label: "Сорта" },
-        { route: "tovary", label: "Каталог" },
+        { route: "stantsii", label: "Электростанции" },
+        { route: "stantsii", label: "Каталог" },
       ]),
-    /Для раздела «Товары» уже задан лейбл/,
+    /Для раздела «Электростанции» уже задан лейбл/,
   );
 });
 

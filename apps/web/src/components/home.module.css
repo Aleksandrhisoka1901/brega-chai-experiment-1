@@ -382,6 +382,11 @@
   justify-content: flex-end;
 }
 
+.articlesTrack {
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
 .cardCopy {
   min-height: 10.9375rem;
   padding: 1.4375rem 1.5625rem 1.875rem;

@@ -6,19 +6,25 @@ import styles from "./article-grid.module.css";
 export function ArticleGrid({
   articles,
   brandName,
+  className,
+  headingLevel = 2,
   imagePlaceholder,
 }: {
   articles: ArticleCardData[];
   brandName: string;
+  className?: string;
+  headingLevel?: 2 | 3;
   imagePlaceholder: string;
 }) {
   return (
-    <div className={`${styles.grid} article-grid`}>
+    <div
+      className={`${styles.grid} article-grid${className ? ` ${className}` : ""}`}
+    >
       {articles.map((article) => (
         <ArticleCard
           article={article}
           brandName={brandName}
-          headingLevel={2}
+          headingLevel={headingLevel}
           imagePlaceholder={imagePlaceholder}
           key={article.id}
         />

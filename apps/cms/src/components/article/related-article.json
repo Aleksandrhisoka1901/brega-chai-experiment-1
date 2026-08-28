@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_article_related_articles",
+  "info": {
+    "displayName": "Ссылка на статью",
+    "description": "Выберите другую статью для блока «Читайте также»."
+  },
+  "attributes": {
+    "article": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::article.article",
+      "required": true
+    }
+  }
+}

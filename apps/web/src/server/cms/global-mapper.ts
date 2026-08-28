@@ -72,7 +72,7 @@ const responseSchema = z.object({
     sectionBreadcrumbs: z
       .array(
         z.object({
-          route: z.enum(["tovary", "nabory", "stati"]),
+          route: z.enum(["stantsii", "paneli", "stati"]),
           label: z.string().trim().min(1),
         }),
       )
@@ -116,7 +116,7 @@ export type GlobalSettings = Omit<
     description: string;
     imageUrl?: string;
   };
-  sectionBreadcrumbs: Record<"tovary" | "nabory" | "stati", string>;
+  sectionBreadcrumbs: Record<"stantsii" | "paneli" | "stati", string>;
   legalDocuments?: Partial<
     Record<"privacyPolicy" | "terms" | "deliveryAndReturns", string>
   >;
@@ -131,7 +131,7 @@ export type CheckoutSettings = Pick<
 >;
 
 function mediaUrl(path: string, base: string) {
-  return URL.canParse(path) ? path : new URL(path, base).toString();
+  return versionCmsMediaUrl(path, base);
 }
 
 export function mapGlobalSettingsPayload(
@@ -148,9 +148,9 @@ export function mapGlobalSettingsPayload(
     legalDocuments,
     ...settings
   } = parsed.data.data;
-  const breadcrumbLabels: Record<"tovary" | "nabory" | "stati", string> = {
-    tovary: "Сорта",
-    nabory: "Ритуалы",
+  const breadcrumbLabels: Record<"stantsii" | "paneli" | "stati", string> = {
+    stantsii: "Электростанции",
+    paneli: "Солнечные панели",
     stati: "Статьи",
   };
   for (const breadcrumb of sectionBreadcrumbs) {

@@ -26,7 +26,12 @@ const ALLOWED_DATABASE_HOSTS = new Set([
   "::1",
   "postgres",
 ]);
-const ALLOWED_DATABASE_NAMES = new Set(["brega_chai", "brega_chai_test"]);
+const ALLOWED_DATABASE_NAMES = new Set([
+  "brega_chai",
+  "brega_chai_test",
+  "elektrogeneratory",
+  "my_tea_db",
+]);
 
 export const PUBLIC_STOREFRONT_ACTIONS = [
   "api::global-setting.global-setting.find",
@@ -38,6 +43,7 @@ export const PUBLIC_STOREFRONT_ACTIONS = [
   "api::articles-page.articles-page.find",
   "api::article.article.find",
   "api::article.article.findOne",
+  "api::robots-txt.robots-txt.find",
 ] as const;
 
 export function assertSeedAllowed(

@@ -7,7 +7,7 @@ async function expectCanonical(page: Page, path: string) {
   await expect(canonical).toHaveCount(1);
 }
 
-for (const basePath of ["/tovary", "/nabory"] as const) {
+for (const basePath of ["/stantsii", "/paneli"] as const) {
   test(`${basePath} filters products by price and keeps pagination in the query`, async ({
     page,
   }) => {
@@ -49,7 +49,7 @@ for (const basePath of ["/tovary", "/nabory"] as const) {
 test("price filter empty state stays on the catalog and can be cleared", async ({
   page,
 }) => {
-  await page.goto("/tovary?minPrice=9000");
+  await page.goto("/stantsii?minPrice=9000");
 
   await expect(
     page.getByText("Нет товаров в выбранном диапазоне цен."),
@@ -62,7 +62,7 @@ test("price filter empty state stays on the catalog and can be cleared", async (
     .getByRole("form", { name: "Фильтр по цене" })
     .getByRole("button", { name: "Сбросить" })
     .click();
-  await expect(page).toHaveURL(/\/tovary$/);
+  await expect(page).toHaveURL(/\/stantsii$/);
   await expect(page.locator(".product-grid .product-card")).toHaveCount(8);
 });
 
@@ -73,11 +73,11 @@ test("invalid catalog price query is not found and page one alias keeps the filt
   expect(baseURL).toBeTruthy();
 
   for (const query of ["minPrice=01", "maxPrice=abc", "minPrice=0"]) {
-    const response = await request.get(`/tovary?${query}`);
+    const response = await request.get(`/stantsii?${query}`);
     expect(response.status(), query).toBe(404);
   }
 
-  const firstPageAlias = await request.get("/tovary?minPrice=1500&page=1", {
+  const firstPageAlias = await request.get("/stantsii?minPrice=1500&page=1", {
     maxRedirects: 0,
   });
   expect(firstPageAlias.status()).toBe(308);

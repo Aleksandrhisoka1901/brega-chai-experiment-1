@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { hasReadableContrast } from "../../lib/readable-colors.ts";
+import { mapArticlesPayload } from "./article-mapper.ts";
 import { CmsValidationError } from "./errors.ts";
 import { versionCmsMediaUrl } from "./media-url.ts";
 import { mapProductsPayload } from "./product-mapper.ts";
@@ -30,8 +32,8 @@ const linkSchema = z.object({
 });
 const optionalEyebrowSchema = z.string().nullable().optional();
 export const DEFAULT_HERO_COLORS = {
-  background: "#AFB094",
-  text: "#24251E",
+  background: "#1E2329",
+  text: "#F5F7FA",
 } as const;
 const previewSchema = z.object({
   eyebrow: optionalEyebrowSchema,
@@ -71,6 +73,7 @@ const responseSchema = z.object({
     }),
     naboryPreview: previewSchema,
     tovaryPreview: previewSchema.extend({ linkLabel: z.string().min(1) }),
+    articlesPreview: previewSchema.nullable().optional(),
   }),
 });
 
@@ -118,6 +121,12 @@ export type HomePageContent = {
     subtitle?: string;
     linkLabel: string;
   };
+  articlesPreview: {
+    eyebrow?: string;
+    title: string;
+    subtitle?: string;
+    linkLabel: string;
+  };
 };
 
 export function mapHomeCollectionsPayload(
@@ -129,6 +138,7 @@ export function mapHomeCollectionsPayload(
       data: z.object({
         featuredNabory: z.array(z.unknown()),
         featuredTovary: z.array(z.unknown()),
+        featuredArticles: z.array(z.unknown()).optional().default([]),
       }),
     })
     .safeParse(payload);
@@ -144,12 +154,49 @@ export function mapHomeCollectionsPayload(
       { data: parsed.data.data.featuredTovary },
       publicBase,
     ),
+    articles: mapArticlesPayload(
+      { data: parsed.data.data.featuredArticles },
+      publicBase,
+    ),
   };
 }
 
 function optionalEyebrow(value: string | null | undefined) {
   const eyebrow = value?.trim();
   return eyebrow ? { eyebrow } : {};
+}
+
+function heroColors(
+  backgroundColor: string | null | undefined,
+  textColor: string | null | undefined,
+) {
+  const background = backgroundColor?.trim() || DEFAULT_HERO_COLORS.background;
+  const text = textColor?.trim() || DEFAULT_HERO_COLORS.text;
+  if (!hasReadableContrast(text, background)) return DEFAULT_HERO_COLORS;
+  return { background, text };
+}
+
+function aboutColors(
+  backgroundColor: string | null | undefined,
+  textColor: string | null | undefined,
+) {
+  const background = backgroundColor?.trim();
+  const text = textColor?.trim();
+  if (background && text && !hasReadableContrast(text, background)) return {};
+  if (
+    background &&
+    !text &&
+    !hasReadableContrast(DEFAULT_HERO_COLORS.text, background)
+  ) {
+    return {};
+  }
+  if (text && !background && !hasReadableContrast(text, "#F5F7FA")) {
+    return {};
+  }
+  return {
+    ...(background ? { backgroundColor: background } : {}),
+    ...(text ? { textColor: text } : {}),
+  };
 }
 
 function mapImage(value: z.infer<typeof imageSchema>, base: string): HomeImage {
@@ -172,7 +219,9 @@ export function mapHomePagePayload(
 ): HomePageContent {
   const parsed = responseSchema.safeParse(payload);
   if (!parsed.success) throw new CmsValidationError(parsed.error.message);
-  const { hero, about, naboryPreview, tovaryPreview, seo } = parsed.data.data;
+  const { hero, about, naboryPreview, tovaryPreview, articlesPreview, seo } =
+    parsed.data.data;
+  const colors = heroColors(hero.backgroundColor, hero.textColor);
 
   return {
     ...(seo
@@ -200,8 +249,8 @@ export function mapHomePagePayload(
       ...(hero.layout !== "100/0" && hero.image
         ? { image: mapImage(hero.image, publicBase) }
         : {}),
-      backgroundColor: hero.backgroundColor || DEFAULT_HERO_COLORS.background,
-      textColor: hero.textColor || DEFAULT_HERO_COLORS.text,
+      backgroundColor: colors.background,
+      textColor: colors.text,
       ...(hero.cta ? { cta: hero.cta } : {}),
     },
     about: {
@@ -210,23 +259,28 @@ export function mapHomePagePayload(
       textBlocks: [about.textBlock1, about.textBlock2].flatMap((text) =>
         text?.trim() ? [text.trim()] : [],
       ),
-      ...(about.backgroundColor
-        ? { backgroundColor: about.backgroundColor }
-        : {}),
-      ...(about.textColor ? { textColor: about.textColor } : {}),
+      ...aboutColors(about.backgroundColor, about.textColor),
       spacing: about.spacing,
     },
     naboryPreview: {
       ...optionalEyebrow(naboryPreview.eyebrow),
       title: naboryPreview.title,
       ...(naboryPreview.subtitle ? { subtitle: naboryPreview.subtitle } : {}),
-      linkLabel: naboryPreview.linkLabel?.trim() || "Все ритуалы",
+      linkLabel: naboryPreview.linkLabel?.trim() || "Все панели",
     },
     tovaryPreview: {
       ...optionalEyebrow(tovaryPreview.eyebrow),
       title: tovaryPreview.title,
       ...(tovaryPreview.subtitle ? { subtitle: tovaryPreview.subtitle } : {}),
       linkLabel: tovaryPreview.linkLabel,
+    },
+    articlesPreview: {
+      ...optionalEyebrow(articlesPreview?.eyebrow),
+      title: articlesPreview?.title?.trim() || "Статьи",
+      ...(articlesPreview?.subtitle
+        ? { subtitle: articlesPreview.subtitle }
+        : {}),
+      linkLabel: articlesPreview?.linkLabel?.trim() || "Все статьи",
     },
   };
 }

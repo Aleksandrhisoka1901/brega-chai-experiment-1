@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("shows delayed progress for a slow internal route", async ({ page }) => {
   await page.goto("/");
-  await page.route("**/tovary?*", async (route) => {
+  await page.route("**/stantsii?*", async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 450));
     await route.continue();
   });
@@ -11,7 +11,7 @@ test("shows delayed progress for a slow internal route", async ({ page }) => {
 
   const progress = page.locator("[data-navigation-progress]");
   await expect(progress).toHaveAttribute("data-active", "true");
-  await expect(page).toHaveURL(/\/tovary$/);
+  await expect(page).toHaveURL(/\/stantsii$/);
   await expect(progress).toHaveAttribute("data-active", "false");
 });
 

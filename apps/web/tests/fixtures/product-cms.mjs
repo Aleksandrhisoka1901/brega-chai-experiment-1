@@ -458,7 +458,7 @@ const cms = createServer((request, response) => {
             textColor: null,
             cta: {
               label: "К ритуалам",
-              url: "#nabory",
+              url: "#stantsii",
             },
             image: {
               alt: "Чайная посуда",
@@ -491,6 +491,12 @@ const cms = createServer((request, response) => {
             subtitle: "Чай для знакомства и ежедневных церемоний.",
             linkLabel: "Все сорта",
           },
+          articlesPreview: {
+            eyebrow: "Глава 04",
+            title: "Статьи",
+            subtitle: "Заметки о чае и ритуале.",
+            linkLabel: "Все статьи",
+          },
           featuredNabory: [
             { ...product("ritual-one", 12), type: "nabor" },
             { ...product("ritual-two", 12), type: "nabor" },
@@ -502,6 +508,36 @@ const cms = createServer((request, response) => {
             product("green-tea", 0),
             product("aged-tea", 12),
             product("evening-tea", 12),
+          ],
+          featuredArticles: [
+            {
+              documentId: "document-zavariivanie-bez-speshki",
+              name: "Заваривание без спешки",
+              slug: "zavariivanie-bez-speshki",
+              priority: 20,
+              content: "<p>Чай раскрывается без спешки.</p>",
+              image: {
+                url: "/storefront/gallery-pour.png",
+                width: 800,
+                height: 1000,
+                alternativeText: "Пролив чая",
+                updatedAt: mediaUpdatedAt,
+              },
+            },
+            {
+              documentId: "document-tihij-stol",
+              name: "Тихий стол",
+              slug: "tihij-stol",
+              priority: 10,
+              content: "<p>Небольшой стол уже собирает ритуал.</p>",
+              image: {
+                url: "/storefront/gallery-cup.png",
+                width: 800,
+                height: 1000,
+                alternativeText: "Пиала",
+                updatedAt: mediaUpdatedAt,
+              },
+            },
           ],
         },
       }),
@@ -530,8 +566,8 @@ const cms = createServer((request, response) => {
             cart: "Корзина",
           },
           sectionBreadcrumbs: [
-            { route: "nabory", label: "Ритуалы" },
-            { route: "tovary", label: "Сорта" },
+            { route: "paneli", label: "Ритуалы" },
+            { route: "stantsii", label: "Сорта" },
             { route: "stati", label: "Статьи" },
           ],
           storefrontTexts: {

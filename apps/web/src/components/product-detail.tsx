@@ -73,12 +73,30 @@ export function ProductDetail({
                     alt: product.images[0].alt,
                   }
                 : {
-                    url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23d7cfbe' d='M0 0h4v5H0z'/%3E%3C/svg%3E",
+                    url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Cpath fill='%23eef1f4' d='M0 0h4v3H0z'/%3E%3C/svg%3E",
                     alt: "",
                   },
               stock: product.stock,
             }}
           />
+          {product.specs.length > 0 ? (
+            <section
+              aria-labelledby="product-specs-heading"
+              className={styles.specsSection}
+            >
+              <h2 id="product-specs-heading">Характеристики</h2>
+              <dl className={styles.specs}>
+                {product.specs.map((spec) => [
+                  <dt key={`${spec.label}-label`}>
+                    {bindShortRussianWords(spec.label)}
+                  </dt>,
+                  <dd key={`${spec.label}-value`}>
+                    {bindShortRussianWords(spec.value)}
+                  </dd>,
+                ])}
+              </dl>
+            </section>
+          ) : null}
 
           <div className={styles.copy}>
             <div className={styles.boutiqueStory}>

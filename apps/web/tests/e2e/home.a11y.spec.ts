@@ -33,7 +33,7 @@ test("homepage smoke and accessibility @smoke @a11y", async ({ page }) => {
   await expect(page.getByRole("link", { name: "К ритуалам" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Все ритуалы" })).toHaveAttribute(
     "href",
-    "/nabory",
+    "/paneli",
   );
   const about = page.locator("#about");
   await expect(about.locator("p")).toContainText([

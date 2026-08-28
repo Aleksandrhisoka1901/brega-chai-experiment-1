@@ -42,9 +42,9 @@ type SiteHeaderProps = {
 };
 
 const defaultNavigation = {
-  about: "О проекте",
-  nabory: "Ритуалы",
-  tovary: "Сорта",
+  about: "О компании",
+  nabory: "Солнечные панели",
+  tovary: "Электростанции",
   stati: "Статьи",
   cart: "Корзина",
 };
@@ -62,7 +62,7 @@ const defaultContacts = {
 };
 
 export function SiteHeader({
-  brandName = "Brega Tea",
+  brandName = "Brega",
   logo,
   navigation = defaultNavigation,
   contacts = defaultContacts,
@@ -75,8 +75,8 @@ export function SiteHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const links = [
     { href: "/#about", label: navigation.about },
-    { href: "/nabory", label: navigation.nabory },
-    { href: "/tovary", label: navigation.tovary },
+    { href: "/stantsii", label: navigation.tovary },
+    { href: "/paneli", label: navigation.nabory },
     { href: "/stati", label: navigation.stati },
   ];
 
@@ -146,10 +146,10 @@ export function SiteHeader({
                   <ul>
                     {links.map((link) => {
                       const isCurrent =
-                        (link.href === "/tovary" &&
-                          pathname.startsWith("/tovary")) ||
-                        (link.href === "/nabory" &&
-                          pathname.startsWith("/nabory")) ||
+                        (link.href === "/stantsii" &&
+                          pathname.startsWith("/stantsii")) ||
+                        (link.href === "/paneli" &&
+                          pathname.startsWith("/paneli")) ||
                         (link.href === "/stati" &&
                           pathname.startsWith("/stati"));
 

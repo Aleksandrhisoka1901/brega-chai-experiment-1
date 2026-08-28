@@ -11,14 +11,20 @@ export async function fetchCms(
   const baseUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), CMS_TIMEOUT_MS);
+  const cacheOptions =
+    process.env.NODE_ENV === "development"
+      ? ({ cache: "no-store" } as const)
+      : ({
+          next: {
+            revalidate: options.revalidate ?? 300,
+            tags: options.tags,
+          },
+        } as const);
 
   try {
     const response = await fetch(new URL(path, baseUrl), {
       headers: { Accept: "application/json" },
-      next: {
-        revalidate: options.revalidate ?? 300,
-        tags: options.tags,
-      },
+      ...cacheOptions,
       signal: controller.signal,
     });
 

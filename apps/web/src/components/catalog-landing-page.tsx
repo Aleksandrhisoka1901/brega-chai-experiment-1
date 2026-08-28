@@ -33,21 +33,21 @@ import {
 import { JsonLd } from "./json-ld";
 import { ProductGrid } from "./product-grid";
 
-export type CatalogLandingRoute = "tovary" | "nabory";
+export type CatalogLandingRoute = "stantsii" | "paneli";
 export type CatalogSearchParams = Promise<
   Record<string, string | string[] | undefined>
 >;
 
 const routeConfig = {
-  tovary: {
+  stantsii: {
     content: getProductsPage,
     products: getProducts,
     unavailableTitle: "Каталог временно недоступен",
   },
-  nabory: {
+  paneli: {
     content: getRitualsPage,
     products: getRituals,
-    unavailableTitle: "Каталог ритуалов временно недоступен",
+    unavailableTitle: "Каталог панелей временно недоступен",
   },
 } as const;
 
@@ -217,7 +217,10 @@ export async function CatalogLandingPage({
         ) : (
           <>
             <Suspense>
-              <CatalogPriceFilter basePath={`/${route}`} />
+              <CatalogPriceFilter
+                basePath={`/${route}`}
+                totalItems={pageModel.catalog?.totalItems ?? products.length}
+              />
             </Suspense>
             {products.length === 0 ? (
               <div className="catalog-state">

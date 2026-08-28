@@ -87,6 +87,15 @@ const productDetailRecordSchema = z.object({
     .optional()
     .default([]),
   seo: seoSchema.nullable().optional(),
+  specs: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        value: z.string().min(1),
+      }),
+    )
+    .optional()
+    .default([]),
   mainImage: imageWithAltSchema.nullable().optional(),
   gallery: z.array(imageWithAltSchema).optional().default([]),
 });
@@ -126,6 +135,7 @@ export type ProductDetail = {
   };
   articles: RichContentBlock[][];
   images: ProductDetailImage[];
+  specs: Array<{ label: string; value: string }>;
 };
 
 function mapImage(
@@ -225,5 +235,6 @@ export function mapProductDetailPayload(
       .map((article) => normalizeStrapiBlocks(article.content, publicBase))
       .filter((content) => content.length > 0),
     images,
+    specs: record.specs,
   };
 }

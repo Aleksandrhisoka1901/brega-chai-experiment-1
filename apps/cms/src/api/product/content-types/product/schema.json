@@ -5,7 +5,7 @@
     "singularName": "product",
     "pluralName": "products",
     "displayName": "Товар",
-    "description": "Товар или готовый набор товаров"
+    "description": "Портативная электростанция или солнечная панель"
   },
   "options": {
     "draftAndPublish": true
@@ -17,6 +17,9 @@
       },
       "slugLocked": {
         "hidden": true
+      },
+      "catalogRoute": {
+        "hidden": true
       }
     }
   },
@@ -25,7 +28,7 @@
       "type": "string",
       "required": true,
       "minLength": 1,
-      "description": "Техническое название для списка и внутренних операций, например «Ритуал: Утро без слов» или «Сорт: Да Хун Пао»."
+      "description": "Техническое название для списка и внутренних операций, например «Станция: CTECHi GT500» или «Панель: CTECHi SP-100»."
     },
     "displayName": {
       "type": "string",
@@ -59,6 +62,12 @@
       "enum": ["nabor", "tovar"],
       "required": true
     },
+    "catalogRoute": {
+      "type": "enumeration",
+      "enum": ["stantsii", "paneli"],
+      "required": false,
+      "description": "Публичный префикс URL. Заполняется автоматически: станции → /stantsii, панели → /paneli."
+    },
     "breadcrumbLabel": {
       "type": "string",
       "required": false,
@@ -67,18 +76,18 @@
     "categoryLabel": {
       "type": "string",
       "required": false,
-      "description": "Категория для SEO и структурированных данных, например «сорт чая» или «подарочный набор». Если поле пустое, используется общий тип позиции."
+      "description": "Категория для SEO, например «портативная электростанция» или «солнечная панель». Если поле пустое, используется общий тип позиции."
     },
     "originalTitle": {
       "type": "string",
       "required": false,
-      "regex": "^[А-Яа-яЁё0-9 .,'’«»()\\-]+$"
+      "regex": "^[A-Za-zА-Яа-яЁё0-9 .,'’«»()\\-/·]+$"
     },
     "packageLabel": {
       "type": "string",
       "required": true,
       "minLength": 1,
-      "description": "Укажите тип упаковки и фасовку целиком, например: «Маленькая банка (90 г)» или «Пакетик (50 г)»."
+      "description": "Короткая подпись на карточке, например: «192 Wh · 240 W» или «Солнечная панель 100 W»."
     },
     "price": {
       "type": "integer",
@@ -113,6 +122,13 @@
       "type": "text",
       "required": true,
       "minLength": 1
+    },
+    "specs": {
+      "type": "component",
+      "component": "product.spec",
+      "repeatable": true,
+      "required": false,
+      "description": "Таблица характеристик для карточки товара: ёмкость, мощность, порты, вес и другие параметры."
     },
     "story": {
       "type": "blocks",

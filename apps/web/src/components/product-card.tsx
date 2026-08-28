@@ -1,6 +1,7 @@
 import type { ProductSummary } from "@brega-chai/contracts";
 import Link from "next/link";
 
+import { catalogItemPath } from "@/lib/catalog-routes";
 import { bindShortRussianWords } from "@/lib/typography";
 
 import { CardMedia } from "./card-media";
@@ -20,11 +21,13 @@ export function ProductCard({
   product: ProductSummary;
 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
-  const route = product.type === "nabor" ? "nabory" : "tovary";
 
   return (
     <article className="product-card">
-      <Link className="product-card__link" href={`/${route}/${product.slug}`}>
+      <Link
+        className="product-card__link"
+        href={catalogItemPath(product.type, product.slug)}
+      >
         <CardMedia
           alt={product.imageAlt}
           className="product-card__media"

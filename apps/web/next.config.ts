@@ -18,7 +18,19 @@ const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
   {
     protocol: "http",
     hostname: "localhost",
+    port: "9001",
+    pathname: "/storefront/**",
+  },
+  {
+    protocol: "http",
+    hostname: "localhost",
     port: "1337",
+    pathname: "/uploads/**",
+  },
+  {
+    protocol: "http",
+    hostname: "localhost",
+    port: "1338",
     pathname: "/uploads/**",
   },
 ];

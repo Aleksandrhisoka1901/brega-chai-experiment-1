@@ -4,6 +4,7 @@ import type { ProductSummary } from "@brega-chai/contracts";
 
 import { publicMediaOrigin } from "@/server/public-runtime-config";
 
+import type { ArticleCard } from "./article-mapper";
 import { fetchCms } from "./client";
 import {
   mapHomeCollectionsPayload,
@@ -15,6 +16,7 @@ export type HomePageData = {
   content: HomePageContent;
   nabory: ProductSummary[];
   tovary: ProductSummary[];
+  articles: ArticleCard[];
 };
 
 export async function getHomePage(): Promise<HomePageData> {
@@ -33,6 +35,7 @@ export async function getHomePage(): Promise<HomePageData> {
     "populate[about]": "true",
     "populate[naboryPreview]": "true",
     "populate[tovaryPreview]": "true",
+    "populate[articlesPreview]": "true",
   });
   for (const [relation, type] of [
     ["featuredNabory", "nabor"],
@@ -69,8 +72,34 @@ export async function getHomePage(): Promise<HomePageData> {
     }
   }
 
+  homeQuery.set(
+    "populate[featuredArticles][filters][publishedAt][$notNull]",
+    "true",
+  );
+  for (const [index, field] of [
+    "name",
+    "slug",
+    "priority",
+    "content",
+  ].entries()) {
+    homeQuery.set(`populate[featuredArticles][fields][${index}]`, field);
+  }
+  for (const [index, field] of [
+    "url",
+    "width",
+    "height",
+    "formats",
+    "updatedAt",
+    "alternativeText",
+  ].entries()) {
+    homeQuery.set(
+      `populate[featuredArticles][populate][image][fields][${index}]`,
+      field,
+    );
+  }
+
   const homePayload = await fetchCms(`/api/home-page?${homeQuery}`, {
-    tags: ["home", "products"],
+    tags: ["home", "products", "articles"],
   });
   const publicBase = publicMediaOrigin();
   const collections = mapHomeCollectionsPayload(homePayload, publicBase);

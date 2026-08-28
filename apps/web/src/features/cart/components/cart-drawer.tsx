@@ -166,18 +166,18 @@ export function CartDrawer({
               <p>{bindShortRussianWords("Здесь пока ничего нет.")}</p>
               <span>
                 {bindShortRussianWords(
-                  "Начните с готового ритуала или выберите отдельный сорт.",
+                  "Начните с электростанции или подберите солнечную панель.",
                 )}
               </span>
               <nav aria-label="Перейти к каталогу">
                 <Dialog.Close asChild>
-                  <Link href="/nabory">
-                    {bindShortRussianWords("К ритуалам")}
+                  <Link href="/stantsii">
+                    {bindShortRussianWords("К электростанциям")}
                   </Link>
                 </Dialog.Close>
                 <Dialog.Close asChild>
-                  <Link href="/tovary">
-                    {bindShortRussianWords("К сортам")}
+                  <Link href="/paneli">
+                    {bindShortRussianWords("К панелям")}
                   </Link>
                 </Dialog.Close>
               </nav>
@@ -220,7 +220,7 @@ export function CartDrawer({
                           <div className={styles.namePrice}>
                             <div>
                               <Link
-                                href={`/${item.type === "nabor" ? "nabory" : "tovary"}/${item.slug}`}
+                                href={`/${item.type === "nabor" ? "paneli" : "stantsii"}/${item.slug}`}
                                 onClick={cartDrawerStore.close}
                               >
                                 {bindShortRussianWords(item.title)}

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-const DEFAULT_TITLE = "Brega Tea";
-const DEFAULT_DESCRIPTION = "Чай и ритуалы Brega Tea";
+const DEFAULT_TITLE = "Brega";
+const DEFAULT_DESCRIPTION =
+  "Портативные электростанции и солнечные панели для дома и резервного питания";
 
 export function siteOrigin(value = process.env["SITE_URL"]) {
   const url = new URL(value ?? "http://localhost:3000");

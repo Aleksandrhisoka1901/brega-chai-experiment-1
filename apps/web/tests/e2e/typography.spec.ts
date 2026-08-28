@@ -2,10 +2,10 @@ import { expect, test, type Page } from "@playwright/test";
 
 const publicPages = [
   "/",
-  "/tovary",
-  "/nabory",
-  "/tovary/published-product",
-  "/nabory/ritual-one",
+  "/stantsii",
+  "/paneli",
+  "/stantsii/published-product",
+  "/paneli/ritual-one",
 ] as const;
 
 async function hangingShortWords(page: Page) {
@@ -103,7 +103,7 @@ test("empty cart copy has no hanging Russian service words", async ({
 test("filled cart and checkout copy have no hanging Russian service words", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
   await page.getByRole("button", { name: "Добавить в корзину" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   expect(await hangingShortWords(page)).toEqual([]);

@@ -7,9 +7,14 @@ import type { ArticleCard as ArticleCardData } from "@/server/cms/article-mapper
 import { CardMedia } from "./card-media";
 import styles from "./article-card.module.css";
 
+const ARTICLE_CARD_SUMMARY_LIMIT = 160;
+
 function articleSummary(content?: string) {
   if (!content) return undefined;
-  return safeHtmlToText(content);
+  const text = safeHtmlToText(content).replace(/\s+/g, " ").trim();
+  if (!text) return undefined;
+  if (text.length <= ARTICLE_CARD_SUMMARY_LIMIT) return text;
+  return `${text.slice(0, ARTICLE_CARD_SUMMARY_LIMIT - 1).replace(/\s+\S*$/, "")}…`;
 }
 
 export function ArticleCard({

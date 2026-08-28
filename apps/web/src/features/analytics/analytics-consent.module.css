@@ -5,8 +5,8 @@
   bottom: clamp(1rem, 3vw, 2rem);
   width: min(34rem, calc(100vw - var(--page-gutter) * 2));
   padding: clamp(1.25rem, 2vw, 1.75rem);
-  border: 1px solid #42443a;
-  background: var(--text-primary);
+  border: 1px solid color-mix(in srgb, var(--text-inverse) 18%, transparent);
+  background: var(--surface-inverse);
   box-shadow: 0 1.25rem 4rem rgb(24 25 20 / 24%);
   color: var(--surface-page);
   animation: banner-in 280ms ease-out both;
@@ -14,7 +14,7 @@
 
 .eyebrow {
   margin: 0 0 0.75rem;
-  color: #b9baae;
+  color: var(--text-inverse-muted);
   font-size: var(--type-caption);
   letter-spacing: 0.15em;
   text-transform: uppercase;

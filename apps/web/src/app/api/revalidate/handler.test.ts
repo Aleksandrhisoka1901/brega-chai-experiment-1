@@ -87,8 +87,8 @@ test("maps home, global and products to their exact cache boundaries", async () 
       payload: { id: "evt-products", event: "products" },
       tags: ["products"],
       paths: [
-        ["/tovary", "page"],
-        ["/nabory", "page"],
+        ["/stantsii", "page"],
+        ["/paneli", "page"],
       ],
     },
   ] as const;
@@ -123,9 +123,9 @@ test("maps one product to listing, detail and home", async () => {
   assert.equal(response.status, 200);
   assert.deepEqual(tags, ["products", "product-slug:tovar:sencha-42"]);
   assert.deepEqual(paths, [
-    ["/tovary", "page"],
-    ["/nabory", "page"],
-    ["/tovary/sencha-42", "page"],
+    ["/stantsii", "page"],
+    ["/paneli", "page"],
+    ["/stantsii/sencha-42", "page"],
     ["/", "page"],
   ]);
 });
@@ -176,10 +176,10 @@ test("media updates invalidate every CMS image consumer", async () => {
   assert.deepEqual(paths, [
     ["/", "layout"],
     ["/", "page"],
-    ["/tovary", "page"],
-    ["/nabory", "page"],
-    ["/tovary/[slug]", "page"],
-    ["/nabory/[slug]", "page"],
+    ["/stantsii", "page"],
+    ["/paneli", "page"],
+    ["/stantsii/[slug]", "page"],
+    ["/paneli/[slug]", "page"],
     ["/stati", "page"],
     ["/stati/[slug]", "page"],
   ]);

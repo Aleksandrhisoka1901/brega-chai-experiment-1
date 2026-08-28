@@ -1,6 +1,6 @@
 const PRODUCT_UID = "api::product.product";
 const ORDER_UID = "api::order.order";
-const HIDDEN_PRODUCT_FIELDS = new Set(["seedKey"]);
+const HIDDEN_PRODUCT_FIELDS = new Set(["seedKey", "catalogRoute"]);
 const READ_ONLY_PRODUCT_FIELDS = new Set(["slug"]);
 const SYSTEM_FIELD_LABELS = {
   id: "Идентификатор",
@@ -86,6 +86,8 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
         [{ name: "featuredNabory", size: 12 }],
         [{ name: "tovaryPreview", size: 12 }],
         [{ name: "featuredTovary", size: 12 }],
+        [{ name: "articlesPreview", size: 12 }],
+        [{ name: "featuredArticles", size: 12 }],
         [{ name: "seo", size: 12 }],
       ],
       list: ["id", "hero", "about"],
@@ -149,6 +151,7 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
           { name: "currency", size: 4 },
         ],
         [{ name: "cardExcerpt", size: 12 }],
+        [{ name: "specs", size: 12 }],
         [{ name: "story", size: 12 }],
         [{ name: "mainImage", size: 12 }],
         [{ name: "gallery", size: 12 }],
@@ -181,6 +184,7 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
         [{ name: "image", size: 12 }],
         [{ name: "content", size: 12 }],
         [{ name: "blocks", size: 12 }],
+        [{ name: "relatedMaterials", size: 12 }],
         [{ name: "seo", size: 12 }],
       ],
       list: ["id", "name", "slug", "priority", "updatedAt"],
@@ -246,6 +250,22 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
     metadatas: {
       intro: { list: { searchable: false, sortable: false } },
     },
+  },
+  "home.articles-preview": {
+    layouts: {
+      edit: [
+        [
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
+        ],
+        [
+          { name: "subtitle", size: 8 },
+          { name: "linkLabel", size: 4 },
+        ],
+      ],
+      list: ["id", "title", "subtitle", "eyebrow"],
+    },
+    settings: { mainField: "title", defaultSortBy: "title" },
   },
   "home.catalog-preview": {
     layouts: {
@@ -401,6 +421,18 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       list: ["id", "title"],
     },
     settings: { mainField: "title", defaultSortBy: "title" },
+  },
+  "product.spec": {
+    layouts: {
+      edit: [
+        [
+          { name: "label", size: 6 },
+          { name: "value", size: 6 },
+        ],
+      ],
+      list: ["id", "label", "value"],
+    },
+    settings: { mainField: "label", defaultSortBy: "label" },
   },
   "product.gallery-image": {
     layouts: {

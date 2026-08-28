@@ -7,7 +7,13 @@ import { catalogPageHref } from "./catalog-pagination-model";
 import { parseCatalogPriceInput } from "./catalog-price-filter-model";
 import styles from "./catalog-price-filter.module.css";
 
-export function CatalogPriceFilter({ basePath }: { basePath: string }) {
+export function CatalogPriceFilter({
+  basePath,
+  totalItems,
+}: {
+  basePath: string;
+  totalItems: number;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const minId = useId();
@@ -54,48 +60,66 @@ export function CatalogPriceFilter({ basePath }: { basePath: string }) {
         apply();
       }}
     >
-      <div className={styles.fields}>
-        <label className={styles.field} htmlFor={minId}>
-          <span>Цена от</span>
-          <input
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
-            id={minId}
-            inputMode="numeric"
-            name="minPrice"
-            onChange={(event) => setMinPrice(event.target.value)}
-            value={minPrice}
-          />
-        </label>
-        <label className={styles.field} htmlFor={maxId}>
-          <span>Цена до</span>
-          <input
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
-            id={maxId}
-            inputMode="numeric"
-            name="maxPrice"
-            onChange={(event) => setMaxPrice(event.target.value)}
-            value={maxPrice}
-          />
-        </label>
+      <div className={styles.heading}>
+        <div>
+          <span>Фильтр</span>
+          <h2>Подберите по цене</h2>
+        </div>
+        <p aria-live="polite">Найдено позиций: {totalItems}</p>
       </div>
-      <div className={styles.actions}>
-        <button className={styles.apply} type="submit">
-          Применить
-        </button>
-        <button
-          className={styles.reset}
-          onClick={() => {
-            setMinPrice("");
-            setMaxPrice("");
-            setError(null);
-            router.push(basePath);
-          }}
-          type="button"
-        >
-          Сбросить
-        </button>
+      <div className={styles.controls}>
+        <div className={styles.fields}>
+          <label className={styles.field} htmlFor={minId}>
+            <span>Цена от</span>
+            <span className={styles.input}>
+              <input
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? errorId : undefined}
+                id={minId}
+                inputMode="numeric"
+                name="minPrice"
+                onChange={(event) => setMinPrice(event.target.value)}
+                placeholder="От"
+                value={minPrice}
+              />
+              <span aria-hidden="true">₽</span>
+            </span>
+          </label>
+          <label className={styles.field} htmlFor={maxId}>
+            <span>Цена до</span>
+            <span className={styles.input}>
+              <input
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? errorId : undefined}
+                id={maxId}
+                inputMode="numeric"
+                name="maxPrice"
+                onChange={(event) => setMaxPrice(event.target.value)}
+                placeholder="До"
+                value={maxPrice}
+              />
+              <span aria-hidden="true">₽</span>
+            </span>
+          </label>
+        </div>
+        <div className={styles.actions}>
+          <button className={styles.apply} type="submit">
+            Применить
+          </button>
+          <button
+            className={styles.reset}
+            disabled={!minPrice && !maxPrice}
+            onClick={() => {
+              setMinPrice("");
+              setMaxPrice("");
+              setError(null);
+              router.push(basePath);
+            }}
+            type="button"
+          >
+            Сбросить
+          </button>
+        </div>
       </div>
       {error ? (
         <p className={styles.error} id={errorId} role="alert">

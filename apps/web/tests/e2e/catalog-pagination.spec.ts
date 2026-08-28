@@ -10,7 +10,7 @@ async function expectCanonical(page: Page, path: string) {
 test("catalog pagination uses canonical URLs and navigates every boundary", async ({
   page,
 }) => {
-  await page.goto("/tovary");
+  await page.goto("/stantsii");
 
   const grid = page.locator(".product-grid");
   const pagination = page.getByRole("navigation", {
@@ -24,30 +24,30 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
   );
   await expect(
     pagination.getByRole("link", { name: "Страница 2" }),
-  ).toHaveAttribute("href", "/tovary?page=2");
-  await expectCanonical(page, "/tovary");
+  ).toHaveAttribute("href", "/stantsii?page=2");
+  await expectCanonical(page, "/stantsii");
 
   await pagination.getByRole("link", { name: "Страница 2" }).click();
-  await expect(page).toHaveURL(/\/tovary\?page=2$/);
+  await expect(page).toHaveURL(/\/stantsii\?page=2$/);
   await expect(grid.locator(".product-card")).toHaveCount(8);
   await expect(grid.getByRole("heading").first()).toHaveText("Сорт 08");
   await expect(pagination.getByRole("link", { name: "Назад" })).toHaveAttribute(
     "href",
-    "/tovary",
+    "/stantsii",
   );
   await expect(
     pagination.getByRole("link", { name: "Вперёд" }),
-  ).toHaveAttribute("href", "/tovary?page=3");
-  await expectCanonical(page, "/tovary?page=2");
+  ).toHaveAttribute("href", "/stantsii?page=3");
+  await expectCanonical(page, "/stantsii?page=2");
 
   await pagination.getByRole("link", { name: "Страница 3" }).click();
-  await expect(page).toHaveURL(/\/tovary\?page=3$/);
+  await expect(page).toHaveURL(/\/stantsii\?page=3$/);
   await expect(grid.locator(".product-card")).toHaveCount(8);
   await expect(grid.getByRole("heading").first()).toHaveText("Сорт 16");
   await expect(grid.getByRole("heading").nth(7)).toHaveText("Нет в наличии 01");
 
   await pagination.getByRole("link", { name: "Страница 6" }).click();
-  await expect(page).toHaveURL(/\/tovary\?page=6$/);
+  await expect(page).toHaveURL(/\/stantsii\?page=6$/);
   await expect(grid.locator(".product-card")).toHaveCount(5);
   await expect(grid.getByRole("heading").first()).toHaveText(
     "Нет в наличии 18",
@@ -58,7 +58,7 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
   );
 });
 
-for (const basePath of ["/tovary", "/nabory"] as const) {
+for (const basePath of ["/stantsii", "/paneli"] as const) {
   test(`${basePath} rejects invalid and out-of-range pages and redirects page one`, async ({
     baseURL,
     request,
@@ -83,7 +83,7 @@ for (const basePath of ["/tovary", "/nabory"] as const) {
 test("rituals use their own landing content, product routes and pagination", async ({
   page,
 }) => {
-  await page.goto("/nabory");
+  await page.goto("/paneli");
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Ритуалы");
   await expect(page.getByText("Готовые чайные сценарии.")).toBeVisible();
@@ -91,16 +91,16 @@ test("rituals use their own landing content, product routes and pagination", asy
   await expect(cards).toHaveCount(8);
   await expect(cards.first().locator("a")).toHaveAttribute(
     "href",
-    /^\/nabory\//,
+    /^\/paneli\//,
   );
-  await expectCanonical(page, "/nabory");
+  await expectCanonical(page, "/paneli");
 
   await page
     .getByRole("navigation", { name: "Пагинация каталога" })
     .getByRole("link", { name: "Страница 2" })
     .click();
-  await expect(page).toHaveURL(/\/nabory\?page=2$/);
-  await expectCanonical(page, "/nabory?page=2");
+  await expect(page).toHaveURL(/\/paneli\?page=2$/);
+  await expectCanonical(page, "/paneli?page=2");
 });
 
 for (const viewport of [
@@ -111,7 +111,7 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await page.goto("/tovary?page=2");
+    await page.goto("/stantsii?page=2");
 
     const pagination = page.getByRole("navigation", {
       name: "Пагинация каталога",
@@ -162,7 +162,7 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await page.goto("/tovary?page=2");
+    await page.goto("/stantsii?page=2");
 
     await expect(
       page.getByRole("navigation", { name: "Пагинация каталога" }),

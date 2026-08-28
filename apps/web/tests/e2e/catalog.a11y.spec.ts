@@ -2,8 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 for (const catalog of [
-  { path: "/tovary", title: "Сорта", eyebrow: "Глава 03" },
-  { path: "/nabory", title: "Ритуалы", eyebrow: "Глава 02" },
+  { path: "/stantsii", title: "Сорта", eyebrow: "Глава 03" },
+  { path: "/paneli", title: "Ритуалы", eyebrow: "Глава 02" },
 ] as const) {
   test(`${catalog.path} stays compact, continuous, and accessible`, async ({
     page,
@@ -60,7 +60,7 @@ for (const catalog of [
 
 test("catalog title fills optional eyebrow space", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/tovary");
+  await page.goto("/stantsii");
 
   const intro = page.locator(".catalog-intro");
   const eyebrow = page.getByText("Глава 03", { exact: true });

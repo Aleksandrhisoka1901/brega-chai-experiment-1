@@ -5,26 +5,26 @@ import {
   CatalogItemPage,
 } from "@/components/catalog-item-page";
 
-type TovarPageProps = {
+type StantsiyaPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({
   params,
-}: TovarPageProps): Promise<Metadata> {
+}: StantsiyaPageProps): Promise<Metadata> {
   const { slug } = await params;
 
   return catalogItemMetadata({
-    route: "tovary",
+    route: "stantsii",
     slug,
   });
 }
 
-export default async function TovarPage({ params }: TovarPageProps) {
+export default async function StantsiyaPage({ params }: StantsiyaPageProps) {
   const { slug } = await params;
 
   return CatalogItemPage({
-    route: "tovary",
+    route: "stantsii",
     slug,
   });
 }

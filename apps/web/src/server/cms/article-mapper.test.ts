@@ -47,6 +47,18 @@ test("details request populates blocks and tags the slug cache", () => {
     ),
     false,
   );
+  assert.equal(
+    url.searchParams.get(
+      "populate[relatedMaterials][on][article.related-product][populate][product][fields][0]",
+    ),
+    "displayName",
+  );
+  assert.equal(
+    url.searchParams.get(
+      "populate[relatedMaterials][on][article.related-article][populate][article][populate][image][fields][0]",
+    ),
+    "url",
+  );
   assert.deepEqual(tags, ["articles", "article-slug:tihij-stol"]);
 });
 
@@ -129,11 +141,17 @@ test("maps a detail article with cards-grid and returns null for misses", () => 
   );
 
   assert.equal(article?.name, "Тихий стол");
-  assert.equal(article?.content, "<p>Пауза важнее глотка.</p><script>alert(1)</script>");
+  assert.equal(
+    article?.content,
+    "<p>Пауза важнее глотка.</p><script>alert(1)</script>",
+  );
   assert.equal(article?.blocks[0]?.gridColumns, 3);
   assert.equal(article?.blocks[0]?.cards[0]?.title, "Вода");
   assert.equal(article?.blocks[0]?.cards[0]?.bulletText, "01");
-  assert.equal(mapArticleDetailPayload({ data: [] }, "http://localhost:9000"), null);
+  assert.equal(
+    mapArticleDetailPayload({ data: [] }, "http://localhost:9000"),
+    null,
+  );
   assert.throws(
     () => mapArticleDetailPayload({ data: {} }, "http://localhost:9000"),
     CmsValidationError,
@@ -196,8 +214,112 @@ test("maps rich-text content arrays and loose dynamic-zone blocks", () => {
   assert.equal(article?.blocks.length, 1);
   assert.equal(article?.blocks[0]?.title, "Карточки");
   assert.equal(article?.blocks[0]?.titleColor, "#3a2f23");
-  assert.equal(article?.blocks[0]?.cards[0]?.description, "<p>Меньше листьев.</p>");
+  assert.equal(
+    article?.blocks[0]?.cards[0]?.description,
+    "<p>Меньше листьев.</p>",
+  );
   assert.equal(article?.blocks[0]?.cards[0]?.bgColor, "#f7f4ec");
+});
+
+test("maps related products, rituals, and articles in author order", () => {
+  const article = mapArticleDetailPayload(
+    {
+      data: [
+        {
+          documentId: "source",
+          name: "Чайный вечер",
+          slug: "chajnyj-vecher",
+          relatedMaterials: [
+            {
+              __component: "article.related-product",
+              product: {
+                documentId: "product-1",
+                displayName: "Да Хун Пао",
+                slug: "da-hun-pao",
+                cardExcerpt: "Тёмный улун с глубоким ароматом.",
+                type: "tovar",
+                mainImage: {
+                  alt: "Чай Да Хун Пао",
+                  image: {
+                    url: "/uploads/tea.jpg",
+                    width: 800,
+                    height: 600,
+                    updatedAt: "2026-08-27T10:00:00.000Z",
+                  },
+                },
+              },
+            },
+            {
+              __component: "article.related-product",
+              product: {
+                documentId: "ritual-1",
+                displayName: "Утро без слов",
+                slug: "utro-bez-slov",
+                cardExcerpt: "Готовый ритуал для спокойного утра.",
+                type: "nabor",
+              },
+            },
+            {
+              __component: "article.related-article",
+              article: {
+                documentId: "article-2",
+                name: "Температура воды",
+                slug: "temperatura-vody",
+                content: [
+                  {
+                    type: "paragraph",
+                    children: [
+                      { type: "text", text: "Как не перегреть зелёный чай." },
+                    ],
+                  },
+                ],
+                image: {
+                  url: "/uploads/water.jpg",
+                  alternativeText: "Чайник",
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
+    "http://localhost:9000",
+  );
+
+  assert.deepEqual(
+    article?.relatedMaterials.map(({ type, id, slug, name, description }) => ({
+      type,
+      id,
+      slug,
+      name,
+      description,
+    })),
+    [
+      {
+        type: "product",
+        id: "product-1",
+        slug: "da-hun-pao",
+        name: "Да Хун Пао",
+        description: "Тёмный улун с глубоким ароматом.",
+      },
+      {
+        type: "ritual",
+        id: "ritual-1",
+        slug: "utro-bez-slov",
+        name: "Утро без слов",
+        description: "Готовый ритуал для спокойного утра.",
+      },
+      {
+        type: "article",
+        id: "article-2",
+        slug: "temperatura-vody",
+        name: "Температура воды",
+        description: "Как не перегреть зелёный чай.",
+      },
+    ],
+  );
+  assert.equal(article?.relatedMaterials[0]?.image?.alt, "Чай Да Хун Пао");
+  assert.equal(article?.relatedMaterials[2]?.image?.alt, "Чайник");
 });
 
 test("maps snake_case CardsGrid / BasicInfoCard fields from Strapi", () => {

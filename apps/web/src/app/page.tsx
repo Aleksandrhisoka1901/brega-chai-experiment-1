@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { HomeAbout } from "@/components/home-about";
+import { HomeArticles } from "@/components/home-articles";
 import { HomeHero } from "@/components/home-hero";
 import { HomeNabory } from "@/components/home-nabory";
 import { HomeTovary } from "@/components/home-tovary";
@@ -33,23 +34,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   try {
-    const [{ content, nabory, tovary }, settings] = await Promise.all([
-      getHomePage(),
-      getGlobalSettings(),
-    ]);
+    const [{ content, nabory, tovary, articles }, settings] = await Promise.all(
+      [getHomePage(), getGlobalSettings()],
+    );
 
     return (
       <main>
         <HomeHero hero={content.hero} />
         <HomeAbout about={content.about} />
-        <HomeNabory
-          eyebrow={content.naboryPreview.eyebrow}
-          imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
-          linkLabel={content.naboryPreview.linkLabel}
-          products={nabory}
-          subtitle={content.naboryPreview.subtitle}
-          title={content.naboryPreview.title}
-        />
         <HomeTovary
           brandName={settings.brandName}
           eyebrow={content.tovaryPreview.eyebrow}
@@ -59,6 +51,23 @@ export default async function HomePage() {
           products={tovary}
           subtitle={content.tovaryPreview.subtitle}
           title={content.tovaryPreview.title}
+        />
+        <HomeNabory
+          eyebrow={content.naboryPreview.eyebrow}
+          imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+          linkLabel={content.naboryPreview.linkLabel}
+          products={nabory}
+          subtitle={content.naboryPreview.subtitle}
+          title={content.naboryPreview.title}
+        />
+        <HomeArticles
+          articles={articles}
+          brandName={settings.brandName}
+          eyebrow={content.articlesPreview.eyebrow}
+          imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
+          linkLabel={content.articlesPreview.linkLabel}
+          subtitle={content.articlesPreview.subtitle}
+          title={content.articlesPreview.title}
         />
       </main>
     );

@@ -4,8 +4,8 @@
   "info": {
     "singularName": "rituals-page",
     "pluralName": "rituals-pages",
-    "displayName": "Страница ритуалов",
-    "description": "Вступление и SEO каталога чайных ритуалов"
+    "displayName": "Страница солнечных панелей",
+    "description": "Вступление и SEO каталога солнечных панелей"
   },
   "options": {
     "draftAndPublish": true

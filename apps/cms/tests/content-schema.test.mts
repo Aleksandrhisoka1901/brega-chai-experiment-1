@@ -38,8 +38,9 @@ test("product schema enforces price, stock, currency and publication constraints
   assert.equal(product.attributes.sortOrder, undefined);
   assert.match(
     String(product.attributes.packageLabel.description),
-    /Маленькая банка \(90 г\).*Пакетик \(50 г\)/,
+    /192 Wh|Солнечная панель/,
   );
+  assert.deepEqual(product.attributes.catalogRoute.enum, ["stantsii", "paneli"]);
 });
 
 test("home page stores ordered curated nabor and tovar collections", async () => {
@@ -57,6 +58,14 @@ test("home page stores ordered curated nabor and tovar collections", async () =>
   assert.equal(home.attributes.productsPreview, undefined);
   assert.equal(home.attributes.naboryPreview.component, "home.rituals-preview");
   assert.equal(home.attributes.tovaryPreview.component, "home.catalog-preview");
+  assert.equal(
+    home.attributes.articlesPreview.component,
+    "home.articles-preview",
+  );
+  assert.equal(home.attributes.articlesPreview.required, false);
+  assert.equal(home.attributes.featuredArticles.type, "relation");
+  assert.equal(home.attributes.featuredArticles.relation, "oneToMany");
+  assert.equal(home.attributes.featuredArticles.target, "api::article.article");
 });
 
 test("global settings expose reusable breadcrumb and storefront text components", async () => {
@@ -79,8 +88,8 @@ test("global settings expose reusable breadcrumb and storefront text components"
   );
   assert.equal(global.attributes.storefrontTexts.required, true);
   assert.deepEqual(breadcrumb.attributes.route.enum, [
-    "tovary",
-    "nabory",
+    "stantsii",
+    "paneli",
     "stati",
   ]);
   assert.equal(breadcrumb.attributes.label.required, true);
@@ -135,6 +144,9 @@ test("home and catalog schemas expose every agreed editable text", async () => {
   const ritualsPreview = await schema(
     "src/components/home/rituals-preview.json",
   );
+  const articlesPreview = await schema(
+    "src/components/home/articles-preview.json",
+  );
   const page = await schema(
     "src/api/products-page/content-types/products-page/schema.json",
   );
@@ -160,6 +172,10 @@ test("home and catalog schemas expose every agreed editable text", async () => {
   assert.equal(ritualsPreview.attributes.eyebrow.required, false);
   assert.equal(ritualsPreview.attributes.eyebrow.minLength, undefined);
   assert.equal(ritualsPreview.attributes.linkLabel.required, false);
+  assert.equal(articlesPreview.attributes.eyebrow.required, false);
+  assert.equal(articlesPreview.attributes.eyebrow.minLength, undefined);
+  assert.equal(articlesPreview.attributes.title.required, true);
+  assert.equal(articlesPreview.attributes.linkLabel.required, false);
   assert.equal(page.attributes.eyebrow.required, false);
   assert.equal(page.attributes.eyebrow.minLength, undefined);
   assert.equal(page.attributes.emptyStateText.required, true);
@@ -229,6 +245,9 @@ test("product story uses native Strapi Blocks independently of articles", async 
   assert.equal(product.attributes.story.minLength, undefined);
   assert.equal(product.attributes.story.customField, undefined);
   assert.equal(product.attributes.articles.component, "product.article");
+  assert.equal(product.attributes.specs.type, "component");
+  assert.equal(product.attributes.specs.component, "product.spec");
+  assert.equal(product.attributes.specs.repeatable, true);
 });
 
 test("product supports ordered repeatable rich-content articles", async () => {
@@ -271,7 +290,7 @@ test("public page entities use the optional shared SEO component", async () => {
   }
 });
 
-test("original product title accepts Cyrillic text only", async () => {
+test("original product title accepts Latin and Cyrillic model names", async () => {
   const product = await schema(
     "src/api/product/content-types/product/schema.json",
   );
@@ -279,9 +298,9 @@ test("original product title accepts Cyrillic text only", async () => {
     product.attributes.originalTitle.regex as string,
   );
 
+  assert.equal(expression.test("Ctechi GT200"), true);
   assert.equal(expression.test("Большой красный халат"), true);
   assert.equal(expression.test("大红袍"), false);
-  assert.equal(expression.test("Da Hong Pao"), false);
 });
 
 test("custom colors use the official Strapi color picker", async () => {

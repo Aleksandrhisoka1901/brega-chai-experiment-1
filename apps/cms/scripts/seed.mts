@@ -4,13 +4,15 @@ import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  alignBetterBlocksImages,
   assertSeedAllowed,
   planSeed,
   PUBLIC_STOREFRONT_ACTIONS,
-  resolveSeedArticleImages,
 } from "./seed-helpers.ts";
-import { SHENG_PUER_PRODUCT } from "./seed-product-fixtures.ts";
+import {
+  FEATURED_PANEL_KEYS,
+  FEATURED_STATION_KEYS,
+  SEED_CATALOG_PRODUCTS,
+} from "./seed-catalog.mts";
 
 const require = createRequire(import.meta.url);
 const { compileStrapi, createStrapi } =
@@ -24,396 +26,19 @@ const paragraph = (text: string) => [
     children: [{ type: "text", text }],
   },
 ];
-const sharedGalleryAssets = [
-  {
-    asset: "gallery-gaiwan.png",
-    alt: "Открытая светлая гайвань с заваренным чайным листом",
-  },
-  {
-    asset: "gallery-pour.png",
-    alt: "Янтарный чай наливают из чахая в светлую пиалу",
-  },
-  {
-    asset: "gallery-cup.png",
-    alt: "Светлая пиала с готовым чаем и влажный чайный лист",
-  },
-] as const;
+
+const products = SEED_CATALOG_PRODUCTS;
+const heroAsset = "ctechi-st2000.png";
 const articleImageMetadata = [
   {
-    asset: "gallery-gaiwan.png",
-    alternativeText: "Светлая гайвань с раскрытым чайным листом",
-    caption: "Посуда после нескольких коротких проливов",
+    asset: "ctechi-gt500.png",
+    alternativeText: "Портативная электростанция CTECHi GT500 в интерьере",
+    caption: "Средний формат для квартиры и дачи",
   },
   {
-    asset: "gallery-pour.png",
-    alternativeText: "Янтарный настой переливают в светлую пиалу",
-    caption: "Цвет настоя на третьем проливе",
-  },
-] as const;
-
-const products = [
-  {
-    key: "ritual-evening",
-    title: "Утро без слов",
-    type: "nabor",
-    originalTitle: null,
-    packageLabel: "Подарочный набор",
-    price: 4200,
-    currency: "RUB",
-    stock: 7,
-    cardExcerpt: "Светлый чай, тонкая керамика и десять минут тишины.",
-    story: "Посуда и чай собраны в единый неторопливый сценарий.",
-    articles: [
-      {
-        content: [
-          {
-            type: "heading",
-            level: 1,
-            children: [{ type: "text", text: "Как устроено утро" }],
-          },
-          ...paragraph(
-            "Набор рассчитан на короткое чаепитие до начала дня: спокойный светлый чай, небольшая гайвань и одна чашка.",
-          ),
-          {
-            type: "heading",
-            level: 2,
-            children: [{ type: "text", text: "Последовательность" }],
-          },
-          {
-            type: "list",
-            format: "ordered",
-            children: [
-              {
-                type: "list-item",
-                children: [{ type: "text", text: "Прогрейте посуду водой." }],
-              },
-              {
-                type: "list-item",
-                children: [
-                  { type: "text", text: "Сделайте короткий первый пролив." },
-                ],
-              },
-              {
-                type: "list-item",
-                children: [
-                  {
-                    type: "text",
-                    text: "Оставьте несколько минут без телефона.",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    imageAsset: "ritual-morning-without-words.png",
-    imageAlt: "Белая гайвань, чашка и зелёный чай на светлом столе",
-  },
-  {
-    key: "ritual-after-rain",
-    title: "После дождя",
-    type: "nabor",
-    packageLabel: "Подарочный набор",
-    price: 4400,
-    currency: "RUB",
-    stock: 5,
-    cardExcerpt: "Глубокий аромат прогретого листа и влажного дерева.",
-    story: "Набор для спокойного чаепития после долгой прогулки.",
-    articles: [
-      {
-        content: [
-          {
-            type: "heading",
-            level: 1,
-            children: [{ type: "text", text: "Ритуал после прогулки" }],
-          },
-          ...paragraph(
-            "Тёмная керамика удерживает тепло, а плотный чай постепенно раскрывает древесные и пряные оттенки.",
-          ),
-          {
-            type: "heading",
-            level: 2,
-            children: [{ type: "text", text: "Для долгого вечера" }],
-          },
-          ...paragraph(
-            "Начните с коротких проливов и понемногу увеличивайте время. Набор лучше всего работает без спешки, когда чай успевает меняться от чашки к чашке.",
-          ),
-          {
-            type: "quote",
-            children: [
-              {
-                type: "text",
-                text: "Сначала согрейте посуду, затем дайте листу несколько секунд раскрыться.",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    imageAsset: "ritual-after-rain.png",
-    imageAlt: "Тёмный чайник и две чашки на мокром деревянном подносе",
-  },
-  {
-    key: "ritual-long-evening",
-    title: "Долгий вечер",
-    type: "nabor",
-    packageLabel: "Подарочный набор",
-    price: 4600,
-    currency: "RUB",
-    stock: 4,
-    cardExcerpt: "Набор для медленного разговора и второго пролива.",
-    story: "Чай и посуда для вечера, у которого нет расписания.",
-    imageAsset: "ritual-long-evening.png",
-    imageAlt: "Тёмный чайник и две чашки в тёплом вечернем свете",
-  },
-  {
-    key: "ritual-warm-light",
-    title: "Тёплый свет",
-    type: "nabor",
-    packageLabel: "Подарочный набор",
-    price: 4100,
-    currency: "RUB",
-    stock: 6,
-    cardExcerpt: "Мягкий красный чай и маленькая чашка ручной работы.",
-    story: "Компактный набор для тихого вечера дома.",
-    imageAsset: "ritual-warm-light.png",
-    imageAlt: "Красный глиняный чайник и чашка в тёплом свете",
-  },
-  {
-    key: "product-da-hong-pao",
-    title: "Да Хун Пао",
-    type: "tovar",
-    originalTitle: "Большой красный халат",
-    packageLabel: "Пакетик (50 г)",
-    price: 1600,
-    currency: "RUB",
-    stock: 12,
-    cardExcerpt: "Минеральный утёсный улун с тёплым древесным ароматом.",
-    story: "Выразительный чай для нескольких коротких проливов.",
-    articles: [
-      {
-        content: [
-          {
-            type: "heading",
-            level: 1,
-            children: [{ type: "text", text: "Как раскрывается чай" }],
-          },
-          {
-            type: "paragraph",
-            children: [
-              {
-                type: "text",
-                text: "Первые проливы дают ",
-              },
-              {
-                type: "text",
-                text: "тёплый древесный аромат",
-                bold: true,
-              },
-              {
-                type: "text",
-                text: ", затем проявляются минеральность и ",
-              },
-              {
-                type: "text",
-                text: "мягкая фруктовая сладость",
-                italic: true,
-              },
-            ],
-          },
-          {
-            type: "heading",
-            level: 3,
-            children: [{ type: "text", text: "Аромат и тело" }],
-          },
-          {
-            type: "paragraph",
-            children: [
-              {
-                type: "text",
-                text: "В сухом листе заметны какао и тёплое дерево. В настое — печёные фрукты, камень после дождя и долгое сладкое послевкусие.",
-              },
-            ],
-          },
-          {
-            type: "seed-image",
-            asset: "gallery-gaiwan.png",
-          },
-          {
-            type: "paragraph",
-            children: [
-              { type: "text", text: "Сравните его с " },
-              {
-                type: "link",
-                url: "/tovary",
-                children: [{ type: "text", text: "другими сортами" }],
-              },
-              {
-                type: "text",
-                text: " из короткой коллекции Brega Tea.",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        content: [
-          {
-            type: "heading",
-            level: 2,
-            children: [{ type: "text", text: "Как заваривать" }],
-          },
-          {
-            type: "list",
-            format: "unordered",
-            children: [
-              {
-                type: "list-item",
-                children: [{ type: "text", text: "Вода около 95 °C" }],
-              },
-              {
-                type: "list-item",
-                children: [{ type: "text", text: "Короткие проливы" }],
-              },
-            ],
-          },
-          {
-            type: "quote",
-            children: [
-              {
-                type: "text",
-                text: "Не торопитесь увеличивать время: чай раскрывается постепенно.",
-              },
-            ],
-          },
-          {
-            type: "heading",
-            level: 3,
-            children: [{ type: "text", text: "Параметры пролива" }],
-          },
-          {
-            type: "list",
-            format: "ordered",
-            children: [
-              {
-                type: "list-item",
-                children: [{ type: "text", text: "Прогрейте посуду." }],
-              },
-              {
-                type: "list-item",
-                children: [
-                  {
-                    type: "text",
-                    text: "Возьмите 6–7 граммов листа на 100 мл воды.",
-                  },
-                ],
-              },
-              {
-                type: "list-item",
-                children: [
-                  {
-                    type: "text",
-                    text: "Начните с проливов по 5–10 секунд.",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: "seed-image",
-            asset: "gallery-pour.png",
-          },
-          {
-            type: "heading",
-            level: 4,
-            children: [{ type: "text", text: "Хранение" }],
-          },
-          {
-            type: "paragraph",
-            children: [
-              {
-                type: "text",
-                text: "Храните чай плотно закрытым, вдали от света, влаги и сильных запахов.",
-                underline: true,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    imageAsset: "tea-da-hong-pao.png",
-    imageAlt: "Сухие листья Да Хун Пао и бежевая чайная банка",
-  },
-  {
-    key: "product-sold-out",
-    title: "Гёкуро Асахи",
-    type: "tovar",
-    packageLabel: "Пакетик (40 г)",
-    price: 2400,
-    currency: "RUB",
-    stock: 0,
-    cardExcerpt: "Глубокий японский зелёный чай с насыщенным вкусом умами.",
-    story: "Низкая температура воды раскрывает сладость и морскую свежесть.",
-    imageAsset: "tea-gyokuro-asahi.png",
-    imageAlt: "Тёмно-зелёные листья гёкуро и зелёная чайная банка",
-  },
-  SHENG_PUER_PRODUCT,
-  {
-    key: "product-lun-jing",
-    title: "Лунцзин",
-    type: "tovar",
-    originalTitle: "Колодец дракона",
-    packageLabel: "Пакетик (50 г)",
-    price: 1800,
-    currency: "RUB",
-    stock: 8,
-    cardExcerpt: "Ореховый, ясный, весенний.",
-    story: "Свежий зелёный чай с мягкой сладостью и ореховым ароматом.",
-    imageAsset: "tea-longjing.png",
-    imageAlt: "Плоские листья лунцзина и светлая чайная банка",
-  },
-  {
-    key: "product-sencha",
-    title: "Сенча",
-    type: "tovar",
-    originalTitle: "Пропаренный чай",
-    packageLabel: "Пакетик (50 г)",
-    price: 1700,
-    currency: "RUB",
-    stock: 10,
-    cardExcerpt: "Свежая зелень и морской воздух.",
-    story: "Японский зелёный чай для чистой и бодрой повседневной чашки.",
-    imageAsset: "tea-sencha.png",
-    imageAlt: "Игольчатые листья сенчи и серая чайная банка",
-  },
-  {
-    key: "product-bai-mu-dan",
-    title: "Бай Му Дань",
-    type: "tovar",
-    originalTitle: "Белый пион",
-    packageLabel: "Пакетик (50 г)",
-    price: 1900,
-    currency: "RUB",
-    stock: 7,
-    cardExcerpt: "Белый чай с ароматом сухих трав, груши и полевых цветов.",
-    story: "Мягкий чай для длинного спокойного заваривания.",
-    imageAsset: "tea-bai-mu-dan.png",
-    imageAlt: "Светлые крупные листья белого чая и чайная банка",
-  },
-  {
-    key: "product-dian-hong",
-    title: "Дянь Хун",
-    type: "tovar",
-    originalTitle: "Юньнаньский красный чай",
-    packageLabel: "Пакетик (50 г)",
-    price: 1500,
-    currency: "RUB",
-    stock: 9,
-    cardExcerpt: "Красный чай с оттенками мёда, какао и печёного яблока.",
-    story: "Плотный и ясный чай для неспешного утра.",
-    imageAsset: "tea-dian-hong.png",
-    imageAlt: "Золотисто-коричневые скрученные листья красного чая",
+    asset: "ctechi-gt1200.png",
+    alternativeText: "Портативная электростанция CTECHi GT1200",
+    caption: "Резерв для дома, которому нельзя останавливаться",
   },
 ] as const;
 
@@ -459,7 +84,8 @@ async function upsertSingle(
     | "api::home-page.home-page"
     | "api::products-page.products-page"
     | "api::rituals-page.rituals-page"
-    | "api::articles-page.articles-page",
+    | "api::articles-page.articles-page"
+    | "api::robots-txt.robots-txt",
   data: Record<string, unknown>,
 ) {
   const existing = await strapi.documents(uid).findFirst();
@@ -468,12 +94,15 @@ async function upsertSingle(
     await strapi.documents(uid).update({
       documentId: existing.documentId,
       data,
-      status: "published",
+      ...(uid === "api::robots-txt.robots-txt" ? {} : { status: "published" }),
     });
     return;
   }
 
-  await strapi.documents(uid).create({ data, status: "published" });
+  await strapi.documents(uid).create({
+    data,
+    ...(uid === "api::robots-txt.robots-txt" ? {} : { status: "published" }),
+  });
 }
 
 async function grantPublicStorefrontRead(
@@ -510,13 +139,12 @@ async function run() {
   try {
     const imageByAsset = new Map<string, { id: number }>();
     for (const asset of [
-      "hero-tea-ritual.png",
-      ...sharedGalleryAssets.map((image) => image.asset),
-      ...products.flatMap((product) =>
-        "imageAsset" in product ? [product.imageAsset] : [],
-      ),
+      heroAsset,
+      ...products.map((product) => product.imageAsset),
     ]) {
-      imageByAsset.set(asset, await uploadSeedAsset(strapi, asset));
+      if (!imageByAsset.has(asset)) {
+        imageByAsset.set(asset, await uploadSeedAsset(strapi, asset));
+      }
     }
 
     const uploadFiles = strapi.db.query("plugin::upload.file");
@@ -535,8 +163,9 @@ async function run() {
     }
 
     const defaultSeo = {
-      title: "Brega Tea — чай и ритуалы",
-      description: "Отборный чай, посуда и готовые ритуалы для дома.",
+      title: "Brega — портативные электростанции и солнечные панели",
+      description:
+        "Портативные электростанции и складные солнечные панели для дома, дачи и резервного питания в Москве и по России.",
     };
     const mainImage = (asset: string, alt: string) => ({
       image: imageByAsset.get(asset)?.id,
@@ -544,29 +173,29 @@ async function run() {
     });
 
     await upsertSingle(strapi, "api::global-setting.global-setting", {
-      brandName: "Brega Tea",
+      brandName: "Brega",
       logo: null,
       email: "hello@example.test",
       orderNotificationEmail: "orders@example.test",
-      pickupAddress: "г. Москва, ул. Чайная, д. 1. Ежедневно с 10:00 до 22:00.",
+      pickupAddress: "г. Москва. Самовывоз по согласованию, ежедневно с 10:00 до 20:00.",
       pickupDiscountPercent: 10,
       maxItemQuantity: 5,
       courierDeliveryNote:
-        "Стоимость рассчитывается в день отправки, до 1000 руб.",
+        "Стоимость доставки рассчитывается в день отправки.",
       telegramUrl: "https://t.me/brega_chai",
       defaultProductStory: paragraph(
-        "Каждый чай отобран для ясного и спокойного домашнего ритуала.",
+        "Перед подключением сверяйте номинальную и пусковую мощность прибора с характеристиками станции. Фактическое время работы зависит от нагрузки и режима эксплуатации.",
       ),
       navigation: {
-        about: "О проекте",
-        nabory: "Ритуалы",
-        tovary: "Сорта",
+        about: "О компании",
+        nabory: "Солнечные панели",
+        tovary: "Электростанции",
         stati: "Статьи",
         cart: "Корзина",
       },
       sectionBreadcrumbs: [
-        { route: "tovary", label: "Сорта" },
-        { route: "nabory", label: "Ритуалы" },
+        { route: "stantsii", label: "Электростанции" },
+        { route: "paneli", label: "Солнечные панели" },
         { route: "stati", label: "Статьи" },
       ],
       storefrontTexts: {
@@ -581,81 +210,116 @@ async function run() {
     const homePageData = {
       seo: defaultSeo,
       hero: {
-        eyebrow: "Чай как личная практика",
-        title: "У времени есть вкус.",
-        text: "Небольшая коллекция чая и предметов для тех моментов, когда спешить больше некуда.",
+        eyebrow: "Энергия рядом. Всегда.",
+        title: "Свет есть — когда он нужен.",
+        text: "Портативные электростанции и солнечные панели для дома, дачи и тех часов, когда обычная сеть недоступна.",
         layout: "40/60",
         image: mainImage(
-          "hero-tea-ritual.png",
-          "Чаша зелёного чая и светлая чайная банка на каменном столе",
+          heroAsset,
+          "Портативная электростанция CTECHi ST2000",
         ),
-        backgroundColor: null,
-        textColor: null,
-        cta: { label: "К ритуалам", url: "#nabory" },
+        backgroundColor: "#1E2329",
+        textColor: "#F5F7FA",
+        cta: { label: "К электростанциям", url: "#stantsii" },
       },
       about: {
-        eyebrow: "Глава 01 · О проекте",
-        title: "Вещи обретают смысл, когда становятся частью привычки.",
+        eyebrow: "Глава 01 · О компании",
+        title: "Резерв, который включается без генератора и очереди за топливом.",
         textBlock1:
-          "Мы собираем чай, посуду и простые инструкции в цельные сценарии — для утра, разговора, одиночества или подарка.",
+          "До 600 W — ваш резерв для связи, света и работы. 1000–1500 W — отключения не нарушат привычный быт. 2000 W и выше — энергия для дома, которому нельзя останавливаться.",
         textBlock2:
-          "Ассортимент короткий намеренно. Здесь не нужно сравнивать десятки почти одинаковых позиций.",
+          "Линейка собрана по реальным сценариям: квартира в Москве, дача, поездка и длительный резерв. Станции на LiFePO4, чистая синусоида и совместимые солнечные панели — в одном каталоге.",
         spacing: "L",
       },
       naboryPreview: {
-        eyebrow: "Глава 02",
-        title: "Ритуалы",
-        subtitle: "Всё необходимое для готового чайного сценария.",
-        linkLabel: "Все ритуалы",
+        eyebrow: "Глава 03",
+        title: "Солнечные панели",
+        subtitle:
+          "Складные панели 60, 100 и 200 W, чтобы станция заряжалась без розетки.",
+        linkLabel: "Все панели",
       },
       tovaryPreview: {
-        eyebrow: "Глава 03",
-        title: "Сорта",
-        subtitle: "Чай для самостоятельного знакомства.",
-        linkLabel: "Все сорта",
+        eyebrow: "Глава 02",
+        title: "Портативные электростанции",
+        subtitle:
+          "От компактной розетки для гаджетов до резерва для дома и мастерской.",
+        linkLabel: "Все станции",
+      },
+      articlesPreview: {
+        eyebrow: "Глава 04",
+        title: "Статьи",
+        subtitle:
+          "Как выбрать мощность, что потянет станция и зачем держать резерв дома.",
+        linkLabel: "Все статьи",
       },
     };
 
     await upsertSingle(strapi, "api::products-page.products-page", {
-      eyebrow: "Глава 03",
+      eyebrow: "Глава 02",
       seo: {
-        title: "Сорта чая — Brega Tea",
-        description: "Все сорта чая Brega Tea.",
+        title: "Портативные электростанции — Brega",
+        description:
+          "Каталог портативных электростанций CTECHi, Famlink Power и NP: мощность, ёмкость, порты и цена.",
       },
-      title: "Сорта",
-      emptyStateText: "Сорта скоро появятся.",
+      title: "Электростанции",
+      emptyStateText: "Станции скоро появятся.",
       emptyStateLinkLabel: "Вернуться на главную",
       intro:
-        "Исследуйте чай через происхождение, аромат и собственный ритм заваривания.",
+        "Подберите станцию по мощности и ёмкости: от зарядки гаджетов до резерва для холодильника, котла и мастерской.",
     });
 
     await upsertSingle(strapi, "api::rituals-page.rituals-page", {
-      eyebrow: "Глава 02",
+      eyebrow: "Глава 03",
       seo: {
-        title: "Чайные ритуалы — Brega Tea",
-        description: "Готовые чайные наборы Brega Tea.",
+        title: "Солнечные панели — Brega",
+        description:
+          "Складные солнечные панели CTECHi 60, 100 и 200 W для зарядки портативных электростанций.",
       },
-      title: "Ритуалы",
-      emptyStateText: "Ритуалы скоро появятся.",
+      title: "Солнечные панели",
+      emptyStateText: "Панели скоро появятся.",
       emptyStateLinkLabel: "Вернуться на главную",
       intro:
-        "Готовые чайные сценарии, в которых всё необходимое уже собрано вместе.",
+        "Складные панели, чтобы продлить автономность станции на даче, в поездке и при перебоях с сетью.",
     });
 
     await upsertSingle(strapi, "api::articles-page.articles-page", {
       eyebrow: "Глава 04",
       seo: {
-        title: "Статьи — Brega Tea",
-        description: "Заметки о чае, ритуале и внимательности Brega Tea.",
+        title: "Статьи об электростанциях — Brega",
+        description:
+          "Как выбрать портативную электростанцию для квартиры, дачи и резервного питания в Москве и по России.",
       },
       title: "Статьи",
       emptyStateText: "Статьи скоро появятся.",
       emptyStateLinkLabel: "Вернуться на главную",
       intro:
-        "Короткие тексты о заваривании, внимании и спокойном домашнем ритуале.",
+        "Короткие разборы мощности, автономности и бытовых сценариев — без лишнего шума генератора.",
+    });
+
+    await upsertSingle(strapi, "api::robots-txt.robots-txt", {
+      content: `User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /checkout
+Disallow: /legal/
+
+Sitemap: ${process.env.SITE_URL ?? "http://localhost:3001"}/sitemap.xml
+`,
     });
 
     const productDocuments = strapi.documents("api::product.product");
+    const desiredProductKeys = new Set(products.map((product) => product.key));
+    for (const product of await productDocuments.findMany()) {
+      const seedKey = product.seedKey;
+      if (
+        typeof seedKey === "string" &&
+        seedKey.length > 0 &&
+        !desiredProductKeys.has(seedKey)
+      ) {
+        await productDocuments.delete({ documentId: product.documentId });
+      }
+    }
     const existingProducts = await productDocuments.findMany();
     const existingBySeedKey = existingProducts.flatMap((product) => {
       const desired = products.find(
@@ -676,17 +340,12 @@ async function run() {
       const productData: Record<string, unknown> = {
         ...operation.record,
         story: paragraph(operation.record.story),
-        title: `${operation.record.type === "nabor" ? "Ритуал" : "Сорт"}: ${operation.record.title}`,
+        title: `${operation.record.type === "nabor" ? "Панель" : "Станция"}: ${operation.record.title}`,
         displayName: operation.record.title,
         seedKey: operation.record.key,
-        categoryLabel:
-          operation.record.type === "nabor" ? "чайный ритуал" : "сорт чая",
-        seo: {
-          title: `${operation.record.title} — ${
-            operation.record.type === "nabor" ? "чайный ритуал" : "сорт чая"
-          } Brega Tea`,
-          description: operation.record.cardExcerpt,
-        },
+        categoryLabel: operation.record.categoryLabel,
+        catalogRoute: operation.record.type === "nabor" ? "paneli" : "stantsii",
+        seo: operation.record.seo,
       };
       delete productData.key;
       delete productData.imageAsset;
@@ -696,39 +355,14 @@ async function run() {
         productData.slug = operation.slug;
       }
 
-      if ("articles" in operation.record && operation.record.articles) {
-        productData.articles = operation.record.articles.map(
-          (article, index) => {
-            const content = resolveSeedArticleImages(
-              article.content,
-              imageByAsset,
-            );
-
-            return {
-              content: alignBetterBlocksImages(
-                content,
-                index % 2 === 0 ? "left" : "right",
-              ),
-            };
-          },
-        );
-      }
-
-      const imageAsset =
-        "imageAsset" in operation.record
-          ? operation.record.imageAsset
-          : undefined;
+      const imageAsset = operation.record.imageAsset;
       Object.assign(productData, {
-        gallery: sharedGalleryAssets.map(({ asset, alt }) =>
-          mainImage(asset, alt),
-        ),
+        gallery: [],
         ...(imageAsset
           ? {
               mainImage: mainImage(
                 imageAsset,
-                "imageAlt" in operation.record
-                  ? operation.record.imageAlt
-                  : operation.record.title,
+                operation.record.imageAlt || operation.record.title,
               ),
             }
           : {}),
@@ -757,109 +391,55 @@ async function run() {
         product.documentId,
       ]),
     );
-    const relationIds = (type: "nabor" | "tovar") =>
-      products
-        .filter((product) => product.type === type)
-        .flatMap((product) => {
-          const documentId = productIdBySeedKey.get(product.key);
-          return documentId ? [documentId] : [];
-        });
-
-    await upsertSingle(strapi, "api::home-page.home-page", {
-      ...homePageData,
-      featuredNabory: { set: relationIds("nabor") },
-      featuredTovary: { set: relationIds("tovar").slice(0, 4) },
-    });
+    const relationIds = (keys: readonly string[]) =>
+      keys.flatMap((key) => {
+        const documentId = productIdBySeedKey.get(key);
+        return documentId ? [documentId] : [];
+      });
 
     const articleDocuments = strapi.documents("api::article.article");
     const desiredArticles = [
       {
-        key: "article-brewing-without-haste",
-        name: "Заваривание без спешки",
+        key: "article-moscow-apartment-reserve",
+        name: "Резерв для квартиры в Москве: свет, связь и работа без генератора",
         priority: 20,
-        imageAsset: "gallery-pour.png",
+        imageAsset: "ctechi-gt500.png",
+        seo: {
+          title: "Портативная электростанция для квартиры в Москве — Brega",
+          description:
+            "Зачем держать портативную электростанцию в московской квартире: роутер, свет, ноутбук и тихий резерв без запаха топлива.",
+        },
         content:
-          "<p>Чай раскрывается, когда вода, посуда и внимание встречаются без спешки. Достаточно короткого пролива и паузы, чтобы увидеть, как меняется вкус.</p><p>Начните с прогрева чаши и одного спокойного пролива — этого достаточно для первого знакомства.</p>",
+          "<p>В Москве отключение на пару часов уже не редкость. Для квартиры это роутер, свет, ноутбук и заряд телефонов — как раз то, что закрывает тихая станция в комнате, без генератора во дворе.</p><p>Модели 300–500 W хватает на связь и работу. Если нужен холодильник или котёл, смотрите пусковой ток и ёмкость. Держите станцию заряженной: это короткая страховка, а не запас «на конец света».</p>",
       },
       {
-        key: "article-quiet-table",
-        name: "Тихий стол",
+        key: "article-why-reserve-now",
+        name: "Почему автономный резерв в России стал бытовой нормой",
         priority: 10,
-        imageAsset: "gallery-cup.png",
+        imageAsset: "ctechi-gt1200.png",
+        seo: {
+          title: "Зачем нужна портативная электростанция в России сейчас — Brega",
+          description:
+            "Перебои, нагрузка на инфраструктуру и военные действия рядом с повседневной жизнью: зачем держать тихий электрический резерв дома.",
+        },
         content:
-          "<p>Небольшой стол, чистая ткань и одна чаша уже собирают ритуал. Не нужно много предметов, чтобы остановиться.</p>",
-        blocks: [
-          {
-            __component: "article.cards-grid",
-            title: "Три простых опоры",
-            description:
-              "<p>Этого достаточно, чтобы собрать паузу дома.</p>",
-            titleColor: "#3f3a32",
-            gridColumns: 3,
-            cards: [
-              {
-                title: "Вода",
-                titleHtmlTag: "h3",
-                description: "<p>Свежая, не кипящая дважды.</p>",
-                titleColor: "#3f3a32",
-                descriptionColor: "#6b6458",
-                bgColor: "#f7f4ec",
-                borderColor: "#e4ddd0",
-                bulletText: "01",
-                bulletPosition: "left",
-                bulletAlign: "start",
-                imagePosition: "bottom",
-                imageFit: "contain",
-                imageAlign: "center",
-                gridRowsStart: 1,
-                gridRowsSpan: 1,
-                gridColumnsStart: 1,
-                gridColumnsSpan: 1,
-              },
-              {
-                title: "Посуда",
-                titleHtmlTag: "h3",
-                description: "<p>Одна чаша, которую приятно держать.</p>",
-                titleColor: "#3f3a32",
-                descriptionColor: "#6b6458",
-                bgColor: "#f7f4ec",
-                borderColor: "#e4ddd0",
-                bulletText: "02",
-                bulletPosition: "left",
-                bulletAlign: "start",
-                imagePosition: "bottom",
-                imageFit: "contain",
-                imageAlign: "center",
-                gridRowsStart: 1,
-                gridRowsSpan: 1,
-                gridColumnsStart: 2,
-                gridColumnsSpan: 1,
-              },
-              {
-                title: "Пауза",
-                titleHtmlTag: "h3",
-                description: "<p>Минута до глотка важнее самого глотка.</p>",
-                titleColor: "#3f3a32",
-                descriptionColor: "#6b6458",
-                bgColor: "#f7f4ec",
-                borderColor: "#e4ddd0",
-                bulletText: "03",
-                bulletPosition: "left",
-                bulletAlign: "start",
-                imagePosition: "bottom",
-                imageFit: "contain",
-                imageAlign: "center",
-                gridRowsStart: 1,
-                gridRowsSpan: 1,
-                gridColumnsStart: 3,
-                gridColumnsSpan: 1,
-              },
-            ],
-          },
-        ],
+          "<p>Станцию больше не берут «на рыбалку». Запрос другой: сохранить связь, интернет и быт, когда сеть пропадает на вечер. Для Москвы и городов с нагрузкой на инфраструктуру это уже бытовой резерв.</p><p>Рядом идут военные действия — даже в тылу это ощущается косвенно: отключения, логистика, спрос на генераторы. Дома выигрывает тихая станция: кнопка, без топлива и выхлопа. Как аптечка: надеешься не воспользоваться.</p>",
       },
     ] as const;
 
+    const desiredArticleKeys = new Set(
+      desiredArticles.map((article) => article.key),
+    );
+    for (const article of await articleDocuments.findMany()) {
+      const seedKey = article.seedKey;
+      if (
+        typeof seedKey === "string" &&
+        seedKey.length > 0 &&
+        !desiredArticleKeys.has(seedKey)
+      ) {
+        await articleDocuments.delete({ documentId: article.documentId });
+      }
+    }
     const existingArticles = await articleDocuments.findMany();
     const existingArticlesBySeedKey = existingArticles.flatMap((article) => {
       const desired = desiredArticles.find(
@@ -905,6 +485,27 @@ async function run() {
         });
       }
     }
+
+    const publishedArticles = await articleDocuments.findMany({
+      status: "published",
+    });
+    const articleIdBySeedKey = new Map(
+      publishedArticles.map((article) => [
+        String(article.seedKey),
+        article.documentId,
+      ]),
+    );
+    await upsertSingle(strapi, "api::home-page.home-page", {
+      ...homePageData,
+      featuredNabory: { set: relationIds(FEATURED_PANEL_KEYS) },
+      featuredTovary: { set: relationIds(FEATURED_STATION_KEYS) },
+      featuredArticles: {
+        set: desiredArticles.flatMap((article) => {
+          const documentId = articleIdBySeedKey.get(article.key);
+          return documentId ? [documentId] : [];
+        }),
+      },
+    });
 
     await grantPublicStorefrontRead(strapi);
   } finally {

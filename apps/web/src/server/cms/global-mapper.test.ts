@@ -31,8 +31,8 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
             cart: "Заказ",
           },
           sectionBreadcrumbs: [
-            { route: "tovary", label: "Каталог чая" },
-            { route: "nabory", label: "Готовые ритуалы" },
+            { route: "stantsii", label: "Каталог чая" },
+            { route: "paneli", label: "Готовые ритуалы" },
           ],
           storefrontTexts: {
             imagePlaceholder: "Фото готовится",
@@ -85,8 +85,8 @@ test("maps storefront identity, contacts, navigation and legal details", () => {
         cart: "Заказ",
       },
       sectionBreadcrumbs: {
-        tovary: "Каталог чая",
-        nabory: "Готовые ритуалы",
+        stantsii: "Каталог чая",
+        paneli: "Готовые ритуалы",
         stati: "Статьи",
       },
       storefrontTexts: {
@@ -162,7 +162,7 @@ test("fills missing breadcrumb routes with stable visible-text fallbacks", () =>
           tovary: "Сорта",
           cart: "Заказ",
         },
-        sectionBreadcrumbs: [{ route: "tovary", label: "Все сорта" }],
+        sectionBreadcrumbs: [{ route: "stantsii", label: "Все сорта" }],
         storefrontTexts: {
           imagePlaceholder: "Изображение готовится",
           outOfStock: "Нет в наличии",
@@ -176,8 +176,8 @@ test("fills missing breadcrumb routes with stable visible-text fallbacks", () =>
   );
 
   assert.deepEqual(settings.sectionBreadcrumbs, {
-    tovary: "Все сорта",
-    nabory: "Ритуалы",
+    stantsii: "Все сорта",
+    paneli: "Солнечные панели",
     stati: "Статьи",
   });
 });

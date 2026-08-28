@@ -30,6 +30,8 @@ export function productDetailRequest(type: "tovar" | "nabor", slug: string) {
     "populate[gallery][populate][image][fields][3]": "formats",
     "populate[gallery][populate][image][fields][4]": "updatedAt",
     "populate[articles][fields][0]": "content",
+    "populate[specs][fields][0]": "label",
+    "populate[specs][fields][1]": "value",
     "pagination[pageSize]": "1",
   });
 

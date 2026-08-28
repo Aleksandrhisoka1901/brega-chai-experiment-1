@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_home_articles_previews",
+  "info": {
+    "displayName": "Анонс статей",
+    "description": "Заголовок, короткий анонс и ссылка на раздел статей."
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": false
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "subtitle": {
+      "type": "text",
+      "required": false
+    },
+    "linkLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Текст ссылки на полный раздел статей."
+    }
+  }
+}

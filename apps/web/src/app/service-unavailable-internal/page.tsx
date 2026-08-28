@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { SystemState } from "@/components/system-state";
 
 export const metadata: Metadata = {
-  title: "Сервис временно недоступен — Brega Tea",
+  title: "Сервис временно недоступен — Brega",
   robots: { index: false, follow: false },
 };
 

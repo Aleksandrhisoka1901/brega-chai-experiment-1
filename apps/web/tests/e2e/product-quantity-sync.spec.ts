@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("product quantity controls update and follow the cart after add", async ({
   page,
 }) => {
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const pageQuantity = page.getByRole("group", {
     name: "Количество",

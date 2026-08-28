@@ -440,6 +440,117 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
+  collectionName: 'articles';
+  info: {
+    description: '\u0420\u0435\u0434\u0430\u043A\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0441\u0442\u0430\u0442\u044C\u044F \u0432\u0438\u0442\u0440\u0438\u043D\u044B';
+    displayName: '\u0421\u0442\u0430\u0442\u044C\u044F';
+    pluralName: 'articles';
+    singularName: 'article';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    blocks: Schema.Attribute.DynamicZone<
+      ['article.cards-grid', 'material-templates.cards-grid']
+    >;
+    content: Schema.Attribute.RichText;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::article.article'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    priority: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedMaterials: Schema.Attribute.DynamicZone<
+      ['article.related-product', 'article.related-article']
+    >;
+    seedKey: Schema.Attribute.String &
+      Schema.Attribute.Private &
+      Schema.Attribute.Unique;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 180;
+        minLength: 1;
+      }>;
+    slugLocked: Schema.Attribute.Boolean &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<false>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiArticlesPageArticlesPage extends Struct.SingleTypeSchema {
+  collectionName: 'articles_pages';
+  info: {
+    description: '\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0441\u0442\u0430\u0442\u0435\u0439';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0441\u0442\u0430\u0442\u0435\u0439';
+    pluralName: 'articles-pages';
+    singularName: 'articles-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    emptyStateLinkLabel: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    emptyStateText: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    eyebrow: Schema.Attribute.String;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::articles-page.articles-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
   collectionName: 'global_settings';
   info: {
@@ -549,9 +660,14 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   attributes: {
     about: Schema.Attribute.Component<'home.editorial-section', false> &
       Schema.Attribute.Required;
+    articlesPreview: Schema.Attribute.Component<'home.articles-preview', false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    featuredArticles: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::article.article'
+    >;
     featuredNabory: Schema.Attribute.Relation<
       'oneToMany',
       'api::product.product'
@@ -667,7 +783,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
 export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   collectionName: 'products';
   info: {
-    description: '\u0422\u043E\u0432\u0430\u0440 \u0438\u043B\u0438 \u0433\u043E\u0442\u043E\u0432\u044B\u0439 \u043D\u0430\u0431\u043E\u0440 \u0442\u043E\u0432\u0430\u0440\u043E\u0432';
+    description: '\u041F\u043E\u0440\u0442\u0430\u0442\u0438\u0432\u043D\u0430\u044F \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u0441\u0442\u0430\u043D\u0446\u0438\u044F \u0438\u043B\u0438 \u0441\u043E\u043B\u043D\u0435\u0447\u043D\u0430\u044F \u043F\u0430\u043D\u0435\u043B\u044C';
     displayName: '\u0422\u043E\u0432\u0430\u0440';
     pluralName: 'products';
     singularName: 'product';
@@ -683,6 +799,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
+    catalogRoute: Schema.Attribute.Enumeration<['stantsii', 'paneli']>;
     categoryLabel: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -732,6 +849,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     slugLocked: Schema.Attribute.Boolean &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<false>;
+    specs: Schema.Attribute.Component<'product.spec', true>;
     stock: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -758,8 +876,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
 export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
   collectionName: 'products_pages';
   info: {
-    description: '\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0441\u043E\u0440\u0442\u043E\u0432';
-    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0441\u043E\u0440\u0442\u043E\u0432';
+    description: '\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u0441\u0442\u0430\u043D\u0446\u0438\u0439';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u0441\u0442\u0430\u043D\u0446\u0438\u0439';
     pluralName: 'products-pages';
     singularName: 'products-page';
   };
@@ -808,8 +926,8 @@ export interface ApiProductsPageProductsPage extends Struct.SingleTypeSchema {
 export interface ApiRitualsPageRitualsPage extends Struct.SingleTypeSchema {
   collectionName: 'rituals_pages';
   info: {
-    description: '\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0447\u0430\u0439\u043D\u044B\u0445 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432';
-    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0440\u0438\u0442\u0443\u0430\u043B\u043E\u0432';
+    description: '\u0412\u0441\u0442\u0443\u043F\u043B\u0435\u043D\u0438\u0435 \u0438 SEO \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430 \u0441\u043E\u043B\u043D\u0435\u0447\u043D\u044B\u0445 \u043F\u0430\u043D\u0435\u043B\u0435\u0439';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0441\u043E\u043B\u043D\u0435\u0447\u043D\u044B\u0445 \u043F\u0430\u043D\u0435\u043B\u0435\u0439';
     pluralName: 'rituals-pages';
     singularName: 'rituals-page';
   };
@@ -1528,6 +1646,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::article.article': ApiArticleArticle;
+      'api::articles-page.articles-page': ApiArticlesPageArticlesPage;
       'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;
       'api::home-page.home-page': ApiHomePageHomePage;
       'api::order.order': ApiOrderOrder;

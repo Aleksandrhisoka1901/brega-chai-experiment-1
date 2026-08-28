@@ -4,7 +4,7 @@ type GlobalSettingDocument = {
   documentId: string;
   maxItemQuantity?: number | null;
   sectionBreadcrumbs?: Array<{
-    route: "tovary" | "nabory" | "stati";
+    route: "stantsii" | "paneli" | "stati";
     label: string;
   }>;
   storefrontTexts?: {
@@ -14,8 +14,8 @@ type GlobalSettingDocument = {
 };
 
 const DEFAULT_BREADCRUMBS = [
-  { route: "tovary" as const, label: "Сорта" },
-  { route: "nabory" as const, label: "Ритуалы" },
+  { route: "stantsii" as const, label: "Электростанции" },
+  { route: "paneli" as const, label: "Солнечные панели" },
 ];
 
 const DEFAULT_STOREFRONT_TEXTS = {

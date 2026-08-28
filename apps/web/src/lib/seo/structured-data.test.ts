@@ -28,7 +28,7 @@ test("uses integer RUB price and DTO availability in Product JSON-LD", () => {
       articles: [],
       images: [],
     },
-    "https://brega.example/tovary/tea",
+    "https://brega.example/stantsii/tea",
     "Брега",
   );
 
@@ -59,7 +59,7 @@ test("uses the editable entity category in Product JSON-LD", () => {
       articles: [],
       images: [],
     },
-    "https://brega.example/nabory/quiet-morning",
+    "https://brega.example/paneli/quiet-morning",
   );
 
   assert.equal(data.category, "чайный ритуал");
@@ -72,10 +72,10 @@ test("escapes opening angle brackets during JSON-LD serialization", () => {
 test("keeps breadcrumb order, labels, and canonical URLs", () => {
   const data = breadcrumbStructuredData([
     { name: "Главная", url: "https://brega.example/" },
-    { name: "Сорта", url: "https://brega.example/tovary" },
+    { name: "Сорта", url: "https://brega.example/stantsii" },
     {
       name: "Да Хун Пао",
-      url: "https://brega.example/tovary/da-hun-pao",
+      url: "https://brega.example/stantsii/da-hun-pao",
     },
   ]);
 
@@ -90,12 +90,12 @@ test("keeps breadcrumb order, labels, and canonical URLs", () => {
       {
         position: 2,
         name: "Сорта",
-        item: "https://brega.example/tovary",
+        item: "https://brega.example/stantsii",
       },
       {
         position: 3,
         name: "Да Хун Пао",
-        item: "https://brega.example/tovary/da-hun-pao",
+        item: "https://brega.example/stantsii/da-hun-pao",
       },
     ],
   );

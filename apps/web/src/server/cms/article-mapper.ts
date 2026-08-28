@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { safeHtmlToText } from "../../lib/html/safe-html.ts";
 import { CmsValidationError } from "./errors.ts";
 import { versionCmsMediaUrl } from "./media-url.ts";
 
@@ -23,6 +24,7 @@ const listingRecordSchema = z.object({
 
 const detailRecordSchema = listingRecordSchema.extend({
   blocks: z.unknown().optional(),
+  relatedMaterials: z.unknown().optional(),
   seo: z.unknown().optional(),
 });
 
@@ -41,6 +43,15 @@ export type ArticleCard = {
   priority: number;
   image?: ArticleImage;
   content?: string;
+};
+
+export type ArticleRelatedItem = {
+  type: "product" | "ritual" | "article";
+  id: string;
+  slug: string;
+  name: string;
+  image?: ArticleImage;
+  description?: string;
 };
 
 export type ArticleGridCard = {
@@ -85,6 +96,7 @@ export type ArticleCardsGrid = {
 
 export type ArticleDetail = ArticleCard & {
   blocks: ArticleCardsGrid[];
+  relatedMaterials: ArticleRelatedItem[];
   seo?: {
     title: string;
     description: string;
@@ -147,7 +159,9 @@ function inlineToHtml(nodes: unknown): string {
       if (node.type === "link") {
         const href = asTrimmedString(node.url) ?? asTrimmedString(node.href);
         const children = inlineToHtml(node.children);
-        return href ? `<a href="${escapeHtml(href)}">${children}</a>` : children;
+        return href
+          ? `<a href="${escapeHtml(href)}">${children}</a>`
+          : children;
       }
       return inlineToHtml(node.children);
     })
@@ -163,14 +177,19 @@ function blocksToHtml(blocks: unknown): string | undefined {
       const children = inlineToHtml(block.children);
       switch (block.type) {
         case "heading": {
-          const level = block.level === 3 || block.level === 4 ? block.level : 2;
+          const level =
+            block.level === 3 || block.level === 4 ? block.level : 2;
           return `<h${level}>${children}</h${level}>`;
         }
         case "list": {
-          const tag = block.format === "ordered" || block.ordered === true ? "ol" : "ul";
+          const tag =
+            block.format === "ordered" || block.ordered === true ? "ol" : "ul";
           const items = Array.isArray(block.children)
             ? block.children
-                .map((item) => `<li>${inlineToHtml(isRecord(item) ? item.children : [])}</li>`)
+                .map(
+                  (item) =>
+                    `<li>${inlineToHtml(isRecord(item) ? item.children : [])}</li>`,
+                )
                 .join("")
             : "";
           return `<${tag}>${items}</${tag}>`;
@@ -253,6 +272,103 @@ function mapMedia(
       ];
     }),
   };
+}
+
+function mapImageWithAlt(
+  value: unknown,
+  publicBase: string,
+  fallbackAlt: string,
+): ArticleImage | undefined {
+  const imageWithAlt = unwrapData(value);
+  if (!isRecord(imageWithAlt)) return undefined;
+  const image = mapMedia(imageWithAlt.image, publicBase, fallbackAlt);
+  if (!image) return undefined;
+  return {
+    ...image,
+    alt: asTrimmedString(imageWithAlt.alt) ?? image.alt,
+  };
+}
+
+function mapRelatedProduct(
+  value: Record<string, unknown>,
+  publicBase: string,
+): ArticleRelatedItem | undefined {
+  const relation = unwrapData(value.product);
+  if (!isRecord(relation)) return undefined;
+
+  const id = asTrimmedString(relation.documentId);
+  const slug = asTrimmedString(relation.slug);
+  const name = asTrimmedString(relation.displayName);
+  const productType = asTrimmedString(relation.type);
+  if (
+    !id ||
+    !slug ||
+    !name ||
+    (productType !== "tovar" && productType !== "nabor")
+  ) {
+    return undefined;
+  }
+
+  const image = mapImageWithAlt(relation.mainImage, publicBase, name);
+  const description = asTrimmedString(relation.cardExcerpt);
+
+  return {
+    type: productType === "nabor" ? "ritual" : "product",
+    id,
+    slug,
+    name,
+    ...(image ? { image } : {}),
+    ...(description ? { description } : {}),
+  };
+}
+
+function mapRelatedArticle(
+  value: Record<string, unknown>,
+  publicBase: string,
+): ArticleRelatedItem | undefined {
+  const relation = unwrapData(value.article);
+  if (!isRecord(relation)) return undefined;
+
+  const id = asTrimmedString(relation.documentId);
+  const slug = asTrimmedString(relation.slug);
+  const name = asTrimmedString(relation.name);
+  if (!id || !slug || !name) return undefined;
+
+  const image = mapMedia(relation.image, publicBase, name);
+  const content = normalizeArticleHtml(relation.content);
+  const description = content ? safeHtmlToText(content) : undefined;
+
+  return {
+    type: "article",
+    id,
+    slug,
+    name,
+    ...(image ? { image } : {}),
+    ...(description ? { description } : {}),
+  };
+}
+
+function mapRelatedItems(
+  value: unknown,
+  publicBase: string,
+): ArticleRelatedItem[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item) => {
+    if (!isRecord(item)) return [];
+    switch (componentId(item)) {
+      case "article.related-product": {
+        const mapped = mapRelatedProduct(item, publicBase);
+        return mapped ? [mapped] : [];
+      }
+      case "article.related-article": {
+        const mapped = mapRelatedArticle(item, publicBase);
+        return mapped ? [mapped] : [];
+      }
+      default:
+        return [];
+    }
+  });
 }
 
 function mapSeo(value: unknown, publicBase: string) {
@@ -400,8 +516,7 @@ function isBasicInfoCard(value: unknown): value is Record<string, unknown> {
   if (!isRecord(value)) return false;
   const component = componentId(value);
   return (
-    component.includes("basic-info-card") ||
-    component.endsWith("basicinfocard")
+    component.includes("basic-info-card") || component.endsWith("basicinfocard")
   );
 }
 
@@ -431,15 +546,16 @@ function mapBlocks(value: unknown, publicBase: string): ArticleCardsGrid[] {
   return value.flatMap((block) => {
     if (isCardsGridBlock(block)) return [mapCardsGrid(block, publicBase)];
     if (isBasicInfoCard(block)) {
-      return [
-        mapCardsGrid({ cards: [block], grid_columns: 2 }, publicBase),
-      ];
+      return [mapCardsGrid({ cards: [block], grid_columns: 2 }, publicBase)];
     }
     return [];
   });
 }
 
-function mapArticleCard(record: ListingRecord, publicBase: string): ArticleCard {
+function mapArticleCard(
+  record: ListingRecord,
+  publicBase: string,
+): ArticleCard {
   const image = mapMedia(record.image, publicBase, record.name);
   const content = normalizeArticleHtml(record.content);
 
@@ -503,6 +619,25 @@ function appendCardsGridPopulate(
   }
 }
 
+function appendRelatedProductPopulate(query: URLSearchParams) {
+  const base =
+    "populate[relatedMaterials][on][article.related-product][populate][product]";
+  ["displayName", "slug", "cardExcerpt", "type"].forEach((field, index) => {
+    query.set(`${base}[fields][${index}]`, field);
+  });
+  query.set(`${base}[populate][mainImage][fields][0]`, "alt");
+  appendMediaPopulate(query, `${base}[populate][mainImage][populate][image]`);
+}
+
+function appendRelatedArticlePopulate(query: URLSearchParams) {
+  const base =
+    "populate[relatedMaterials][on][article.related-article][populate][article]";
+  ["name", "slug", "content"].forEach((field, index) => {
+    query.set(`${base}[fields][${index}]`, field);
+  });
+  appendMediaPopulate(query, `${base}[populate][image]`);
+}
+
 export function articleDetailRequest(slug: string) {
   const query = new URLSearchParams({
     status: "published",
@@ -523,6 +658,8 @@ export function articleDetailRequest(slug: string) {
     "image",
     "bullet_icon",
   ]);
+  appendRelatedProductPopulate(query);
+  appendRelatedArticlePopulate(query);
 
   return {
     path: `/api/articles?${query}`,
@@ -560,6 +697,7 @@ export function mapArticleDetailPayload(
     ...mapArticleCard(record, publicBase),
     ...(content ? { content } : {}),
     blocks: mapBlocks(record.blocks, publicBase),
+    relatedMaterials: mapRelatedItems(record.relatedMaterials, publicBase),
     ...(seo ? { seo } : {}),
   };
 }

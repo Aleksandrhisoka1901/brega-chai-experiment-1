@@ -7,7 +7,7 @@ for (const nabor of [
   test(`nabor page renders complete detail for ${nabor.title}`, async ({
     page,
   }) => {
-    const response = await page.goto(`/nabory/${nabor.slug}`);
+    const response = await page.goto(`/paneli/${nabor.slug}`);
 
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(
@@ -21,7 +21,7 @@ for (const nabor of [
     });
     await expect(
       breadcrumbs.getByRole("link", { name: "Ритуалы" }),
-    ).toHaveAttribute("href", "/nabory");
+    ).toHaveAttribute("href", "/paneli");
     await expect(breadcrumbs.getByText(nabor.title)).toHaveAttribute(
       "aria-current",
       "page",

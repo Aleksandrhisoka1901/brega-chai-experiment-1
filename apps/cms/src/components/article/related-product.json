@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_article_related_products",
+  "info": {
+    "displayName": "Товар / ритуал",
+    "description": "Выберите товар или набор-ритуал для связанного блока."
+  },
+  "attributes": {
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "required": true
+    }
+  }
+}

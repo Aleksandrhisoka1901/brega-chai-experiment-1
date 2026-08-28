@@ -6,7 +6,7 @@ const contactEmail = process.env.E2E_CONTACT_EMAIL ?? "hello@brega.test";
 test.use({ viewport: { width: 390, height: 844 } });
 
 test("mobile menu exposes navigation and restores focus", async ({ page }) => {
-  await page.goto("/tovary");
+  await page.goto("/stantsii");
 
   const trigger = page.locator("[data-mobile-menu-trigger]");
   await expect(trigger).toBeVisible();
@@ -45,7 +45,7 @@ test("mobile menu exposes navigation and restores focus", async ({ page }) => {
 });
 
 test("mobile navigation closes after choosing a link", async ({ page }) => {
-  await page.goto("/tovary");
+  await page.goto("/stantsii");
   const trigger = page.getByRole("button", { name: "Открыть меню" });
   await trigger.focus();
   await page.keyboard.press("Enter");

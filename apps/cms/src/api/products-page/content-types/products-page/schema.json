@@ -4,8 +4,8 @@
   "info": {
     "singularName": "products-page",
     "pluralName": "products-pages",
-    "displayName": "Страница сортов",
-    "description": "Вступление и SEO каталога сортов"
+    "displayName": "Страница электростанций",
+    "description": "Вступление и SEO каталога электростанций"
   },
   "options": {
     "draftAndPublish": true

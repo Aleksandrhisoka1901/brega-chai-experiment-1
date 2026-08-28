@@ -6,7 +6,7 @@ test("mobile overlays contain scroll and honor reduced motion", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/tovary/published-product");
+  await page.goto("/stantsii/published-product");
 
   const galleryImage = page.getByRole("img", { name: "Пачка чая" });
   await expect(galleryImage).toHaveCSS("transition-duration", "0s");
@@ -31,7 +31,7 @@ test("browser chrome matches the storefront surface", async ({ page }) => {
 
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
     "content",
-    "#efede4",
+    "#f5f7fa",
   );
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
     "href",

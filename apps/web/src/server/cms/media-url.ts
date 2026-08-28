@@ -3,14 +3,26 @@ export function versionCmsMediaUrl(
   publicBase: string,
   updatedAt?: string,
 ) {
-  let url: URL;
+  if (path.startsWith("data:") || path.startsWith("blob:")) return path;
+
+  let resolved: URL;
   try {
-    url = new URL(path, publicBase);
+    resolved = new URL(path, publicBase);
   } catch {
     return path;
   }
 
-  if (url.protocol !== "http:" && url.protocol !== "https:") return path;
+  if (resolved.protocol !== "http:" && resolved.protocol !== "https:") {
+    return path;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(`${resolved.pathname}${resolved.search}`, publicBase);
+  } catch {
+    return path;
+  }
+
   if (updatedAt) url.searchParams.set("v", updatedAt);
   return url.toString();
 }

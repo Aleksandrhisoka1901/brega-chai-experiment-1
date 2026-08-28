@@ -39,7 +39,7 @@ export function HomeTovary({
   return (
     <section
       className={`${styles.catalog} ${styles.tovarySection}`}
-      id="tovary"
+      id="stantsii"
     >
       <div
         className={`${styles.catalogInner} content-frame`}
@@ -65,7 +65,7 @@ export function HomeTovary({
               onNext={() => slider.scrollItem(1)}
               onPrevious={() => slider.scrollItem(-1)}
               prominent
-              subject="сорта"
+              subject="электростанции"
             />
           ) : null}
         </header>
@@ -91,7 +91,7 @@ export function HomeTovary({
           </div>
         ) : null}
         <div className={styles.catalogLink}>
-          <EditorialLink href="/tovary" label={linkLabel} />
+          <EditorialLink href="/stantsii" label={linkLabel} />
         </div>
       </div>
     </section>

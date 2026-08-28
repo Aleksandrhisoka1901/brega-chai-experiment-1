@@ -55,6 +55,12 @@ test("maps editable home sections and resolves media URLs", () => {
           subtitle: "Отдельные чаи.",
           linkLabel: "Все сорта",
         },
+        articlesPreview: {
+          eyebrow: "Глава 04",
+          title: "Статьи",
+          subtitle: "Заметки о чае.",
+          linkLabel: "Все статьи",
+        },
         seo: {
           title: "Чайный бутик",
           description: "Главная страница чайного бутика.",
@@ -79,6 +85,10 @@ test("maps editable home sections and resolves media URLs", () => {
   assert.equal(home.hero.cta?.url, "#tovary");
   assert.equal(home.naboryPreview.linkLabel, "Все ритуалы");
   assert.equal(home.tovaryPreview.linkLabel, "Все сорта");
+  assert.equal(home.articlesPreview.title, "Статьи");
+  assert.equal(home.articlesPreview.linkLabel, "Все статьи");
+  assert.equal(home.articlesPreview.eyebrow, "Глава 04");
+  assert.equal(home.articlesPreview.subtitle, "Заметки о чае.");
   assert.equal(home.about.spacing, "L");
   assert.equal(home.seo?.title, "Чайный бутик");
 });
@@ -119,12 +129,46 @@ test("100/0 hero ignores an image and optional CTA", () => {
 
   assert.equal(home.hero.image, undefined);
   assert.equal(home.hero.cta, undefined);
-  assert.equal(home.hero.backgroundColor, "#AFB094");
-  assert.equal(home.hero.textColor, "#24251E");
+  assert.equal(home.hero.backgroundColor, "#1E2329");
+  assert.equal(home.hero.textColor, "#F5F7FA");
   assert.equal(home.about.backgroundColor, undefined);
   assert.equal(home.about.textColor, undefined);
   assert.deepEqual(home.about.textBlocks, ["Единственный заполненный блок."]);
-  assert.equal(home.naboryPreview.linkLabel, "Все ритуалы");
+  assert.equal(home.naboryPreview.linkLabel, "Все панели");
+  assert.equal(home.articlesPreview.title, "Статьи");
+  assert.equal(home.articlesPreview.linkLabel, "Все статьи");
+});
+
+test("drops unreadable home about colors instead of painting text into the surface", () => {
+  const home = mapHomePagePayload(
+    {
+      data: {
+        hero: {
+          title: "Текстовый герой",
+          text: "Без изображения.",
+          layout: "100/0",
+          backgroundColor: "#f5efef",
+          textColor: "#f5efef",
+        },
+        about: {
+          title: "О проекте.",
+          textBlock1: "Текст.",
+          textBlock2: null,
+          backgroundColor: "#f5efef",
+          textColor: "#f5efef",
+          spacing: "M",
+        },
+        naboryPreview: { title: "Ритуалы" },
+        tovaryPreview: { title: "Сорта", linkLabel: "Все сорта" },
+      },
+    },
+    "http://localhost:9000",
+  );
+
+  assert.equal(home.hero.backgroundColor, "#1E2329");
+  assert.equal(home.hero.textColor, "#F5F7FA");
+  assert.equal(home.about.backgroundColor, undefined);
+  assert.equal(home.about.textColor, undefined);
 });
 
 for (const [label, alt] of [
@@ -185,6 +229,11 @@ test("maps absent and empty home eyebrows without placeholder content", () => {
           title: "Сорта",
           linkLabel: "Все сорта",
         },
+        articlesPreview: {
+          eyebrow: "",
+          title: "Статьи",
+          linkLabel: "Все статьи",
+        },
       },
     },
     "http://localhost:9000",
@@ -194,6 +243,7 @@ test("maps absent and empty home eyebrows without placeholder content", () => {
   assert.equal(home.about.eyebrow, undefined);
   assert.equal(home.naboryPreview.eyebrow, undefined);
   assert.equal(home.tovaryPreview.eyebrow, undefined);
+  assert.equal(home.articlesPreview.eyebrow, undefined);
 });
 
 test("maps curated home collections in the order returned by Strapi", () => {
@@ -219,6 +269,20 @@ test("maps curated home collections in the order returned by Strapi", () => {
           record("tovar-2", "Второй сорт", "tovar"),
           record("tovar-1", "Первый сорт", "tovar"),
         ],
+        featuredArticles: [
+          {
+            documentId: "article-2",
+            name: "Вторая статья",
+            slug: "vtoraya-statya",
+            priority: 5,
+          },
+          {
+            documentId: "article-1",
+            name: "Первая статья",
+            slug: "pervaya-statya",
+            priority: 10,
+          },
+        ],
       },
     },
     "http://localhost:9000",
@@ -231,5 +295,9 @@ test("maps curated home collections in the order returned by Strapi", () => {
   assert.deepEqual(
     collections.tovary.map(({ id }) => id),
     ["tovar-2", "tovar-1"],
+  );
+  assert.deepEqual(
+    collections.articles.map(({ id }) => id),
+    ["article-2", "article-1"],
   );
 });

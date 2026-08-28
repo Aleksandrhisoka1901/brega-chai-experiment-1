@@ -13,14 +13,14 @@ export function invalidateOrderStock(
 ) {
   dependencies.revalidateTag("products");
   dependencies.revalidatePath("/", "page");
-  dependencies.revalidatePath("/tovary", "page");
-  dependencies.revalidatePath("/nabory", "page");
+  dependencies.revalidatePath("/stantsii", "page");
+  dependencies.revalidatePath("/paneli", "page");
 
   const slugs = new Set(order.lines.map((line) => line.slug));
   for (const slug of slugs) {
     for (const [type, route] of [
-      ["tovar", "tovary"],
-      ["nabor", "nabory"],
+      ["tovar", "stantsii"],
+      ["nabor", "paneli"],
     ] as const) {
       dependencies.revalidateTag(`product-slug:${type}:${slug}`);
       dependencies.revalidatePath(`/${route}/${slug}`, "page");

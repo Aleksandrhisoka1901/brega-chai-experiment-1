@@ -34,7 +34,7 @@ export function HomeNabory({
   if (layout.mode === "hidden") return null;
 
   return (
-    <section className={styles.catalog} id="nabory">
+    <section className={styles.catalog} id="paneli">
       <div
         className={`${styles.catalogInner} content-frame`}
         data-content-frame
@@ -59,7 +59,7 @@ export function HomeNabory({
               onNext={() => slider.scrollItem(1)}
               onPrevious={() => slider.scrollItem(-1)}
               prominent
-              subject="ритуалы"
+              subject="панели"
             />
           ) : null}
         </header>
@@ -83,7 +83,7 @@ export function HomeNabory({
             >
               <Link
                 className={styles.naborCardLink}
-                href={`/nabory/${product.slug}`}
+                href={`/paneli/${product.slug}`}
               >
                 <CardMedia
                   alt={product.imageAlt}
@@ -112,7 +112,7 @@ export function HomeNabory({
           </div>
         ) : null}
         <div className={styles.catalogLink}>
-          <EditorialLink href="/nabory" label={linkLabel} />
+          <EditorialLink href="/paneli" label={linkLabel} />
         </div>
       </div>
     </section>

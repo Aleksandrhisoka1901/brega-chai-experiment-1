@@ -183,7 +183,7 @@
 
 .warning {
   margin: 0.9rem 0 0;
-  color: #7a362c;
+  color: var(--status-error);
   font-size: var(--type-caption);
   line-height: 1.45;
 }
@@ -249,7 +249,7 @@
 
 .summary .stockCheckError {
   margin-top: -0.5rem;
-  color: #b83d2f;
+  color: var(--status-error);
 }
 
 .checkout {
@@ -264,7 +264,7 @@
 }
 
 .checkout:hover:not(:disabled) {
-  background: #35372e;
+  background: var(--action-primary-hover);
 }
 
 .checkout:disabled {

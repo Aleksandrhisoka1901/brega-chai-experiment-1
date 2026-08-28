@@ -4,7 +4,7 @@ type GlobalSettingEvent = {
   params: {
     data?: {
       sectionBreadcrumbs?: Array<{
-        route?: "tovary" | "nabory" | "stati";
+        route?: "stantsii" | "paneli" | "stati";
         label?: string;
       }>;
     };
