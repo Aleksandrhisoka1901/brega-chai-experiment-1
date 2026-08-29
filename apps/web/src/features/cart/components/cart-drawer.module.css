@@ -10,6 +10,7 @@
 }
 
 .overlay[data-state="closed"] {
+  pointer-events: none;
   animation: overlay-out 280ms ease-in forwards;
 }
 
@@ -317,6 +318,6 @@
 @media (prefers-reduced-motion: reduce) {
   .overlay[data-state],
   .drawer[data-state] {
-    animation: none;
+    animation-duration: 0.01ms;
   }
 }

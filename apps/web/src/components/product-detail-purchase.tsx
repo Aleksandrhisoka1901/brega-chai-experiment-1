@@ -88,15 +88,19 @@ export function ProductDetailPurchase({
       maximum,
     });
 
-    if (change.target === "cart") {
-      cartStore.updateQuantity(
-        product.productId,
-        change.quantity,
-        currentStock,
-        maxItemQuantity,
-      );
-    } else {
-      setQuantity(change.quantity);
+    try {
+      if (change.target === "cart") {
+        cartStore.updateQuantity(
+          product.productId,
+          change.quantity,
+          currentStock,
+          maxItemQuantity,
+        );
+      } else {
+        setQuantity(change.quantity);
+      }
+    } catch {
+      // Keep the current quantity if stock or the per-item limit rejects the change.
     }
   };
 
@@ -112,7 +116,7 @@ export function ProductDetailPurchase({
           >
             <button
               aria-label="Уменьшить количество"
-              disabled={displayedQuantity <= 1}
+              disabled={!cartReady || displayedQuantity <= 1}
               onClick={() => changeQuantity(-1)}
               type="button"
             >
@@ -123,7 +127,7 @@ export function ProductDetailPurchase({
             </output>
             <button
               aria-label="Увеличить количество"
-              disabled={displayedQuantity >= maximum}
+              disabled={!cartReady || displayedQuantity >= maximum}
               onClick={() => changeQuantity(1)}
               type="button"
             >
@@ -136,22 +140,32 @@ export function ProductDetailPurchase({
       <button
         className={styles.addButton}
         data-cart-ready={cartReady}
-        disabled={!inStock}
+        disabled={!inStock || !cartReady}
         onClick={(event) => {
-          if (!inCart) {
-            cartStore.add(
-              { ...product, stock: currentStock },
-              quantity,
-              maxItemQuantity,
-            );
-            cartDrawerStore.registerStock(product.productId, currentStock);
+          try {
+            if (!inCart) {
+              cartStore.add(
+                { ...product, stock: currentStock },
+                quantity,
+                maxItemQuantity,
+              );
+              cartDrawerStore.registerStock(product.productId, currentStock);
+            }
+            cartDrawerStore.open(event.currentTarget);
+          } catch {
+            return;
           }
-          cartDrawerStore.open(event.currentTarget);
         }}
         type="button"
       >
         {bindShortRussianWords(
-          !inStock ? outOfStock : inCart ? "В корзине" : "Добавить в корзину",
+          !cartReady
+            ? "Загрузка…"
+            : !inStock
+              ? outOfStock
+              : inCart
+                ? "В корзине"
+                : "Добавить в корзину",
         )}
       </button>
     </div>

@@ -14,6 +14,7 @@
 }
 
 .overlay[data-state="closed"] {
+  pointer-events: none;
   animation: mobile-menu-overlay-out 320ms ease-in forwards;
 }
 
@@ -168,6 +169,6 @@
 @media (prefers-reduced-motion: reduce) {
   .overlay[data-state],
   .panel[data-state] {
-    animation: none;
+    animation-duration: 0.01ms;
   }
 }

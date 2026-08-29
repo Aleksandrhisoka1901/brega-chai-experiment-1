@@ -260,15 +260,19 @@ export function CartDrawer({
                               <button
                                 aria-label={`Уменьшить количество ${item.title}`}
                                 disabled={!controls.canDecrease}
-                                onClick={() =>
-                                  cartStore.updateQuantity(
-                                    item.productId,
-                                    item.quantity - 1,
-                                    currentStock ??
+                                onClick={() => {
+                                  try {
+                                    cartStore.updateQuantity(
+                                      item.productId,
+                                      item.quantity - 1,
+                                      currentStock ??
+                                        checkoutSettings.maxItemQuantity,
                                       checkoutSettings.maxItemQuantity,
-                                    checkoutSettings.maxItemQuantity,
-                                  )
-                                }
+                                    );
+                                  } catch {
+                                    return;
+                                  }
+                                }}
                                 type="button"
                               >
                                 <Minus aria-hidden="true" />
@@ -279,15 +283,19 @@ export function CartDrawer({
                               <button
                                 aria-label={`Увеличить количество ${item.title}`}
                                 disabled={!controls.canIncrease}
-                                onClick={() =>
-                                  cartStore.updateQuantity(
-                                    item.productId,
-                                    item.quantity + 1,
-                                    currentStock ??
+                                onClick={() => {
+                                  try {
+                                    cartStore.updateQuantity(
+                                      item.productId,
+                                      item.quantity + 1,
+                                      currentStock ??
+                                        checkoutSettings.maxItemQuantity,
                                       checkoutSettings.maxItemQuantity,
-                                    checkoutSettings.maxItemQuantity,
-                                  )
-                                }
+                                    );
+                                  } catch {
+                                    return;
+                                  }
+                                }}
                                 type="button"
                               >
                                 <Plus aria-hidden="true" />
