@@ -25,6 +25,7 @@ export default (config: UserConfig) =>
       dedupe: codeMirrorModules,
     },
     server: {
+      allowedHosts: true,
       host: "0.0.0.0",
       hmr: {
         host: "localhost",
