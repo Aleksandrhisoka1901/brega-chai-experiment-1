@@ -73,7 +73,7 @@
   padding: 0.9rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   border: 1px solid var(--border-default);
   cursor: pointer;
