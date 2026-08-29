@@ -38,6 +38,20 @@ export const DEFAULT_SITEMAP_URLS = [
   { slug: "/stati", priority: 0.9, frequency: "weekly" },
 ] as const;
 
+export function shouldReplaceSitemapOrigin(
+  existing: string | undefined,
+  next: string,
+): boolean {
+  if (!existing?.trim()) return true;
+  if (existing.trim() === next) return false;
+  try {
+    const hostname = new URL(existing).hostname;
+    return hostname === "localhost" || /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
+  } catch {
+    return true;
+  }
+}
+
 export function normalizeSitemapOrigin(value: string): string {
   const url = new URL(value);
   if (url.protocol !== "http:" && url.protocol !== "https:") {
@@ -85,7 +99,7 @@ async function ensurePluginOptions(strapi: any, baseUrl: string) {
     return;
   }
 
-  if (!existing.baseUrl?.trim()) {
+  if (shouldReplaceSitemapOrigin(existing.baseUrl, baseUrl)) {
     await query.update({ where: { id: existing.id }, data: { baseUrl } });
   }
 }

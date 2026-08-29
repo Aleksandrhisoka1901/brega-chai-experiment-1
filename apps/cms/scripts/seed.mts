@@ -175,8 +175,8 @@ async function run() {
     await upsertSingle(strapi, "api::global-setting.global-setting", {
       brandName: "Voltora",
       logo: null,
-      email: "hello@voltora.ru",
-      orderNotificationEmail: "orders@voltora.ru",
+      email: "hello@lon-energy.ru",
+      orderNotificationEmail: "orders@lon-energy.ru",
       pickupAddress:
         "Самовывоз осуществляется по адресу: г. Москва, проезд Серебрякова, д. 14, стр. 6.",
       pickupDiscountPercent: null,

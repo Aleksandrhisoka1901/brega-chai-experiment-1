@@ -7,8 +7,24 @@ import {
   DEFAULT_SITEMAP_URLS,
   ensureSitemapConfiguration,
   normalizeSitemapOrigin,
+  shouldReplaceSitemapOrigin,
   SITEMAP_PERMISSION_ACTION,
 } from "../src/sitemap-configuration.ts";
+
+test("replaces only empty, localhost, or IP sitemap origins", () => {
+  assert.equal(
+    shouldReplaceSitemapOrigin(undefined, "https://lon-energy.ru"),
+    true,
+  );
+  assert.equal(
+    shouldReplaceSitemapOrigin("http://201.24.49.82:3000", "https://lon-energy.ru"),
+    true,
+  );
+  assert.equal(
+    shouldReplaceSitemapOrigin("https://editor.example", "https://lon-energy.ru"),
+    false,
+  );
+});
 
 test("normalizes the public sitemap origin", () => {
   assert.equal(
