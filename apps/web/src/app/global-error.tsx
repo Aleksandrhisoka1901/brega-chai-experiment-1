@@ -21,7 +21,7 @@ export default function GlobalError({
     <html lang="ru">
       <head>
         <meta content="noindex, nofollow" name="robots" />
-        <title>Сервис временно недоступен — Brega</title>
+        <title>Сервис временно недоступен — Voltora</title>
       </head>
       <body>
         <SystemState

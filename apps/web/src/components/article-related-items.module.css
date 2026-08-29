@@ -26,18 +26,18 @@
 
 .card {
   min-width: 0;
+  isolation: isolate;
   overflow: hidden;
-  background: var(--surface-page);
-  box-shadow: 0 0.35rem 1.5rem rgb(42 37 31 / 8%);
-  transition:
-    box-shadow 240ms ease,
-    transform 240ms ease;
+  border: 0;
+  border-radius: var(--product-radius, 0.75rem);
+  background: var(--product-media-surface);
+  box-shadow: var(--product-card-shadow);
+  transition: box-shadow 240ms ease;
 }
 
 .card:hover,
 .card:focus-within {
-  box-shadow: 0 0.8rem 2rem rgb(42 37 31 / 13%);
-  transform: translateY(-0.125rem);
+  box-shadow: var(--product-card-shadow-hover);
 }
 
 .link {
@@ -57,11 +57,14 @@
   position: relative;
   min-height: 13rem;
   overflow: hidden;
-  background: var(--surface-subtle);
+  background: var(--product-media-surface);
 }
 
 .media img {
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  padding: 1rem;
+  mix-blend-mode: multiply;
   transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 

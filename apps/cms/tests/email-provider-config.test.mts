@@ -11,7 +11,7 @@ test("configures the Mailgun HTTP API provider from environment variables", () =
   const plugins = createPluginsConfig({
     env: createEnv({
       EMAIL_PROVIDER: "mailgun",
-      EMAIL_FROM: "Brega Tea <postmaster@sandbox.example.mailgun.org>",
+      EMAIL_FROM: "Voltora <postmaster@sandbox.example.mailgun.org>",
       EMAIL_REPLY_TO: "orders@example.test",
       MAILGUN_API_KEY: "test-api-key",
       MAILGUN_DOMAIN: "sandbox.example.mailgun.org",
@@ -27,7 +27,7 @@ test("configures the Mailgun HTTP API provider from environment variables", () =
       url: "https://api.eu.mailgun.net",
     },
     settings: {
-      defaultFrom: "Brega Tea <postmaster@sandbox.example.mailgun.org>",
+      defaultFrom: "Voltora <postmaster@sandbox.example.mailgun.org>",
       defaultReplyTo: "orders@example.test",
     },
   });

@@ -270,7 +270,7 @@ export interface MaterialTemplatesBasicInfoCard extends Struct.ComponentSchema {
   collectionName: 'components_material_templates_basic_info_cards';
   info: {
     description: '\u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0430 \u0441\u0435\u0442\u043A\u0438: \u0442\u0435\u043A\u0441\u0442, \u043C\u0430\u0440\u043A\u0435\u0440 \u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435';
-    displayName: 'BasicInfoCard';
+    displayName: '\u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0430 \u0441\u0435\u0442\u043A\u0438';
   };
   attributes: {
     bg_color: Schema.Attribute.String;

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { SystemState } from "@/components/system-state";
 
 export const metadata: Metadata = {
-  title: "Сервис временно недоступен — Brega",
+  title: `Сервис временно недоступен — ${BRAND_NAME}`,
   robots: { index: false, follow: false },
 };
 

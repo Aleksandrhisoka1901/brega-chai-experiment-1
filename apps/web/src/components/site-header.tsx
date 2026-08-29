@@ -11,6 +11,7 @@ import { getCartQuantity } from "@/features/cart/model";
 import { CartDrawer } from "@/features/cart/components/cart-drawer";
 import { cartDrawerStore } from "@/features/cart/components/cart-drawer-store";
 import { useCart } from "@/features/cart/use-cart";
+import { BRAND_EMAIL, BRAND_NAME, BRAND_TELEGRAM_URL } from "@/lib/brand";
 import { bindShortRussianWords } from "@/lib/typography";
 import type { CheckoutSettings } from "@/server/cms/global-mapper";
 
@@ -51,18 +52,19 @@ const defaultNavigation = {
 
 const defaultCheckoutSettings: CheckoutSettings = {
   maxItemQuantity: 5,
-  pickupAddress: "г. Москва, ул. Чайная, д. 1. Ежедневно с 10:00 до 22:00.",
+  pickupAddress:
+    "Самовывоз осуществляется по адресу: г. Москва, проезд Серебрякова, д. 14, стр. 6.",
   pickupDiscountPercent: null,
   courierDeliveryNote: "Стоимость рассчитывается в день отправки, до 1000 руб.",
 };
 
 const defaultContacts = {
-  email: "hello@example.test",
-  telegramUrl: "https://t.me/brega_chai",
+  email: BRAND_EMAIL,
+  telegramUrl: BRAND_TELEGRAM_URL,
 };
 
 export function SiteHeader({
-  brandName = "Brega",
+  brandName = BRAND_NAME,
   logo,
   navigation = defaultNavigation,
   contacts = defaultContacts,

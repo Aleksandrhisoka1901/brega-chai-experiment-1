@@ -82,11 +82,8 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
   await expect(aboutParagraphs.first()).toHaveCSS("font-size", "20px");
 
   const nabory = page.locator("#paneli");
-  const naborCards = nabory.locator('[data-home-card="nabor"]');
-  const naborTrackBox = await nabory
-    .locator('[data-home-card="nabor"]')
-    .first()
-    .boundingBox();
+  const naborCards = nabory.locator(".product-card");
+  const naborTrackBox = await nabory.locator(".product-card").first().boundingBox();
   expect(
     Math.abs((wordmarkBox?.x ?? 0) - (naborTrackBox?.x ?? 0)),
   ).toBeLessThan(2);
@@ -99,7 +96,7 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
   const products = page.locator("#stantsii");
   const productGrid = products.locator(".product-grid");
   const productCards = products.locator(".product-card");
-  await expect(productGrid).toHaveCSS("gap", "0px");
+  await expect(productGrid).toHaveCSS("gap", "20px");
   await expect(productCards).toHaveCount(4);
   await expect(productCards.first().getByText("1 600 ₽")).toBeVisible();
   await expect(productCards.first().getByText("Пакетик (50 г)")).toBeVisible();
@@ -137,7 +134,7 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
   await expect(firstProductHeading.getByRole("heading")).toHaveText(
     "Да Хун Пао",
   );
-  await expect(firstProductHeading).toHaveCSS("align-items", "baseline");
+  await expect(firstProductHeading).toHaveCSS("align-items", "start");
   await expect(firstProductHeading).toHaveCSS("margin-bottom", "10px");
   await expect(firstProductHeading.getByRole("heading")).toHaveCSS(
     "margin-bottom",
@@ -145,14 +142,14 @@ test("homepage follows the quiet-book desktop composition @visual", async ({
   );
   await expect(firstProductHeading.getByText("Пакетик (50 г)")).toHaveCSS(
     "justify-self",
-    "end",
+    "start",
   );
   const firstProductCommerce = productCards
     .first()
     .locator(".product-card__commerce");
   await expect(firstProductCommerce).toHaveCSS("justify-content", "flex-start");
   await expect(firstProductCommerce).toHaveCSS("border-top-width", "0px");
-  await expect(products).toHaveCSS("background-color", "rgb(215, 207, 190)");
+  await expect(products).toHaveCSS("background-color", "rgb(238, 241, 244)");
   const productsLink = products.getByRole("link", { name: "Все сорта" });
   await expect(productsLink).toHaveCSS("text-transform", "uppercase");
   await expect(productsLink.locator("svg")).toHaveCount(1);

@@ -172,7 +172,7 @@ export function buildAdminOrderNotification(
   const model = buildTemplateModel(order, "admin");
 
   return {
-    subject: `Новый заказ №${order.orderNumber} — Brega Tea`,
+    subject: `Новый заказ №${order.orderNumber} — Voltora`,
     text: adminTextTemplate(model).trim(),
     html: htmlTemplate(model).trim(),
   };
@@ -186,7 +186,7 @@ export function buildCustomerOrderConfirmation(
   const model = buildTemplateModel(order, "customer");
 
   return {
-    subject: `Заказ №${order.orderNumber} принят — Brega Tea`,
+    subject: `Заказ №${order.orderNumber} принят — Voltora`,
     text: customerTextTemplate(model).trim(),
     html: htmlTemplate(model).trim(),
   };

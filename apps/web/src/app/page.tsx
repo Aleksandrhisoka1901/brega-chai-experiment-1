@@ -53,9 +53,11 @@ export default async function HomePage() {
           title={content.tovaryPreview.title}
         />
         <HomeNabory
+          brandName={settings.brandName}
           eyebrow={content.naboryPreview.eyebrow}
           imagePlaceholder={settings.storefrontTexts.imagePlaceholder}
           linkLabel={content.naboryPreview.linkLabel}
+          outOfStock={settings.storefrontTexts.outOfStock}
           products={nabory}
           subtitle={content.naboryPreview.subtitle}
           title={content.naboryPreview.title}

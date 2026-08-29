@@ -37,7 +37,7 @@ for (const catalog of [
     await expect(
       page.getByRole("form", { name: "Фильтр по цене" }),
     ).toBeVisible();
-    await expect(productGrid).toHaveCSS("gap", "0px");
+    await expect(productGrid).toHaveCSS("gap", "20px");
     await expect(productGrid).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     const gridBox = await productGrid.boundingBox();
     expect(gridBox?.y).toBeLessThan(620);

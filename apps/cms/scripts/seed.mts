@@ -163,9 +163,9 @@ async function run() {
     }
 
     const defaultSeo = {
-      title: "Brega — портативные электростанции и солнечные панели",
+      title: "Voltora — портативные электростанции и солнечные панели",
       description:
-        "Портативные электростанции и складные солнечные панели для дома, дачи и резервного питания в Москве и по России.",
+        "Портативные электростанции и складные солнечные панели для дома, дачи и резервного питания. Доставка по России, опт и розница.",
     };
     const mainImage = (asset: string, alt: string) => ({
       image: imageByAsset.get(asset)?.id,
@@ -173,16 +173,17 @@ async function run() {
     });
 
     await upsertSingle(strapi, "api::global-setting.global-setting", {
-      brandName: "Brega",
+      brandName: "Voltora",
       logo: null,
-      email: "hello@example.test",
-      orderNotificationEmail: "orders@example.test",
-      pickupAddress: "г. Москва. Самовывоз по согласованию, ежедневно с 10:00 до 20:00.",
-      pickupDiscountPercent: 10,
+      email: "hello@voltora.ru",
+      orderNotificationEmail: "orders@voltora.ru",
+      pickupAddress:
+        "Самовывоз осуществляется по адресу: г. Москва, проезд Серебрякова, д. 14, стр. 6.",
+      pickupDiscountPercent: null,
       maxItemQuantity: 5,
       courierDeliveryNote:
         "Стоимость доставки рассчитывается в день отправки.",
-      telegramUrl: "https://t.me/brega_chai",
+      telegramUrl: "https://t.me/voltora",
       defaultProductStory: paragraph(
         "Перед подключением сверяйте номинальную и пусковую мощность прибора с характеристиками станции. Фактическое время работы зависит от нагрузки и режима эксплуатации.",
       ),
@@ -204,7 +205,7 @@ async function run() {
       },
       currency: "RUB",
       defaultSeo,
-      legalDetails: "ИП Иванов Иван. ИНН 123456789",
+      legalDetails: "Voltora. Доставка по всей России.",
     });
 
     const homePageData = {
@@ -224,11 +225,11 @@ async function run() {
       },
       about: {
         eyebrow: "Глава 01 · О компании",
-        title: "Резерв, который включается без генератора и очереди за топливом.",
+        title: "Опт, розница и доставка по всей России.",
         textBlock1:
-          "До 600 W — ваш резерв для связи, света и работы. 1000–1500 W — отключения не нарушат привычный быт. 2000 W и выше — энергия для дома, которому нельзя останавливаться.",
+          "Работаем с частными покупателями и с организациями: подберём станцию под квартиру, дачу, мастерскую или поставку на объект. Доставка — по всей России, итоговую стоимость подтверждаем в день отправки.",
         textBlock2:
-          "Линейка собрана по реальным сценариям: квартира в Москве, дача, поездка и длительный резерв. Станции на LiFePO4, чистая синусоида и совместимые солнечные панели — в одном каталоге.",
+          "Оборудование сопровождается декларацией соответствия. Актуальный документ: [Декларация соответствия](/legal/deklaraciya-sootvetstviya).",
         spacing: "L",
       },
       naboryPreview: {
@@ -257,7 +258,7 @@ async function run() {
     await upsertSingle(strapi, "api::products-page.products-page", {
       eyebrow: "Глава 02",
       seo: {
-        title: "Портативные электростанции — Brega",
+        title: "Портативные электростанции — Voltora",
         description:
           "Каталог портативных электростанций CTECHi, Famlink Power и NP: мощность, ёмкость, порты и цена.",
       },
@@ -271,7 +272,7 @@ async function run() {
     await upsertSingle(strapi, "api::rituals-page.rituals-page", {
       eyebrow: "Глава 03",
       seo: {
-        title: "Солнечные панели — Brega",
+        title: "Солнечные панели — Voltora",
         description:
           "Складные солнечные панели CTECHi 60, 100 и 200 W для зарядки портативных электростанций.",
       },
@@ -285,7 +286,7 @@ async function run() {
     await upsertSingle(strapi, "api::articles-page.articles-page", {
       eyebrow: "Глава 04",
       seo: {
-        title: "Статьи об электростанциях — Brega",
+        title: "Статьи об электростанциях — Voltora",
         description:
           "Как выбрать портативную электростанцию для квартиры, дачи и резервного питания в Москве и по России.",
       },
@@ -405,7 +406,7 @@ Sitemap: ${process.env.SITE_URL ?? "http://localhost:3001"}/sitemap.xml
         priority: 20,
         imageAsset: "ctechi-gt500.png",
         seo: {
-          title: "Портативная электростанция для квартиры в Москве — Brega",
+          title: "Портативная электростанция для квартиры в Москве — Voltora",
           description:
             "Зачем держать портативную электростанцию в московской квартире: роутер, свет, ноутбук и тихий резерв без запаха топлива.",
         },
@@ -418,7 +419,7 @@ Sitemap: ${process.env.SITE_URL ?? "http://localhost:3001"}/sitemap.xml
         priority: 10,
         imageAsset: "ctechi-gt1200.png",
         seo: {
-          title: "Зачем нужна портативная электростанция в России сейчас — Brega",
+          title: "Зачем нужна портативная электростанция в России сейчас — Voltora",
           description:
             "Перебои, нагрузка на инфраструктуру и военные действия рядом с повседневной жизнью: зачем держать тихий электрический резерв дома.",
         },

@@ -54,20 +54,21 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
         </div>
         <div className="site-footer__legal">
           <h2>Правовая информация</h2>
-          {configuredLegalDocuments.length > 0 ? (
-            <nav aria-label="Юридические документы">
-              {configuredLegalDocuments.map(({ href, label }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {bindShortRussianWords(label)}
-                </a>
-              ))}
-            </nav>
-          ) : null}
+          <nav aria-label="Юридические документы">
+            <a href="/legal/deklaraciya-sootvetstviya">
+              {bindShortRussianWords("Декларация соответствия")}
+            </a>
+            {configuredLegalDocuments.map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {bindShortRussianWords(label)}
+              </a>
+            ))}
+          </nav>
           <small>
             © {new Date().getFullYear()}.{" "}
             {bindShortRussianWords(settings.legalDetails)}

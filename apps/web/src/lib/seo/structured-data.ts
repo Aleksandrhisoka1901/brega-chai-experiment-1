@@ -1,4 +1,5 @@
 import type { ProductDetail } from "@/server/cms/product-detail-mapper";
+import { BRAND_NAME } from "@/lib/brand";
 
 export function serializeJsonLd(data: unknown) {
   return JSON.stringify(data).replace(/</g, "\\u003c");
@@ -7,7 +8,7 @@ export function serializeJsonLd(data: unknown) {
 export function productStructuredData(
   product: ProductDetail,
   url: string,
-  brandName = "Brega",
+  brandName = BRAND_NAME,
 ) {
   return {
     "@context": "https://schema.org",

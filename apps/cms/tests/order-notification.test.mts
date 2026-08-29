@@ -48,7 +48,7 @@ const order: StoredOrder = {
   statusHistory: [{ from: null, to: "new", at: "2026-07-31T12:00:00.000Z" }],
 };
 
-test("renders the admin order email in the Brega Tea visual language", () => {
+test("renders the admin order email in the Voltora visual language", () => {
   const previousSiteUrl = process.env.SITE_URL;
   const message = (() => {
     process.env.SITE_URL = "https://brega.example/storefront";
@@ -60,7 +60,7 @@ test("renders the admin order email in the Brega Tea visual language", () => {
     }
   })();
 
-  assert.equal(message.subject, "Новый заказ №2607-0001 — Brega Tea");
+  assert.equal(message.subject, "Новый заказ №2607-0001 — Voltora");
   assert.match(message.text, /Способ получения: Самовывоз/);
   assert.match(message.text, /Адрес самовывоза:/);
   assert.match(message.text, /Стандартная сумма: 1[\s\u00a0]495/);
@@ -82,18 +82,18 @@ test("renders the admin order email in the Brega Tea visual language", () => {
   );
   assert.match(
     message.html,
-    /style="color: #ffffff; text-decoration: none;"[^>]*>Brega Tea<\/a>/,
+    /style="color: #ffffff; text-decoration: none;"[^>]*>Voltora<\/a>/,
   );
   assert.match(
     message.html,
-    /style="color: #c5b792; text-decoration: none;"[^>]*>Brega Tea<\/a>/,
+    /style="color: #c5b792; text-decoration: none;"[^>]*>Voltora<\/a>/,
   );
 });
 
 test("renders a customer confirmation without the admin-only contact block", () => {
   const message = buildCustomerOrderConfirmation(order);
 
-  assert.equal(message.subject, "Заказ №2607-0001 принят — Brega Tea");
+  assert.equal(message.subject, "Заказ №2607-0001 принят — Voltora");
   assert.match(message.text, /^Спасибо за заказ/);
   assert.match(message.text, /свяжемся с вами, когда он будет готов к выдаче/);
   assert.match(message.html, /Подтверждение заказа/);

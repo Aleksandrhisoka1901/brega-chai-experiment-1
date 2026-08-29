@@ -3,6 +3,25 @@ import { bindShortRussianWords } from "@/lib/typography";
 
 import styles from "./home.module.css";
 
+function AboutParagraph({ text }: { text: string }) {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+
+  return (
+    <p>
+      {parts.map((part, index) => {
+        const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+        if (!match) return bindShortRussianWords(part);
+
+        return (
+          <a href={match[2]} key={`${match[2]}-${index}`}>
+            {bindShortRussianWords(match[1])}
+          </a>
+        );
+      })}
+    </p>
+  );
+}
+
 export function HomeAbout({ about }: { about: HomePageContent["about"] }) {
   return (
     <section
@@ -25,7 +44,7 @@ export function HomeAbout({ about }: { about: HomePageContent["about"] }) {
         </div>
         <div className={styles.aboutCopy}>
           {about.textBlocks.map((paragraph) => (
-            <p key={paragraph}>{bindShortRussianWords(paragraph)}</p>
+            <AboutParagraph key={paragraph} text={paragraph} />
           ))}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { bindShortRussianWords } from "@/lib/typography";
 import type { ArticleRelatedItem } from "@/server/cms/article-mapper";
 
@@ -50,7 +51,7 @@ function RelatedMaterialsGroup({
                 className={styles.media}
                 fallback={
                   <div className={styles.placeholder} aria-hidden="true">
-                    <span>Brega</span>
+                    <span>{BRAND_NAME}</span>
                     <small>{relatedItemLabel(item.type)}</small>
                   </div>
                 }

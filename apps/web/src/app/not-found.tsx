@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
 import { SystemState } from "@/components/system-state";
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Страница не найдена — Brega",
+  title: `Страница не найдена — ${BRAND_NAME}`,
   robots: { index: false, follow: false },
 };
 

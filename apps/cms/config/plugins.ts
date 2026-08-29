@@ -5,7 +5,7 @@ export default ({ env }) => {
   const smtpPassword = env("SMTP_PASSWORD");
   const smtpFrom = env(
     "SMTP_FROM",
-    smtpUsername || "Brega Tea <no-reply@example.test>",
+    smtpUsername || "Voltora <no-reply@example.test>",
   );
   const emailFrom = env("EMAIL_FROM", smtpFrom);
   const emailReplyTo = env("EMAIL_REPLY_TO", env("SMTP_REPLY_TO", emailFrom));

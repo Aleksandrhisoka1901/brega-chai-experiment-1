@@ -13,6 +13,7 @@ import {
   organizationStructuredData,
   websiteStructuredData,
 } from "@/lib/seo/structured-data";
+import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import { CmsUnavailableError } from "@/server/cms/errors";
 import { getGlobalSettings } from "@/server/cms/global";
 
@@ -26,10 +27,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(siteOrigin()),
-    title: settings?.defaultSeo.title ?? "Brega",
-    description:
-      settings?.defaultSeo.description ??
-      "Портативные электростанции и солнечные панели для дома и резервного питания",
+    title: settings?.defaultSeo.title ?? BRAND_NAME,
+    description: settings?.defaultSeo.description ?? BRAND_TAGLINE,
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
       shortcut: "/favicon.svg",
@@ -67,13 +66,13 @@ export default async function RootLayout({
         <JsonLd
           data={organizationStructuredData(
             siteOrigin(),
-            settings?.brandName ?? "Brega",
+            settings?.brandName ?? BRAND_NAME,
           )}
         />
         <JsonLd
           data={websiteStructuredData(
             siteOrigin(),
-            settings?.brandName ?? "Brega",
+            settings?.brandName ?? BRAND_NAME,
           )}
         />
         <a className="skip-link" href="#main-content">

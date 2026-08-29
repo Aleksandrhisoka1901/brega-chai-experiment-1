@@ -83,10 +83,7 @@ for (const viewport of viewports) {
 
       if (path === "/" && viewport.width <= 1023) {
         const nabory = page.locator("#paneli");
-        const naborTrack = nabory
-          .locator('[data-home-card="nabor"]')
-          .first()
-          .locator("..");
+        const naborTrack = nabory.locator(".product-grid").first();
         await expect(
           nabory.getByRole("button", { name: /ритуалы/u }),
         ).toBeHidden();

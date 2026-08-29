@@ -30,24 +30,33 @@
   position: relative;
   aspect-ratio: 1;
   padding: 0;
+  isolation: isolate;
   overflow: hidden;
-  border: 1px solid transparent;
-  background: var(--surface-subtle);
+  border: 0;
+  box-shadow: inset 0 0 0 2px transparent;
+  border-radius: 0.5rem;
+  background: var(--product-media-surface);
   cursor: pointer;
 }
 
 .thumbnail[aria-pressed="true"] {
-  border-color: var(--text-primary);
+  box-shadow: inset 0 0 0 2px var(--action-accent);
 }
 
 .thumbnail img {
   object-fit: contain;
+  object-position: center;
+  padding: 0.35rem;
+  mix-blend-mode: multiply;
 }
 
 .mainImage,
 .placeholder {
+  isolation: isolate;
   aspect-ratio: 4 / 3;
-  background: var(--surface-subtle);
+  overflow: hidden;
+  border-radius: var(--product-radius, 0.75rem);
+  background: var(--product-media-surface);
 }
 
 .mainImage {
@@ -61,6 +70,9 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
+  padding: 1.25rem;
+  mix-blend-mode: multiply;
 }
 
 .mainImageTransition {

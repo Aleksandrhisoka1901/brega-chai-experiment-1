@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
-const DEFAULT_TITLE = "Brega";
-const DEFAULT_DESCRIPTION =
-  "Портативные электростанции и солнечные панели для дома и резервного питания";
+import { BRAND_NAME, BRAND_TAGLINE } from "../brand.ts";
+
+const DEFAULT_TITLE = BRAND_NAME;
+const DEFAULT_DESCRIPTION = BRAND_TAGLINE;
 
 export function siteOrigin(value = process.env["SITE_URL"]) {
   const url = new URL(value ?? "http://localhost:3000");
