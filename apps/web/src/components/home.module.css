@@ -28,6 +28,8 @@
 }
 
 .heroCopy {
+  position: relative;
+  z-index: 1;
   min-width: 0;
   padding: clamp(2.75rem, 7vw, 6.875rem) var(--page-gutter) 2.625rem;
   display: flex;
@@ -98,8 +100,27 @@
 .heroMedia,
 .cardMedia {
   position: relative;
+  min-width: 0;
+  isolation: isolate;
   overflow: hidden;
   background: var(--surface-subtle);
+}
+
+.heroMedia {
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  background: var(--product-media-surface, #eef1f4);
+}
+
+.heroImage {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .cardMedia {
@@ -108,7 +129,12 @@
 }
 
 .heroMedia img {
-  object-fit: cover;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .cardMedia img {
@@ -526,38 +552,11 @@
 
 @media (min-width: 1601px) {
   .hero {
-    position: relative;
-    isolation: isolate;
     background: var(--surface-subtle);
-  }
-
-  .hero::before {
-    position: absolute;
-    inset: 0 auto 0 0;
-    background: var(--hero-copy-background, var(--surface-editorial));
-    content: "";
-    pointer-events: none;
-  }
-
-  .hero[data-layout="40/60"]::before {
-    width: calc(50% - 10rem);
-  }
-
-  .hero[data-layout="50/50"]::before {
-    width: 50%;
-  }
-
-  .hero[data-layout="100/0"]::before {
-    width: 100%;
   }
 
   .heroInner {
     position: relative;
-    z-index: 1;
-  }
-
-  .heroCopy {
-    background: transparent;
   }
 }
 

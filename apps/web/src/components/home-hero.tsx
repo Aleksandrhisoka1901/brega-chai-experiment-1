@@ -51,7 +51,7 @@ export function HomeHero({ hero }: { hero: HomePageContent["hero"] }) {
             {hero.image ? (
               <ResponsiveImage
                 alt={hero.image.alt}
-                fill
+                className={styles.heroImage}
                 height={hero.image.height}
                 priority
                 sizes={layout.imageSizes}
