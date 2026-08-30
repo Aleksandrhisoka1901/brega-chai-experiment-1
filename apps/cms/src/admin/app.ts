@@ -179,6 +179,15 @@ const adminApp = {
         "content-manager.content-types.api::articles-page.articles-page.title":
           "Заголовок",
 
+        "content-manager.content-types.api::wholesale-page.wholesale-page.title":
+          "Заголовок",
+        "content-manager.content-types.api::wholesale-page.wholesale-page.content":
+          "Текст страницы",
+        "content-manager.content-types.api::wholesale-page.wholesale-page.blocks":
+          "Блоки",
+        "content-manager.content-types.api::wholesale-page.wholesale-page.seo":
+          "SEO-настройки",
+
         "content-manager.content-types.api::article.article.blocks":
           "Блоки статьи",
         "content-manager.content-types.api::article.article.relatedMaterials":

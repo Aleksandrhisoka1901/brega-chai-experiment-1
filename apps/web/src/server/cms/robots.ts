@@ -1,5 +1,7 @@
 import "server-only";
 
+import { resolveRobotsContent } from "@/lib/seo/indexing";
+
 import { fetchCms } from "./client";
 import { DEFAULT_ROBOTS_CONTENT, mapRobotsPayload } from "./robots-mapper";
 
@@ -10,8 +12,8 @@ export async function getRobotsContent(): Promise<string> {
       revalidate: 0,
     });
 
-    return mapRobotsPayload(payload);
+    return resolveRobotsContent(mapRobotsPayload(payload));
   } catch {
-    return DEFAULT_ROBOTS_CONTENT;
+    return resolveRobotsContent(DEFAULT_ROBOTS_CONTENT);
   }
 }

@@ -45,4 +45,10 @@ test("browser chrome matches the storefront surface", async ({ page }) => {
   const favicon = await page.request.get("/favicon.svg");
   expect(favicon.ok()).toBe(true);
   expect(favicon.headers()["content-type"]).toContain("image/svg+xml");
+
+  const legacyFavicon = await page.request.get("/favicon.ico");
+  expect(legacyFavicon.ok()).toBe(true);
+  const legacyBody = await legacyFavicon.text();
+  expect(legacyBody).toContain("<svg");
+  expect(legacyBody).toContain("#24251e");
 });

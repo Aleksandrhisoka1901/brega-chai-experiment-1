@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { BRAND_NAME, BRAND_TAGLINE } from "../brand.ts";
+import { indexingMetadata } from "./indexing.ts";
 
 const DEFAULT_TITLE = BRAND_NAME;
 const DEFAULT_DESCRIPTION = BRAND_TAGLINE;
@@ -37,6 +38,7 @@ export function pageMetadata(input: {
 
   return {
     ...values,
+    ...indexingMetadata(),
     alternates: { canonical },
     openGraph: {
       ...values,

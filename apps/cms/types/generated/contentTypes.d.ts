@@ -551,6 +551,44 @@ export interface ApiArticlesPageArticlesPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiWholesalePageWholesalePage extends Struct.SingleTypeSchema {
+  collectionName: 'wholesale_pages';
+  info: {
+    description: '\u0420\u0435\u0434\u0430\u043A\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u00AB\u0414\u043B\u044F \u043E\u043F\u0442\u043E\u0432\u0438\u043A\u043E\u0432\u00BB \u0441 \u0442\u0435\u043C\u0438 \u0436\u0435 \u0431\u043B\u043E\u043A\u0430\u043C\u0438, \u0447\u0442\u043E \u0443 \u0441\u0442\u0430\u0442\u0435\u0439';
+    displayName: '\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u0434\u043B\u044F \u043E\u043F\u0442\u043E\u0432\u0438\u043A\u043E\u0432';
+    pluralName: 'wholesale-pages';
+    singularName: 'wholesale-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    blocks: Schema.Attribute.DynamicZone<
+      ['article.cards-grid', 'material-templates.cards-grid']
+    >;
+    content: Schema.Attribute.RichText;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::wholesale-page.wholesale-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
   collectionName: 'global_settings';
   info: {
@@ -1648,6 +1686,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::article.article': ApiArticleArticle;
       'api::articles-page.articles-page': ApiArticlesPageArticlesPage;
+      'api::wholesale-page.wholesale-page': ApiWholesalePageWholesalePage;
       'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;
       'api::home-page.home-page': ApiHomePageHomePage;
       'api::order.order': ApiOrderOrder;

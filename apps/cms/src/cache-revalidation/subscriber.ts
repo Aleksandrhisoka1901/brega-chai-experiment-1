@@ -13,6 +13,7 @@ const EVENT_BY_UID: Readonly<Record<string, RevalidationEventName>> = {
   "api::product.product": "product",
   "api::articles-page.articles-page": "articles",
   "api::article.article": "article",
+  "api::wholesale-page.wholesale-page": "wholesale",
 };
 
 interface StrapiPublicationEvent {

@@ -44,7 +44,7 @@ test("normalizes the public sitemap origin", () => {
 test("creates the minimal sitemap configuration and public permission", async () => {
   assert.deepEqual(
     DEFAULT_SITEMAP_URLS.map(({ slug }) => slug),
-    ["/", "/stantsii", "/paneli", "/stati"],
+    ["/", "/stantsii", "/paneli", "/stati", "/dlya-optovikov"],
   );
   const creates = new Map<string, unknown[]>();
   const query = (uid: string) => ({

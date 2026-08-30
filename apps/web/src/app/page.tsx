@@ -5,6 +5,7 @@ import { HomeArticles } from "@/components/home-articles";
 import { HomeHero } from "@/components/home-hero";
 import { HomeNabory } from "@/components/home-nabory";
 import { HomeTovary } from "@/components/home-tovary";
+import { HomeWholesale } from "@/components/home-wholesale";
 import { CmsUnavailableError } from "@/server/cms/errors";
 import { getHomePage } from "@/server/cms/home";
 import { getGlobalSettings } from "@/server/cms/global";
@@ -42,6 +43,7 @@ export default async function HomePage() {
       <main>
         <HomeHero hero={content.hero} />
         <HomeAbout about={content.about} />
+        <HomeWholesale />
         <HomeTovary
           brandName={settings.brandName}
           eyebrow={content.tovaryPreview.eyebrow}

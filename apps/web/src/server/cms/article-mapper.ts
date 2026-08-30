@@ -608,6 +608,14 @@ function appendMediaPopulate(query: URLSearchParams, prefix: string) {
   });
 }
 
+export function appendCardsGridPopulateToQuery(query: URLSearchParams) {
+  appendCardsGridPopulate(query, "article.cards-grid", ["image", "bulletIcon"]);
+  appendCardsGridPopulate(query, "material-templates.cards-grid", [
+    "image",
+    "bullet_icon",
+  ]);
+}
+
 function appendCardsGridPopulate(
   query: URLSearchParams,
   component: string,
@@ -653,11 +661,7 @@ export function articleDetailRequest(slug: string) {
   query.set("populate[seo][fields][1]", "description");
   appendMediaPopulate(query, "populate[seo][populate][image]");
   // Strapi 5 rejects populate[blocks][populate] on a dynamic zone; use on[uid].
-  appendCardsGridPopulate(query, "article.cards-grid", ["image", "bulletIcon"]);
-  appendCardsGridPopulate(query, "material-templates.cards-grid", [
-    "image",
-    "bullet_icon",
-  ]);
+  appendCardsGridPopulateToQuery(query);
   appendRelatedProductPopulate(query);
   appendRelatedArticlePopulate(query);
 

@@ -85,6 +85,7 @@ async function upsertSingle(
     | "api::products-page.products-page"
     | "api::rituals-page.rituals-page"
     | "api::articles-page.articles-page"
+    | "api::wholesale-page.wholesale-page"
     | "api::robots-txt.robots-txt",
   data: Record<string, unknown>,
 ) {
@@ -295,6 +296,17 @@ async function run() {
       emptyStateLinkLabel: "Вернуться на главную",
       intro:
         "Короткие разборы мощности, автономности и бытовых сценариев — без лишнего шума генератора.",
+    });
+
+    await upsertSingle(strapi, "api::wholesale-page.wholesale-page", {
+      title: "Для оптовиков",
+      content:
+        "<p>Условия поставок, партии и сопровождение для магазинов, монтажников и дистрибьюторов. Напишите нам — подберём линейку под ваш канал продаж.</p>",
+      seo: {
+        title: "Для оптовиков — Voltora",
+        description:
+          "Оптовые поставки портативных электростанций и солнечных панелей Voltora для магазинов и партнёров.",
+      },
     });
 
     await upsertSingle(strapi, "api::robots-txt.robots-txt", {

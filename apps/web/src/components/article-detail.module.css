@@ -5,7 +5,7 @@
 }
 
 .header {
-  max-width: 42rem;
+  max-width: none;
 }
 
 .header h1 {
@@ -14,7 +14,8 @@
   font-size: var(--type-heading-1);
   font-weight: 400;
   letter-spacing: -0.03em;
-  line-height: 1.05;
+  line-height: 1.12;
+  text-wrap: balance;
 }
 
 .body {

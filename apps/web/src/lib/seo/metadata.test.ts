@@ -60,4 +60,5 @@ test("adds an optional editorial image to Open Graph metadata", () => {
   assert.deepEqual(metadata.openGraph?.images, [
     { url: "https://media.example.test/seo.png" },
   ]);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
 });

@@ -227,6 +227,86 @@
   text-underline-offset: 0.22em;
 }
 
+.wholesale {
+  overflow: hidden;
+  background: #1e2329;
+  color: #f5f7fa;
+}
+
+.wholesaleInner {
+  position: relative;
+  padding: 7.5rem var(--page-gutter);
+  display: grid;
+  grid-template-columns: minmax(17.5rem, 1.05fr) minmax(18rem, 0.95fr);
+  gap: 6vw;
+  align-items: end;
+}
+
+.wholesaleInner::before {
+  position: absolute;
+  top: -3.5rem;
+  right: var(--page-gutter);
+  color: currentColor;
+  content: "ОПТ";
+  opacity: 0.07;
+  font-family: var(--font-display);
+  font-size: clamp(8rem, 14vw, 16rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.wholesaleTitle .chapter {
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.wholesale h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--type-heading-2);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+}
+
+.wholesaleCopy {
+  position: relative;
+  display: grid;
+  gap: 1.75rem;
+  justify-items: start;
+  font-family: var(--font-display);
+  font-size: var(--type-body-editorial);
+  line-height: 1.65;
+}
+
+.wholesaleCopy p {
+  margin: 0;
+  max-width: 34rem;
+}
+
+.wholesaleCopy ul {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.wholesaleCopy li {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 999px;
+  font-size: var(--type-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wholesale .editorialLink {
+  min-width: 13.5rem;
+}
+
 .catalog {
   overflow: hidden;
   background: var(--surface-subtle);
@@ -597,7 +677,8 @@
 
   .heroIntro,
   .aboutInner,
-  .aboutCopy {
+  .aboutCopy,
+  .wholesaleInner {
     grid-template-columns: 1fr;
   }
 
@@ -609,6 +690,11 @@
   .aboutInner {
     gap: 3.5rem;
     padding: 6.25rem var(--page-gutter);
+  }
+
+  .wholesaleInner {
+    gap: 2.25rem;
+    padding: 5.5rem var(--page-gutter);
   }
 
   .aboutCopy {

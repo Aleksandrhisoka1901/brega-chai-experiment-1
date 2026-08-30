@@ -7,6 +7,7 @@ import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { AnalyticsConsent } from "@/features/analytics/analytics-consent";
+import { indexingMetadata } from "@/lib/seo/indexing";
 import { siteOrigin } from "@/lib/seo/metadata";
 import { bindShortRussianWords } from "@/lib/typography";
 import {
@@ -29,8 +30,12 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteOrigin()),
     title: settings?.defaultSeo.title ?? BRAND_NAME,
     description: settings?.defaultSeo.description ?? BRAND_TAGLINE,
+    ...indexingMetadata(),
     icons: {
-      icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+      icon: [
+        { url: "/favicon.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico" },
+      ],
       shortcut: "/favicon.svg",
       apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
     },

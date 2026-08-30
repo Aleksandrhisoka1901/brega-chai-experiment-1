@@ -298,6 +298,12 @@ test("covers every editable storefront schema with a canonical layout", () => {
       "emptyStateLinkLabel",
       "seo",
     ],
+    "api::wholesale-page.wholesale-page": [
+      "title",
+      "content",
+      "blocks",
+      "seo",
+    ],
     "api::article.article": [
       "name",
       "priority",

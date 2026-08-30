@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server.js";
 
+import { applyIndexingHeaders } from "./lib/seo/indexing.ts";
+
 export const SERVICE_UNAVAILABLE_PATH = "/service-unavailable-internal";
 export const SITEMAP_PLUGIN_PATH = "/api/strapi-5-sitemap-plugin/sitemap.xml";
 
@@ -78,22 +80,29 @@ const canonicalRedirect = (request: NextRequest) => {
   const current = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   const canonical = `${target.pathname}${target.search}`;
 
-  return current === canonical ? null : NextResponse.redirect(target, 301);
+  if (current === canonical) return null;
+  return withIndexingHeaders(NextResponse.redirect(target, 301));
+};
+
+const withIndexingHeaders = (response: NextResponse) => {
+  applyIndexingHeaders(response.headers);
+  return response;
 };
 
 const serviceUnavailableResponse = (request: NextRequest) => {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-brega-service-unavailable", "1");
 
-  return NextResponse.rewrite(new URL(SERVICE_UNAVAILABLE_PATH, request.url), {
-    request: { headers: requestHeaders },
-    status: 503,
-    headers: {
-      "Cache-Control": "no-store",
-      "Retry-After": "60",
-      "X-Robots-Tag": "noindex, nofollow",
-    },
-  });
+  return withIndexingHeaders(
+    NextResponse.rewrite(new URL(SERVICE_UNAVAILABLE_PATH, request.url), {
+      request: { headers: requestHeaders },
+      status: 503,
+      headers: {
+        "Cache-Control": "no-store",
+        "Retry-After": "60",
+      },
+    }),
+  );
 };
 
 const sitemapResponse = (request: NextRequest) => {
@@ -102,7 +111,7 @@ const sitemapResponse = (request: NextRequest) => {
   const cmsUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
   const target = new URL(SITEMAP_PLUGIN_PATH, cmsUrl);
   target.search = request.nextUrl.search;
-  return NextResponse.rewrite(target);
+  return withIndexingHeaders(NextResponse.rewrite(target));
 };
 
 const legalDocumentResponse = async (request: NextRequest) => {
@@ -130,14 +139,15 @@ const legalDocumentResponse = async (request: NextRequest) => {
       },
     );
     if (!response.ok) {
-      return new NextResponse(null, {
-        status: 503,
-        headers: {
-          "Cache-Control": "no-store",
-          "Retry-After": "60",
-          "X-Robots-Tag": "noindex, nofollow",
-        },
-      });
+      return withIndexingHeaders(
+        new NextResponse(null, {
+          status: 503,
+          headers: {
+            "Cache-Control": "no-store",
+            "Retry-After": "60",
+          },
+        }),
+      );
     }
 
     const payload = (await response.json()) as {
@@ -152,35 +162,30 @@ const legalDocumentResponse = async (request: NextRequest) => {
     };
     const document = payload.data?.legalDocuments?.[field];
     if (!document?.url || document.mime !== "application/pdf") {
-      return new NextResponse(null, {
-        status: 404,
-        headers: { "X-Robots-Tag": "noindex, nofollow" },
-      });
+      return withIndexingHeaders(new NextResponse(null, { status: 404 }));
     }
 
     const target = new URL(document.url, publicMediaUrl);
     if (target.protocol !== "http:" && target.protocol !== "https:") {
-      return new NextResponse(null, {
-        status: 404,
-        headers: { "X-Robots-Tag": "noindex, nofollow" },
-      });
+      return withIndexingHeaders(new NextResponse(null, { status: 404 }));
     }
-    return NextResponse.rewrite(target);
+    return withIndexingHeaders(NextResponse.rewrite(target));
   } catch {
-    return new NextResponse(null, {
-      status: 503,
-      headers: {
-        "Cache-Control": "no-store",
-        "Retry-After": "60",
-        "X-Robots-Tag": "noindex, nofollow",
-      },
-    });
+    return withIndexingHeaders(
+      new NextResponse(null, {
+        status: 503,
+        headers: {
+          "Cache-Control": "no-store",
+          "Retry-After": "60",
+        },
+      }),
+    );
   }
 };
 
 export async function middleware(request: NextRequest) {
   if (request.method !== "GET" && request.method !== "HEAD") {
-    return NextResponse.next();
+    return withIndexingHeaders(NextResponse.next());
   }
 
   const sitemap = sitemapResponse(request);
@@ -189,13 +194,15 @@ export async function middleware(request: NextRequest) {
   const legalDocument = await legalDocumentResponse(request);
   if (legalDocument) return legalDocument;
 
-  if (isExcludedPath(request.nextUrl.pathname)) return NextResponse.next();
+  if (isExcludedPath(request.nextUrl.pathname)) {
+    return withIndexingHeaders(NextResponse.next());
+  }
 
   if (!(await isCmsReady())) {
     return serviceUnavailableResponse(request);
   }
 
-  return canonicalRedirect(request) ?? NextResponse.next();
+  return canonicalRedirect(request) ?? withIndexingHeaders(NextResponse.next());
 }
 
 export const config = {

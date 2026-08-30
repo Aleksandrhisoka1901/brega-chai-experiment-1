@@ -53,6 +53,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   skipMiddlewareUrlNormalize: true,
   skipTrailingSlashRedirect: true,
+  devIndicators: false,
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 3600,

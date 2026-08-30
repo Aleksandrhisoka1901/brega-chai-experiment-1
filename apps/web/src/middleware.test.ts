@@ -201,6 +201,7 @@ test("continues public navigation when CMS readiness is healthy", async () => {
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("x-middleware-next"), "1");
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
     assert.deepEqual(readinessRequest, {
       input: "http://127.0.0.1:1337/api/health/readiness",
       cache: "no-store",

@@ -12,6 +12,7 @@ import { CartDrawer } from "@/features/cart/components/cart-drawer";
 import { cartDrawerStore } from "@/features/cart/components/cart-drawer-store";
 import { useCart } from "@/features/cart/use-cart";
 import { BRAND_EMAIL, BRAND_NAME, BRAND_TELEGRAM_URL } from "@/lib/brand";
+import { WHOLESALE_PATH } from "@/lib/storefront-routes";
 import { bindShortRussianWords } from "@/lib/typography";
 import type { CheckoutSettings } from "@/server/cms/global-mapper";
 
@@ -33,6 +34,7 @@ type SiteHeaderProps = {
     nabory: string;
     tovary: string;
     stati: string;
+    optovikam?: string;
     cart: string;
   };
   contacts?: {
@@ -47,6 +49,7 @@ const defaultNavigation = {
   nabory: "Солнечные панели",
   tovary: "Электростанции",
   stati: "Статьи",
+  optovikam: "Для оптовиков",
   cart: "Корзина",
 };
 
@@ -80,6 +83,10 @@ export function SiteHeader({
     { href: "/stantsii", label: navigation.tovary },
     { href: "/paneli", label: navigation.nabory },
     { href: "/stati", label: navigation.stati },
+    {
+      href: WHOLESALE_PATH,
+      label: navigation.optovikam ?? defaultNavigation.optovikam,
+    },
   ];
 
   return (
@@ -153,7 +160,9 @@ export function SiteHeader({
                         (link.href === "/paneli" &&
                           pathname.startsWith("/paneli")) ||
                         (link.href === "/stati" &&
-                          pathname.startsWith("/stati"));
+                          pathname.startsWith("/stati")) ||
+                        (link.href === WHOLESALE_PATH &&
+                          pathname.startsWith(WHOLESALE_PATH));
 
                       return (
                         <li key={link.href}>

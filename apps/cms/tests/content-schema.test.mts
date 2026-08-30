@@ -376,3 +376,18 @@ test("article catalog uses draft/publish, generated slug and cards-grid blocks",
   assert.equal(card.attributes.titleHtmlTag.default, "h3");
   assert.equal(navigation.attributes.stati.required, true);
 });
+
+test("wholesale page reuses article cards-grid blocks", async () => {
+  const page = await schema(
+    "src/api/wholesale-page/content-types/wholesale-page/schema.json",
+  );
+
+  assert.equal(page.kind, "singleType");
+  assert.equal(page.options?.draftAndPublish, true);
+  assert.equal(page.attributes.title.required, true);
+  assert.equal(page.attributes.content.type, "richtext");
+  assert.deepEqual(page.attributes.blocks.components, [
+    "article.cards-grid",
+    "material-templates.cards-grid",
+  ]);
+});

@@ -9,6 +9,7 @@ import { ensureHomeEditorialPalette } from "./home-palette-configuration.js";
 import { ensureRelatedItemsPermissions } from "./related-items-configuration.js";
 import { ensureSitemapConfiguration } from "./sitemap-configuration.js";
 import { ensureRitualsPageConfiguration } from "./rituals-page-configuration.js";
+import { ensureWholesalePageConfiguration } from "./wholesale-page-configuration.js";
 
 export default {
   register() {},
@@ -16,6 +17,7 @@ export default {
     await ensureRussianAdminLocale(strapi);
     await ensureGlobalContentDefaults(strapi);
     await ensureRitualsPageConfiguration(strapi);
+    await ensureWholesalePageConfiguration(strapi);
     await ensureRelatedItemsPermissions(strapi);
     await ensureHomeArticlesPreview(strapi);
     await ensureHomeEditorialPalette(strapi);

@@ -251,6 +251,17 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       intro: { list: { searchable: false, sortable: false } },
     },
   },
+  "api::wholesale-page.wholesale-page": {
+    layouts: {
+      edit: [
+        [{ name: "title", size: 12 }],
+        [{ name: "content", size: 12 }],
+        [{ name: "blocks", size: 12 }],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "title", "updatedAt"],
+    },
+  },
   "home.articles-preview": {
     layouts: {
       edit: [

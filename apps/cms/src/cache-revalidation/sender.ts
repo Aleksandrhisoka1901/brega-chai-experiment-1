@@ -7,6 +7,7 @@ export type RevalidationEventName =
   | "product"
   | "articles"
   | "article"
+  | "wholesale"
   | "media";
 export type RevalidationAction = "publish" | "update" | "unpublish";
 
