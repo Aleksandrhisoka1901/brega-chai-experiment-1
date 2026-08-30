@@ -2,8 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 for (const catalog of [
-  { path: "/stantsii", title: "Сорта", eyebrow: "Глава 03" },
-  { path: "/paneli", title: "Ритуалы", eyebrow: "Глава 02" },
+  { path: "/stantsii", title: "Сорта" },
+  { path: "/paneli", title: "Ритуалы" },
 ] as const) {
   test(`${catalog.path} stays compact, continuous, and accessible`, async ({
     page,
@@ -27,9 +27,6 @@ for (const catalog of [
         level: 1,
         name: catalog.title,
       }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(catalog.eyebrow, { exact: true }),
     ).toBeVisible();
 
     const productGrid = page.locator(".product-grid");
@@ -63,17 +60,10 @@ test("catalog title fills optional eyebrow space", async ({ page }) => {
   await page.goto("/stantsii");
 
   const intro = page.locator(".catalog-intro");
-  const eyebrow = page.getByText("Глава 03", { exact: true });
   const title = page.getByRole("heading", { level: 1, name: "Сорта" });
-  const eyebrowBox = await eyebrow.boundingBox();
 
-  await eyebrow.evaluate((element) => element.remove());
-  await intro.evaluate((element) =>
-    element.setAttribute("data-has-eyebrow", "false"),
-  );
-
-  const desktopTitleBox = await title.boundingBox();
-  expect(desktopTitleBox?.x).toBeCloseTo(eyebrowBox?.x ?? 0, 0);
+  await expect(intro).toHaveAttribute("data-has-eyebrow", "false");
+  await expect(title).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(title).toHaveCSS("margin-top", "0px");

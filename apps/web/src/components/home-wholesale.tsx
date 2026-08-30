@@ -4,12 +4,6 @@ import { bindShortRussianWords } from "@/lib/typography";
 import { EditorialLink } from "./editorial-link";
 import styles from "./home.module.css";
 
-const points = [
-  "Магазины и маркетплейсы",
-  "Монтаж и сервис",
-  "Дистрибуция по России",
-] as const;
-
 export function HomeWholesale() {
   return (
     <section className={styles.wholesale} id="opt">
@@ -29,11 +23,6 @@ export function HomeWholesale() {
               "Партии станций и панелей для тех, кто продаёт, ставит и обслуживает автономный резерв. Подберём линейку, сроки и комплектацию под ваш канал — без розничной витрины.",
             )}
           </p>
-          <ul>
-            {points.map((point) => (
-              <li key={point}>{bindShortRussianWords(point)}</li>
-            ))}
-          </ul>
           <EditorialLink href={WHOLESALE_PATH} label="Условия для опта" />
         </div>
       </div>

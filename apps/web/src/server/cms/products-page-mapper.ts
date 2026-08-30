@@ -1,6 +1,7 @@
 import type { ProductSummary } from "@brega-chai/contracts";
 import { z } from "zod";
 
+import { sanitizeEditorialEyebrow } from "./editorial-eyebrow.ts";
 import { CmsValidationError } from "./errors.ts";
 import { versionCmsMediaUrl } from "./media-url.ts";
 
@@ -10,7 +11,7 @@ const optionalEyebrow = z
   .trim()
   .nullable()
   .optional()
-  .transform((value) => value || undefined);
+  .transform((value) => sanitizeEditorialEyebrow(value));
 const seoSchema = z.object({
   title: nonEmptyString,
   description: nonEmptyString,

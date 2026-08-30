@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { hasReadableContrast } from "../../lib/readable-colors.ts";
 import { mapArticlesPayload } from "./article-mapper.ts";
+import { sanitizeEditorialEyebrow } from "./editorial-eyebrow.ts";
 import { CmsValidationError } from "./errors.ts";
 import { versionCmsMediaUrl } from "./media-url.ts";
 import { mapProductsPayload } from "./product-mapper.ts";
@@ -162,7 +163,7 @@ export function mapHomeCollectionsPayload(
 }
 
 function optionalEyebrow(value: string | null | undefined) {
-  const eyebrow = value?.trim();
+  const eyebrow = sanitizeEditorialEyebrow(value);
   return eyebrow ? { eyebrow } : {};
 }
 

@@ -3,7 +3,6 @@ export const HOME_PAGE_UID = "api::home-page.home-page";
 type DocumentStatus = "draft" | "published";
 
 export const DEFAULT_ARTICLES_PREVIEW = {
-  eyebrow: "Глава 04",
   title: "Статьи",
   subtitle:
     "Как выбрать мощность, что потянет станция и зачем держать резерв дома.",

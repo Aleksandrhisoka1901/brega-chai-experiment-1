@@ -14,7 +14,6 @@ test("/stati lists article cards with catalog composition", async ({ page }) => 
     "page",
   );
   await expect(page.getByRole("heading", { level: 1, name: "Статьи" })).toBeVisible();
-  await expect(page.getByText("Глава 04", { exact: true })).toBeVisible();
 
   const articles = page.locator(".article-grid").getByRole("article");
   await expect(articles).toHaveCount(2);

@@ -225,7 +225,7 @@ async function run() {
         cta: { label: "К электростанциям", url: "#stantsii" },
       },
       about: {
-        eyebrow: "Глава 01 · О компании",
+        eyebrow: "О компании",
         title: "Опт, розница и доставка по всей России.",
         textBlock1:
           "Работаем с частными покупателями и с организациями: подберём станцию под квартиру, дачу, мастерскую или поставку на объект. Доставка — по всей России, итоговую стоимость подтверждаем в день отправки.",
@@ -234,21 +234,18 @@ async function run() {
         spacing: "L",
       },
       naboryPreview: {
-        eyebrow: "Глава 03",
         title: "Солнечные панели",
         subtitle:
           "Складные панели 60, 100 и 200 W, чтобы станция заряжалась без розетки.",
         linkLabel: "Все панели",
       },
       tovaryPreview: {
-        eyebrow: "Глава 02",
         title: "Портативные электростанции",
         subtitle:
           "От компактной розетки для гаджетов до резерва для дома и мастерской.",
         linkLabel: "Все станции",
       },
       articlesPreview: {
-        eyebrow: "Глава 04",
         title: "Статьи",
         subtitle:
           "Как выбрать мощность, что потянет станция и зачем держать резерв дома.",
@@ -257,7 +254,6 @@ async function run() {
     };
 
     await upsertSingle(strapi, "api::products-page.products-page", {
-      eyebrow: "Глава 02",
       seo: {
         title: "Портативные электростанции — Voltora",
         description:
@@ -271,7 +267,6 @@ async function run() {
     });
 
     await upsertSingle(strapi, "api::rituals-page.rituals-page", {
-      eyebrow: "Глава 03",
       seo: {
         title: "Солнечные панели — Voltora",
         description:
@@ -285,7 +280,6 @@ async function run() {
     });
 
     await upsertSingle(strapi, "api::articles-page.articles-page", {
-      eyebrow: "Глава 04",
       seo: {
         title: "Статьи об электростанциях — Voltora",
         description:

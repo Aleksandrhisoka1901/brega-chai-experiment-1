@@ -87,7 +87,10 @@ test("maps editable home sections and resolves media URLs", () => {
   assert.equal(home.tovaryPreview.linkLabel, "Все сорта");
   assert.equal(home.articlesPreview.title, "Статьи");
   assert.equal(home.articlesPreview.linkLabel, "Все статьи");
-  assert.equal(home.articlesPreview.eyebrow, "Глава 04");
+  assert.equal(home.about.eyebrow, "О проекте");
+  assert.equal(home.naboryPreview.eyebrow, undefined);
+  assert.equal(home.tovaryPreview.eyebrow, undefined);
+  assert.equal(home.articlesPreview.eyebrow, undefined);
   assert.equal(home.articlesPreview.subtitle, "Заметки о чае.");
   assert.equal(home.about.spacing, "L");
   assert.equal(home.seo?.title, "Чайный бутик");

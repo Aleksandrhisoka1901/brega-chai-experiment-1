@@ -23,21 +23,21 @@ const validPayload = {
   },
 };
 
-test("maps the published products-page plain intro and SEO", () => {
-  assert.deepEqual(
-    mapProductsPagePayload(validPayload, "http://localhost:9000"),
-    {
-      eyebrow: "Глава 03",
-      title: "Чай, выбранный для внимания",
-      emptyStateText: "Сорта скоро появятся.",
-      emptyStateLinkLabel: "Вернуться на главную",
-      intro: "Небольшая коллекция без спешки.",
-      seo: {
-        title: "Купить китайский чай",
-        description: "Коллекция китайского чая Brega Chai.",
-      },
+test("maps a chapter products-page eyebrow without showing the number", () => {
+  const content = mapProductsPagePayload(validPayload, "http://localhost:9000");
+
+  assert.equal(content.eyebrow, undefined);
+  assert.equal(Object.hasOwn(content, "eyebrow"), false);
+  assert.deepEqual(content, {
+    title: "Чай, выбранный для внимания",
+    emptyStateText: "Сорта скоро появятся.",
+    emptyStateLinkLabel: "Вернуться на главную",
+    intro: "Небольшая коллекция без спешки.",
+    seo: {
+      title: "Купить китайский чай",
+      description: "Коллекция китайского чая Brega Chai.",
     },
-  );
+  });
 });
 
 test("maps an absent or blank products-page eyebrow without a placeholder", () => {

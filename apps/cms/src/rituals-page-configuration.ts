@@ -2,7 +2,6 @@ export const RITUALS_PAGE_UID = "api::rituals-page.rituals-page";
 export const RITUALS_PAGE_PERMISSION_ACTION = `${RITUALS_PAGE_UID}.find`;
 
 export const DEFAULT_RITUALS_PAGE = {
-  eyebrow: "Глава 03",
   title: "Солнечные панели",
   intro:
     "Складные панели, чтобы продлить автономность станции на даче, в поездке и при перебоях с сетью.",
