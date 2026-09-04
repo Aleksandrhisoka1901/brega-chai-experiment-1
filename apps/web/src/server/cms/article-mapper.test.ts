@@ -177,6 +177,10 @@ test("turns markdown lists and line breaks in richtext strings into HTML", () =>
     "<ul><li>Первая.</li><li>Вторая.</li></ul>",
   );
   assert.equal(
+    normalizeArticleHtml("<p>- Первая.</p><p>- Вторая.</p>"),
+    "<ul><li>Первая.</li><li>Вторая.</li></ul>",
+  );
+  assert.equal(
     normalizeArticleHtml("Первая строка\nВторая строка"),
     "<p>Первая строка<br>Вторая строка</p>",
   );

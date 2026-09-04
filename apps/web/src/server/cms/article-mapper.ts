@@ -221,7 +221,7 @@ function markdownLiteToHtml(source: string) {
     }
 
     if (line.trim() === "") {
-      flushBlocks();
+      flushParagraph();
       continue;
     }
 
