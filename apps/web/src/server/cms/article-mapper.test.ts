@@ -7,6 +7,7 @@ import {
   articlesListRequest,
   mapArticleDetailPayload,
   mapArticlesPayload,
+  normalizeArticleHtml,
 } from "./article-mapper.ts";
 
 test("lists articles with a narrow published populate and articles tag", () => {
@@ -155,6 +156,44 @@ test("maps a detail article with cards-grid and returns null for misses", () => 
   assert.throws(
     () => mapArticleDetailPayload({ data: {} }, "http://localhost:9000"),
     CmsValidationError,
+  );
+});
+
+test("turns markdown lists and line breaks in richtext strings into HTML", () => {
+  assert.equal(
+    normalizeArticleHtml(
+      [
+        "- Солнечные панели различной мощности.",
+        "- Портативные зарядные станции.",
+        "- Сопутствующее оборудование для монтажа и подключения.",
+        "",
+        "Мы поможем вам подобрать продукцию, которая решит ваши задачи.",
+      ].join("\n"),
+    ),
+    "<ul><li>Солнечные панели различной мощности.</li><li>Портативные зарядные станции.</li><li>Сопутствующее оборудование для монтажа и подключения.</li></ul><p>Мы поможем вам подобрать продукцию, которая решит ваши задачи.</p>",
+  );
+  assert.equal(
+    normalizeArticleHtml("<p>- Первая.\n- Вторая.</p>"),
+    "<ul><li>Первая.</li><li>Вторая.</li></ul>",
+  );
+  assert.equal(
+    normalizeArticleHtml("Первая строка\nВторая строка"),
+    "<p>Первая строка<br>Вторая строка</p>",
+  );
+  assert.equal(
+    normalizeArticleHtml("1. Панели\n2. Станции"),
+    "<ol><li>Панели</li><li>Станции</li></ol>",
+  );
+  assert.equal(normalizeArticleHtml("<p>Свежая.</p>"), "<p>Свежая.</p>");
+  assert.equal(
+    normalizeArticleHtml("<ul><li>Уже список</li></ul>"),
+    "<ul><li>Уже список</li></ul>",
+  );
+  assert.equal(
+    normalizeArticleHtml(
+      "<p>Пауза важнее глотка.</p><script>alert(1)</script>",
+    ),
+    "<p>Пауза важнее глотка.</p><script>alert(1)</script>",
   );
 });
 

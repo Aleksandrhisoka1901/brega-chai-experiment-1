@@ -36,6 +36,14 @@
   margin-bottom: 0;
 }
 
+.body :is(ul, ol) {
+  padding-left: 1.35em;
+}
+
+.body li + li {
+  margin-top: 0.35em;
+}
+
 .body :is(h2, h3, h4) {
   font-family: var(--font-display);
   font-weight: 400;

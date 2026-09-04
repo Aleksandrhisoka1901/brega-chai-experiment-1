@@ -143,6 +143,111 @@ function escapeHtml(value: string) {
     .replace(/"/g, "&quot;");
 }
 
+const UL_ITEM = /^[ \t]*[-*][ \t]+([\s\S]+)$/;
+const OL_ITEM = /^[ \t]*\d+\.[ \t]+([\s\S]+)$/;
+const HTML_TAG = /<\/?[a-z][^>]*>/i;
+
+function inlineHtmlOrEscape(value: string) {
+  return HTML_TAG.test(value) ? value : escapeHtml(value);
+}
+
+function htmlToMarkdownSource(value: string) {
+  if (!HTML_TAG.test(value)) return value.replace(/\r\n/g, "\n");
+
+  return value
+    .replace(/\r\n/g, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>\s*<p\b[^>]*>/gi, "\n\n")
+    .replace(/<\/?p\b[^>]*>/gi, "\n")
+    .replace(/^\n+|\n+$/g, "");
+}
+
+function needsMarkdownStructure(source: string) {
+  return (
+    source.includes("\n") || /(?:^|\n)[ \t]*(?:[-*] |\d+\.\s)/.test(source)
+  );
+}
+
+function isParagraphOnlyHtml(value: string) {
+  const withoutAllowed = value.replace(
+    /<\/?(?:p|br|strong|em|b|i|u|a)\b[^>]*>/gi,
+    "",
+  );
+  return !HTML_TAG.test(withoutAllowed);
+}
+
+function markdownLiteToHtml(source: string) {
+  const html: string[] = [];
+  let ulItems: string[] = [];
+  let olItems: string[] = [];
+  let paragraphLines: string[] = [];
+
+  const flushUl = () => {
+    if (ulItems.length === 0) return;
+    html.push(`<ul>${ulItems.map((item) => `<li>${item}</li>`).join("")}</ul>`);
+    ulItems = [];
+  };
+  const flushOl = () => {
+    if (olItems.length === 0) return;
+    html.push(`<ol>${olItems.map((item) => `<li>${item}</li>`).join("")}</ol>`);
+    olItems = [];
+  };
+  const flushParagraph = () => {
+    if (paragraphLines.length === 0) return;
+    html.push(`<p>${paragraphLines.join("<br>")}</p>`);
+    paragraphLines = [];
+  };
+  const flushBlocks = () => {
+    flushParagraph();
+    flushUl();
+    flushOl();
+  };
+
+  for (const line of source.replace(/\r\n/g, "\n").split("\n")) {
+    const unordered = line.match(UL_ITEM);
+    if (unordered?.[1]) {
+      flushParagraph();
+      flushOl();
+      ulItems.push(inlineHtmlOrEscape(unordered[1].trimEnd()));
+      continue;
+    }
+
+    const ordered = line.match(OL_ITEM);
+    if (ordered?.[1]) {
+      flushParagraph();
+      flushUl();
+      olItems.push(inlineHtmlOrEscape(ordered[1].trimEnd()));
+      continue;
+    }
+
+    if (line.trim() === "") {
+      flushBlocks();
+      continue;
+    }
+
+    flushUl();
+    flushOl();
+    paragraphLines.push(inlineHtmlOrEscape(line.trimEnd()));
+  }
+
+  flushBlocks();
+  return html.join("");
+}
+
+function normalizeRichTextString(value: string) {
+  if (/<(?:ul|ol)\b/i.test(value)) return value;
+
+  const source = HTML_TAG.test(value)
+    ? isParagraphOnlyHtml(value)
+      ? htmlToMarkdownSource(value)
+      : null
+    : value.replace(/\r\n/g, "\n");
+
+  if (source === null || !needsMarkdownStructure(source)) return value;
+
+  return markdownLiteToHtml(source) || value;
+}
+
 function inlineToHtml(nodes: unknown): string {
   if (!Array.isArray(nodes)) return "";
 
@@ -207,7 +312,10 @@ function blocksToHtml(blocks: unknown): string | undefined {
 }
 
 export function normalizeArticleHtml(value: unknown): string | undefined {
-  if (typeof value === "string") return asTrimmedString(value);
+  if (typeof value === "string") {
+    const trimmed = asTrimmedString(value);
+    return trimmed ? normalizeRichTextString(trimmed) : undefined;
+  }
   if (Array.isArray(value)) return blocksToHtml(value);
   return undefined;
 }

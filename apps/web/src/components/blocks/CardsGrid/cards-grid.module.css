@@ -125,6 +125,14 @@
   margin-bottom: 0;
 }
 
+.cardDescription :is(ul, ol) {
+  padding-left: 1.25em;
+}
+
+.cardDescription li + li {
+  margin-top: 0.2rem;
+}
+
 .bullet {
   display: inline-flex;
   align-items: center;
