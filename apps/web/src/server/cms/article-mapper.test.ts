@@ -32,14 +32,14 @@ test("details request looks up mixed or encoded slugs by their latin prefix", ()
   assert.equal(decodeRouteSlug(encoded), mixed);
   assert.equal(
     latinSlugPrefix(mixed),
-    "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrych",
+    "rezervnoe-pitanie-doma-pri-otklyuchenii",
   );
 
   const { path, tags } = articleDetailRequest(encoded);
   const url = new URL(path, "http://localhost");
   assert.equal(
     url.searchParams.get("filters[slug][$startsWith]"),
-    "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrych",
+    "rezervnoe-pitanie-doma-pri-otklyuchenii",
   );
   assert.equal(url.searchParams.get("filters[slug][$eq]"), null);
   assert.deepEqual(tags, ["articles", `article-slug:${mixed}`]);

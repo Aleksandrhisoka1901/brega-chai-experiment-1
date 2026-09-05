@@ -769,10 +769,18 @@ export function decodeRouteSlug(slug: string) {
 }
 
 export function latinSlugPrefix(slug: string) {
-  const match = decodeRouteSlug(slug)
-    .toLowerCase()
-    .match(/^[a-z0-9]+(?:-[a-z0-9]+)*/);
-  return match?.[0] ?? "";
+  const decoded = decodeRouteSlug(slug).toLowerCase();
+  const match = decoded.match(/^[a-z0-9]+(?:-[a-z0-9]+)*/);
+  const prefix = match?.[0] ?? "";
+  if (!prefix) return "";
+
+  const leftover = decoded.slice(prefix.length);
+  if (!leftover) return prefix;
+
+  // The last latin token is usually a cut-off transliteration
+  // (`elektrych` + `ества`), so drop it before `$startsWith`.
+  const withoutBrokenTail = prefix.replace(/-[a-z0-9]+$/, "");
+  return withoutBrokenTail || prefix;
 }
 
 function isAsciiSlug(slug: string) {
