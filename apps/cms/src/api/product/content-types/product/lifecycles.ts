@@ -1,6 +1,7 @@
 import {
   assertSlugImmutable,
   generateUniqueSlug,
+  isValidAsciiSlug,
   shouldRegenerateDraftSlug,
   shouldGenerateSlug,
   transliterateCatalogTitle,
@@ -123,15 +124,21 @@ export default {
 
     if (hasPublishedVersion) {
       event.params.data.slugLocked = true;
-      assertSlugImmutable(current.slug, event.params.data.slug);
-      return;
+      if (isValidAsciiSlug(current.slug)) {
+        assertSlugImmutable(current.slug, event.params.data.slug);
+        return;
+      }
+    } else {
+      delete event.params.data.slugLocked;
     }
 
-    delete event.params.data.slugLocked;
-
-    const nextDisplayName = event.params.data.displayName;
+    const nextDisplayName =
+      typeof event.params.data.displayName === "string" &&
+      event.params.data.displayName.trim().length > 0
+        ? event.params.data.displayName
+        : current.displayName;
     if (
-      typeof nextDisplayName === "string" &&
+      !isValidAsciiSlug(current.slug) ||
       shouldRegenerateDraftSlug({
         currentDisplayName: current.displayName,
         nextDisplayName,

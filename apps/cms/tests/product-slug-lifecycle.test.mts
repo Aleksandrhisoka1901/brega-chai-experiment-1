@@ -49,6 +49,32 @@ async function loadLifecycle() {
   ).then((module) => module.default);
 }
 
+test("create replaces a client-supplied slug that still contains Cyrillic", async () => {
+  (globalThis as { strapi?: unknown }).strapi = {
+    db: {
+      query: () => ({ findOne: async () => null }),
+    },
+  };
+
+  const lifecycle = await loadLifecycle();
+  const event = {
+    params: {
+      data: {
+        displayName: "Резервное питание дома при отключении электричества",
+        slug: "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества",
+      },
+    },
+  };
+
+  await lifecycle.beforeCreate(event);
+
+  assert.equal(
+    event.params.data.slug,
+    "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrichestva",
+  );
+  delete (globalThis as { strapi?: unknown }).strapi;
+});
+
 test("create generates a server-owned slug when the form omits it", async () => {
   (globalThis as { strapi?: unknown }).strapi = {
     db: {

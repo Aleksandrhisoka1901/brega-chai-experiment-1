@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   assertSlugImmutable,
   generateUniqueSlug,
+  isValidAsciiSlug,
   normalizeSlugBase,
   shouldRegenerateDraftSlug,
   shouldGenerateSlug,
@@ -26,6 +27,21 @@ test("uses the agreed URL transliteration for Cyrillic titles", () => {
 
 test("uses a stable fallback for titles without latin characters", () => {
   assert.equal(normalizeSlugBase("茶"), "item");
+});
+
+test("builds an ascii slug from a long Russian article title", async () => {
+  const slug = await generateUniqueSlug({
+    title:
+      "Резервное питание дома при отключении электричества: какую портативную электростанцию выбрать для квартиры и дачи",
+    transliterate: transliterateCatalogTitle,
+    exists: async () => false,
+  });
+
+  assert.equal(
+    slug,
+    "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrichestva-kakuyu-portativnuyu-elektrostanciyu-vybrat-dlya-kvartiry-i-dachi",
+  );
+  assert.equal(isValidAsciiSlug(slug), true);
 });
 
 test("adds deterministic numeric suffixes when a generated slug collides", async () => {
@@ -52,11 +68,20 @@ test("rejects a changed slug but permits an omitted or unchanged value", () => {
   );
 });
 
-test("generates a slug only when create data does not already carry one", () => {
+test("generates a slug when create data omits one or carries a non-ascii value", () => {
   assert.equal(shouldGenerateSlug(undefined), true);
   assert.equal(shouldGenerateSlug(""), true);
   assert.equal(shouldGenerateSlug("product"), false);
   assert.equal(shouldGenerateSlug("tea-a1b2c3"), false);
+  assert.equal(
+    shouldGenerateSlug("rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества"),
+    true,
+  );
+  assert.equal(isValidAsciiSlug("rezervnoe-pitanie-doma-pri-otklyuchenii-elektrichestva"), true);
+  assert.equal(
+    isValidAsciiSlug("rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества"),
+    false,
+  );
 });
 
 test("regenerates from a changed draft display name before first publish", () => {

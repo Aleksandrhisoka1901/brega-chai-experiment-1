@@ -10,6 +10,7 @@ import { ensureRelatedItemsPermissions } from "./related-items-configuration.js"
 import { ensureSitemapConfiguration } from "./sitemap-configuration.js";
 import { ensureRitualsPageConfiguration } from "./rituals-page-configuration.js";
 import { ensureChapterEyebrowsCleared } from "./chapter-eyebrow.js";
+import { repairNonAsciiArticleSlugs } from "./article-slug-repair.js";
 import { ensureWholesalePageConfiguration } from "./wholesale-page-configuration.js";
 
 export default {
@@ -24,6 +25,7 @@ export default {
     await ensureHomeEditorialPalette(strapi);
     await ensureChapterEyebrowsCleared(strapi);
     await ensureSitemapConfiguration(strapi);
+    await repairNonAsciiArticleSlugs(strapi);
     await syncAdminContentManager(strapi, russianAdminTranslations);
     registerOrderStatusMiddleware(strapi);
     registerCacheRevalidation(strapi);

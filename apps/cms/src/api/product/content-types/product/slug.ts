@@ -57,8 +57,14 @@ export function assertSlugImmutable(
   }
 }
 
+const ASCII_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function isValidAsciiSlug(slug: unknown): boolean {
+  return typeof slug === "string" && ASCII_SLUG.test(slug);
+}
+
 export function shouldGenerateSlug(slug: unknown): boolean {
-  return typeof slug !== "string" || slug.trim().length === 0;
+  return !isValidAsciiSlug(slug);
 }
 
 export function shouldRegenerateDraftSlug({

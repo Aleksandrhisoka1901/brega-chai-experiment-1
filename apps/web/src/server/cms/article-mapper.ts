@@ -754,16 +754,51 @@ function appendRelatedArticlePopulate(query: URLSearchParams) {
   appendMediaPopulate(query, `${base}[populate][image]`);
 }
 
+export function decodeRouteSlug(slug: string) {
+  let current = slug.trim();
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const decoded = decodeURIComponent(current);
+      if (decoded === current) break;
+      current = decoded;
+    } catch {
+      break;
+    }
+  }
+  return current;
+}
+
+export function latinSlugPrefix(slug: string) {
+  const match = decodeRouteSlug(slug)
+    .toLowerCase()
+    .match(/^[a-z0-9]+(?:-[a-z0-9]+)*/);
+  return match?.[0] ?? "";
+}
+
+function isAsciiSlug(slug: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
 export function articleDetailRequest(slug: string) {
+  const decoded = decodeRouteSlug(slug);
   const query = new URLSearchParams({
     status: "published",
-    "filters[slug][$eq]": slug,
     "fields[0]": "name",
     "fields[1]": "slug",
     "fields[2]": "priority",
     "fields[3]": "content",
     "pagination[pageSize]": "1",
   });
+  if (isAsciiSlug(decoded)) {
+    query.set("filters[slug][$eq]", decoded);
+  } else {
+    const prefix = latinSlugPrefix(decoded);
+    if (prefix) {
+      query.set("filters[slug][$startsWith]", prefix);
+    } else {
+      query.set("filters[slug][$eq]", decoded);
+    }
+  }
   appendMediaPopulate(query, "populate[image]");
   query.set("populate[seo][fields][0]", "title");
   query.set("populate[seo][fields][1]", "description");
@@ -775,7 +810,7 @@ export function articleDetailRequest(slug: string) {
 
   return {
     path: `/api/articles?${query}`,
-    tags: ["articles", `article-slug:${slug}`],
+    tags: ["articles", `article-slug:${decoded}`],
   } as const;
 }
 

@@ -5,6 +5,8 @@ import { CmsValidationError } from "./errors.ts";
 import {
   articleDetailRequest,
   articlesListRequest,
+  decodeRouteSlug,
+  latinSlugPrefix,
   mapArticleDetailPayload,
   mapArticlesPayload,
   normalizeArticleHtml,
@@ -22,6 +24,25 @@ test("lists articles with a narrow published populate and articles tag", () => {
   assert.equal(url.searchParams.get("fields[3]"), "content");
   assert.equal(url.searchParams.get("sort[0]"), "priority:desc");
   assert.deepEqual(tags, ["articles"]);
+});
+
+test("details request looks up mixed or encoded slugs by their latin prefix", () => {
+  const mixed = "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества";
+  const encoded = encodeURIComponent(mixed);
+  assert.equal(decodeRouteSlug(encoded), mixed);
+  assert.equal(
+    latinSlugPrefix(mixed),
+    "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrych",
+  );
+
+  const { path, tags } = articleDetailRequest(encoded);
+  const url = new URL(path, "http://localhost");
+  assert.equal(
+    url.searchParams.get("filters[slug][$startsWith]"),
+    "rezervnoe-pitanie-doma-pri-otklyuchenii-elektrych",
+  );
+  assert.equal(url.searchParams.get("filters[slug][$eq]"), null);
+  assert.deepEqual(tags, ["articles", `article-slug:${mixed}`]);
 });
 
 test("details request populates blocks and tags the slug cache", () => {
