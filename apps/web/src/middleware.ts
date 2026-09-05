@@ -72,13 +72,22 @@ export const canonicalSearch = (searchParams: URLSearchParams) => {
   return search ? `?${search}` : "";
 };
 
+const decodePathname = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 const canonicalRedirect = (request: NextRequest) => {
+  const nextPathname = canonicalPathname(request.nextUrl.pathname);
   const target = new URL(request.url);
-  target.pathname = canonicalPathname(request.nextUrl.pathname);
+  target.pathname = nextPathname;
   target.search = canonicalSearch(request.nextUrl.searchParams);
 
-  const current = `${request.nextUrl.pathname}${request.nextUrl.search}`;
-  const canonical = `${target.pathname}${target.search}`;
+  const current = `${decodePathname(request.nextUrl.pathname)}${request.nextUrl.search}`;
+  const canonical = `${decodePathname(nextPathname)}${target.search}`;
 
   if (current === canonical) return null;
   return withIndexingHeaders(NextResponse.redirect(target, 301));

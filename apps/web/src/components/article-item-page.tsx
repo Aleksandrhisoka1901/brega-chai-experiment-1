@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { canonicalUrl } from "@/lib/seo/metadata";
 import {
@@ -17,6 +17,9 @@ export async function ArticleItemPage({ slug }: { slug: string }) {
     getGlobalSettings(),
   ]);
   if (!article) notFound();
+  if (slug !== article.slug) {
+    permanentRedirect(`/stati/${article.slug}`);
+  }
 
   const breadcrumbs = [
     { name: "Главная", href: "/" },

@@ -258,6 +258,21 @@ test("redirects supported dirty URLs to their canonical URL in one 301", async (
   });
 });
 
+test("does not 301-loop when a storefront slug still contains Cyrillic", async () => {
+  const path =
+    "/stati/rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества";
+
+  await withCmsReadiness(204, async () => {
+    const response = await middleware(
+      new NextRequest(`https://brega.example${path}`),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("location"), null);
+    assert.equal(response.headers.get("x-middleware-next"), "1");
+  });
+});
+
 test("preserves canonical and unknown entity URLs for the server data layer", async () => {
   await withCmsReadiness(204, async () => {
     for (const path of [
