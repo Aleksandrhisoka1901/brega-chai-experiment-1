@@ -19,9 +19,14 @@
 }
 
 .body {
-  max-width: 38rem;
+  width: 100%;
+  max-width: none;
   font-size: var(--type-body-editorial);
   line-height: 1.65;
+}
+
+.body :is(strong, b) {
+  font-weight: 700;
 }
 
 .body p {

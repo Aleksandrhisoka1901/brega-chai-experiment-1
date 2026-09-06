@@ -147,8 +147,34 @@ const UL_ITEM = /^[ \t]*[-*][ \t]+([\s\S]+)$/;
 const OL_ITEM = /^[ \t]*\d+\.[ \t]+([\s\S]+)$/;
 const HTML_TAG = /<\/?[a-z][^>]*>/i;
 
+function applyInlineMarkdown(text: string) {
+  return text
+    .replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/__([\s\S]+?)__/g, "<strong>$1</strong>")
+    .replace(/(?<!\*)\*(?!\*)([^*\n]+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
+    .replace(/(?<!_)_(?!_)([^_\n]+?)(?<!_)_(?!_)/g, "<em>$1</em>")
+    .replace(/\*\*/g, "");
+}
+
+function applyInlineMarkdownInHtml(value: string) {
+  return value.replace(
+    /(^|>)([^<]*)/g,
+    (_match, prefix: string, text: string) => prefix + applyInlineMarkdown(text),
+  );
+}
+
+function hasInlineMarkdown(source: string) {
+  return (
+    /\*\*[\s\S]+?\*\*/.test(source) ||
+    /__[\s\S]+?__/.test(source) ||
+    /(?<!\*)\*[^*\n]+\*(?!\*)/.test(source) ||
+    /(?<!_)_[^_\n]+_(?!_)/.test(source)
+  );
+}
+
 function inlineHtmlOrEscape(value: string) {
-  return HTML_TAG.test(value) ? value : escapeHtml(value);
+  const prepared = HTML_TAG.test(value) ? value : escapeHtml(value);
+  return applyInlineMarkdown(prepared);
 }
 
 function htmlToMarkdownSource(value: string) {
@@ -206,17 +232,21 @@ function markdownLiteToHtml(source: string) {
   for (const line of source.replace(/\r\n/g, "\n").split("\n")) {
     const unordered = line.match(UL_ITEM);
     if (unordered?.[1]) {
+      const item = inlineHtmlOrEscape(unordered[1].trimEnd());
+      if (!item) continue;
       flushParagraph();
       flushOl();
-      ulItems.push(inlineHtmlOrEscape(unordered[1].trimEnd()));
+      ulItems.push(item);
       continue;
     }
 
     const ordered = line.match(OL_ITEM);
     if (ordered?.[1]) {
+      const item = inlineHtmlOrEscape(ordered[1].trimEnd());
+      if (!item) continue;
       flushParagraph();
       flushUl();
-      olItems.push(inlineHtmlOrEscape(ordered[1].trimEnd()));
+      olItems.push(item);
       continue;
     }
 
@@ -225,9 +255,12 @@ function markdownLiteToHtml(source: string) {
       continue;
     }
 
+    const paragraphLine = inlineHtmlOrEscape(line.trimEnd());
+    if (!paragraphLine) continue;
+
     flushUl();
     flushOl();
-    paragraphLines.push(inlineHtmlOrEscape(line.trimEnd()));
+    paragraphLines.push(paragraphLine);
   }
 
   flushBlocks();
@@ -235,7 +268,7 @@ function markdownLiteToHtml(source: string) {
 }
 
 function normalizeRichTextString(value: string) {
-  if (/<(?:ul|ol)\b/i.test(value)) return value;
+  if (/<(?:ul|ol)\b/i.test(value)) return applyInlineMarkdownInHtml(value);
 
   const source = HTML_TAG.test(value)
     ? isParagraphOnlyHtml(value)
@@ -243,9 +276,12 @@ function normalizeRichTextString(value: string) {
       : null
     : value.replace(/\r\n/g, "\n");
 
-  if (source === null || !needsMarkdownStructure(source)) return value;
+  if (source === null) return applyInlineMarkdownInHtml(value);
+  if (!needsMarkdownStructure(source) && !hasInlineMarkdown(source)) {
+    return applyInlineMarkdownInHtml(value);
+  }
 
-  return markdownLiteToHtml(source) || value;
+  return applyInlineMarkdownInHtml(markdownLiteToHtml(source) || value);
 }
 
 function inlineToHtml(nodes: unknown): string {
@@ -255,7 +291,7 @@ function inlineToHtml(nodes: unknown): string {
     .map((node) => {
       if (!isRecord(node)) return "";
       if (node.type === "text" && typeof node.text === "string") {
-        let html = escapeHtml(node.text);
+        let html = applyInlineMarkdown(escapeHtml(node.text));
         if (node.bold === true) html = `<strong>${html}</strong>`;
         if (node.italic === true) html = `<em>${html}</em>`;
         if (node.underline === true) html = `<u>${html}</u>`;

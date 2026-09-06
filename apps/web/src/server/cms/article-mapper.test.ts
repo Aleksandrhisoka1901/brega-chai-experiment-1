@@ -220,6 +220,18 @@ test("turns markdown lists and line breaks in richtext strings into HTML", () =>
     ),
     "<p>Пауза важнее глотка.</p><script>alert(1)</script>",
   );
+  assert.equal(
+    normalizeArticleHtml("**Требуемые характеристики:** запас 12 часов"),
+    "<p><strong>Требуемые характеристики:</strong> запас 12 часов</p>",
+  );
+  assert.equal(
+    normalizeArticleHtml("<p>**Ошибка 1:** слишком мало ёмкости</p>"),
+    "<p><strong>Ошибка 1:</strong> слишком мало ёмкости</p>",
+  );
+  assert.equal(
+    normalizeArticleHtml("<ul><li>**FAQ:** холодильник</li></ul>"),
+    "<ul><li><strong>FAQ:</strong> холодильник</li></ul>",
+  );
 });
 
 test("maps rich-text content arrays and loose dynamic-zone blocks", () => {

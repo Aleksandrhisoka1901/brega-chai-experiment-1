@@ -19,11 +19,17 @@
 }
 
 .description {
-  max-width: 40rem;
+  width: 100%;
+  max-width: none;
   color: var(--text-muted);
   font-family: var(--font-display);
   font-size: var(--type-body);
   line-height: 1.6;
+}
+
+.description :is(strong, b),
+.cardDescription :is(strong, b) {
+  font-weight: 700;
 }
 
 .description :is(p, ul, ol) {
