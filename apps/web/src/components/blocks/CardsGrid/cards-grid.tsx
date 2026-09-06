@@ -129,6 +129,7 @@ export function CardsGrid({ block }: { block: ArticleCardsGrid }) {
   return (
     <section
       className={styles.block}
+      data-columns={block.gridColumns}
       style={{
         ["--grid-columns" as string]: String(block.gridColumns),
       }}

@@ -20,13 +20,22 @@
 
 .body {
   width: 100%;
-  max-width: none;
+  max-width: 46rem;
+  color: var(--text-primary);
   font-size: var(--type-body-editorial);
   line-height: 1.65;
 }
 
 .body :is(strong, b) {
+  display: block;
+  margin: 1.2rem 0 0.4rem;
+  color: var(--text-primary);
   font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.body p:first-child > :is(strong, b):first-child {
+  margin-top: 0;
 }
 
 .body p {
