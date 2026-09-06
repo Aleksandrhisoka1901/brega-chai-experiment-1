@@ -1,10 +1,7 @@
 .block {
   display: grid;
+  width: 100%;
   gap: 1.75rem;
-}
-
-.block[data-columns="1"] {
-  max-width: 46rem;
 }
 
 .title {
@@ -24,7 +21,7 @@
 
 .description {
   width: 100%;
-  max-width: 46rem;
+  max-width: none;
   color: var(--text-primary);
   font-family: var(--font-display);
   font-size: var(--type-body-editorial);

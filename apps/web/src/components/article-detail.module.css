@@ -20,7 +20,7 @@
 
 .body {
   width: 100%;
-  max-width: 46rem;
+  max-width: none;
   color: var(--text-primary);
   font-size: var(--type-body-editorial);
   line-height: 1.65;
