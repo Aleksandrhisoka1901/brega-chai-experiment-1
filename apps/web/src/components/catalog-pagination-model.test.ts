@@ -3,7 +3,10 @@ import test from "node:test";
 
 import {
   catalogPageHref,
+  catalogPageDescription,
+  catalogPageHeading,
   catalogPaginationModel,
+  isCatalogPaginationPage,
   resolveCatalogPage,
 } from "./catalog-pagination-model.ts";
 
@@ -64,4 +67,18 @@ test("builds canonical catalog links and navigation boundaries", () => {
     previousPage: null,
     nextPage: null,
   });
+});
+
+test("unique copy for pagination pages starts from page two", () => {
+  assert.equal(catalogPageHeading("Электростанции", 1), "Электростанции");
+  assert.equal(
+    catalogPageHeading("Электростанции", 2),
+    "Электростанции - страница 2",
+  );
+  assert.equal(
+    catalogPageDescription("Каталог станций.", 2),
+    "Каталог станций. - Страница 2",
+  );
+  assert.equal(isCatalogPaginationPage(1), false);
+  assert.equal(isCatalogPaginationPage(3), true);
 });

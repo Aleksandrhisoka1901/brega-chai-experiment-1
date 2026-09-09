@@ -46,6 +46,10 @@ test("creates the minimal sitemap configuration and public permission", async ()
     DEFAULT_SITEMAP_URLS.map(({ slug }) => slug),
     ["/", "/stantsii", "/paneli", "/stati", "/dlya-optovikov"],
   );
+  assert.equal(
+    DEFAULT_SITEMAP_URLS.some(({ slug }) => /[?&]page=/.test(slug)),
+    false,
+  );
   const creates = new Map<string, unknown[]>();
   const query = (uid: string) => ({
     async findMany() {

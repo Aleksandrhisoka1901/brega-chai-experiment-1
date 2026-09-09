@@ -5,6 +5,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { canonicalUrl, pageMetadata } from "@/lib/seo/metadata";
+import { PAGINATION_ROBOTS } from "@/lib/seo/indexing";
 import { breadcrumbStructuredData } from "@/lib/seo/structured-data";
 import { bindShortRussianWords } from "@/lib/typography";
 import { CmsUnavailableError } from "@/server/cms/errors";
@@ -22,6 +23,9 @@ import { Breadcrumbs, type BreadcrumbItem } from "./breadcrumbs";
 import { CatalogPagination } from "./catalog-pagination";
 import {
   catalogPageHref,
+  catalogPageDescription,
+  catalogPageHeading,
+  isCatalogPaginationPage,
   resolveCatalogPage,
 } from "./catalog-pagination-model";
 import { CatalogPriceFilter } from "./catalog-price-filter";
@@ -130,11 +134,23 @@ export async function catalogLandingMetadata({
       getGlobalSettings(),
     ]);
 
+    const title = catalogPageHeading(
+      content.seo?.title ?? settings.defaultSeo.title ?? content.title,
+      page,
+    );
+    const description = catalogPageDescription(
+      content.seo?.description ?? settings.defaultSeo.description ?? "",
+      page,
+    );
+    const paginated = isCatalogPaginationPage(page);
+
     return pageMetadata({
-      title: content.seo?.title ?? settings.defaultSeo.title ?? content.title,
-      description: content.seo?.description ?? settings.defaultSeo.description,
+      title,
+      description,
       imageUrl: content.seo?.imageUrl ?? settings.defaultSeo.imageUrl,
       path: catalogPageHref(`/${route}`, page, priceFilter),
+      includeCanonical: !paginated,
+      ...(paginated ? { robots: PAGINATION_ROBOTS } : {}),
     });
   } catch (error) {
     if (!(error instanceof CmsUnavailableError)) throw error;
@@ -169,6 +185,7 @@ export async function CatalogLandingPage({
   ];
   const filteredEmpty =
     products.length === 0 && hasCatalogPriceFilter(priceFilter);
+  const showSeoCopy = !isCatalogPaginationPage(page);
 
   return (
     <main>
@@ -183,10 +200,10 @@ export async function CatalogLandingPage({
       <section
         className="catalog-intro content-frame"
         data-content-frame
-        data-has-eyebrow={Boolean(content?.eyebrow)}
+        data-has-eyebrow={Boolean(showSeoCopy && content?.eyebrow)}
       >
         <Breadcrumbs items={breadcrumbs} />
-        {content?.eyebrow ? (
+        {showSeoCopy && content?.eyebrow ? (
           <p className="eyebrow">{bindShortRussianWords(content.eyebrow)}</p>
         ) : null}
         {contentUnavailable ? (
@@ -196,10 +213,14 @@ export async function CatalogLandingPage({
           </div>
         ) : content ? (
           <>
-            <h1>{bindShortRussianWords(content.title)}</h1>
-            <div className="catalog-intro__text">
-              <p>{bindShortRussianWords(content.intro)}</p>
-            </div>
+            <h1>
+              {bindShortRussianWords(catalogPageHeading(content.title, page))}
+            </h1>
+            {showSeoCopy ? (
+              <div className="catalog-intro__text">
+                <p>{bindShortRussianWords(content.intro)}</p>
+              </div>
+            ) : null}
           </>
         ) : null}
       </section>

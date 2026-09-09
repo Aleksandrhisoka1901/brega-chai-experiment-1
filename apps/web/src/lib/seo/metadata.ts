@@ -32,19 +32,25 @@ export function pageMetadata(input: {
   description?: string | null;
   imageUrl?: string;
   path: string;
+  includeCanonical?: boolean;
+  robots?: Metadata["robots"];
 }): Metadata {
   const values = metadataWithFallbacks(input);
   const canonical = canonicalUrl(input.path);
+  const includeCanonical = input.includeCanonical !== false;
 
   return {
     ...values,
     ...indexingMetadata(),
-    alternates: { canonical },
+    ...(input.robots ? { robots: input.robots } : {}),
+    alternates: includeCanonical
+      ? { canonical }
+      : { canonical: null },
     openGraph: {
       ...values,
       ...(input.imageUrl ? { images: [{ url: input.imageUrl }] } : {}),
       type: "website",
-      url: canonical,
+      ...(includeCanonical ? { url: canonical } : {}),
       siteName: DEFAULT_TITLE,
     },
   };

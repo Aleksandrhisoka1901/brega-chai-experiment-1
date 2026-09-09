@@ -90,11 +90,11 @@ const canonicalRedirect = (request: NextRequest) => {
   const canonical = `${decodePathname(nextPathname)}${target.search}`;
 
   if (current === canonical) return null;
-  return withIndexingHeaders(NextResponse.redirect(target, 301));
+  return withIndexingHeaders(NextResponse.redirect(target, 301), request);
 };
 
-const withIndexingHeaders = (response: NextResponse) => {
-  applyIndexingHeaders(response.headers);
+const withIndexingHeaders = (response: NextResponse, request: NextRequest) => {
+  applyIndexingHeaders(response.headers, request.nextUrl.searchParams);
   return response;
 };
 
@@ -111,6 +111,7 @@ const serviceUnavailableResponse = (request: NextRequest) => {
         "Retry-After": "60",
       },
     }),
+    request,
   );
 };
 
@@ -120,7 +121,7 @@ const sitemapResponse = (request: NextRequest) => {
   const cmsUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
   const target = new URL(SITEMAP_PLUGIN_PATH, cmsUrl);
   target.search = request.nextUrl.search;
-  return withIndexingHeaders(NextResponse.rewrite(target));
+  return withIndexingHeaders(NextResponse.rewrite(target), request);
 };
 
 const legalDocumentResponse = async (request: NextRequest) => {
@@ -156,6 +157,7 @@ const legalDocumentResponse = async (request: NextRequest) => {
             "Retry-After": "60",
           },
         }),
+        request,
       );
     }
 
@@ -171,14 +173,14 @@ const legalDocumentResponse = async (request: NextRequest) => {
     };
     const document = payload.data?.legalDocuments?.[field];
     if (!document?.url || document.mime !== "application/pdf") {
-      return withIndexingHeaders(new NextResponse(null, { status: 404 }));
+      return withIndexingHeaders(new NextResponse(null, { status: 404 }), request);
     }
 
     const target = new URL(document.url, publicMediaUrl);
     if (target.protocol !== "http:" && target.protocol !== "https:") {
-      return withIndexingHeaders(new NextResponse(null, { status: 404 }));
+      return withIndexingHeaders(new NextResponse(null, { status: 404 }), request);
     }
-    return withIndexingHeaders(NextResponse.rewrite(target));
+    return withIndexingHeaders(NextResponse.rewrite(target), request);
   } catch {
     return withIndexingHeaders(
       new NextResponse(null, {
@@ -188,13 +190,14 @@ const legalDocumentResponse = async (request: NextRequest) => {
           "Retry-After": "60",
         },
       }),
+      request,
     );
   }
 };
 
 export async function middleware(request: NextRequest) {
   if (request.method !== "GET" && request.method !== "HEAD") {
-    return withIndexingHeaders(NextResponse.next());
+    return withIndexingHeaders(NextResponse.next(), request);
   }
 
   const sitemap = sitemapResponse(request);
@@ -204,14 +207,14 @@ export async function middleware(request: NextRequest) {
   if (legalDocument) return legalDocument;
 
   if (isExcludedPath(request.nextUrl.pathname)) {
-    return withIndexingHeaders(NextResponse.next());
+    return withIndexingHeaders(NextResponse.next(), request);
   }
 
   if (!(await isCmsReady())) {
     return serviceUnavailableResponse(request);
   }
 
-  return canonicalRedirect(request) ?? withIndexingHeaders(NextResponse.next());
+  return canonicalRedirect(request) ?? withIndexingHeaders(NextResponse.next(), request);
 }
 
 export const config = {

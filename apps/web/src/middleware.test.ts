@@ -211,6 +211,17 @@ test("continues public navigation when CMS readiness is healthy", async () => {
   }
 });
 
+test("marks catalog pagination pages as noindex follow", async () => {
+  await withCmsReadiness(204, async () => {
+    const response = await middleware(
+      new NextRequest("https://brega.example/stantsii?page=2"),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, follow");
+  });
+});
+
 test("redirects supported dirty URLs to their canonical URL in one 301", async () => {
   const cases = [
     {

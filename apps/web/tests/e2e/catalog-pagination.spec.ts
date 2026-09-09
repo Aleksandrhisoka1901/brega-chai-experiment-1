@@ -26,6 +26,10 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
     pagination.getByRole("link", { name: "Страница 2" }),
   ).toHaveAttribute("href", "/stantsii?page=2");
   await expectCanonical(page, "/stantsii");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, nofollow",
+  );
 
   await pagination.getByRole("link", { name: "Страница 2" }).click();
   await expect(page).toHaveURL(/\/stantsii\?page=2$/);
@@ -38,7 +42,15 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
   await expect(
     pagination.getByRole("link", { name: "Вперёд" }),
   ).toHaveAttribute("href", "/stantsii?page=3");
-  await expectCanonical(page, "/stantsii?page=2");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    /страница 2$/,
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, follow",
+  );
+  await expect(page.locator(".catalog-intro__text")).toHaveCount(0);
 
   await pagination.getByRole("link", { name: "Страница 3" }).click();
   await expect(page).toHaveURL(/\/stantsii\?page=3$/);
@@ -100,7 +112,14 @@ test("rituals use their own landing content, product routes and pagination", asy
     .getByRole("link", { name: "Страница 2" })
     .click();
   await expect(page).toHaveURL(/\/paneli\?page=2$/);
-  await expectCanonical(page, "/paneli?page=2");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    /страница 2$/,
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, follow",
+  );
 });
 
 for (const viewport of [

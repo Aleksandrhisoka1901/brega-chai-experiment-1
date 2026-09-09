@@ -62,3 +62,17 @@ test("adds an optional editorial image to Open Graph metadata", () => {
   ]);
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
+
+test("pagination pages drop canonical and ask crawlers to follow without indexing", () => {
+  const metadata = pageMetadata({
+    title: "Электростанции - страница 2",
+    description: "Каталог. - Страница 2",
+    path: "/stantsii?page=2",
+    includeCanonical: false,
+    robots: { index: false, follow: true },
+  });
+
+  assert.deepEqual(metadata.alternates, { canonical: null });
+  assert.equal(metadata.openGraph?.url, undefined);
+  assert.deepEqual(metadata.robots, { index: false, follow: true });
+});

@@ -4,8 +4,10 @@ import test from "node:test";
 import {
   CLOSED_ROBOTS_TXT,
   NOINDEX_ROBOTS_HEADER,
+  PAGINATION_ROBOTS_HEADER,
   SITE_INDEXING_ENABLED,
   applyIndexingHeaders,
+  isPaginationSearch,
   resolveRobotsContent,
 } from "./indexing.ts";
 
@@ -19,4 +21,16 @@ test("keeps the storefront closed to crawlers until indexing is re-enabled", () 
   const headers = new Headers();
   applyIndexingHeaders(headers);
   assert.equal(headers.get("X-Robots-Tag"), NOINDEX_ROBOTS_HEADER);
+
+  const paginationHeaders = new Headers();
+  applyIndexingHeaders(
+    paginationHeaders,
+    new URLSearchParams("page=2"),
+  );
+  assert.equal(
+    paginationHeaders.get("X-Robots-Tag"),
+    PAGINATION_ROBOTS_HEADER,
+  );
+  assert.equal(isPaginationSearch(new URLSearchParams("page=1")), false);
+  assert.equal(isPaginationSearch(new URLSearchParams("page=2")), true);
 });

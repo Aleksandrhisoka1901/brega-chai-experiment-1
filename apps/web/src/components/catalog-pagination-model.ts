@@ -29,6 +29,18 @@ export function catalogPageHref(
   return search ? `${basePath}?${search}` : basePath;
 }
 
+export function catalogPageHeading(title: string, page: number) {
+  return page > 1 ? `${title} - страница ${page}` : title;
+}
+
+export function catalogPageDescription(description: string, page: number) {
+  return page > 1 ? `${description} - Страница ${page}` : description;
+}
+
+export function isCatalogPaginationPage(page: number) {
+  return page > 1;
+}
+
 export function catalogPaginationModel(
   totalItems: number,
   currentPage: number,
