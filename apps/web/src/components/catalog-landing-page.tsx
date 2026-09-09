@@ -23,8 +23,6 @@ import { Breadcrumbs, type BreadcrumbItem } from "./breadcrumbs";
 import { CatalogPagination } from "./catalog-pagination";
 import {
   catalogPageHref,
-  catalogPageDescription,
-  catalogPageHeading,
   isCatalogPaginationPage,
   resolveCatalogPage,
 } from "./catalog-pagination-model";
@@ -134,19 +132,11 @@ export async function catalogLandingMetadata({
       getGlobalSettings(),
     ]);
 
-    const title = catalogPageHeading(
-      content.seo?.title ?? settings.defaultSeo.title ?? content.title,
-      page,
-    );
-    const description = catalogPageDescription(
-      content.seo?.description ?? settings.defaultSeo.description ?? "",
-      page,
-    );
     const paginated = isCatalogPaginationPage(page);
 
     return pageMetadata({
-      title,
-      description,
+      title: content.seo?.title ?? settings.defaultSeo.title ?? content.title,
+      description: content.seo?.description ?? settings.defaultSeo.description,
       imageUrl: content.seo?.imageUrl ?? settings.defaultSeo.imageUrl,
       path: catalogPageHref(`/${route}`, page, priceFilter),
       includeCanonical: !paginated,
@@ -213,9 +203,7 @@ export async function CatalogLandingPage({
           </div>
         ) : content ? (
           <>
-            <h1>
-              {bindShortRussianWords(catalogPageHeading(content.title, page))}
-            </h1>
+            <h1>{bindShortRussianWords(content.title)}</h1>
             {showSeoCopy ? (
               <div className="catalog-intro__text">
                 <p>{bindShortRussianWords(content.intro)}</p>

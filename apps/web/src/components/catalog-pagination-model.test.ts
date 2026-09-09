@@ -3,8 +3,6 @@ import test from "node:test";
 
 import {
   catalogPageHref,
-  catalogPageDescription,
-  catalogPageHeading,
   catalogPaginationModel,
   isCatalogPaginationPage,
   resolveCatalogPage,
@@ -69,16 +67,7 @@ test("builds canonical catalog links and navigation boundaries", () => {
   });
 });
 
-test("unique copy for pagination pages starts from page two", () => {
-  assert.equal(catalogPageHeading("Электростанции", 1), "Электростанции");
-  assert.equal(
-    catalogPageHeading("Электростанции", 2),
-    "Электростанции - страница 2",
-  );
-  assert.equal(
-    catalogPageDescription("Каталог станций.", 2),
-    "Каталог станций. - Страница 2",
-  );
+test("treats only pages after the first as pagination", () => {
   assert.equal(isCatalogPaginationPage(1), false);
   assert.equal(isCatalogPaginationPage(3), true);
 });

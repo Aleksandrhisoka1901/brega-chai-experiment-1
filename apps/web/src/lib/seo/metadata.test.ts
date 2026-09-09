@@ -65,8 +65,8 @@ test("adds an optional editorial image to Open Graph metadata", () => {
 
 test("pagination pages drop canonical and ask crawlers to follow without indexing", () => {
   const metadata = pageMetadata({
-    title: "Электростанции - страница 2",
-    description: "Каталог. - Страница 2",
+    title: "Электростанции",
+    description: "Каталог.",
     path: "/stantsii?page=2",
     includeCanonical: false,
     robots: { index: false, follow: true },
