@@ -1,6 +1,9 @@
 .card {
   width: 100%;
   min-width: 0;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--product-radius, 0.75rem);
   background: var(--surface-page);
   box-shadow: 0 0.25rem 1.5rem rgb(42 37 31 / 6%);
   transition:
