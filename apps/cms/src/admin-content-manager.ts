@@ -262,6 +262,17 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       list: ["id", "title", "updatedAt"],
     },
   },
+  "api::conformity-page.conformity-page": {
+    layouts: {
+      edit: [
+        [{ name: "title", size: 12 }],
+        [{ name: "eyebrow", size: 12 }],
+        [{ name: "content", size: 12 }],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "title", "updatedAt"],
+    },
+  },
   "home.articles-preview": {
     layouts: {
       edit: [

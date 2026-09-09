@@ -304,6 +304,12 @@ test("covers every editable storefront schema with a canonical layout", () => {
       "blocks",
       "seo",
     ],
+    "api::conformity-page.conformity-page": [
+      "title",
+      "eyebrow",
+      "content",
+      "seo",
+    ],
     "api::article.article": [
       "name",
       "priority",

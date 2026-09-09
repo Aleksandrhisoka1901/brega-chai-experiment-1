@@ -188,6 +188,15 @@ const adminApp = {
         "content-manager.content-types.api::wholesale-page.wholesale-page.seo":
           "SEO-настройки",
 
+        "content-manager.content-types.api::conformity-page.conformity-page.title":
+          "Заголовок",
+        "content-manager.content-types.api::conformity-page.conformity-page.eyebrow":
+          "Надстрочник",
+        "content-manager.content-types.api::conformity-page.conformity-page.content":
+          "Текст страницы",
+        "content-manager.content-types.api::conformity-page.conformity-page.seo":
+          "SEO-настройки",
+
         "content-manager.content-types.api::article.article.blocks":
           "Блоки статьи",
         "content-manager.content-types.api::article.article.relatedMaterials":

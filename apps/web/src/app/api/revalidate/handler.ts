@@ -23,7 +23,7 @@ export interface RevalidationDependencies {
 type RevalidationEvent =
   | {
       id: string;
-      event: "home" | "global" | "products" | "media" | "articles" | "wholesale";
+      event: "home" | "global" | "products" | "media" | "articles" | "wholesale" | "conformity";
       action: "publish" | "update" | "unpublish";
       occurredAt: string;
     }
@@ -103,7 +103,8 @@ function parseEvent(value: unknown): RevalidationEvent | undefined {
     body.event === "products" ||
     body.event === "media" ||
     body.event === "articles" ||
-    body.event === "wholesale"
+    body.event === "wholesale" ||
+    body.event === "conformity"
   ) {
     return hasExactKeys(body, ["action", "event", "id", "occurredAt"])
       ? {
@@ -221,6 +222,8 @@ function invalidate(
     revalidatePath("/stati/[slug]", "page");
     revalidateTag("wholesale-page");
     revalidatePath("/dlya-optovikov", "page");
+    revalidateTag("conformity-page");
+    revalidatePath("/legal/deklaraciya-sootvetstviya", "page");
     return;
   }
 
@@ -234,6 +237,12 @@ function invalidate(
   if (event.event === "wholesale") {
     revalidateTag("wholesale-page");
     revalidatePath("/dlya-optovikov", "page");
+    return;
+  }
+
+  if (event.event === "conformity") {
+    revalidateTag("conformity-page");
+    revalidatePath("/legal/deklaraciya-sootvetstviya", "page");
     return;
   }
 

@@ -11,6 +11,7 @@ import { ensureSitemapConfiguration } from "./sitemap-configuration.js";
 import { ensureRitualsPageConfiguration } from "./rituals-page-configuration.js";
 import { ensureChapterEyebrowsCleared } from "./chapter-eyebrow.js";
 import { repairNonAsciiArticleSlugs } from "./article-slug-repair.js";
+import { ensureConformityPageConfiguration } from "./conformity-page-configuration.js";
 import { ensureWholesalePageConfiguration } from "./wholesale-page-configuration.js";
 
 export default {
@@ -20,6 +21,7 @@ export default {
     await ensureGlobalContentDefaults(strapi);
     await ensureRitualsPageConfiguration(strapi);
     await ensureWholesalePageConfiguration(strapi);
+    await ensureConformityPageConfiguration(strapi);
     await ensureRelatedItemsPermissions(strapi);
     await ensureHomeArticlesPreview(strapi);
     await ensureHomeEditorialPalette(strapi);

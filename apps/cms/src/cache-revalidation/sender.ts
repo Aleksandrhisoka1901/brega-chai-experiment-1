@@ -8,6 +8,7 @@ export type RevalidationEventName =
   | "articles"
   | "article"
   | "wholesale"
+  | "conformity"
   | "media";
 export type RevalidationAction = "publish" | "update" | "unpublish";
 

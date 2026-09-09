@@ -769,6 +769,74 @@ a {
   text-underline-offset: 0.2em;
 }
 
+.legal-page__body :is(h2, h3, h4) {
+  margin: 1.75rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.legal-page__body h2 {
+  font-size: var(--type-heading-3);
+}
+
+.legal-page__body h3,
+.legal-page__body h4 {
+  font-size: var(--type-body-editorial);
+}
+
+.legal-page__body :is(ul, ol) {
+  margin: 0 0 1rem;
+  padding-left: 1.5em;
+}
+
+.legal-page__body li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-page__body figure {
+  width: min(100%, 42rem);
+  margin: 0 0 1.5rem;
+}
+
+.legal-page__body figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.legal-page__body figcaption {
+  margin-top: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-interface);
+  font-size: var(--type-caption);
+}
+
+.legal-page__body [data-rich-table-scroll] {
+  max-width: 100%;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.legal-page__body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.legal-page__body :is(th, td) {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-default);
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-page__body hr {
+  margin: 0 0 1.5rem;
+  border: 0;
+  border-top: 1px solid var(--border-default);
+}
+
 @media (max-width: 1023px) {
   .product-grid {
     grid-template-columns: 1fr;

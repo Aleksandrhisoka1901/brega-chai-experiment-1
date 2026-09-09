@@ -6,6 +6,7 @@ async function schema(path: string) {
   return JSON.parse(
     await readFile(new URL(`../${path}`, import.meta.url), "utf8"),
   ) as {
+    kind?: string;
     options?: { draftAndPublish?: boolean };
     attributes: Record<string, Record<string, unknown>>;
   };
@@ -278,6 +279,7 @@ test("public page entities use the optional shared SEO component", async () => {
     "src/api/articles-page/content-types/articles-page/schema.json",
     "src/api/product/content-types/product/schema.json",
     "src/api/article/content-types/article/schema.json",
+    "src/api/conformity-page/content-types/conformity-page/schema.json",
   ]) {
     const contentType = await schema(path);
     assert.equal(contentType.attributes.seo.type, "component");
@@ -390,4 +392,21 @@ test("wholesale page reuses article cards-grid blocks", async () => {
     "article.cards-grid",
     "material-templates.cards-grid",
   ]);
+});
+
+test("conformity page uses Better Blocks for the legal copy", async () => {
+  const page = await schema(
+    "src/api/conformity-page/content-types/conformity-page/schema.json",
+  );
+
+  assert.equal(page.kind, "singleType");
+  assert.equal(page.options?.draftAndPublish, true);
+  assert.equal(page.attributes.title.required, true);
+  assert.equal(page.attributes.eyebrow.required, false);
+  assert.equal(page.attributes.content.type, "json");
+  assert.equal(
+    page.attributes.content.customField,
+    "plugin::better-blocks.better-blocks",
+  );
+  assert.equal(page.attributes.seo.component, "shared.seo");
 });

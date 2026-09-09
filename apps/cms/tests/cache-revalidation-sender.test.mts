@@ -214,6 +214,10 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     entry: {},
   });
   await subscriber?.("entry.publish", {
+    uid: "api::conformity-page.conformity-page",
+    entry: {},
+  });
+  await subscriber?.("entry.publish", {
     uid: "api::order.order",
     entry: {},
   });
@@ -242,6 +246,7 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
       article: { documentId: "article-1", slug: "tihij-stol" },
     },
     { event: "articles", action: "publish" },
+    { event: "conformity", action: "publish" },
     { event: "media", action: "update" },
   ]);
 });

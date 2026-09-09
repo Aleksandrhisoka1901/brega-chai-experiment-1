@@ -45,6 +45,7 @@ export const PUBLIC_STOREFRONT_ACTIONS = [
   "api::article.article.findOne",
   "api::robots-txt.robots-txt.find",
   "api::wholesale-page.wholesale-page.find",
+  "api::conformity-page.conformity-page.find",
 ] as const;
 
 export function assertSeedAllowed(

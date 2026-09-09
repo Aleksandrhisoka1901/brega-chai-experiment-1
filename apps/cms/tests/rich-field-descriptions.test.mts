@@ -6,6 +6,7 @@ const schemaPaths = [
   "src/api/product/content-types/product/schema.json",
   "src/api/products-page/content-types/products-page/schema.json",
   "src/api/global-setting/content-types/global-setting/schema.json",
+  "src/api/conformity-page/content-types/conformity-page/schema.json",
   "src/components/home/editorial-section.json",
   "src/components/product/article.json",
 ];

@@ -1,0 +1,38 @@
+{
+  "kind": "singleType",
+  "collectionName": "conformity_pages",
+  "info": {
+    "singularName": "conformity-page",
+    "pluralName": "conformity-pages",
+    "displayName": "Декларация соответствия",
+    "description": "Редактируемая страница /legal/deklaraciya-sootvetstviya"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Заголовок страницы на витрине."
+    },
+    "eyebrow": {
+      "type": "string",
+      "required": false,
+      "description": "Короткая подпись над заголовком."
+    },
+    "content": {
+      "type": "json",
+      "customField": "plugin::better-blocks.better-blocks",
+      "required": false,
+      "description": "Основной текст декларации: абзацы, списки, ссылки и изображения скана. H1 на сайте берётся из заголовка страницы, поэтому в тексте используйте H2 и ниже. Неподдерживаемое или исполняемое содержимое не выводится."
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    }
+  }
+}

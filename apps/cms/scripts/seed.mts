@@ -86,6 +86,7 @@ async function upsertSingle(
     | "api::rituals-page.rituals-page"
     | "api::articles-page.articles-page"
     | "api::wholesale-page.wholesale-page"
+    | "api::conformity-page.conformity-page"
     | "api::robots-txt.robots-txt",
   data: Record<string, unknown>,
 ) {
@@ -300,6 +301,45 @@ async function run() {
         title: "Для оптовиков — Voltora",
         description:
           "Оптовые поставки портативных электростанций и солнечных панелей Voltora для магазинов и партнёров.",
+      },
+    });
+
+    await upsertSingle(strapi, "api::conformity-page.conformity-page", {
+      title: "Декларация соответствия",
+      eyebrow: "Правовая информация",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "Поставляемое оборудование сопровождается декларацией соответствия требованиям технических регламентов, применимым к портативным электростанциям и солнечным панелям.",
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "Актуальный скан декларации направляется по запросу на ",
+            },
+            {
+              type: "link",
+              url: "mailto:hello@lon-energy.ru",
+              children: [{ type: "text", text: "hello@lon-energy.ru" }],
+            },
+            {
+              type: "text",
+              text: " или при оформлении заказа. После регистрации электронной копии документ будет опубликован на этой странице.",
+            },
+          ],
+        },
+      ],
+      seo: {
+        title: "Декларация соответствия — Voltora",
+        description:
+          "Декларация соответствия на портативные электростанции и солнечные панели. Актуальный документ предоставляется по запросу.",
       },
     });
 
