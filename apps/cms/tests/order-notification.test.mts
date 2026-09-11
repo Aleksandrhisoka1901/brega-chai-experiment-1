@@ -67,9 +67,11 @@ test("renders the admin order email in the Voltora visual language", () => {
   assert.match(message.text, /Скидка за самовывоз: 10%/);
   assert.match(message.text, /Сумма со скидкой: 1[\s\u00a0]346/);
   assert.match(message.html, /^<!doctype html>/);
-  assert.match(message.html, /background: #efede4/);
-  assert.match(message.html, /background: #24251e/);
-  assert.match(message.html, /font-family: Georgia/);
+  assert.match(message.html, /background: #eef1f4/);
+  assert.match(message.html, /background: #1e2329/);
+  assert.match(message.html, /background: #ff8a00/);
+  assert.doesNotMatch(message.html, /font-family: Georgia/);
+  assert.doesNotMatch(message.html, /Чай и ритуалы/);
   assert.match(message.html, /Служебное уведомление/);
   assert.doesNotMatch(message.html, /Анна <Чай>/);
   assert.match(message.html, /Анна &lt;Чай&gt;/);
@@ -86,7 +88,7 @@ test("renders the admin order email in the Voltora visual language", () => {
   );
   assert.match(
     message.html,
-    /style="color: #c5b792; text-decoration: none;"[^>]*>Voltora<\/a>/,
+    /style="color: #f5f7fa; text-decoration: none;"[^>]*>Voltora<\/a>/,
   );
 });
 
