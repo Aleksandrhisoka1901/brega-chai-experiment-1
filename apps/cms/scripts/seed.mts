@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { publicRobotsContent } from "../src/api/robots-txt/public-robots-content.ts";
 import {
   assertSeedAllowed,
   planSeed,
@@ -344,15 +345,9 @@ async function run() {
     });
 
     await upsertSingle(strapi, "api::robots-txt.robots-txt", {
-      content: `User-agent: *
-Allow: /
-
-Disallow: /api/
-Disallow: /checkout
-Disallow: /legal/
-
-Sitemap: ${process.env.SITE_URL ?? "http://localhost:3001"}/sitemap.xml
-`,
+      content: publicRobotsContent(
+        process.env.SITE_URL ?? "http://localhost:3001",
+      ),
     });
 
     const productDocuments = strapi.documents("api::product.product");

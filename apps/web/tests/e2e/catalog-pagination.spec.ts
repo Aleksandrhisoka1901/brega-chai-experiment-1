@@ -26,10 +26,9 @@ test("catalog pagination uses canonical URLs and navigates every boundary", asyn
     pagination.getByRole("link", { name: "Страница 2" }),
   ).toHaveAttribute("href", "/stantsii?page=2");
   await expectCanonical(page, "/stantsii");
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    "noindex, nofollow",
-  );
+  await expect(
+    page.locator('meta[name="robots"][content="noindex, nofollow"]'),
+  ).toHaveCount(0);
 
   await pagination.getByRole("link", { name: "Страница 2" }).click();
   await expect(page).toHaveURL(/\/stantsii\?page=2$/);

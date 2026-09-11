@@ -1,4 +1,4 @@
-export const SITE_INDEXING_ENABLED = false;
+export const SITE_INDEXING_ENABLED = true;
 
 export const NOINDEX_ROBOTS = { index: false, follow: false } as const;
 export const PAGINATION_ROBOTS = { index: false, follow: true } as const;
@@ -20,14 +20,26 @@ export function isPaginationSearch(searchParams: URLSearchParams) {
 export function applyIndexingHeaders(
   headers: Headers,
   searchParams?: URLSearchParams,
+  status = 200,
 ) {
-  if (SITE_INDEXING_ENABLED) return;
-  headers.set(
-    "X-Robots-Tag",
-    searchParams && isPaginationSearch(searchParams)
-      ? PAGINATION_ROBOTS_HEADER
-      : NOINDEX_ROBOTS_HEADER,
-  );
+  if (!SITE_INDEXING_ENABLED) {
+    headers.set(
+      "X-Robots-Tag",
+      searchParams && isPaginationSearch(searchParams)
+        ? PAGINATION_ROBOTS_HEADER
+        : NOINDEX_ROBOTS_HEADER,
+    );
+    return;
+  }
+
+  if (status >= 400) {
+    headers.set("X-Robots-Tag", NOINDEX_ROBOTS_HEADER);
+    return;
+  }
+
+  if (searchParams && isPaginationSearch(searchParams)) {
+    headers.set("X-Robots-Tag", PAGINATION_ROBOTS_HEADER);
+  }
 }
 
 export function resolveRobotsContent(cmsContent: string) {

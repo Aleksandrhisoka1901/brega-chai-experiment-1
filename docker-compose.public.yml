@@ -1,11 +1,61 @@
 # Timeweb public edge for the experiment stack (project my-tea).
 # Do not use this file on bregalliance.ru.
+# Together with docker-compose.yml this runs production web/CMS images, not next/strapi develop.
 services:
+  workspace-dependencies:
+    profiles:
+      - dev-bind-mount
+
   web:
+    build: !override
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: production
+    environment:
+      NODE_ENV: production
     ports: !reset []
+    volumes: !reset []
+    depends_on: !override
+      cms:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   cms:
+    build: !override
+      context: .
+      dockerfile: apps/cms/Dockerfile
+      target: production
+    environment:
+      NODE_ENV: production
+      SEED_ALLOWED: "false"
     ports: !reset []
+    volumes: !reset []
+    depends_on: !override
+      postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_started
+      rustfs-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:1337/api/health/readiness').then(r=>{if(r.status!==204)process.exit(1)}).catch(()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
 
   postgres:
     ports: !reset []
@@ -31,7 +81,7 @@ services:
       - letsencrypt:/etc/letsencrypt:ro
     depends_on:
       web:
-        condition: service_started
+        condition: service_healthy
       cms:
         condition: service_healthy
       rustfs:

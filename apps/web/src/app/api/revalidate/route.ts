@@ -1,5 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 
+import { invalidateCmsMemoryCache } from "@/server/cms/memory-cache";
+
 import { createMemoryDeliveryStore, handleRevalidation } from "./handler.ts";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +26,9 @@ export async function POST(request: Request) {
     secret,
     deliveries,
     revalidatePath,
-    revalidateTag,
+    revalidateTag: (tag) => {
+      invalidateCmsMemoryCache(tag);
+      revalidateTag(tag);
+    },
   });
 }

@@ -6,6 +6,7 @@ export const SERVICE_UNAVAILABLE_PATH = "/service-unavailable-internal";
 export const SITEMAP_PLUGIN_PATH = "/api/strapi-5-sitemap-plugin/sitemap.xml";
 
 const CMS_READINESS_TIMEOUT_MS = 2_000;
+const CMS_READINESS_CACHE_MS = 5_000;
 const LEGAL_DOCUMENT_PATHS = {
   "/legal/privacy.pdf": "privacyPolicy",
   "/legal/terms.pdf": "terms",
@@ -26,7 +27,18 @@ const isExcludedPath = (pathname: string) =>
   pathname.startsWith("/_next/") ||
   (FILE_PATH.test(pathname) && !INDEX_ALIAS.test(pathname));
 
+let cmsReadinessCache: { expiresAt: number; ready: boolean } | null = null;
+
+export function resetCmsReadinessCache() {
+  cmsReadinessCache = null;
+}
+
 const isCmsReady = async () => {
+  const now = Date.now();
+  if (cmsReadinessCache && cmsReadinessCache.expiresAt > now) {
+    return cmsReadinessCache.ready;
+  }
+
   const baseUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
 
   try {
@@ -34,9 +46,17 @@ const isCmsReady = async () => {
       cache: "no-store",
       signal: AbortSignal.timeout(CMS_READINESS_TIMEOUT_MS),
     });
-
-    return response.ok;
+    const ready = response.ok;
+    cmsReadinessCache = {
+      expiresAt: now + CMS_READINESS_CACHE_MS,
+      ready,
+    };
+    return ready;
   } catch {
+    cmsReadinessCache = {
+      expiresAt: now + CMS_READINESS_CACHE_MS,
+      ready: false,
+    };
     return false;
   }
 };
@@ -94,7 +114,11 @@ const canonicalRedirect = (request: NextRequest) => {
 };
 
 const withIndexingHeaders = (response: NextResponse, request: NextRequest) => {
-  applyIndexingHeaders(response.headers, request.nextUrl.searchParams);
+  applyIndexingHeaders(
+    response.headers,
+    request.nextUrl.searchParams,
+    response.status,
+  );
   return response;
 };
 

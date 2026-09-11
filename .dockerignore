@@ -6,9 +6,11 @@
 .DS_Store
 .next
 .turbo
+.tmp-docs-extract
 .yarn/cache
 .yarn/install-state.gz
 backups
+docs
 node_modules
 **/node_modules
 apps/cms/.cache

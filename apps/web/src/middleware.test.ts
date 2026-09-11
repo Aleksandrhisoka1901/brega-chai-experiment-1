@@ -5,11 +5,13 @@ import { NextRequest } from "next/server.js";
 
 import {
   middleware,
+  resetCmsReadinessCache,
   SERVICE_UNAVAILABLE_PATH,
   SITEMAP_PLUGIN_PATH,
 } from "./middleware.ts";
 
 const withCmsReadiness = async (status: number, run: () => Promise<void>) => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(null, { status });
 
@@ -38,6 +40,7 @@ test("rewrites public pages to an honest 503 when CMS is unavailable", async () 
 });
 
 test("does not run readiness checks for internal and non-page routes", async () => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
   let requests = 0;
   globalThis.fetch = async () => {
@@ -64,6 +67,7 @@ test("does not run readiness checks for internal and non-page routes", async () 
 });
 
 test("proxies the public sitemap to the Strapi plugin at runtime", async () => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
   const originalCmsUrl = process.env.CMS_INTERNAL_URL;
   let requests = 0;
@@ -92,6 +96,7 @@ test("proxies the public sitemap to the Strapi plugin at runtime", async () => {
 });
 
 test("proxies configured legal PDFs while preserving their public URLs", async () => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
   const originalCmsUrl = process.env.CMS_INTERNAL_URL;
   const originalMediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL;
@@ -138,6 +143,7 @@ test("proxies configured legal PDFs while preserving their public URLs", async (
 });
 
 test("returns 404 when a legal PDF is missing or has another media type", async () => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>
     Response.json({
@@ -164,6 +170,7 @@ test("returns 404 when a legal PDF is missing or has another media type", async 
 });
 
 test("returns 503 for legal PDFs when CMS cannot be reached", async () => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => {
     throw new TypeError("network unavailable");
@@ -184,7 +191,9 @@ test("returns 503 for legal PDFs when CMS cannot be reached", async () => {
 });
 
 test("continues public navigation when CMS readiness is healthy", async () => {
+  resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
+  const originalCmsUrl = process.env.CMS_INTERNAL_URL;
   let readinessRequest: { input: string; cache?: RequestCache } | undefined;
   globalThis.fetch = async (input, init) => {
     readinessRequest = {
@@ -193,6 +202,7 @@ test("continues public navigation when CMS readiness is healthy", async () => {
     };
     return new Response(null, { status: 204 });
   };
+  delete process.env.CMS_INTERNAL_URL;
 
   try {
     const response = await middleware(
@@ -201,13 +211,15 @@ test("continues public navigation when CMS readiness is healthy", async () => {
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("x-middleware-next"), "1");
-    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    assert.equal(response.headers.get("x-robots-tag"), null);
     assert.deepEqual(readinessRequest, {
       input: "http://127.0.0.1:1337/api/health/readiness",
       cache: "no-store",
     });
   } finally {
     globalThis.fetch = originalFetch;
+    if (originalCmsUrl === undefined) delete process.env.CMS_INTERNAL_URL;
+    else process.env.CMS_INTERNAL_URL = originalCmsUrl;
   }
 });
 

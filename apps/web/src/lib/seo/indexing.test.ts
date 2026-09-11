@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  CLOSED_ROBOTS_TXT,
   NOINDEX_ROBOTS_HEADER,
   PAGINATION_ROBOTS_HEADER,
   SITE_INDEXING_ENABLED,
@@ -11,16 +10,16 @@ import {
   resolveRobotsContent,
 } from "./indexing.ts";
 
-test("keeps the storefront closed to crawlers until indexing is re-enabled", () => {
-  assert.equal(SITE_INDEXING_ENABLED, false);
+test("opens the storefront to crawlers and still noindexes errors and pagination", () => {
+  assert.equal(SITE_INDEXING_ENABLED, true);
   assert.equal(
     resolveRobotsContent("User-agent: *\nAllow: /\n"),
-    CLOSED_ROBOTS_TXT,
+    "User-agent: *\nAllow: /\n",
   );
 
   const headers = new Headers();
   applyIndexingHeaders(headers);
-  assert.equal(headers.get("X-Robots-Tag"), NOINDEX_ROBOTS_HEADER);
+  assert.equal(headers.get("X-Robots-Tag"), null);
 
   const paginationHeaders = new Headers();
   applyIndexingHeaders(
@@ -31,6 +30,11 @@ test("keeps the storefront closed to crawlers until indexing is re-enabled", () 
     paginationHeaders.get("X-Robots-Tag"),
     PAGINATION_ROBOTS_HEADER,
   );
+
+  const errorHeaders = new Headers();
+  applyIndexingHeaders(errorHeaders, undefined, 503);
+  assert.equal(errorHeaders.get("X-Robots-Tag"), NOINDEX_ROBOTS_HEADER);
+
   assert.equal(isPaginationSearch(new URLSearchParams("page=1")), false);
   assert.equal(isPaginationSearch(new URLSearchParams("page=2")), true);
 });

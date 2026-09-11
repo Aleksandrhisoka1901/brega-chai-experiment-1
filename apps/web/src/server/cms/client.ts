@@ -1,13 +1,34 @@
 import "server-only";
 
 import { CmsUnavailableError } from "./errors";
+import {
+  invalidateCmsMemoryCache,
+  readCmsMemoryCache,
+  withCmsInFlight,
+  writeCmsMemoryCache,
+} from "./memory-cache";
 
 const CMS_TIMEOUT_MS = 5_000;
+
+export { invalidateCmsMemoryCache };
 
 export async function fetchCms(
   path: string,
   options: { tags: string[]; revalidate?: number },
 ) {
+  const cached = readCmsMemoryCache(path);
+  if (cached !== undefined) return cached;
+
+  return withCmsInFlight(path, () => loadCms(path, options));
+}
+
+async function loadCms(
+  path: string,
+  options: { tags: string[]; revalidate?: number },
+) {
+  const cached = readCmsMemoryCache(path);
+  if (cached !== undefined) return cached;
+
   const baseUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), CMS_TIMEOUT_MS);
@@ -40,7 +61,14 @@ export async function fetchCms(
       );
     }
 
-    return (await response.json()) as unknown;
+    const payload = (await response.json()) as unknown;
+    writeCmsMemoryCache(
+      path,
+      options.tags,
+      options.revalidate ?? 300,
+      payload,
+    );
+    return payload;
   } catch (error) {
     if (error instanceof CmsUnavailableError) throw error;
     throw new CmsUnavailableError(
