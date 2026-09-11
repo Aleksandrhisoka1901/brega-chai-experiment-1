@@ -48,17 +48,17 @@ test("configured media origins preserve their actual path scope", () => {
   );
 });
 
-test("Timeweb public compose runs production web and CMS images", async () => {
+test("Timeweb public compose runs the storefront as a production image", async () => {
   const compose = await readFile(
     new URL("../../../../docker-compose.public.yml", import.meta.url),
     "utf8",
   );
 
   assert.match(compose, /dockerfile:\s*apps\/web\/Dockerfile/);
-  assert.match(compose, /dockerfile:\s*apps\/cms\/Dockerfile/);
   assert.match(compose, /target:\s*production/);
   assert.match(compose, /NODE_ENV:\s*production/);
   assert.doesNotMatch(compose, /dev-with-media-proxy|DEV_IMAGE_UPSTREAM/);
+  assert.doesNotMatch(compose, /dockerfile:\s*apps\/cms\/Dockerfile/);
 });
 
 test("Docker development forwards public media without changing browser URLs", async () => {

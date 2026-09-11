@@ -20,6 +20,7 @@ CMD ["node", "apps/web/scripts/dev-with-media-proxy.mjs"]
 FROM dependencies AS build
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=2048
 RUN yarn workspace @brega-chai/contracts build \
   && yarn workspace @brega-chai/web build
 
