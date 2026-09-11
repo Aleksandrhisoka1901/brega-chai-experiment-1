@@ -19,6 +19,8 @@ CMD ["node", "apps/web/scripts/dev-with-media-proxy.mjs"]
 
 FROM dependencies AS build
 COPY . .
+ARG NEXT_PUBLIC_MEDIA_URL=
+ENV NEXT_PUBLIC_MEDIA_URL=$NEXT_PUBLIC_MEDIA_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=2048
 RUN yarn workspace @brega-chai/contracts build \

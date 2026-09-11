@@ -16,6 +16,12 @@ test("Next image optimization has exact media origins and a one-hour floor", () 
       pathname: "/**",
     },
     {
+      protocol: "https",
+      hostname: "media.lon-energy.ru",
+      port: "",
+      pathname: "/**",
+    },
+    {
       protocol: "http",
       hostname: "localhost",
       port: "9000",
@@ -24,7 +30,19 @@ test("Next image optimization has exact media origins and a one-hour floor", () 
     {
       protocol: "http",
       hostname: "localhost",
+      port: "9001",
+      pathname: "/storefront/**",
+    },
+    {
+      protocol: "http",
+      hostname: "localhost",
       port: "1337",
+      pathname: "/uploads/**",
+    },
+    {
+      protocol: "http",
+      hostname: "localhost",
+      port: "1338",
       pathname: "/uploads/**",
     },
   ]);
@@ -57,6 +75,7 @@ test("Timeweb public compose runs the storefront as a production image", async (
   assert.match(compose, /dockerfile:\s*apps\/web\/Dockerfile/);
   assert.match(compose, /target:\s*production/);
   assert.match(compose, /NODE_ENV:\s*production/);
+  assert.match(compose, /NEXT_PUBLIC_MEDIA_URL:/);
   assert.doesNotMatch(compose, /dev-with-media-proxy|DEV_IMAGE_UPSTREAM/);
   assert.doesNotMatch(compose, /dockerfile:\s*apps\/cms\/Dockerfile/);
 });
@@ -71,6 +90,7 @@ test("Docker development forwards public media without changing browser URLs", a
   ]);
 
   assert.match(compose, /DEV_IMAGE_UPSTREAM:\s*http:\/\/rustfs:9000/);
+  assert.match(dockerfile, /ARG NEXT_PUBLIC_MEDIA_URL/);
   assert.match(dockerfile, /development[\s\S]*dev-with-media-proxy\.mjs/);
   assert.doesNotMatch(
     dockerfile.slice(dockerfile.indexOf("AS production")),

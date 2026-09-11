@@ -10,6 +10,12 @@ const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
     pathname: "/**",
   },
   {
+    protocol: "https",
+    hostname: "media.lon-energy.ru",
+    port: "",
+    pathname: "/**",
+  },
+  {
     protocol: "http",
     hostname: "localhost",
     port: "9000",
