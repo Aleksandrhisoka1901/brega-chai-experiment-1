@@ -10,7 +10,7 @@ function AboutParagraph({ text }: { text: string }) {
     <p>
       {parts.map((part, index) => {
         const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-        if (!match) return bindShortRussianWords(part);
+        if (!match?.[1] || !match[2]) return bindShortRussianWords(part);
 
         return (
           <a href={match[2]} key={`${match[2]}-${index}`}>
