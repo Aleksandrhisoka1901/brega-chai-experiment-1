@@ -21,3 +21,14 @@ export const parseAnalyticsConsent = (
 
   return null;
 };
+
+export const shouldLoadAnalytics = ({
+  hostname,
+  nodeEnv,
+}: {
+  hostname: string;
+  nodeEnv?: string;
+}) => {
+  if (nodeEnv === "production") return true;
+  return hostname !== "localhost" && hostname !== "127.0.0.1";
+};

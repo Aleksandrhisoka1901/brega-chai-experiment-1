@@ -2,7 +2,16 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const CONSENT_STORAGE_KEY = "brega.analytics-consent.v1";
-const METRIKA_SCRIPT_URL = "https://mc.yandex.ru/metrika/tag.js";
+const METRIKA_COUNTER_ID = 112496290;
+const METRIKA_SCRIPT_URL = `https://mc.yandex.ru/metrika/tag.js?id=${METRIKA_COUNTER_ID}`;
+const METRIKA_INIT_OPTIONS = {
+  ssr: true,
+  webvisor: true,
+  clickmap: true,
+  ecommerce: "dataLayer",
+  accurateTrackBounce: true,
+  trackLinks: true,
+};
 
 test.describe("analytics consent", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
@@ -74,7 +83,7 @@ test.describe("analytics consent", () => {
     expect(metrikaRequests).toEqual([]);
   });
 
-  test("loads counter 111349846 after acceptance and keeps the choice", async ({
+  test("loads counter 112496290 after acceptance and keeps the choice", async ({
     page,
   }) => {
     const metrikaRequests: string[] = [];
@@ -114,22 +123,27 @@ test.describe("analytics consent", () => {
       .toBe("accepted");
     await expect
       .poll(() =>
-        page.evaluate(() =>
-          window.ym?.a?.find(
-            (command) => command[0] === 111349846 && command[1] === "init",
-          ),
+        page.evaluate(
+          (counterId) =>
+            window.ym?.a?.find(
+              (command) => command[0] === counterId && command[1] === "init",
+            ),
+          METRIKA_COUNTER_ID,
         ),
       )
-      .toEqual([
-        111349846,
+      .toMatchObject([
+        METRIKA_COUNTER_ID,
         "init",
         {
-          accurateTrackBounce: true,
-          clickmap: true,
-          trackLinks: true,
+          ...METRIKA_INIT_OPTIONS,
+          referrer: expect.any(String),
+          url: expect.stringContaining("http://"),
         },
       ]);
     expect(metrikaRequests).toEqual([METRIKA_SCRIPT_URL]);
+    expect(
+      await page.evaluate(() => Array.isArray(window.dataLayer)),
+    ).toBe(true);
 
     const persistedScriptRequest = page.waitForRequest(METRIKA_SCRIPT_URL);
     await page.reload();
@@ -149,19 +163,21 @@ test.describe("analytics consent", () => {
       .toBe("accepted");
     await expect
       .poll(() =>
-        page.evaluate(() =>
-          window.ym?.a?.find(
-            (command) => command[0] === 111349846 && command[1] === "init",
-          ),
+        page.evaluate(
+          (counterId) =>
+            window.ym?.a?.find(
+              (command) => command[0] === counterId && command[1] === "init",
+            ),
+          METRIKA_COUNTER_ID,
         ),
       )
-      .toEqual([
-        111349846,
+      .toMatchObject([
+        METRIKA_COUNTER_ID,
         "init",
         {
-          accurateTrackBounce: true,
-          clickmap: true,
-          trackLinks: true,
+          ...METRIKA_INIT_OPTIONS,
+          referrer: expect.any(String),
+          url: expect.stringContaining("http://"),
         },
       ]);
     expect(metrikaRequests).toEqual([METRIKA_SCRIPT_URL, METRIKA_SCRIPT_URL]);
