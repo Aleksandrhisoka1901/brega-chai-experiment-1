@@ -11,6 +11,8 @@ import { getHomePage } from "@/server/cms/home";
 import { getGlobalSettings } from "@/server/cms/global";
 import { pageMetadata } from "@/lib/seo/metadata";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const [{ content }, settings] = await Promise.all([

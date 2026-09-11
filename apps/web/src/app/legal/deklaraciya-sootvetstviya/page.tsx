@@ -5,6 +5,8 @@ import {
   conformityPageMetadata,
 } from "@/components/conformity-declaration-page";
 
+export const dynamic = "force-dynamic";
+
 export function generateMetadata(): Promise<Metadata> {
   return conformityPageMetadata();
 }
