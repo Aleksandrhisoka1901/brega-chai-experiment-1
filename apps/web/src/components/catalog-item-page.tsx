@@ -39,7 +39,7 @@ export async function catalogItemMetadata({
   route,
   slug,
 }: CatalogItemPageOptions): Promise<Metadata> {
-  const { collectionUrl, type } = routeConfig[route];
+  const { type } = routeConfig[route];
   try {
     const [product, settings] = await Promise.all([
       getProductBySlug(type, slug),
