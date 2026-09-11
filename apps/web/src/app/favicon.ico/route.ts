@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 export async function GET() {
   const body = await readFile(path.join(process.cwd(), "public/favicon.svg"));
 
-  return new Response(body, {
+  return new Response(new Uint8Array(body), {
     headers: {
       "Cache-Control": "public, max-age=0, must-revalidate",
       "Content-Type": "image/svg+xml",
