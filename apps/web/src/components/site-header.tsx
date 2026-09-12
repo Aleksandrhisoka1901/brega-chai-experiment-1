@@ -143,7 +143,7 @@ export function SiteHeader({
                 </VisuallyHidden.Root>
                 <header className={styles.header}>
                   <span className={styles.brand}>
-                    {bindShortRussianWords(brandName)}
+                    <SiteWordmark brandName={brandName} />
                   </span>
                   <Dialog.Close asChild>
                     <IconButton aria-label="Закрыть меню" size="l">
