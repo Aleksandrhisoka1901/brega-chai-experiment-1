@@ -916,8 +916,13 @@ a {
 @media (max-width: 767px) {
   .site-header__content {
     min-height: 4rem;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: auto 1fr auto;
     gap: 0.5rem;
+  }
+
+  .cart-trigger {
+    margin-left: 0;
+    justify-self: end;
   }
 
   .primary-nav {
@@ -949,6 +954,11 @@ a {
 }
 
 @media (max-width: 520px) {
+  .cart-trigger > span:first-child,
+  .cart-trigger > span:nth-child(2) {
+    display: none;
+  }
+
   .product-grid {
     grid-template-columns: 1fr;
   }
