@@ -96,6 +96,26 @@
   text-transform: uppercase;
 }
 
+.chosen[data-hidden="true"] {
+  visibility: hidden;
+}
+
+.tableBlock {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.tableTitle {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border-default);
+  border-bottom: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
 .scroll {
   min-width: 0;
   overflow-x: auto;
@@ -107,14 +127,6 @@
   min-width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
-}
-
-.table caption {
-  padding: 1rem 1.1rem;
-  caption-side: top;
-  text-align: left;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
 }
 
 .table th,
@@ -202,7 +214,7 @@
     padding-top: 0.5rem;
   }
 
-  .scroll {
+  .tableBlock {
     display: none;
   }
 

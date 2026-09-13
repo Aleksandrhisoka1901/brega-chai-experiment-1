@@ -72,9 +72,9 @@ export function CapabilityCompare() {
                   {column.power ? ` · ${column.power}` : ""}
                 </span>
                 <small>{column.productModel}</small>
-                {isSelected ? (
-                  <em className={styles.chosen}>Выбрано</em>
-                ) : null}
+                <em className={styles.chosen} data-hidden={!isSelected}>
+                  Выбрано
+                </em>
               </span>
             </button>
           );
@@ -104,13 +104,12 @@ export function CapabilityCompare() {
           ))}
         </dl>
       </section>
-      <div className={styles.scroll} ref={tableScrollRef}>
+      <section className={styles.tableBlock} aria-labelledby="capability-table-title">
+        <h2 className={styles.tableTitle} id="capability-table-title">
+          {bindShortRussianWords("Сравнительная таблица аккумуляторных систем")}
+        </h2>
+        <div className={styles.scroll} ref={tableScrollRef}>
         <table className={styles.table}>
-          <caption>
-            {bindShortRussianWords(
-              "Сравнительная таблица аккумуляторных систем",
-            )}
-          </caption>
           <thead>
             <tr>
               <th scope="col">Характеристика</th>
@@ -168,7 +167,8 @@ export function CapabilityCompare() {
             ))}
           </tbody>
         </table>
-      </div>
+        </div>
+      </section>
       <InquiryForm
         collapsedByDefault
         defaultModel={selected.name}
