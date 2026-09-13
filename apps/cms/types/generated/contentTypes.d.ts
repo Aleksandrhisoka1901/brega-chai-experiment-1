@@ -750,7 +750,9 @@ export interface ApiInquiryInquiry extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    customerEmail: Schema.Attribute.Email & Schema.Attribute.Private;
+    customerEmail: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
     customerName: Schema.Attribute.String & Schema.Attribute.Required;
     customerPhone: Schema.Attribute.String &
       Schema.Attribute.Required &

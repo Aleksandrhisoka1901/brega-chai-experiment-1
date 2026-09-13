@@ -22,7 +22,7 @@
     },
     "customerEmail": {
       "type": "email",
-      "required": false,
+      "required": true,
       "private": true
     },
     "comment": {

@@ -39,17 +39,14 @@ export const inquirySchema = z.object({
       }
     }),
   email: z
-    .union([
-      z.literal(""),
-      z
-        .string()
-        .max(
-          checkoutFieldLimits.email,
-          `Не больше ${checkoutFieldLimits.email} символов`,
-        )
-        .pipe(z.email("Проверьте адрес электронной почты")),
-    ])
-    .transform((value) => value || undefined),
+    .string()
+    .trim()
+    .min(1, "Укажите email")
+    .max(
+      checkoutFieldLimits.email,
+      `Не больше ${checkoutFieldLimits.email} символов`,
+    )
+    .pipe(z.email("Проверьте адрес электронной почты")),
   comment: optionalText(
     checkoutFieldLimits.comment,
     `Не больше ${checkoutFieldLimits.comment} символов`,

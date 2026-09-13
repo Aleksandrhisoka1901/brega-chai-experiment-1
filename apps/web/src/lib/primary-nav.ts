@@ -15,7 +15,7 @@ export const DEFAULT_PRIMARY_NAV_LABELS = {
   tovary: "Электростанции",
   stati: "Статьи",
   optovikam: "Для оптовиков",
-  tipovye: "Типовые решения",
+  tipovye: "Системы хранения энергии",
 } as const;
 
 export function buildPrimaryNavLinks(navigation: PrimaryNavLabels) {

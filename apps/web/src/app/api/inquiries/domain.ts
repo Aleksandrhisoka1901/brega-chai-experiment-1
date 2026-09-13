@@ -4,7 +4,7 @@ const inquiryPayloadSchema = z
   .object({
     customerName: z.string().trim().min(1).max(100),
     customerPhone: z.string().trim().regex(/^\+7\d{10}$/),
-    customerEmail: z.email().max(254).optional(),
+    customerEmail: z.email().max(254),
     comment: z.string().trim().max(1000).optional(),
     source: z
       .string()

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutFieldLimits } from "@brega-chai/contracts";
-import { AlertCircle, LoaderCircle } from "lucide-react";
+import { AlertCircle, ChevronDown, LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -45,6 +45,9 @@ export function InquiryForm({
   submitLabel = "Отправить заявку",
   models,
   defaultModel,
+  collapsedByDefault = true,
+  expanded,
+  onExpandedChange,
   id = "inquiry",
   className,
   client,
@@ -55,6 +58,9 @@ export function InquiryForm({
   submitLabel?: string;
   models?: readonly InquiryFormModel[];
   defaultModel?: string;
+  collapsedByDefault?: boolean;
+  expanded?: boolean;
+  onExpandedChange?(open: boolean): void;
   id?: string;
   className?: string;
   client?: InquiryClient;
@@ -68,8 +74,11 @@ export function InquiryForm({
     | { type: "error"; message: string }
   >();
   const [honeypot, setHoneypot] = useState(false);
-  const [isPreparing, setIsPreparing] = useState(true);
+  const [internalOpen, setInternalOpen] = useState(!collapsedByDefault);
+  const [isPreparing, setIsPreparing] = useState(false);
   const submittingRef = useRef(false);
+  const open = expanded ?? internalOpen;
+  const setOpen = onExpandedChange ?? setInternalOpen;
   const {
     register,
     handleSubmit,
@@ -88,11 +97,16 @@ export function InquiryForm({
   });
 
   useEffect(() => {
-    if (defaultModel) setValue("modelInterest", defaultModel);
-  }, [defaultModel, setValue]);
+    if (defaultModel) {
+      setValue("modelInterest", defaultModel);
+      if (expanded === undefined) setInternalOpen(true);
+    }
+  }, [defaultModel, expanded, setValue]);
 
   useEffect(() => {
+    if (!open) return;
     let active = true;
+    setIsPreparing(true);
     Promise.resolve(inquiryClient.prepare?.())
       .catch(() => {
         if (active) {
@@ -108,7 +122,7 @@ export function InquiryForm({
     return () => {
       active = false;
     };
-  }, [inquiryClient]);
+  }, [inquiryClient, open]);
 
   if (result?.type === "success") {
     return (
@@ -131,9 +145,24 @@ export function InquiryForm({
       data-inquiry-form
       id={id}
     >
-      <h2>{bindShortRussianWords(heading)}</h2>
-      <p className={styles.lead}>{bindShortRussianWords(description)}</p>
+      <button
+        aria-controls={`${id}-fields`}
+        aria-expanded={open}
+        className={styles.toggle}
+        type="button"
+        onClick={() => setOpen(!open)}
+      >
+        <span>
+          <strong>{bindShortRussianWords(heading)}</strong>
+          <span className={styles.toggleLead}>
+            {bindShortRussianWords(description)}
+          </span>
+        </span>
+        <ChevronDown aria-hidden="true" data-open={open} />
+      </button>
+      {open ? (
       <form
+        id={`${id}-fields`}
         className={styles.form}
         noValidate
         onSubmit={handleSubmit(
@@ -230,7 +259,7 @@ export function InquiryForm({
           </small>
         </label>
         <label className={styles.field}>
-          <span>{bindShortRussianWords("Email (необязательно)")}</span>
+          <span>{bindShortRussianWords("Email")}</span>
           <input
             autoComplete="email"
             inputMode="email"
@@ -292,6 +321,7 @@ export function InquiryForm({
           <span>{bindShortRussianWords(submitLabel)}</span>
         </button>
       </form>
+      ) : null}
     </section>
   );
 }

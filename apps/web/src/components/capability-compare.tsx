@@ -14,35 +14,70 @@ import styles from "./capability-page.module.css";
 
 export function CapabilityCompare() {
   const [selectedId, setSelectedId] = useState<string>();
+  const [formOpen, setFormOpen] = useState(false);
   const selected = CAPABILITY_COLUMNS.find((column) => column.id === selectedId);
+
+  const chooseModel = (id: string) => {
+    setSelectedId(id);
+    setFormOpen(true);
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("inquiry")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   return (
     <>
+      <div className={styles.models}>
+        {CAPABILITY_COLUMNS.map((column) => (
+          <button
+            className={styles.modelCard}
+            data-selected={column.id === selectedId}
+            key={column.id}
+            type="button"
+            onClick={() => chooseModel(column.id)}
+          >
+            <img
+              alt={column.name}
+              className={styles.modelPhoto}
+              height={480}
+              src={column.image}
+              width={640}
+            />
+            <span className={styles.modelBody}>
+              <strong>{column.name}</strong>
+              <span>
+                {column.capacity}
+                {column.power ? ` · ${column.power}` : ""}
+              </span>
+              <small>{column.productModel}</small>
+            </span>
+          </button>
+        ))}
+      </div>
       <div className={styles.scroll}>
         <table className={styles.table}>
           <caption>
-            {bindShortRussianWords("Сравнительная таблица аккумуляторных систем")}
+            {bindShortRussianWords(
+              "Сравнительная таблица аккумуляторных систем",
+            )}
           </caption>
           <thead>
             <tr>
               <th scope="col">Характеристика</th>
               {CAPABILITY_COLUMNS.map((column) => {
-                const selected = column.id === selectedId;
+                const isSelected = column.id === selectedId;
                 return (
                   <th
-                    className={`${styles.model}${selected ? ` ${styles.selected}` : ""}`}
+                    className={`${styles.model}${isSelected ? ` ${styles.selected}` : ""}`}
                     key={column.id}
                     scope="col"
                   >
                     <button
                       className={styles.modelButton}
                       type="button"
-                      onClick={() => {
-                        setSelectedId(column.id);
-                        document
-                          .getElementById("inquiry")
-                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }}
+                      onClick={() => chooseModel(column.id)}
                     >
                       <span className={styles.modelName}>{column.name}</span>
                       <span className={styles.modelCode}>
@@ -62,10 +97,10 @@ export function CapabilityCompare() {
                 </th>
                 {row.values.map((value, index) => {
                   const column = CAPABILITY_COLUMNS[index];
-                  const selected = column?.id === selectedId;
+                  const isSelected = column?.id === selectedId;
                   return (
                     <td
-                      className={selected ? styles.selected : undefined}
+                      className={isSelected ? styles.selected : undefined}
                       key={`${row.label}-${column?.id ?? index}`}
                     >
                       {value}
@@ -78,12 +113,15 @@ export function CapabilityCompare() {
         </table>
       </div>
       <InquiryForm
+        collapsedByDefault
         defaultModel={selected?.name}
+        expanded={formOpen}
         models={CAPABILITY_COLUMNS.map((column) => ({
           id: column.id,
           name: column.name,
         }))}
         source={CAPABILITY_PATH}
+        onExpandedChange={setFormOpen}
       />
     </>
   );

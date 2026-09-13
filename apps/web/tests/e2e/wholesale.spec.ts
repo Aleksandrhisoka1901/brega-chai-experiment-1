@@ -11,9 +11,10 @@ test("/dlya-optovikov renders the wholesale landing", async ({ page }) => {
       { name: "Для оптовиков" },
     ),
   ).toHaveAttribute("href", "/dlya-optovikov");
-  await expect(page.locator("[data-inquiry-form]")).toBeVisible();
+  const form = page.locator("[data-inquiry-form]");
+  await expect(form).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Хотите узнать условия для опта?" }),
+    form.getByRole("button", { name: /Хотите узнать условия для опта/ }),
   ).toBeVisible();
 });
 

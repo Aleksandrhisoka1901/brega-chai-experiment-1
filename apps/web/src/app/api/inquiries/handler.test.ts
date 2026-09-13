@@ -8,6 +8,7 @@ const secret = "test-secret-with-enough-entropy";
 const inquiry = {
   customerName: "Анна",
   customerPhone: "+79991234567",
+  customerEmail: "anna@example.com",
   source: "/tipovye-resheniya",
   modelInterest: "FP115KWH",
   privacyConsent: true as const,

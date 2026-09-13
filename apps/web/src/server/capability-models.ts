@@ -2,6 +2,9 @@ export type CapabilityColumn = {
   id: string;
   name: string;
   productModel: string;
+  image: string;
+  capacity: string;
+  power: string;
 };
 
 export type CapabilityRow = {
@@ -10,17 +13,45 @@ export type CapabilityRow = {
 };
 
 export const CAPABILITY_PAGE = {
-  eyebrow: "Производство",
-  title: "Типовые аккумуляторные системы",
+  eyebrow: "Коммерция и промышленность",
+  title: "Коммерческая и промышленная система хранения энергии",
   lead: "Цен на этой странице нет: это ориентиры по характеристикам. С такими параметрами мы можем выпускать системы под ваш объект — мощность, ёмкость и комплектацию согласуем отдельно.",
   note: "Характеристики сведены из предоставленных данных. Итоговая спецификация фиксируется в коммерческом предложении.",
 } as const;
 
 export const CAPABILITY_COLUMNS = [
-  { id: "fp115", name: "FP115KWH", productModel: "FP115KWH" },
-  { id: "fp215", name: "FP215KWH", productModel: "CT-ES-215/AC" },
-  { id: "fp3350", name: "FP3.35МВтч", productModel: "CT-ES-3.35МВтч/AC" },
-  { id: "fp40", name: "FP40КВтч", productModel: "CT-ES-40/AC" },
+  {
+    id: "fp115",
+    name: "FP115KWH",
+    productModel: "FP115KWH",
+    image: "/capability/fp115.png",
+    capacity: "115,2 кВт·ч",
+    power: "50 кВт",
+  },
+  {
+    id: "fp215",
+    name: "FP215KWH",
+    productModel: "CT-ES-215/AC",
+    image: "/capability/fp215.png",
+    capacity: "215 кВт·ч",
+    power: "100 кВт",
+  },
+  {
+    id: "fp3350",
+    name: "FP3.35МВтч",
+    productModel: "CT-ES-3.35МВтч/AC",
+    image: "/capability/fp3350.png",
+    capacity: "3,35 МВт·ч",
+    power: "Контейнер 20GP",
+  },
+  {
+    id: "fp40",
+    name: "FP40КВтч",
+    productModel: "CT-ES-40/AC",
+    image: "/capability/fp40.png",
+    capacity: "40 кВт·ч",
+    power: "20 кВт",
+  },
 ] as const satisfies readonly CapabilityColumn[];
 
 export const CAPABILITY_ROWS = [

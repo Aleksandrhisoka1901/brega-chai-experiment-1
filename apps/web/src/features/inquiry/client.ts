@@ -74,7 +74,7 @@ export function createFetchInquiryClient({
             inquiry: {
               customerName: customer.name,
               customerPhone: customer.phone,
-              ...(customer.email ? { customerEmail: customer.email } : {}),
+              customerEmail: customer.email,
               ...(customer.comment ? { comment: customer.comment } : {}),
               source,
               ...(customer.modelInterest

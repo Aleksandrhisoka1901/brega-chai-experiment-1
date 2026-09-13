@@ -11,7 +11,7 @@ export default factories.createCoreService(INQUIRY_UID, ({ strapi }) => ({
       data: {
         customerName: input.customerName,
         customerPhone: input.customerPhone,
-        ...(input.customerEmail ? { customerEmail: input.customerEmail } : {}),
+        customerEmail: input.customerEmail,
         ...(input.comment ? { comment: input.comment } : {}),
         source: input.source,
         ...(input.modelInterest ? { modelInterest: input.modelInterest } : {}),

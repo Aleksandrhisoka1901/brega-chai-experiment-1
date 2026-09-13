@@ -9,6 +9,7 @@ import {
 const valid = {
   customerName: "Анна",
   customerPhone: "+79991234567",
+  customerEmail: "anna@example.com",
   source: "/tipovye-resheniya",
   privacyConsent: true as const,
 };
@@ -26,6 +27,10 @@ test("accepts a storefront inquiry and rejects junk", () => {
   );
   assert.throws(
     () => parseInquiryInput({ ...valid, customerEmail: "not-an-email" }),
+    InquiryServiceError,
+  );
+  assert.throws(
+    () => parseInquiryInput({ ...valid, customerEmail: undefined }),
     InquiryServiceError,
   );
 

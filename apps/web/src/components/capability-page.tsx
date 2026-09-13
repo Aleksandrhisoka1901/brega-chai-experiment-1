@@ -26,7 +26,7 @@ export function capabilityPageMetadata(): Metadata {
 export function CapabilityStorefrontPage() {
   const breadcrumbs = [
     { name: "Главная", href: "/" },
-    { name: "Типовые решения", href: CAPABILITY_PATH },
+    { name: CAPABILITY_PAGE.title, href: CAPABILITY_PATH },
   ];
 
   return (
@@ -49,10 +49,12 @@ export function CapabilityStorefrontPage() {
       <article className={`${styles.page} content-frame`} data-content-frame>
         <Breadcrumbs items={breadcrumbs} />
         <header className={styles.header}>
-          <p className={styles.eyebrow}>
-            {bindShortRussianWords(CAPABILITY_PAGE.eyebrow)}
-          </p>
-          <h1>{bindShortRussianWords(CAPABILITY_PAGE.title)}</h1>
+          <div className={styles.titleBlock}>
+            <p className={styles.eyebrow}>
+              {bindShortRussianWords(CAPABILITY_PAGE.eyebrow)}
+            </p>
+            <h1>{bindShortRussianWords(CAPABILITY_PAGE.title)}</h1>
+          </div>
           <p className={styles.lead}>
             {bindShortRussianWords(CAPABILITY_PAGE.lead)}
           </p>

@@ -6,7 +6,8 @@
   max-width: 36rem;
 }
 
-.section h2 {
+.section h2,
+.toggle strong {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--type-heading-2, 1.75rem);
@@ -15,11 +16,44 @@
   line-height: 1.2;
 }
 
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.toggleLead,
 .lead {
   margin: 0;
   color: var(--text-muted);
   font-size: var(--type-body-editorial, 1.05rem);
   line-height: 1.6;
+}
+
+.toggleLead {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.toggle svg {
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.35rem;
+  transition: transform 180ms ease;
+}
+
+.toggle svg[data-open="true"] {
+  transform: rotate(180deg);
 }
 
 .form {

@@ -14,10 +14,7 @@ export const inquiryInputSchema = z
       .string()
       .trim()
       .regex(/^\+7\d{10}$/, "Некорректный телефон"),
-    customerEmail: z
-      .union([z.literal(""), z.string().trim().email().max(254)])
-      .optional()
-      .transform((value) => value || undefined),
+    customerEmail: z.string().trim().email().max(254),
     comment: optionalText(1000).optional(),
     source: z
       .string()
