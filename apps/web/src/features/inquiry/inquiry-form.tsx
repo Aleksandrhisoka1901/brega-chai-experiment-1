@@ -49,6 +49,7 @@ export function InquiryForm({
   collapsedByDefault = true,
   expanded,
   onExpandedChange,
+  onModelChange,
   id = "inquiry",
   className,
   client,
@@ -63,6 +64,7 @@ export function InquiryForm({
   collapsedByDefault?: boolean;
   expanded?: boolean;
   onExpandedChange?(open: boolean): void;
+  onModelChange?(name: string): void;
   id?: string;
   className?: string;
   client?: InquiryClient;
@@ -99,11 +101,9 @@ export function InquiryForm({
   });
 
   useEffect(() => {
-    if (defaultModel) {
-      setValue("modelInterest", defaultModel);
-      if (expanded === undefined) setInternalOpen(true);
-    }
-  }, [defaultModel, expanded, setValue]);
+    setValue("modelInterest", defaultModel ?? "");
+    if (defaultModel && expanded === undefined) setInternalOpen(true);
+  }, [defaultModel, expanded, open, setValue]);
 
   useEffect(() => {
     if (!open) return;
@@ -207,7 +207,13 @@ export function InquiryForm({
         {models && models.length > 0 ? (
           <label className={styles.field}>
             <span>{bindShortRussianWords("Какая система интересует")}</span>
-            <select {...register("modelInterest")}>
+            <select
+              {...register("modelInterest")}
+              onChange={(event) => {
+                void register("modelInterest").onChange(event);
+                onModelChange?.(event.currentTarget.value);
+              }}
+            >
               <option value="">Пока не знаю</option>
               {models.map((model) => (
                 <option key={model.id} value={model.name}>

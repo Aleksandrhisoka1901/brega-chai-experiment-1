@@ -17,9 +17,10 @@ export function CapabilityCompare() {
   const [formOpen, setFormOpen] = useState(false);
   const selected = CAPABILITY_COLUMNS.find((column) => column.id === selectedId);
 
-  const chooseModel = (id: string) => {
+  const chooseModel = (id: string, scrollToForm = false) => {
     setSelectedId(id);
     setFormOpen(true);
+    if (!scrollToForm) return;
     window.requestAnimationFrame(() => {
       document
         .getElementById("inquiry")
@@ -30,31 +31,38 @@ export function CapabilityCompare() {
   return (
     <>
       <div className={styles.models}>
-        {CAPABILITY_COLUMNS.map((column) => (
-          <button
-            className={styles.modelCard}
-            data-selected={column.id === selectedId}
-            key={column.id}
-            type="button"
-            onClick={() => chooseModel(column.id)}
-          >
-            <img
-              alt={column.name}
-              className={styles.modelPhoto}
-              height={480}
-              src={column.image}
-              width={640}
-            />
-            <span className={styles.modelBody}>
-              <strong>{column.name}</strong>
-              <span>
-                {column.capacity}
-                {column.power ? ` · ${column.power}` : ""}
+        {CAPABILITY_COLUMNS.map((column) => {
+          const isSelected = column.id === selectedId;
+          return (
+            <button
+              aria-pressed={isSelected}
+              className={styles.modelCard}
+              data-selected={isSelected}
+              key={column.id}
+              type="button"
+              onClick={() => chooseModel(column.id, true)}
+            >
+              <img
+                alt={column.name}
+                className={styles.modelPhoto}
+                height={480}
+                src={column.image}
+                width={640}
+              />
+              <span className={styles.modelBody}>
+                <strong>{column.name}</strong>
+                <span>
+                  {column.capacity}
+                  {column.power ? ` · ${column.power}` : ""}
+                </span>
+                <small>{column.productModel}</small>
+                {isSelected ? (
+                  <em className={styles.chosen}>Выбрано</em>
+                ) : null}
               </span>
-              <small>{column.productModel}</small>
-            </span>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
       <div className={styles.scroll}>
         <table className={styles.table}>
@@ -103,7 +111,15 @@ export function CapabilityCompare() {
                       className={isSelected ? styles.selected : undefined}
                       key={`${row.label}-${column?.id ?? index}`}
                     >
-                      {value}
+                      <button
+                        className={styles.cellButton}
+                        type="button"
+                        onClick={() => {
+                          if (column) chooseModel(column.id);
+                        }}
+                      >
+                        {value}
+                      </button>
                     </td>
                   );
                 })}
@@ -114,7 +130,7 @@ export function CapabilityCompare() {
       </div>
       <InquiryForm
         collapsedByDefault
-        defaultModel={selected?.name}
+        defaultModel={selected?.name ?? ""}
         expanded={formOpen}
         models={CAPABILITY_COLUMNS.map((column) => ({
           id: column.id,
@@ -122,6 +138,10 @@ export function CapabilityCompare() {
         }))}
         source={CAPABILITY_PATH}
         onExpandedChange={setFormOpen}
+        onModelChange={(name) => {
+          const match = CAPABILITY_COLUMNS.find((column) => column.name === name);
+          setSelectedId(match?.id);
+        }}
       />
     </>
   );
