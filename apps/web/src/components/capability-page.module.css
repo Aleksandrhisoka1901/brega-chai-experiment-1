@@ -61,11 +61,11 @@
 .modelPhoto {
   display: block;
   width: 100%;
-  height: 8.5rem;
-  object-fit: contain;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   object-position: center;
   background: transparent;
-  mix-blend-mode: multiply;
 }
 
 .modelBody {
@@ -196,10 +196,6 @@
   .models {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem 0.85rem;
-  }
-
-  .modelPhoto {
-    height: 6.25rem;
   }
 
   .modelBody {
