@@ -50,44 +50,28 @@
 
 .modelCard {
   padding: 0;
-  overflow: hidden;
   border: 0;
-  border-radius: var(--product-radius);
-  background: var(--surface-page);
-  box-shadow: var(--product-card-shadow);
+  background: transparent;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: box-shadow 240ms ease;
-}
-
-.modelCard:hover {
-  box-shadow: var(--product-card-shadow-hover);
-}
-
-.modelCard[data-selected="true"] {
-  box-shadow:
-    var(--product-card-shadow-hover),
-    0 0 0 1.5px var(--text-primary);
 }
 
 .modelPhoto {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 8.5rem;
   object-fit: contain;
   object-position: center;
-  padding: 0.55rem 0.85rem;
-  background: var(--product-media-surface);
+  background: transparent;
   mix-blend-mode: multiply;
 }
 
 .modelBody {
   display: grid;
-  gap: 0.3rem;
-  padding: 0.75rem 0.95rem 0.9rem;
-  border-top: 1px solid color-mix(in srgb, var(--border-default) 70%, transparent);
+  gap: 0.25rem;
+  padding: 0.7rem 0 0;
 }
 
 .modelBody strong {
@@ -186,8 +170,11 @@
 }
 
 .selected {
-  background: color-mix(in srgb, var(--text-primary) 5%, var(--surface-page));
-  box-shadow: inset 3px 0 0 var(--text-primary);
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--surface-page));
+}
+
+.table thead th.selected {
+  background: color-mix(in srgb, var(--text-primary) 8%, var(--surface-page));
 }
 
 @media (max-width: 1100px) {

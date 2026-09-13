@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { InquiryForm } from "@/features/inquiry/inquiry-form";
 import { CAPABILITY_PATH } from "@/lib/storefront-routes";
@@ -15,7 +15,25 @@ import styles from "./capability-page.module.css";
 export function CapabilityCompare() {
   const [selectedId, setSelectedId] = useState<string>();
   const [formOpen, setFormOpen] = useState(false);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
   const selected = CAPABILITY_COLUMNS.find((column) => column.id === selectedId);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const scroller = tableScrollRef.current;
+    const cell = scroller?.querySelector<HTMLElement>(
+      `[data-model-col="${selectedId}"]`,
+    );
+    if (!scroller || !cell) return;
+    const sticky = scroller.querySelector<HTMLElement>(`.${styles.rowLabel}`);
+    const offset = (sticky?.getBoundingClientRect().width ?? 0) + 16;
+    const nextLeft =
+      scroller.scrollLeft +
+      cell.getBoundingClientRect().left -
+      scroller.getBoundingClientRect().left -
+      offset;
+    scroller.scrollTo({ left: Math.max(0, nextLeft), behavior: "smooth" });
+  }, [selectedId]);
 
   const chooseModel = (id: string, scrollToForm = false) => {
     setSelectedId(id);
@@ -64,7 +82,7 @@ export function CapabilityCompare() {
           );
         })}
       </div>
-      <div className={styles.scroll}>
+      <div className={styles.scroll} ref={tableScrollRef}>
         <table className={styles.table}>
           <caption>
             {bindShortRussianWords(
@@ -79,6 +97,7 @@ export function CapabilityCompare() {
                 return (
                   <th
                     className={`${styles.model}${isSelected ? ` ${styles.selected}` : ""}`}
+                    data-model-col={column.id}
                     key={column.id}
                     scope="col"
                   >
