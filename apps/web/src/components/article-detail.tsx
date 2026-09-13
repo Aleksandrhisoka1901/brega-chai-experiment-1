@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { CardsGrid } from "@/components/blocks/CardsGrid";
 import { bindShortRussianWords } from "@/lib/typography";
 import type { ArticleDetail as ArticleDetailData } from "@/server/cms/article-mapper";
@@ -10,9 +12,11 @@ import styles from "./article-detail.module.css";
 export function ArticleDetail({
   article,
   breadcrumbs,
+  footer,
 }: {
   article: ArticleDetailData;
   breadcrumbs: BreadcrumbItem[];
+  footer?: ReactNode;
 }) {
   return (
     <article className={`${styles.page} content-frame`} data-content-frame>
@@ -27,6 +31,7 @@ export function ArticleDetail({
         <CardsGrid block={block} key={`${block.title ?? "block"}-${index}`} />
       ))}
       <ArticleRelatedMaterials materials={article.relatedMaterials} />
+      {footer}
     </article>
   );
 }

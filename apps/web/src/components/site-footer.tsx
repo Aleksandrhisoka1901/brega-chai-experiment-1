@@ -1,5 +1,6 @@
 import { Mail } from "lucide-react";
 
+import { TrackedContactLink } from "@/features/analytics/tracked-contact-link";
 import type { GlobalSettings } from "@/server/cms/global-mapper";
 import { bindShortRussianWords } from "@/lib/typography";
 
@@ -39,18 +40,22 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
         </div>
         <div className="site-footer__contacts">
           <h2>Контакты</h2>
-          <a href={`mailto:${settings.email}`}>
+          <TrackedContactLink
+            goal="emailClick"
+            href={`mailto:${settings.email}`}
+          >
             <Mail aria-hidden="true" />
             <span>{settings.email}</span>
-          </a>
-          <a
+          </TrackedContactLink>
+          <TrackedContactLink
+            goal="telegramClick"
             href={settings.telegramUrl}
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
           >
             <TelegramMark />
             <span>Telegram</span>
-          </a>
+          </TrackedContactLink>
         </div>
         <div className="site-footer__legal">
           <h2>Правовая информация</h2>

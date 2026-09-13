@@ -37,6 +37,7 @@ export const DEFAULT_SITEMAP_URLS = [
   { slug: "/paneli", priority: 0.9, frequency: "weekly" },
   { slug: "/stati", priority: 0.9, frequency: "weekly" },
   { slug: "/dlya-optovikov", priority: 0.8, frequency: "weekly" },
+  { slug: "/tipovye-resheniya", priority: 0.8, frequency: "weekly" },
 ] as const;
 
 export function shouldReplaceSitemapOrigin(

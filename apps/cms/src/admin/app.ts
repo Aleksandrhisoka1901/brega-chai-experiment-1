@@ -67,6 +67,21 @@ const adminApp = {
         "content-manager.content-types.api::home-page.home-page.seo":
           "SEO-настройки",
 
+        "content-manager.content-types.api::inquiry.inquiry.comment":
+          "Комментарий",
+        "content-manager.content-types.api::inquiry.inquiry.customerEmail":
+          "Электронная почта",
+        "content-manager.content-types.api::inquiry.inquiry.customerName":
+          "Имя",
+        "content-manager.content-types.api::inquiry.inquiry.customerPhone":
+          "Телефон",
+        "content-manager.content-types.api::inquiry.inquiry.inquiryStatus":
+          "Статус заявки",
+        "content-manager.content-types.api::inquiry.inquiry.modelInterest":
+          "Интересующая модель",
+        "content-manager.content-types.api::inquiry.inquiry.source":
+          "Страница заявки",
+
         "content-manager.content-types.api::order.order.comment": "Комментарий",
         "content-manager.content-types.api::order.order.managerComment":
           "Комментарий менеджера",

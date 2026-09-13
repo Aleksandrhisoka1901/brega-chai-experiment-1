@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 
-export const YANDEX_METRIKA_COUNTER_ID = 112496290;
+import { YANDEX_METRIKA_COUNTER_ID } from "./goals";
+
+export {
+  METRIKA_GOALS,
+  reachMetrikaGoal,
+  YANDEX_METRIKA_COUNTER_ID,
+} from "./goals";
 
 export const YANDEX_METRIKA_SCRIPT_URL = `https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_COUNTER_ID}`;
 
@@ -47,6 +54,9 @@ const ensureMetrikaScript = () => {
 };
 
 export function YandexMetrika() {
+  const pathname = usePathname();
+  const skipNextHit = useRef(true);
+
   useEffect(() => {
     if (window.__bregaMetrikaInitialized) return;
 
@@ -70,6 +80,14 @@ export function YandexMetrika() {
       window.__bregaMetrikaInitialized = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (skipNextHit.current) {
+      skipNextHit.current = false;
+      return;
+    }
+    window.ym?.(YANDEX_METRIKA_COUNTER_ID, "hit", location.href);
+  }, [pathname]);
 
   return (
     <noscript>

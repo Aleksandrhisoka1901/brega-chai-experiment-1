@@ -5,7 +5,7 @@ import {
   assertLocalOrTestEnvironment,
   emitAccessKey,
   ensureOrderCreateToken,
-  ORDER_CREATE_PERMISSION,
+  STOREFRONT_WRITE_PERMISSIONS,
   type ContentApiTokenService,
 } from "../scripts/order-api-token-helpers.ts";
 
@@ -24,7 +24,7 @@ function serviceStub(
   };
 }
 
-test("creates a custom token with only the order create permission", async () => {
+test("creates a custom token with storefront write permissions", async () => {
   const calls: unknown[] = [];
   const service = serviceStub({
     async create(attributes) {
@@ -40,9 +40,9 @@ test("creates a custom token with only the order create permission", async () =>
   assert.deepEqual(calls, [
     {
       name: "test-order-create",
-      description: "Local/test token for private order creation",
+      description: "Local/test token for private storefront writes",
       type: "custom",
-      permissions: [ORDER_CREATE_PERMISSION],
+      permissions: [...STOREFRONT_WRITE_PERMISSIONS],
       lifespan: null,
     },
   ]);
@@ -58,7 +58,7 @@ test("reuses the named token without creating or updating it", async () => {
         id: 7,
         accessKey: "existing-token",
         type: "custom",
-        permissions: [ORDER_CREATE_PERMISSION],
+        permissions: [...STOREFRONT_WRITE_PERMISSIONS],
       };
     },
     async create() {
@@ -96,7 +96,7 @@ test("repairs a named token that has broader permissions", async () => {
       id: 9,
       attributes: {
         type: "custom",
-        permissions: [ORDER_CREATE_PERMISSION],
+        permissions: [...STOREFRONT_WRITE_PERMISSIONS],
       },
     },
   ]);

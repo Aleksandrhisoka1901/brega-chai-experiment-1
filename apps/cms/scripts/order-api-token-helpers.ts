@@ -1,4 +1,9 @@
 export const ORDER_CREATE_PERMISSION = "api::order.order.create";
+export const INQUIRY_CREATE_PERMISSION = "api::inquiry.inquiry.create";
+export const STOREFRONT_WRITE_PERMISSIONS = [
+  ORDER_CREATE_PERMISSION,
+  INQUIRY_CREATE_PERMISSION,
+];
 export const DEFAULT_ORDER_TOKEN_NAME = "local-order-create";
 
 type ApiToken = {
@@ -54,11 +59,13 @@ export function assertLocalOrTestEnvironment(nodeEnv: string | undefined) {
   }
 }
 
-function hasExactOrderCreateScope(token: ApiToken) {
+function hasExactStorefrontWriteScope(token: ApiToken) {
+  if (token.type !== "custom") return false;
+  const actual = [...(token.permissions ?? [])].sort();
+  const wanted = [...STOREFRONT_WRITE_PERMISSIONS].sort();
   return (
-    token.type === "custom" &&
-    token.permissions?.length === 1 &&
-    token.permissions[0] === ORDER_CREATE_PERMISSION
+    actual.length === wanted.length &&
+    actual.every((permission, index) => permission === wanted[index])
   );
 }
 
@@ -80,18 +87,18 @@ export async function ensureOrderCreateToken(
   if (!existing) {
     const created = await service.create({
       name,
-      description: "Local/test token for private order creation",
+      description: "Local/test token for private storefront writes",
       type: "custom",
-      permissions: [ORDER_CREATE_PERMISSION],
+      permissions: [...STOREFRONT_WRITE_PERMISSIONS],
       lifespan: null,
     });
     return requireAccessKey(created);
   }
 
-  if (!hasExactOrderCreateScope(existing)) {
+  if (!hasExactStorefrontWriteScope(existing)) {
     await service.update(existing.id, {
       type: "custom",
-      permissions: [ORDER_CREATE_PERMISSION],
+      permissions: [...STOREFRONT_WRITE_PERMISSIONS],
     });
   }
 

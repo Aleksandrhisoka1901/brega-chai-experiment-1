@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { CheckoutSettings } from "../../server/cms/global-mapper";
 
+import { METRIKA_GOALS, reachMetrikaGoal } from "../analytics/goals";
 import { AutoResizeTextarea } from "../../components/auto-resize-textarea";
 import { MoneyAmount } from "../../components/money-amount";
 import { ScrollArea } from "../../components/scroll-area";
@@ -155,6 +156,7 @@ export function CheckoutPanel({
                 honeypot,
               });
               if (response.ok) {
+                reachMetrikaGoal(METRIKA_GOALS.orderSubmit);
                 draft.clear();
                 onOrderAccepted();
                 setResult({

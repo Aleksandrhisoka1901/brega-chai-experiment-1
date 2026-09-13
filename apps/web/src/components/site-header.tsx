@@ -7,12 +7,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { TrackedContactLink } from "@/features/analytics/tracked-contact-link";
+import { METRIKA_GOALS, reachMetrikaGoal } from "@/features/analytics/goals";
 import { getCartQuantity } from "@/features/cart/model";
 import { CartDrawer } from "@/features/cart/components/cart-drawer";
 import { cartDrawerStore } from "@/features/cart/components/cart-drawer-store";
 import { useCart } from "@/features/cart/use-cart";
 import { BRAND_EMAIL, BRAND_NAME, BRAND_TELEGRAM_URL } from "@/lib/brand";
-import { WHOLESALE_PATH } from "@/lib/storefront-routes";
+import {
+  buildPrimaryNavLinks,
+  DEFAULT_PRIMARY_NAV_LABELS,
+  isPrimaryNavCurrent,
+} from "@/lib/primary-nav";
 import { bindShortRussianWords } from "@/lib/typography";
 import type { CheckoutSettings } from "@/server/cms/global-mapper";
 
@@ -35,6 +41,7 @@ type SiteHeaderProps = {
     tovary: string;
     stati: string;
     optovikam?: string;
+    tipovye?: string;
     cart: string;
   };
   contacts?: {
@@ -45,11 +52,7 @@ type SiteHeaderProps = {
 };
 
 const defaultNavigation = {
-  about: "О компании",
-  nabory: "Солнечные панели",
-  tovary: "Электростанции",
-  stati: "Статьи",
-  optovikam: "Для оптовиков",
+  ...DEFAULT_PRIMARY_NAV_LABELS,
   cart: "Корзина",
 };
 
@@ -78,16 +81,7 @@ export function SiteHeader({
   const pathname = usePathname();
   const cartTriggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = [
-    { href: "/#about", label: navigation.about },
-    { href: "/stantsii", label: navigation.tovary },
-    { href: "/paneli", label: navigation.nabory },
-    { href: "/stati", label: navigation.stati },
-    {
-      href: WHOLESALE_PATH,
-      label: navigation.optovikam ?? defaultNavigation.optovikam,
-    },
-  ];
+  const links = buildPrimaryNavLinks(navigation);
 
   return (
     <>
@@ -113,7 +107,10 @@ export function SiteHeader({
             type="button"
             aria-haspopup="dialog"
             aria-label={`Открыть корзину, товаров: ${quantity}`}
-            onClick={(event) => cartDrawerStore.open(event.currentTarget)}
+            onClick={(event) => {
+              reachMetrikaGoal(METRIKA_GOALS.cartOpen);
+              cartDrawerStore.open(event.currentTarget);
+            }}
           >
             <span>{bindShortRussianWords(navigation.cart)}</span>
             <span aria-hidden="true">·</span>
@@ -154,15 +151,10 @@ export function SiteHeader({
                 <nav aria-label="Мобильная навигация" className={styles.nav}>
                   <ul>
                     {links.map((link) => {
-                      const isCurrent =
-                        (link.href === "/stantsii" &&
-                          pathname.startsWith("/stantsii")) ||
-                        (link.href === "/paneli" &&
-                          pathname.startsWith("/paneli")) ||
-                        (link.href === "/stati" &&
-                          pathname.startsWith("/stati")) ||
-                        (link.href === WHOLESALE_PATH &&
-                          pathname.startsWith(WHOLESALE_PATH));
+                      const isCurrent = isPrimaryNavCurrent(
+                        link.href,
+                        pathname,
+                      );
 
                       return (
                         <li key={link.href}>
@@ -183,22 +175,27 @@ export function SiteHeader({
                 </nav>
                 <footer className={styles.footer}>
                   <div className={styles.contacts}>
-                    <a href={`mailto:${contacts.email}`}>
+                    <TrackedContactLink
+                      goal="emailClick"
+                      href={`mailto:${contacts.email}`}
+                    >
                       <Mail aria-hidden="true" />
                       <span>{contacts.email}</span>
-                    </a>
-                    <a
+                    </TrackedContactLink>
+                    <TrackedContactLink
+                      goal="telegramClick"
                       href={contacts.telegramUrl}
-                      target="_blank"
                       rel="noopener noreferrer"
+                      target="_blank"
                     >
                       <TelegramMark />
                       <span>Telegram</span>
-                    </a>
+                    </TrackedContactLink>
                   </div>
                   <button
                     className={styles.cart}
                     onClick={() => {
+                      reachMetrikaGoal(METRIKA_GOALS.cartOpen);
                       setMenuOpen(false);
                       window.setTimeout(() => {
                         if (cartTriggerRef.current) {

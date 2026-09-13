@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "inquiries",
+  "info": {
+    "singularName": "inquiry",
+    "pluralName": "inquiries",
+    "displayName": "Заявка",
+    "description": "Заявка с витрины: подробности по типовым системам и другим страницам"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "customerName": {
+      "type": "string",
+      "required": true
+    },
+    "customerPhone": {
+      "type": "string",
+      "required": true,
+      "private": true
+    },
+    "customerEmail": {
+      "type": "email",
+      "required": false,
+      "private": true
+    },
+    "comment": {
+      "type": "text",
+      "required": false,
+      "private": true
+    },
+    "source": {
+      "type": "string",
+      "required": true
+    },
+    "modelInterest": {
+      "type": "string",
+      "required": false
+    },
+    "inquiryStatus": {
+      "type": "enumeration",
+      "enum": ["new", "processed"],
+      "required": true,
+      "default": "new"
+    }
+  }
+}

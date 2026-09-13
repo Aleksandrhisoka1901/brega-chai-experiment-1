@@ -734,6 +734,45 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiInquiryInquiry extends Struct.CollectionTypeSchema {
+  collectionName: 'inquiries';
+  info: {
+    description: '\u0417\u0430\u044F\u0432\u043A\u0430 \u0441 \u0432\u0438\u0442\u0440\u0438\u043D\u044B: \u043F\u043E\u0434\u0440\u043E\u0431\u043D\u043E\u0441\u0442\u0438 \u043F\u043E \u0442\u0438\u043F\u043E\u0432\u044B\u043C \u0441\u0438\u0441\u0442\u0435\u043C\u0430\u043C \u0438 \u0434\u0440\u0443\u0433\u0438\u043C \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0430\u043C';
+    displayName: '\u0417\u0430\u044F\u0432\u043A\u0430';
+    pluralName: 'inquiries';
+    singularName: 'inquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    comment: Schema.Attribute.Text & Schema.Attribute.Private;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerEmail: Schema.Attribute.Email & Schema.Attribute.Private;
+    customerName: Schema.Attribute.String & Schema.Attribute.Required;
+    customerPhone: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    inquiryStatus: Schema.Attribute.Enumeration<['new', 'processed']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'new'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::inquiry.inquiry'
+    > &
+      Schema.Attribute.Private;
+    modelInterest: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    source: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
   collectionName: 'orders';
   info: {
@@ -1727,6 +1766,7 @@ declare module '@strapi/strapi' {
       'api::conformity-page.conformity-page': ApiConformityPageConformityPage;
       'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;
       'api::home-page.home-page': ApiHomePageHomePage;
+      'api::inquiry.inquiry': ApiInquiryInquiry;
       'api::order.order': ApiOrderOrder;
       'api::product.product': ApiProductProduct;
       'api::products-page.products-page': ApiProductsPageProductsPage;

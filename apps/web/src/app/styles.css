@@ -290,6 +290,7 @@ a {
 
 .primary-nav a {
   padding-block: 1rem;
+  white-space: nowrap;
   text-decoration: none;
 }
 

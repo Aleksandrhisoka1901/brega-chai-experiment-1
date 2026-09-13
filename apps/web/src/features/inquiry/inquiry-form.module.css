@@ -1,0 +1,157 @@
+.section {
+  --inquiry-error: var(--status-error);
+
+  display: grid;
+  gap: 1.25rem;
+  max-width: 36rem;
+}
+
+.section h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--type-heading-2, 1.75rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--type-body-editorial, 1.05rem);
+  line-height: 1.6;
+}
+
+.form {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: var(--type-caption);
+}
+
+.field > span {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+.field select {
+  appearance: none;
+}
+
+.field textarea {
+  min-height: 5rem;
+  overflow-y: hidden;
+  resize: none;
+}
+
+.field :is(input, textarea, select)[aria-invalid="true"] {
+  border-color: var(--inquiry-error);
+}
+
+.field small,
+.checkbox small {
+  min-height: 1rem;
+  color: var(--inquiry-error);
+  line-height: 1.25;
+}
+
+.checkbox {
+  margin-top: 0.5rem;
+  font-size: var(--type-caption);
+}
+
+.checkboxLine {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  line-height: 1.45;
+}
+
+.checkbox input {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--text-primary);
+}
+
+.checkbox a {
+  color: inherit;
+}
+
+.submit {
+  width: 100%;
+  min-height: 3.25rem;
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border: 1px solid var(--text-primary);
+  background: var(--text-primary);
+  color: var(--surface-page);
+  font: inherit;
+  cursor: pointer;
+}
+
+.submit svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  animation: spin 800ms linear infinite;
+}
+
+.submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.submitError,
+.result {
+  margin: 0;
+  font-size: var(--type-caption);
+  line-height: 1.5;
+}
+
+.submitError {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: var(--inquiry-error);
+}
+
+.result {
+  color: var(--text-muted);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

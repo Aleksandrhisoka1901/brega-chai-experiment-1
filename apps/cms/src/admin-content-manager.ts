@@ -130,6 +130,34 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       list: ["id", "orderNumber", "idempotencyKey", "requestFingerprint"],
     },
   },
+  "api::inquiry.inquiry": {
+    layouts: {
+      edit: [
+        [
+          { name: "customerName", size: 6 },
+          { name: "customerPhone", size: 6 },
+        ],
+        [
+          { name: "customerEmail", size: 6 },
+          { name: "inquiryStatus", size: 6 },
+        ],
+        [
+          { name: "source", size: 6 },
+          { name: "modelInterest", size: 6 },
+        ],
+        [{ name: "comment", size: 12 }],
+      ],
+      list: [
+        "id",
+        "customerName",
+        "customerPhone",
+        "source",
+        "modelInterest",
+        "inquiryStatus",
+      ],
+    },
+    settings: { mainField: "customerName", defaultSortBy: "createdAt" },
+  },
   "api::product.product": {
     layouts: {
       edit: [

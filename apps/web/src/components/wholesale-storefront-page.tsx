@@ -7,6 +7,7 @@ import {
   breadcrumbStructuredData,
   collectionPageStructuredData,
 } from "@/lib/seo/structured-data";
+import { InquiryForm } from "@/features/inquiry/inquiry-form";
 import { WHOLESALE_PATH } from "@/lib/storefront-routes";
 import { CmsUnavailableError } from "@/server/cms/errors";
 import { getGlobalSettings } from "@/server/cms/global";
@@ -70,7 +71,17 @@ export async function WholesaleStorefrontPage() {
           url,
         })}
       />
-      <ArticleDetail article={page} breadcrumbs={breadcrumbs} />
+      <ArticleDetail
+        article={page}
+        breadcrumbs={breadcrumbs}
+        footer={
+          <InquiryForm
+            description="Напишите, какой объём и какие модели нужны — менеджер свяжется с вами в ближайшее время."
+            heading="Хотите узнать условия для опта?"
+            source={WHOLESALE_PATH}
+          />
+        }
+      />
     </main>
   );
 }
