@@ -24,6 +24,10 @@ test("accepts a storefront inquiry and rejects junk", () => {
     }).modelInterest,
     "FP115KWH",
   );
+  assert.throws(
+    () => parseInquiryInput({ ...valid, customerEmail: "not-an-email" }),
+    InquiryServiceError,
+  );
 
   assert.throws(
     () => parseInquiryInput({ ...valid, privacyConsent: false }),
