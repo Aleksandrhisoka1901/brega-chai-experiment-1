@@ -13,10 +13,15 @@ import {
 import styles from "./capability-page.module.css";
 
 export function CapabilityCompare() {
-  const [selectedId, setSelectedId] = useState<string>();
+  const [selectedId, setSelectedId] = useState(CAPABILITY_COLUMNS[0].id);
   const [formOpen, setFormOpen] = useState(false);
   const tableScrollRef = useRef<HTMLDivElement>(null);
-  const selected = CAPABILITY_COLUMNS.find((column) => column.id === selectedId);
+  const selected =
+    CAPABILITY_COLUMNS.find((column) => column.id === selectedId) ??
+    CAPABILITY_COLUMNS[0];
+  const activeIndex = CAPABILITY_COLUMNS.findIndex(
+    (column) => column.id === selected.id,
+  );
 
   useEffect(() => {
     if (!selectedId) return;
@@ -35,22 +40,15 @@ export function CapabilityCompare() {
     scroller.scrollTo({ left: Math.max(0, nextLeft), behavior: "smooth" });
   }, [selectedId]);
 
-  const chooseModel = (id: string, scrollToForm = false) => {
+  const chooseModel = (id: string) => {
     setSelectedId(id);
-    setFormOpen(true);
-    if (!scrollToForm) return;
-    window.requestAnimationFrame(() => {
-      document
-        .getElementById("inquiry")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
   };
 
   return (
     <>
       <div className={styles.models}>
         {CAPABILITY_COLUMNS.map((column) => {
-          const isSelected = column.id === selectedId;
+          const isSelected = column.id === selected.id;
           return (
             <button
               aria-pressed={isSelected}
@@ -58,7 +56,7 @@ export function CapabilityCompare() {
               data-selected={isSelected}
               key={column.id}
               type="button"
-              onClick={() => chooseModel(column.id, true)}
+              onClick={() => chooseModel(column.id)}
             >
               <img
                 alt={column.name}
@@ -82,6 +80,30 @@ export function CapabilityCompare() {
           );
         })}
       </div>
+      <section className={styles.mobileSpecs} aria-label="Характеристики">
+        <div className={styles.chips}>
+          {CAPABILITY_COLUMNS.map((column) => (
+            <button
+              aria-pressed={column.id === selected.id}
+              className={styles.chip}
+              data-selected={column.id === selected.id}
+              key={column.id}
+              type="button"
+              onClick={() => chooseModel(column.id)}
+            >
+              {column.name}
+            </button>
+          ))}
+        </div>
+        <dl className={styles.specList}>
+          {CAPABILITY_ROWS.map((row) => (
+            <div key={row.label}>
+              <dt>{bindShortRussianWords(row.label)}</dt>
+              <dd>{row.values[activeIndex]}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
       <div className={styles.scroll} ref={tableScrollRef}>
         <table className={styles.table}>
           <caption>
@@ -93,7 +115,7 @@ export function CapabilityCompare() {
             <tr>
               <th scope="col">Характеристика</th>
               {CAPABILITY_COLUMNS.map((column) => {
-                const isSelected = column.id === selectedId;
+                const isSelected = column.id === selected.id;
                 return (
                   <th
                     className={`${styles.model}${isSelected ? ` ${styles.selected}` : ""}`}
@@ -124,7 +146,7 @@ export function CapabilityCompare() {
                 </th>
                 {row.values.map((value, index) => {
                   const column = CAPABILITY_COLUMNS[index];
-                  const isSelected = column?.id === selectedId;
+                  const isSelected = column?.id === selected.id;
                   return (
                     <td
                       className={isSelected ? styles.selected : undefined}
@@ -149,7 +171,7 @@ export function CapabilityCompare() {
       </div>
       <InquiryForm
         collapsedByDefault
-        defaultModel={selected?.name ?? ""}
+        defaultModel={selected.name}
         expanded={formOpen}
         models={CAPABILITY_COLUMNS.map((column) => ({
           id: column.id,

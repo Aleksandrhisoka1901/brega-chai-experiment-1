@@ -177,6 +177,10 @@
   background: color-mix(in srgb, var(--text-primary) 8%, var(--surface-page));
 }
 
+.mobileSpecs {
+  display: none;
+}
+
 @media (max-width: 1100px) {
   .models {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -185,16 +189,78 @@
 
 @media (max-width: 767px) {
   .page {
-    gap: 1.5rem;
-    padding-block: 1.5rem 3.5rem;
+    gap: 1.25rem;
+    padding-block: 1.25rem 3rem;
   }
 
   .models {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 0.85rem;
   }
 
-  .rowLabel,
-  .table thead th:first-child {
-    min-width: 10.5rem;
+  .modelPhoto {
+    height: 6.25rem;
+  }
+
+  .modelBody {
+    padding-top: 0.5rem;
+  }
+
+  .scroll {
+    display: none;
+  }
+
+  .mobileSpecs {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .chips {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border-default);
+    background: var(--surface-page);
+    color: inherit;
+    font: inherit;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .chip[data-selected="true"] {
+    border-color: var(--text-primary);
+    background: var(--text-primary);
+    color: var(--surface-page);
+  }
+
+  .specList {
+    display: grid;
+    margin: 0;
+  }
+
+  .specList div {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--border-default);
+  }
+
+  .specList dt {
+    color: var(--text-muted);
+    font-size: var(--type-caption);
+  }
+
+  .specList dd {
+    margin: 0;
+    line-height: 1.45;
   }
 }
