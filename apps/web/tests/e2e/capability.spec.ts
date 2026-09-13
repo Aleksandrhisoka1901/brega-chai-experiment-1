@@ -26,6 +26,6 @@ test("/tipovye-resheniya shows the comparison table and inquiry form", async ({
   const form = page.locator("[data-inquiry-form]");
   await expect(form).toBeVisible();
   await expect(page.getByLabel("Email")).toHaveCount(0);
-  await form.getByRole("button", { name: /Хотите узнать подробности/ }).click();
+  await form.getByRole("button", { name: "Оставить заявку" }).click();
   await expect(page.getByLabel("Email")).toBeVisible();
 });

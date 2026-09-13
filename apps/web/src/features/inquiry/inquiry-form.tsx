@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutFieldLimits } from "@brega-chai/contracts";
-import { AlertCircle, ChevronDown, LoaderCircle } from "lucide-react";
+import { AlertCircle, LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -43,6 +43,7 @@ export function InquiryForm({
   heading = "Хотите узнать подробности?",
   description = "Оставьте контакты — с вами свяжется менеджер в ближайшее время.",
   submitLabel = "Отправить заявку",
+  toggleLabel = "Оставить заявку",
   models,
   defaultModel,
   collapsedByDefault = true,
@@ -56,6 +57,7 @@ export function InquiryForm({
   heading?: string;
   description?: string;
   submitLabel?: string;
+  toggleLabel?: string;
   models?: readonly InquiryFormModel[];
   defaultModel?: string;
   collapsedByDefault?: boolean;
@@ -145,22 +147,21 @@ export function InquiryForm({
       data-inquiry-form
       id={id}
     >
-      <button
-        aria-controls={`${id}-fields`}
-        aria-expanded={open}
-        className={styles.toggle}
-        type="button"
-        onClick={() => setOpen(!open)}
-      >
-        <span>
-          <strong>{bindShortRussianWords(heading)}</strong>
-          <span className={styles.toggleLead}>
-            {bindShortRussianWords(description)}
-          </span>
-        </span>
-        <ChevronDown aria-hidden="true" data-open={open} />
-      </button>
       {open ? (
+      <>
+      <header className={styles.panelHead}>
+        <div>
+          <h2>{bindShortRussianWords(heading)}</h2>
+          <p className={styles.lead}>{bindShortRussianWords(description)}</p>
+        </div>
+        <button
+          className={styles.collapse}
+          type="button"
+          onClick={() => setOpen(false)}
+        >
+          {bindShortRussianWords("Свернуть")}
+        </button>
+      </header>
       <form
         id={`${id}-fields`}
         className={styles.form}
@@ -321,7 +322,21 @@ export function InquiryForm({
           <span>{bindShortRussianWords(submitLabel)}</span>
         </button>
       </form>
-      ) : null}
+      </>
+      ) : (
+      <div className={styles.invite}>
+        <button
+          aria-controls={`${id}-fields`}
+          aria-expanded={false}
+          className={styles.cta}
+          type="button"
+          onClick={() => setOpen(true)}
+        >
+          {bindShortRussianWords(toggleLabel)}
+        </button>
+        <p className={styles.caption}>{bindShortRussianWords(description)}</p>
+      </div>
+      )}
     </section>
   );
 }

@@ -6,8 +6,7 @@
   max-width: 36rem;
 }
 
-.section h2,
-.toggle strong {
+.section h2 {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--type-heading-2, 1.75rem);
@@ -16,22 +15,38 @@
   line-height: 1.2;
 }
 
-.toggle {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
+.invite {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+
+.cta,
+.submit {
+  min-height: 3.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border: 1px solid var(--text-primary);
+  background: var(--text-primary);
+  color: var(--surface-page);
   font: inherit;
-  text-align: left;
   cursor: pointer;
 }
 
-.toggleLead,
+.cta {
+  min-width: 14.5rem;
+  padding: 0.85rem 1.5rem;
+}
+
+.cta:hover,
+.submit:hover:not(:disabled) {
+  background: var(--action-primary-hover);
+  border-color: var(--action-primary-hover);
+}
+
+.caption,
 .lead {
   margin: 0;
   color: var(--text-muted);
@@ -39,21 +54,38 @@
   line-height: 1.6;
 }
 
-.toggleLead {
-  display: block;
+.caption {
+  max-width: 28rem;
+  font-size: var(--type-body-ui);
+}
+
+.panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panelHead .lead {
   margin-top: 0.5rem;
 }
 
-.toggle svg {
+.collapse {
   flex: 0 0 auto;
-  width: 1.5rem;
-  height: 1.5rem;
   margin-top: 0.35rem;
-  transition: transform 180ms ease;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--type-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
-.toggle svg[data-open="true"] {
-  transform: rotate(180deg);
+.collapse:hover {
+  color: var(--text-primary);
 }
 
 .form {
@@ -142,17 +174,7 @@
 
 .submit {
   width: 100%;
-  min-height: 3.25rem;
   margin-top: 0.75rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  border: 1px solid var(--text-primary);
-  background: var(--text-primary);
-  color: var(--surface-page);
-  font: inherit;
-  cursor: pointer;
 }
 
 .submit svg {

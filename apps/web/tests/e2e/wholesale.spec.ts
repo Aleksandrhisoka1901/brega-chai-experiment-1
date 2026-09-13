@@ -14,7 +14,7 @@ test("/dlya-optovikov renders the wholesale landing", async ({ page }) => {
   const form = page.locator("[data-inquiry-form]");
   await expect(form).toBeVisible();
   await expect(
-    form.getByRole("button", { name: /Хотите узнать условия для опта/ }),
+    form.getByRole("button", { name: "Оставить заявку" }),
   ).toBeVisible();
 });
 
