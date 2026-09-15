@@ -1,5 +1,9 @@
 export const YANDEX_METRIKA_COUNTER_ID = 112496290;
 
+export const YANDEX_METRIKA_SCRIPT_URL = `https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_COUNTER_ID}`;
+
+export const YANDEX_METRIKA_WATCH_URL = `https://mc.yandex.ru/watch/${YANDEX_METRIKA_COUNTER_ID}`;
+
 export const METRIKA_GOALS = {
   inquirySubmit: "inquiry_submit",
   telegramClick: "telegram_click",

@@ -10,9 +10,7 @@ import {
   ANALYTICS_CONSENT_VALUES,
   type AnalyticsConsent as AnalyticsConsentValue,
   parseAnalyticsConsent,
-  shouldLoadAnalytics,
 } from "./consent";
-import { YandexMetrika } from "./yandex-metrika";
 
 const readStoredConsent = () => {
   try {
@@ -55,14 +53,6 @@ export function AnalyticsConsent() {
 
   return (
     <>
-      {consent === ANALYTICS_CONSENT_VALUES.accepted &&
-      shouldLoadAnalytics({
-        hostname: typeof window === "undefined" ? "" : window.location.hostname,
-        nodeEnv: process.env.NODE_ENV,
-      }) ? (
-        <YandexMetrika />
-      ) : null}
-
       {isReady && consent === null ? (
         <aside
           aria-labelledby="analytics-consent-title"

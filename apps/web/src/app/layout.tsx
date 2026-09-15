@@ -7,6 +7,8 @@ import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { AnalyticsConsent } from "@/features/analytics/analytics-consent";
+import { YandexMetrika } from "@/features/analytics/yandex-metrika";
+import { YandexMetrikaSnippet } from "@/features/analytics/yandex-metrika-snippet";
 import { indexingMetadata } from "@/lib/seo/indexing";
 import { siteOrigin } from "@/lib/seo/metadata";
 import { bindShortRussianWords } from "@/lib/typography";
@@ -110,6 +112,8 @@ export default async function RootLayout({
           {children}
         </div>
         {settings ? <SiteFooter settings={settings} /> : null}
+        <YandexMetrikaSnippet />
+        <YandexMetrika />
         <AnalyticsConsent />
       </body>
     </html>

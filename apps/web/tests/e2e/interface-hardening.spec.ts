@@ -48,7 +48,15 @@ test("browser chrome matches the storefront surface", async ({ page }) => {
 
   const legacyFavicon = await page.request.get("/favicon.ico");
   expect(legacyFavicon.ok()).toBe(true);
-  const legacyBody = await legacyFavicon.text();
-  expect(legacyBody).toContain("<svg");
-  expect(legacyBody).toContain("#24251e");
+  expect(legacyFavicon.headers()["content-type"]).toMatch(
+    /image\/(x-icon|vnd\.microsoft\.icon|ico)/i,
+  );
+  const legacyBody = Buffer.from(await legacyFavicon.body());
+  expect(legacyBody.subarray(0, 4).equals(Buffer.from([0, 0, 1, 0]))).toBe(
+    true,
+  );
+
+  const appleTouchIcon = await page.request.get("/apple-touch-icon.png");
+  expect(appleTouchIcon.ok()).toBe(true);
+  expect(appleTouchIcon.headers()["content-type"]).toContain("image/png");
 });
