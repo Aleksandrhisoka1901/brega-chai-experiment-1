@@ -15,11 +15,19 @@ test("public robots.txt stays within the CMS field limit and keeps search crawle
   assert.match(content, /Allow: \/\*\?page=/);
   assert.match(content, /Disallow: \/api\//);
   assert.match(content, /Disallow: \/legal\/privacy\.pdf/);
+  assert.match(content, /User-agent: Yandex\nAllow: \//);
+  assert.match(content, /User-agent: YandexBot\nAllow: \//);
   assert.match(content, /Host: https:\/\/lon-energy\.ru/);
   assert.match(content, /Sitemap: https:\/\/lon-energy\.ru\/sitemap\.xml/);
+  assert.doesNotMatch(content, /Disallow: \/\*\?\*\n/);
   assert.doesNotMatch(content, /Disallow: \/\*%/);
   assert.doesNotMatch(content, /User-agent: Bot\n/);
   assert.doesNotMatch(content, /Disallow: \/legal\/\n/);
+  assert.equal(
+    content.indexOf("Host: https://lon-energy.ru") <
+      content.indexOf("User-agent: AhrefsBot"),
+    true,
+  );
 
   for (const crawler of PUBLIC_ROBOTS_SEARCH_CRAWLER_USER_AGENTS) {
     const lowerCrawler = crawler.toLowerCase();

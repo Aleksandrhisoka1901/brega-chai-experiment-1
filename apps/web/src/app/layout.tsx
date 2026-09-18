@@ -14,6 +14,7 @@ import { siteOrigin } from "@/lib/seo/metadata";
 import { bindShortRussianWords } from "@/lib/typography";
 import {
   organizationStructuredData,
+  streetAddressFromPickup,
   websiteStructuredData,
 } from "@/lib/seo/structured-data";
 import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
@@ -74,6 +75,9 @@ export default async function RootLayout({
           data={organizationStructuredData(
             siteOrigin(),
             settings?.brandName ?? BRAND_NAME,
+            {
+              streetAddress: streetAddressFromPickup(settings?.pickupAddress),
+            },
           )}
         />
         <JsonLd

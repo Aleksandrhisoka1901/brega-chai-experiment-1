@@ -6,6 +6,7 @@ import {
   organizationStructuredData,
   productStructuredData,
   serializeJsonLd,
+  streetAddressFromPickup,
   websiteStructuredData,
 } from "./structured-data.ts";
 
@@ -109,5 +110,21 @@ test("uses the CMS brand name for organization and website identity", () => {
   assert.equal(
     websiteStructuredData("https://brega.example", "Брега").name,
     "Брега",
+  );
+});
+
+test("puts a Moscow postal address into organization JSON-LD", () => {
+  const data = organizationStructuredData("https://lon-energy.ru", "LonEnergy", {
+    streetAddress: streetAddressFromPickup(
+      "Самовывоз осуществляется по адресу: г. Москва, проезд Серебрякова, д. 14, стр. 6.",
+    ),
+  });
+
+  assert.equal(data.address["@type"], "PostalAddress");
+  assert.equal(data.address.addressLocality, "Москва");
+  assert.equal(data.address.addressCountry, "RU");
+  assert.equal(
+    data.address.streetAddress,
+    "проезд Серебрякова, д. 14, стр. 6.",
   );
 });

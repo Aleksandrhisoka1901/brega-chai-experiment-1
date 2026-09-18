@@ -49,13 +49,37 @@ export function breadcrumbStructuredData(
   };
 }
 
-export function organizationStructuredData(origin: string, brandName: string) {
+export function organizationStructuredData(
+  origin: string,
+  brandName: string,
+  address?: {
+    streetAddress?: string;
+    addressLocality?: string;
+    addressCountry?: string;
+  },
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: brandName,
     url: origin,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: address?.addressLocality ?? "Москва",
+      addressCountry: address?.addressCountry ?? "RU",
+      ...(address?.streetAddress
+        ? { streetAddress: address.streetAddress }
+        : {}),
+    },
   };
+}
+
+export function streetAddressFromPickup(pickupAddress?: string | null) {
+  if (!pickupAddress?.trim()) return "проезд Серебрякова, д. 14, стр. 6";
+  return pickupAddress
+    .replace(/^самовывоз осуществляется по адресу:\s*/i, "")
+    .replace(/^г\.\s*москва,\s*/i, "")
+    .trim();
 }
 
 export function websiteStructuredData(origin: string, brandName: string) {

@@ -140,6 +140,9 @@ export function publicRobotsContent(
     (name) => `User-agent: ${name}\nDisallow: /`,
   ).join("\n\n");
 
+  const cleanParam =
+    "utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&ysclid&ymclid&gclid&fbclid&erid&etext&from&openstat&_ym_debug&minPrice&maxPrice";
+
   return `User-agent: *
 Allow: /
 
@@ -154,46 +157,33 @@ Disallow: /*?maxPrice=
 Disallow: /*?*minPrice=
 Disallow: /*?*maxPrice=
 
-Disallow: /?amp
-Disallow: /?at=
-Disallow: /?clckid=
-Disallow: /?disable
-Disallow: /*?erid=
-Disallow: /*?etext=
-Disallow: /?fbclid=
-Disallow: /*?muid=
-Disallow: /?peer_id=
-Disallow: /?r=
-Disallow: /*?ybaip=
 Disallow: /?utm_
 Disallow: /*?utm_
 Disallow: /*?*utm_
 Disallow: /*&utm_
-Disallow: /?gclid=
 Disallow: /?yclid=
 Disallow: /*?yclid=
 Disallow: /?ymclid=
-Disallow: /?openstat=
-Disallow: /?from=
-Disallow: /?returnUrl=
-Disallow: /?schema=
-Disallow: /?spm=
-Disallow: /?subscription_unsub=
-Disallow: /*?yprqee=
+Disallow: /?gclid=
+Disallow: /?fbclid=
+Disallow: /*?erid=
 Disallow: /*?ysclid=
-Disallow: /?__ym_debug=
-Disallow: /?_ym_debug=
-Disallow: /?_ym_
-Disallow: /?live_unsub=
 
-Disallow: /*?*
 Allow: /*?page=
 
-Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&ysclid&ymclid&gclid&fbclid&erid&etext&from&openstat&_ym_debug&minPrice&maxPrice
-
-${blocked}
+Clean-param: ${cleanParam}
 
 Host: ${origin}
 Sitemap: ${origin}/sitemap.xml
+
+User-agent: Yandex
+Allow: /
+Clean-param: ${cleanParam}
+Host: ${origin}
+
+User-agent: YandexBot
+Allow: /
+
+${blocked}
 `;
 }
