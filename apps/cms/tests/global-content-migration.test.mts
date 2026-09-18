@@ -87,3 +87,47 @@ test("global content migration leaves complete settings untouched", async () => 
   await ensureGlobalContentDefaults(strapi);
   assert.equal(updateCount, 0);
 });
+
+test("renames leftover Voltora brand to LonEnergy", async () => {
+  const updates: unknown[] = [];
+  const strapi = {
+    documents() {
+      return {
+        async findMany() {
+          return [
+            {
+              documentId: "settings",
+              brandName: "Voltora",
+              maxItemQuantity: 8,
+              sectionBreadcrumbs: [
+                { route: "stantsii", label: "Каталог" },
+                { route: "paneli", label: "Коллекции" },
+              ],
+              storefrontTexts: {
+                imagePlaceholder: "Скоро",
+                outOfStock: "Закончилось",
+              },
+            },
+          ];
+        },
+        async update(input: unknown) {
+          updates.push(input);
+        },
+      };
+    },
+  };
+
+  await ensureGlobalContentDefaults(strapi);
+  assert.deepEqual(updates, [
+    {
+      documentId: "settings",
+      status: "draft",
+      data: { brandName: "LonEnergy" },
+    },
+    {
+      documentId: "settings",
+      status: "published",
+      data: { brandName: "LonEnergy" },
+    },
+  ]);
+});

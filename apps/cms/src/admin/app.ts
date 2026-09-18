@@ -203,6 +203,23 @@ const adminApp = {
         "content-manager.content-types.api::wholesale-page.wholesale-page.seo":
           "SEO-настройки",
 
+        "content-manager.content-types.api::capability-page.capability-page.eyebrow":
+          "Надстрочник",
+        "content-manager.content-types.api::capability-page.capability-page.title":
+          "Заголовок",
+        "content-manager.content-types.api::capability-page.capability-page.lead":
+          "Вступление",
+        "content-manager.content-types.api::capability-page.capability-page.note":
+          "Пояснение",
+        "content-manager.content-types.api::capability-page.capability-page.tableTitle":
+          "Заголовок таблицы",
+        "content-manager.content-types.api::capability-page.capability-page.models":
+          "Лента моделей",
+        "content-manager.content-types.api::capability-page.capability-page.specRows":
+          "Сравнительная таблица",
+        "content-manager.content-types.api::capability-page.capability-page.seo":
+          "SEO-настройки",
+
         "content-manager.content-types.api::conformity-page.conformity-page.title":
           "Заголовок",
         "content-manager.content-types.api::conformity-page.conformity-page.eyebrow":

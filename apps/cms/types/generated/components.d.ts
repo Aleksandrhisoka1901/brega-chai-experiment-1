@@ -522,6 +522,43 @@ export interface SharedSeo extends Struct.ComponentSchema {
   };
 }
 
+export interface CapabilityModel extends Struct.ComponentSchema {
+  collectionName: 'components_capability_models';
+  info: {
+    description: '\u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0430 \u0432 \u043B\u0435\u043D\u0442\u0435: \u0444\u043E\u0442\u043E, \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0438 \u043A\u043E\u0440\u043E\u0442\u043A\u043E\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0435';
+    displayName: '\u041C\u043E\u0434\u0435\u043B\u044C \u0441\u0438\u0441\u0442\u0435\u043C\u044B \u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F';
+  };
+  attributes: {
+    description: Schema.Attribute.String & Schema.Attribute.Required;
+    image: Schema.Attribute.Media<'images'>;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    productModel: Schema.Attribute.String;
+    slug: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface CapabilitySpecCell extends Struct.ComponentSchema {
+  collectionName: 'components_capability_spec_cells';
+  info: {
+    displayName: '\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435 \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043A\u0438';
+  };
+  attributes: {
+    value: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface CapabilitySpecRow extends Struct.ComponentSchema {
+  collectionName: 'components_capability_spec_rows';
+  info: {
+    displayName: '\u0421\u0442\u0440\u043E\u043A\u0430 \u0442\u0430\u0431\u043B\u0438\u0446\u044B';
+  };
+  attributes: {
+    cells: Schema.Attribute.Component<'capability.spec-cell', true> &
+      Schema.Attribute.Required;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedStorefrontTexts extends Struct.ComponentSchema {
   collectionName: 'components_shared_storefront_texts';
   info: {
@@ -549,6 +586,9 @@ declare module '@strapi/strapi' {
       'article.cards-grid': ArticleCardsGrid;
       'article.related-article': ArticleRelatedArticle;
       'article.related-product': ArticleRelatedProduct;
+      'capability.model': CapabilityModel;
+      'capability.spec-cell': CapabilitySpecCell;
+      'capability.spec-row': CapabilitySpecRow;
       'home.articles-preview': HomeArticlesPreview;
       'home.catalog-preview': HomeCatalogPreview;
       'home.editorial-section': HomeEditorialSection;

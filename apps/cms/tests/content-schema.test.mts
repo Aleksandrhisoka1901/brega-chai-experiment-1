@@ -379,6 +379,24 @@ test("article catalog uses draft/publish, generated slug and cards-grid blocks",
   assert.equal(navigation.attributes.stati.required, true);
 });
 
+test("capability page stores the model strip and comparison table", async () => {
+  const page = await schema(
+    "src/api/capability-page/content-types/capability-page/schema.json",
+  );
+  const model = await schema("src/components/capability/model.json");
+  const specRow = await schema("src/components/capability/spec-row.json");
+
+  assert.equal(page.kind, "singleType");
+  assert.equal(page.options?.draftAndPublish, true);
+  assert.equal(page.attributes.title.required, true);
+  assert.equal(page.attributes.models.component, "capability.model");
+  assert.equal(page.attributes.specRows.component, "capability.spec-row");
+  assert.equal(model.attributes.name.required, true);
+  assert.equal(model.attributes.description.required, true);
+  assert.deepEqual(model.attributes.image.allowedTypes, ["images"]);
+  assert.equal(specRow.attributes.cells.component, "capability.spec-cell");
+});
+
 test("wholesale page reuses article cards-grid blocks", async () => {
   const page = await schema(
     "src/api/wholesale-page/content-types/wholesale-page/schema.json",

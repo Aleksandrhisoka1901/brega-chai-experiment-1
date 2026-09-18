@@ -5,22 +5,30 @@ import { useEffect, useRef, useState } from "react";
 import { InquiryForm } from "@/features/inquiry/inquiry-form";
 import { CAPABILITY_PATH } from "@/lib/storefront-routes";
 import { bindShortRussianWords } from "@/lib/typography";
-import {
-  CAPABILITY_COLUMNS,
-  CAPABILITY_ROWS,
+import type {
+  CapabilityColumn,
+  CapabilityRow,
 } from "@/server/capability-models";
 
 import styles from "./capability-page.module.css";
 
-export function CapabilityCompare() {
-  const [selectedId, setSelectedId] = useState(CAPABILITY_COLUMNS[0].id);
+export function CapabilityCompare({
+  models,
+  rows,
+  tableTitle,
+}: {
+  models: readonly CapabilityColumn[];
+  rows: readonly CapabilityRow[];
+  tableTitle: string;
+}) {
+  const [selectedId, setSelectedId] = useState(models[0]?.id ?? "");
   const [formOpen, setFormOpen] = useState(false);
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const selected =
-    CAPABILITY_COLUMNS.find((column) => column.id === selectedId) ??
-    CAPABILITY_COLUMNS[0];
-  const activeIndex = CAPABILITY_COLUMNS.findIndex(
-    (column) => column.id === selected.id,
+    models.find((column) => column.id === selectedId) ?? models[0];
+  const activeIndex = Math.max(
+    0,
+    models.findIndex((column) => column.id === selected?.id),
   );
 
   useEffect(() => {
@@ -40,6 +48,8 @@ export function CapabilityCompare() {
     scroller.scrollTo({ left: Math.max(0, nextLeft), behavior: "smooth" });
   }, [selectedId]);
 
+  if (!selected) return null;
+
   const chooseModel = (id: string) => {
     setSelectedId(id);
   };
@@ -47,7 +57,7 @@ export function CapabilityCompare() {
   return (
     <>
       <div className={styles.models}>
-        {CAPABILITY_COLUMNS.map((column) => {
+        {models.map((column) => {
           const isSelected = column.id === selected.id;
           return (
             <button
@@ -67,10 +77,7 @@ export function CapabilityCompare() {
               />
               <span className={styles.modelBody}>
                 <strong>{column.name}</strong>
-                <span>
-                  {column.capacity}
-                  {column.power ? ` · ${column.power}` : ""}
-                </span>
+                <span>{column.description}</span>
                 <small>{column.productModel}</small>
                 <em className={styles.chosen} data-hidden={!isSelected}>
                   Выбрано
@@ -82,7 +89,7 @@ export function CapabilityCompare() {
       </div>
       <section className={styles.mobileSpecs} aria-label="Характеристики">
         <div className={styles.chips}>
-          {CAPABILITY_COLUMNS.map((column) => (
+          {models.map((column) => (
             <button
               aria-pressed={column.id === selected.id}
               className={styles.chip}
@@ -96,7 +103,7 @@ export function CapabilityCompare() {
           ))}
         </div>
         <dl className={styles.specList}>
-          {CAPABILITY_ROWS.map((row) => (
+          {rows.map((row) => (
             <div key={row.label}>
               <dt>{bindShortRussianWords(row.label)}</dt>
               <dd>{row.values[activeIndex]}</dd>
@@ -106,14 +113,14 @@ export function CapabilityCompare() {
       </section>
       <section className={styles.tableBlock} aria-labelledby="capability-table-title">
         <h2 className={styles.tableTitle} id="capability-table-title">
-          {bindShortRussianWords("Сравнительная таблица аккумуляторных систем")}
+          {bindShortRussianWords(tableTitle)}
         </h2>
         <div className={styles.scroll} ref={tableScrollRef}>
         <table className={styles.table}>
           <thead>
             <tr>
               <th scope="col">Характеристика</th>
-              {CAPABILITY_COLUMNS.map((column) => {
+              {models.map((column) => {
                 const isSelected = column.id === selected.id;
                 return (
                   <th
@@ -138,13 +145,13 @@ export function CapabilityCompare() {
             </tr>
           </thead>
           <tbody>
-            {CAPABILITY_ROWS.map((row) => (
+            {rows.map((row) => (
               <tr key={row.label}>
                 <th className={styles.rowLabel} scope="row">
                   {bindShortRussianWords(row.label)}
                 </th>
                 {row.values.map((value, index) => {
-                  const column = CAPABILITY_COLUMNS[index];
+                  const column = models[index];
                   const isSelected = column?.id === selected.id;
                   return (
                     <td
@@ -173,15 +180,15 @@ export function CapabilityCompare() {
         collapsedByDefault
         defaultModel={selected.name}
         expanded={formOpen}
-        models={CAPABILITY_COLUMNS.map((column) => ({
+        models={models.map((column) => ({
           id: column.id,
           name: column.name,
         }))}
         source={CAPABILITY_PATH}
         onExpandedChange={setFormOpen}
         onModelChange={(name) => {
-          const match = CAPABILITY_COLUMNS.find((column) => column.name === name);
-          setSelectedId(match?.id);
+          const match = models.find((column) => column.name === name);
+          if (match) setSelectedId(match.id);
         }}
       />
     </>

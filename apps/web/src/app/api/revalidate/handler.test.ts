@@ -164,6 +164,18 @@ test("maps wholesale page to its storefront route", async () => {
   assert.deepEqual(paths, [["/dlya-optovikov", "page"]]);
 });
 
+test("maps capability page to its storefront route", async () => {
+  const { dependencies, tags, paths } = harness();
+  const response = await handleRevalidation(
+    signedRequest({ id: "evt-capability", event: "capability" }),
+    dependencies,
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(tags, ["capability-page"]);
+  assert.deepEqual(paths, [["/tipovye-resheniya", "page"]]);
+});
+
 test("maps conformity page to its storefront route", async () => {
   const { dependencies, tags, paths } = harness();
   const response = await handleRevalidation(
@@ -196,7 +208,7 @@ test("media updates invalidate every CMS image consumer", async () => {
   );
 
   assert.equal(response.status, 200);
-  assert.deepEqual(tags, ["home", "global", "products", "articles", "articles-page", "wholesale-page", "conformity-page"]);
+  assert.deepEqual(tags, ["home", "global", "products", "articles", "articles-page", "wholesale-page", "capability-page", "conformity-page"]);
   assert.deepEqual(paths, [
     ["/", "layout"],
     ["/", "page"],
@@ -207,6 +219,7 @@ test("media updates invalidate every CMS image consumer", async () => {
     ["/stati", "page"],
     ["/stati/[slug]", "page"],
     ["/dlya-optovikov", "page"],
+    ["/tipovye-resheniya", "page"],
     ["/legal/deklaraciya-sootvetstviya", "page"],
   ]);
 });

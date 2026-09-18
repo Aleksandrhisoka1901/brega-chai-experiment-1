@@ -2,6 +2,7 @@ type DocumentStatus = "draft" | "published";
 
 type GlobalSettingDocument = {
   documentId: string;
+  brandName?: string | null;
   maxItemQuantity?: number | null;
   sectionBreadcrumbs?: Array<{
     route: "stantsii" | "paneli" | "stati";
@@ -12,6 +13,8 @@ type GlobalSettingDocument = {
     outOfStock?: string;
   };
 };
+
+const LEGACY_BRAND_NAMES = new Set(["Voltora", "Brega Chai", "Brega"]);
 
 const DEFAULT_BREADCRUMBS = [
   { route: "stantsii" as const, label: "Электростанции" },
@@ -34,6 +37,12 @@ export async function ensureGlobalContentDefaults(strapi: any) {
 
     for (const setting of settings) {
       const data: Partial<GlobalSettingDocument> = {};
+      if (
+        setting.brandName &&
+        LEGACY_BRAND_NAMES.has(setting.brandName.trim())
+      ) {
+        data.brandName = "LonEnergy";
+      }
       if (!setting.maxItemQuantity) {
         data.maxItemQuantity = 5;
       }

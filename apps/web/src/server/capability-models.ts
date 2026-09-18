@@ -3,13 +3,22 @@ export type CapabilityColumn = {
   name: string;
   productModel: string;
   image: string;
-  capacity: string;
-  power: string;
+  description: string;
 };
 
 export type CapabilityRow = {
   label: string;
-  values: readonly [string, string, string, string];
+  values: readonly string[];
+};
+
+export type CapabilityPageContent = {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  note: string;
+  tableTitle: string;
+  models: CapabilityColumn[];
+  rows: CapabilityRow[];
 };
 
 export const CAPABILITY_PAGE = {
@@ -17,7 +26,12 @@ export const CAPABILITY_PAGE = {
   title: "Коммерческая и промышленная система хранения энергии",
   lead: "Цен на этой странице нет: это ориентиры по характеристикам. С такими параметрами мы можем выпускать системы под ваш объект — мощность, ёмкость и комплектацию согласуем отдельно.",
   note: "Характеристики сведены из предоставленных данных. Итоговая спецификация фиксируется в коммерческом предложении.",
+  tableTitle: "Сравнительная таблица аккумуляторных систем",
 } as const;
+
+export function fallbackCapabilityImage(slug: string) {
+  return `/capability/${slug}.png`;
+}
 
 export const CAPABILITY_COLUMNS = [
   {
@@ -25,32 +39,28 @@ export const CAPABILITY_COLUMNS = [
     name: "FP115KWH",
     productModel: "FP115KWH",
     image: "/capability/fp115.png",
-    capacity: "115,2 кВт·ч",
-    power: "50 кВт",
+    description: "115,2 кВт·ч · 50 кВт",
   },
   {
     id: "fp215",
     name: "FP215KWH",
     productModel: "CT-ES-215/AC",
     image: "/capability/fp215.png",
-    capacity: "215 кВт·ч",
-    power: "100 кВт",
+    description: "215 кВт·ч · 100 кВт",
   },
   {
     id: "fp3350",
     name: "FP3.35МВтч",
     productModel: "CT-ES-3.35МВтч/AC",
     image: "/capability/fp3350.png",
-    capacity: "3,35 МВт·ч",
-    power: "Контейнер 20GP",
+    description: "3,35 МВт·ч · Контейнер 20GP",
   },
   {
     id: "fp40",
     name: "FP40КВтч",
     productModel: "CT-ES-40/AC",
     image: "/capability/fp40.png",
-    capacity: "40 кВт·ч",
-    power: "20 кВт",
+    description: "40 кВт·ч · 20 кВт",
   },
 ] as const satisfies readonly CapabilityColumn[];
 
@@ -236,6 +246,19 @@ export const CAPABILITY_ROWS = [
     values: ["1500 кг", "2000 кг", "≤35 т", "Около 750 кг"],
   },
 ] as const satisfies readonly CapabilityRow[];
+
+export const FALLBACK_CAPABILITY_PAGE: CapabilityPageContent = {
+  eyebrow: CAPABILITY_PAGE.eyebrow,
+  title: CAPABILITY_PAGE.title,
+  lead: CAPABILITY_PAGE.lead,
+  note: CAPABILITY_PAGE.note,
+  tableTitle: CAPABILITY_PAGE.tableTitle,
+  models: CAPABILITY_COLUMNS.map((column) => ({ ...column })),
+  rows: CAPABILITY_ROWS.map((row) => ({
+    label: row.label,
+    values: [...row.values],
+  })),
+};
 
 const PRICE_LIKE = /(?:^|\s)(?:\d[\d\s]*[.,]?\d*)\s*(?:₽|руб|RUB)/i;
 

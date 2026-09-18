@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_capability_spec_cells",
+  "info": {
+    "displayName": "Значение характеристики",
+    "description": "Одно значение в строке сравнительной таблицы. Порядок значений должен совпадать с порядком моделей в ленте."
+  },
+  "attributes": {
+    "value": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    }
+  }
+}

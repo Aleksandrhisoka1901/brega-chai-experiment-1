@@ -81,7 +81,9 @@ export function InquiryForm({
   const [internalOpen, setInternalOpen] = useState(!collapsedByDefault);
   const [isPreparing, setIsPreparing] = useState(false);
   const submittingRef = useRef(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const open = expanded ?? internalOpen;
+  const wasOpen = useRef(open);
   const setOpen = onExpandedChange ?? setInternalOpen;
   const {
     register,
@@ -126,12 +128,25 @@ export function InquiryForm({
     };
   }, [inquiryClient, open]);
 
+  useEffect(() => {
+    const justOpened = open && !wasOpen.current;
+    wasOpen.current = open;
+    if (!justOpened) return;
+
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const frame = window.requestAnimationFrame(() => {
+      setFocus(models && models.length > 0 ? "modelInterest" : "name");
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, models, setFocus]);
+
   if (result?.type === "success") {
     return (
       <section
         className={`${styles.section}${className ? ` ${className}` : ""}`}
         data-inquiry-form
         id={id}
+        ref={sectionRef}
       >
         <h2>{bindShortRussianWords(heading)}</h2>
         <p className={styles.result} role="status">
@@ -146,6 +161,7 @@ export function InquiryForm({
       className={`${styles.section}${className ? ` ${className}` : ""}`}
       data-inquiry-form
       id={id}
+      ref={sectionRef}
     >
       {open ? (
       <>

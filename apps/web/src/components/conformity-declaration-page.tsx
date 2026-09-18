@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { CONFORMITY_PATH } from "@/lib/storefront-routes";
 import { bindShortRussianWords } from "@/lib/typography";
@@ -35,7 +36,7 @@ export async function conformityPageMetadata(): Promise<Metadata> {
   return pageMetadata({
     title:
       page.seo?.title ??
-      `${page.title} — ${settings?.brandName ?? "Voltora"}`,
+      `${page.title} — ${settings?.brandName ?? BRAND_NAME}`,
     description:
       page.seo?.description ??
       settings?.defaultSeo.description ??

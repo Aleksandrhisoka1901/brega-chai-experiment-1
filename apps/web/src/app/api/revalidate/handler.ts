@@ -23,7 +23,7 @@ export interface RevalidationDependencies {
 type RevalidationEvent =
   | {
       id: string;
-      event: "home" | "global" | "products" | "media" | "articles" | "wholesale" | "conformity";
+      event: "home" | "global" | "products" | "media" | "articles" | "wholesale" | "capability" | "conformity";
       action: "publish" | "update" | "unpublish";
       occurredAt: string;
     }
@@ -104,6 +104,7 @@ function parseEvent(value: unknown): RevalidationEvent | undefined {
     body.event === "media" ||
     body.event === "articles" ||
     body.event === "wholesale" ||
+    body.event === "capability" ||
     body.event === "conformity"
   ) {
     return hasExactKeys(body, ["action", "event", "id", "occurredAt"])
@@ -222,6 +223,8 @@ function invalidate(
     revalidatePath("/stati/[slug]", "page");
     revalidateTag("wholesale-page");
     revalidatePath("/dlya-optovikov", "page");
+    revalidateTag("capability-page");
+    revalidatePath("/tipovye-resheniya", "page");
     revalidateTag("conformity-page");
     revalidatePath("/legal/deklaraciya-sootvetstviya", "page");
     return;
@@ -237,6 +240,12 @@ function invalidate(
   if (event.event === "wholesale") {
     revalidateTag("wholesale-page");
     revalidatePath("/dlya-optovikov", "page");
+    return;
+  }
+
+  if (event.event === "capability") {
+    revalidateTag("capability-page");
+    revalidatePath("/tipovye-resheniya", "page");
     return;
   }
 

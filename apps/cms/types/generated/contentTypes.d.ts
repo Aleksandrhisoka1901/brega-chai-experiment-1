@@ -1125,6 +1125,49 @@ export interface ApiWholesalePageWholesalePage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiCapabilityPageCapabilityPage
+  extends Struct.SingleTypeSchema {
+  collectionName: 'capability_pages';
+  info: {
+    description: 'Capability systems page';
+    displayName: 'Energy storage systems';
+    pluralName: 'capability-pages';
+    singularName: 'capability-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    eyebrow: Schema.Attribute.String;
+    lead: Schema.Attribute.Text & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::capability-page.capability-page'
+    > &
+      Schema.Attribute.Private;
+    models: Schema.Attribute.Component<'capability.model', true> &
+      Schema.Attribute.Required;
+    note: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
+    specRows: Schema.Attribute.Component<'capability.spec-row', true> &
+      Schema.Attribute.Required;
+    tableTitle: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1765,6 +1808,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::article.article': ApiArticleArticle;
       'api::articles-page.articles-page': ApiArticlesPageArticlesPage;
+      'api::capability-page.capability-page': ApiCapabilityPageCapabilityPage;
       'api::conformity-page.conformity-page': ApiConformityPageConformityPage;
       'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;
       'api::home-page.home-page': ApiHomePageHomePage;

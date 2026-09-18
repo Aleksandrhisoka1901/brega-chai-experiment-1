@@ -290,6 +290,55 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
       list: ["id", "title", "updatedAt"],
     },
   },
+  "api::capability-page.capability-page": {
+    layouts: {
+      edit: [
+        [
+          { name: "eyebrow", size: 4 },
+          { name: "title", size: 8 },
+        ],
+        [{ name: "lead", size: 12 }],
+        [{ name: "note", size: 12 }],
+        [{ name: "models", size: 12 }],
+        [{ name: "tableTitle", size: 12 }],
+        [{ name: "specRows", size: 12 }],
+        [{ name: "seo", size: 12 }],
+      ],
+      list: ["id", "title", "updatedAt"],
+    },
+  },
+  "capability.model": {
+    layouts: {
+      edit: [
+        [
+          { name: "slug", size: 4 },
+          { name: "name", size: 8 },
+        ],
+        [{ name: "description", size: 12 }],
+        [{ name: "productModel", size: 12 }],
+        [{ name: "image", size: 12 }],
+      ],
+      list: ["id", "name", "slug", "description"],
+    },
+    settings: { mainField: "name", defaultSortBy: "name" },
+  },
+  "capability.spec-row": {
+    layouts: {
+      edit: [
+        [{ name: "label", size: 12 }],
+        [{ name: "cells", size: 12 }],
+      ],
+      list: ["id", "label"],
+    },
+    settings: { mainField: "label", defaultSortBy: "label" },
+  },
+  "capability.spec-cell": {
+    layouts: {
+      edit: [[{ name: "value", size: 12 }]],
+      list: ["id", "value"],
+    },
+    settings: { mainField: "value", defaultSortBy: "value" },
+  },
   "api::conformity-page.conformity-page": {
     layouts: {
       edit: [

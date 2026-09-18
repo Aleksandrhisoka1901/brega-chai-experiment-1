@@ -127,6 +127,7 @@ test("seed exposes only read actions required by the storefront", () => {
     "api::article.article.findOne",
     "api::robots-txt.robots-txt.find",
     "api::wholesale-page.wholesale-page.find",
+    "api::capability-page.capability-page.find",
     "api::conformity-page.conformity-page.find",
   ]);
   assert.equal(

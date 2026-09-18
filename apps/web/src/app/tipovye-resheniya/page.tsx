@@ -4,11 +4,13 @@ import {
   capabilityPageMetadata,
   CapabilityStorefrontPage,
 } from "@/components/capability-page";
+import { getCapabilityPage } from "@/server/cms/capability-page";
 
-export function generateMetadata(): Metadata {
-  return capabilityPageMetadata();
+export async function generateMetadata(): Promise<Metadata> {
+  return capabilityPageMetadata(await getCapabilityPage());
 }
 
-export default function TipovyeResheniyaPage() {
-  return <CapabilityStorefrontPage />;
+export default async function TipovyeResheniyaPage() {
+  const content = await getCapabilityPage();
+  return <CapabilityStorefrontPage content={content} />;
 }

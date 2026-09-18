@@ -8,25 +8,29 @@ import {
 } from "@/lib/seo/structured-data";
 import { CAPABILITY_PATH } from "@/lib/storefront-routes";
 import { bindShortRussianWords } from "@/lib/typography";
-import { CAPABILITY_PAGE } from "@/server/capability-models";
+import type { CapabilityPageContent } from "@/server/capability-models";
 
 import { Breadcrumbs } from "./breadcrumbs";
 import { CapabilityCompare } from "./capability-compare";
 import styles from "./capability-page.module.css";
 import { JsonLd } from "./json-ld";
 
-export function capabilityPageMetadata(): Metadata {
+export function capabilityPageMetadata(content: CapabilityPageContent): Metadata {
   return pageMetadata({
-    title: `${CAPABILITY_PAGE.title} — ${BRAND_NAME}`,
-    description: CAPABILITY_PAGE.lead,
+    title: `${content.title} — ${BRAND_NAME}`,
+    description: content.lead,
     path: CAPABILITY_PATH,
   });
 }
 
-export function CapabilityStorefrontPage() {
+export function CapabilityStorefrontPage({
+  content,
+}: {
+  content: CapabilityPageContent;
+}) {
   const breadcrumbs = [
     { name: "Главная", href: "/" },
-    { name: CAPABILITY_PAGE.title, href: CAPABILITY_PATH },
+    { name: content.title, href: CAPABILITY_PATH },
   ];
 
   return (
@@ -41,8 +45,8 @@ export function CapabilityStorefrontPage() {
       />
       <JsonLd
         data={collectionPageStructuredData({
-          name: CAPABILITY_PAGE.title,
-          description: CAPABILITY_PAGE.lead,
+          name: content.title,
+          description: content.lead,
           url: canonicalUrl(CAPABILITY_PATH),
         })}
       />
@@ -50,19 +54,23 @@ export function CapabilityStorefrontPage() {
         <Breadcrumbs items={breadcrumbs} />
         <header className={styles.header}>
           <div className={styles.titleBlock}>
-            <p className={styles.eyebrow}>
-              {bindShortRussianWords(CAPABILITY_PAGE.eyebrow)}
-            </p>
-            <h1>{bindShortRussianWords(CAPABILITY_PAGE.title)}</h1>
+            {content.eyebrow ? (
+              <p className={styles.eyebrow}>
+                {bindShortRussianWords(content.eyebrow)}
+              </p>
+            ) : null}
+            <h1>{bindShortRussianWords(content.title)}</h1>
           </div>
-          <p className={styles.lead}>
-            {bindShortRussianWords(CAPABILITY_PAGE.lead)}
-          </p>
-          <p className={styles.note}>
-            {bindShortRussianWords(CAPABILITY_PAGE.note)}
-          </p>
+          <p className={styles.lead}>{bindShortRussianWords(content.lead)}</p>
+          {content.note ? (
+            <p className={styles.note}>{bindShortRussianWords(content.note)}</p>
+          ) : null}
         </header>
-        <CapabilityCompare />
+        <CapabilityCompare
+          models={content.models}
+          rows={content.rows}
+          tableTitle={content.tableTitle}
+        />
       </article>
     </main>
   );

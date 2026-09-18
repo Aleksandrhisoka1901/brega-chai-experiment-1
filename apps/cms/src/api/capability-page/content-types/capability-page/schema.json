@@ -1,0 +1,65 @@
+{
+  "kind": "singleType",
+  "collectionName": "capability_pages",
+  "info": {
+    "singularName": "capability-page",
+    "pluralName": "capability-pages",
+    "displayName": "Системы хранения энергии",
+    "description": "Страница /tipovye-resheniya: лента моделей и сравнительная таблица"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": false,
+      "description": "Короткая подпись над заголовком."
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Заголовок H1 на витрине."
+    },
+    "lead": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "description": "Вводный текст под заголовком."
+    },
+    "note": {
+      "type": "text",
+      "required": false,
+      "description": "Пояснение под вступлением."
+    },
+    "tableTitle": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "description": "Заголовок сравнительной таблицы."
+    },
+    "models": {
+      "type": "component",
+      "component": "capability.model",
+      "repeatable": true,
+      "required": true,
+      "min": 1,
+      "description": "Лента карточек: фото, название и описание."
+    },
+    "specRows": {
+      "type": "component",
+      "component": "capability.spec-row",
+      "repeatable": true,
+      "required": true,
+      "min": 1,
+      "description": "Строки сравнительной таблицы. Значения идут в том же порядке, что и модели в ленте."
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": false
+    }
+  }
+}

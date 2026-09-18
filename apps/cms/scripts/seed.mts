@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { DEFAULT_CAPABILITY_PAGE } from "../src/capability-page-configuration.ts";
 import { publicRobotsContent } from "../src/api/robots-txt/public-robots-content.ts";
 import {
   assertSeedAllowed,
@@ -87,6 +88,7 @@ async function upsertSingle(
     | "api::rituals-page.rituals-page"
     | "api::articles-page.articles-page"
     | "api::wholesale-page.wholesale-page"
+    | "api::capability-page.capability-page"
     | "api::conformity-page.conformity-page"
     | "api::robots-txt.robots-txt",
   data: Record<string, unknown>,
@@ -304,6 +306,12 @@ async function run() {
           "Оптовые поставки портативных электростанций и солнечных панелей Voltora для магазинов и партнёров.",
       },
     });
+
+    await upsertSingle(
+      strapi,
+      "api::capability-page.capability-page",
+      DEFAULT_CAPABILITY_PAGE as unknown as Record<string, unknown>,
+    );
 
     await upsertSingle(strapi, "api::conformity-page.conformity-page", {
       title: "Декларация соответствия",

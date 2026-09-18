@@ -43,7 +43,7 @@ test("builds lowercase canonical URLs without trailing slash", () => {
 
 test("applies stable title and description fallbacks", () => {
   assert.deepEqual(metadataWithFallbacks({ title: "", description: null }), {
-    title: "Voltora",
+    title: "LonEnergy",
     description:
       "Портативные электростанции и солнечные панели для дома и резервного питания",
   });

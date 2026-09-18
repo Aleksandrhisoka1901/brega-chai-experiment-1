@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_capability_spec_rows",
+  "info": {
+    "displayName": "Строка таблицы",
+    "description": "Название характеристики и значения по моделям слева направо."
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "minLength": 1
+    },
+    "cells": {
+      "type": "component",
+      "component": "capability.spec-cell",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    }
+  }
+}
