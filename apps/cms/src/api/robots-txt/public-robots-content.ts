@@ -5,6 +5,8 @@ const SEARCH_CRAWLER_USER_AGENTS = [
   "Mail.RU_Bot",
   "TelegramBot",
   "Twitterbot",
+  "YandexAdditional",
+  "YandexAdditionalBot",
   "YandexBot",
   "bingbot",
   "facebookexternalhit",
@@ -139,12 +141,7 @@ export function publicRobotsContent(
   const blocked = PUBLIC_ROBOTS_BLOCKED_USER_AGENTS.map(
     (name) => `User-agent: ${name}\nDisallow: /`,
   ).join("\n\n");
-
-  const cleanParam =
-    "utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&ysclid&ymclid&gclid&fbclid&erid&etext&from&openstat&_ym_debug&minPrice&maxPrice";
-
-  return `User-agent: *
-Allow: /
+  const pathRules = `Allow: /
 
 Disallow: /api/
 Disallow: /service-unavailable-internal
@@ -157,33 +154,77 @@ Disallow: /*?maxPrice=
 Disallow: /*?*minPrice=
 Disallow: /*?*maxPrice=
 
-Disallow: /?utm_
-Disallow: /*?utm_
-Disallow: /*?*utm_
-Disallow: /*&utm_
-Disallow: /?yclid=
-Disallow: /*?yclid=
-Disallow: /?ymclid=
-Disallow: /?gclid=
-Disallow: /?fbclid=
-Disallow: /*?erid=
-Disallow: /*?ysclid=
+Allow: /*?page=`;
+  const cleanParam =
+    "utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&ysclid&ymclid&gclid&fbclid&erid&etext&from&openstat&_ym_debug";
 
-Allow: /*?page=
+  return `User-agent: *
+${pathRules}
 
-Clean-param: ${cleanParam}
-
-Host: ${origin}
 Sitemap: ${origin}/sitemap.xml
 
 User-agent: Yandex
-Allow: /
-Clean-param: ${cleanParam}
-Host: ${origin}
+${pathRules}
 
-User-agent: YandexBot
+Clean-param: ${cleanParam}
+
+Sitemap: ${origin}/sitemap.xml
+
+User-agent: YandexAdditionalBot
+Allow: /
+
+User-agent: YandexAdditional
 Allow: /
 
 ${blocked}
 `;
 }
+
+export function shouldSyncPublicRobotsContent(
+  siteUrl = process.env.SITE_URL ?? "",
+) {
+  try {
+    const hostname = new URL(siteUrl).hostname.toLowerCase();
+    return (
+      hostname.length > 0 &&
+      hostname !== "localhost" &&
+      hostname !== "127.0.0.1" &&
+      !/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+export async function ensurePublicRobotsContent(
+  strapi: {
+    documents: (uid: string) => {
+      findFirst(options: { fields: string[] }): Promise<{
+        documentId?: string;
+        content?: string | null;
+      } | null>;
+      create(options: { data: { content: string } }): Promise<unknown>;
+      update(options: {
+        documentId: string;
+        data: { content: string };
+      }): Promise<unknown>;
+    };
+  },
+  siteUrl = process.env.SITE_URL ?? "http://localhost:3001",
+) {
+  if (!shouldSyncPublicRobotsContent(siteUrl)) return;
+
+  const content = publicRobotsContent(siteUrl);
+  const documents = strapi.documents("api::robots-txt.robots-txt");
+  const existing = await documents.findFirst({ fields: ["content"] });
+  if (!existing?.documentId) {
+    await documents.create({ data: { content } });
+    return;
+  }
+  if (existing.content === content) return;
+  await documents.update({
+    documentId: existing.documentId,
+    data: { content },
+  });
+}
+

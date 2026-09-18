@@ -38,6 +38,11 @@ export const DEFAULT_SITEMAP_URLS = [
   { slug: "/stati", priority: 0.9, frequency: "weekly" },
   { slug: "/dlya-optovikov", priority: 0.8, frequency: "weekly" },
   { slug: "/tipovye-resheniya", priority: 0.8, frequency: "weekly" },
+  {
+    slug: "/legal/deklaraciya-sootvetstviya",
+    priority: 0.6,
+    frequency: "monthly",
+  },
 ] as const;
 
 export function shouldReplaceSitemapOrigin(

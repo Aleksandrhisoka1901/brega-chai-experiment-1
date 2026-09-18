@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  articleStructuredData,
   breadcrumbStructuredData,
   organizationStructuredData,
   productStructuredData,
@@ -123,8 +124,31 @@ test("puts a Moscow postal address into organization JSON-LD", () => {
   assert.equal(data.address["@type"], "PostalAddress");
   assert.equal(data.address.addressLocality, "Москва");
   assert.equal(data.address.addressCountry, "RU");
+  assert.equal(data.email, "hello@lon-energy.ru");
+  assert.equal(data.areaServed.name, "RU");
   assert.equal(
     data.address.streetAddress,
     "проезд Серебрякова, д. 14, стр. 6.",
   );
+  assert.equal(data.logo, undefined);
+});
+
+test("keeps Russian language and publisher URL in website JSON-LD", () => {
+  const data = websiteStructuredData("https://lon-energy.ru", "LonEnergy");
+  assert.equal(data.inLanguage, "ru-RU");
+  assert.equal(data.publisher.url, "https://lon-energy.ru");
+});
+
+test("marks articles as Russian organization-authored content", () => {
+  const data = articleStructuredData({
+    headline: "Как выбрать станцию",
+    description: "Короткий разбор.",
+    url: "https://lon-energy.ru/stati/kak-vybrat",
+    brandName: "LonEnergy",
+  });
+
+  assert.equal(data.inLanguage, "ru-RU");
+  assert.equal(data.author["@type"], "Organization");
+  assert.equal(data.author.name, "LonEnergy");
+  assert.equal(data.publisher.url, "https://lon-energy.ru");
 });

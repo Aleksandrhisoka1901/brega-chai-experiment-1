@@ -217,6 +217,10 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     uid: "api::conformity-page.conformity-page",
     entry: {},
   });
+  await subscriber?.("entry.update", {
+    uid: "api::robots-txt.robots-txt",
+    entry: {},
+  });
   await subscriber?.("entry.publish", {
     uid: "api::order.order",
     entry: {},
@@ -247,6 +251,7 @@ test("subscriber routes allowlisted publication events and ignores others", asyn
     },
     { event: "articles", action: "publish" },
     { event: "conformity", action: "publish" },
+    { event: "global", action: "update" },
     { event: "media", action: "update" },
   ]);
 });

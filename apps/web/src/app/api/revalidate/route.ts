@@ -1,5 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 
+import { submitIndexNow } from "@/lib/seo/indexnow";
+import { siteOrigin } from "@/lib/seo/metadata";
 import { invalidateCmsMemoryCache } from "@/server/cms/memory-cache";
 
 import { createMemoryDeliveryStore, handleRevalidation } from "./handler.ts";
@@ -30,5 +32,7 @@ export async function POST(request: Request) {
       invalidateCmsMemoryCache(tag);
       revalidateTag(tag);
     },
+    origin: siteOrigin(),
+    notifyIndexNow: (urls) => submitIndexNow(urls, { origin: siteOrigin() }),
   });
 }

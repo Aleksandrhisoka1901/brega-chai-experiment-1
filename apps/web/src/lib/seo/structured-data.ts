@@ -1,5 +1,5 @@
-import type { ProductDetail } from "@/server/cms/product-detail-mapper";
-import { BRAND_NAME } from "@/lib/brand";
+import type { ProductDetail } from "../../server/cms/product-detail-mapper.ts";
+import { BRAND_EMAIL, BRAND_NAME, BRAND_TELEGRAM_URL } from "../brand.ts";
 
 export function serializeJsonLd(data: unknown) {
   return JSON.stringify(data).replace(/</g, "\\u003c");
@@ -56,6 +56,7 @@ export function organizationStructuredData(
     streetAddress?: string;
     addressLocality?: string;
     addressCountry?: string;
+    logo?: string;
   },
 ) {
   return {
@@ -63,6 +64,13 @@ export function organizationStructuredData(
     "@type": "Organization",
     name: brandName,
     url: origin,
+    email: BRAND_EMAIL,
+    sameAs: [BRAND_TELEGRAM_URL],
+    ...(address?.logo ? { logo: address.logo } : {}),
+    areaServed: {
+      "@type": "Country",
+      name: "RU",
+    },
     address: {
       "@type": "PostalAddress",
       addressLocality: address?.addressLocality ?? "Москва",
@@ -88,6 +96,12 @@ export function websiteStructuredData(origin: string, brandName: string) {
     "@type": "WebSite",
     name: brandName,
     url: origin,
+    inLanguage: "ru-RU",
+    publisher: {
+      "@type": "Organization",
+      name: brandName,
+      url: origin,
+    },
   };
 }
 
@@ -105,6 +119,7 @@ export function collectionPageStructuredData({
     "@type": "CollectionPage",
     name,
     url,
+    inLanguage: "ru-RU",
     ...(description ? { description } : {}),
   };
 }
@@ -122,16 +137,29 @@ export function articleStructuredData({
   imageUrl?: string;
   brandName: string;
 }) {
+  let publisherUrl: string | undefined;
+  try {
+    publisherUrl = new URL(url).origin;
+  } catch {
+    publisherUrl = undefined;
+  }
+
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline,
     description,
     url,
+    inLanguage: "ru-RU",
     ...(imageUrl ? { image: imageUrl } : {}),
+    author: {
+      "@type": "Organization",
+      name: brandName,
+    },
     publisher: {
       "@type": "Organization",
       name: brandName,
+      ...(publisherUrl ? { url: publisherUrl } : {}),
     },
   };
 }

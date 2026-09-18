@@ -32,13 +32,18 @@ function signedRequest(body: unknown, signatureSecret = secret) {
 function harness() {
   const tags: string[] = [];
   const paths: Array<[string, "page" | "layout" | undefined]> = [];
+  const indexNow: string[][] = [];
   const dependencies: RevalidationDependencies = {
     secret,
     deliveries: createMemoryDeliveryStore(),
     revalidateTag: (tag) => tags.push(tag),
     revalidatePath: (path, type) => paths.push([path, type]),
+    origin: "https://lon-energy.ru",
+    notifyIndexNow: (urls) => {
+      indexNow.push(urls);
+    },
   };
-  return { dependencies, tags, paths };
+  return { dependencies, tags, paths, indexNow };
 }
 
 test("rejects an invalid signature without parsing or purging", async () => {
@@ -80,7 +85,7 @@ test("maps home, global and products to their exact cache boundaries", async () 
     },
     {
       payload: { id: "evt-global", event: "global" },
-      tags: ["global"],
+      tags: ["global", "robots"],
       paths: [["/", "layout"]],
     },
     {
@@ -106,7 +111,7 @@ test("maps home, global and products to their exact cache boundaries", async () 
 });
 
 test("maps one product to listing, detail and home", async () => {
-  const { dependencies, tags, paths } = harness();
+  const { dependencies, tags, paths, indexNow } = harness();
   const response = await handleRevalidation(
     signedRequest({
       id: "evt-product",
@@ -127,6 +132,13 @@ test("maps one product to listing, detail and home", async () => {
     ["/paneli", "page"],
     ["/stantsii/sencha-42", "page"],
     ["/", "page"],
+  ]);
+  assert.deepEqual(indexNow, [
+    [
+      "https://lon-energy.ru/stantsii/sencha-42",
+      "https://lon-energy.ru/stantsii",
+      "https://lon-energy.ru/",
+    ],
   ]);
 });
 
@@ -153,7 +165,7 @@ test("maps one article to listing and detail", async () => {
 });
 
 test("maps wholesale page to its storefront route", async () => {
-  const { dependencies, tags, paths } = harness();
+  const { dependencies, tags, paths, indexNow } = harness();
   const response = await handleRevalidation(
     signedRequest({ id: "evt-wholesale", event: "wholesale" }),
     dependencies,
@@ -162,6 +174,7 @@ test("maps wholesale page to its storefront route", async () => {
   assert.equal(response.status, 200);
   assert.deepEqual(tags, ["wholesale-page"]);
   assert.deepEqual(paths, [["/dlya-optovikov", "page"]]);
+  assert.deepEqual(indexNow, [["https://lon-energy.ru/dlya-optovikov"]]);
 });
 
 test("maps capability page to its storefront route", async () => {
@@ -225,7 +238,7 @@ test("media updates invalidate every CMS image consumer", async () => {
 });
 
 test("acknowledges a repeated delivery without purging twice", async () => {
-  const { dependencies, tags, paths } = harness();
+  const { dependencies, tags, paths, indexNow } = harness();
   const payload = { id: "evt-repeat", event: "home" };
 
   const first = await handleRevalidation(signedRequest(payload), dependencies);
@@ -242,6 +255,7 @@ test("acknowledges a repeated delivery without purging twice", async () => {
   });
   assert.deepEqual(tags, ["home"]);
   assert.deepEqual(paths, [["/", "page"]]);
+  assert.deepEqual(indexNow, [["https://lon-energy.ru/"]]);
 });
 
 test("rejects an event ID reused for a different signed payload", async () => {

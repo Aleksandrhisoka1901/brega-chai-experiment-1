@@ -42,7 +42,6 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: "/favicon.svg",
       apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
     },
-    alternates: { canonical: "/" },
     ...(settings?.defaultSeo.imageUrl
       ? { openGraph: { images: [{ url: settings.defaultSeo.imageUrl }] } }
       : {}),
@@ -77,6 +76,7 @@ export default async function RootLayout({
             settings?.brandName ?? BRAND_NAME,
             {
               streetAddress: streetAddressFromPickup(settings?.pickupAddress),
+              logo: settings?.logo?.url,
             },
           )}
         />

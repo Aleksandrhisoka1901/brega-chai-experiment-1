@@ -5,9 +5,12 @@ import type {
   RevalidationEventName,
 } from "./sender.js";
 
+const LIVE_WITHOUT_PUBLISH_UIDS = new Set(["api::robots-txt.robots-txt"]);
+
 const EVENT_BY_UID: Readonly<Record<string, RevalidationEventName>> = {
   "api::home-page.home-page": "home",
   "api::global-setting.global-setting": "global",
+  "api::robots-txt.robots-txt": "global",
   "api::products-page.products-page": "products",
   "api::rituals-page.rituals-page": "products",
   "api::product.product": "product",
@@ -114,7 +117,11 @@ export function registerCacheRevalidationSubscriber(
     if (action !== "publish" && action !== "update" && action !== "unpublish") {
       return;
     }
-    if (action === "update" && event.entry?.publishedAt == null) {
+    if (
+      action === "update" &&
+      event.entry?.publishedAt == null &&
+      !LIVE_WITHOUT_PUBLISH_UIDS.has(event.uid ?? "")
+    ) {
       return;
     }
     const routed = routeEvent(action, event);

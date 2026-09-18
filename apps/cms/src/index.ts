@@ -7,6 +7,7 @@ import { ensureGlobalContentDefaults } from "./content-migration.js";
 import { ensureHomeArticlesPreview } from "./home-articles-configuration.js";
 import { ensureHomeEditorialPalette } from "./home-palette-configuration.js";
 import { ensureRelatedItemsPermissions } from "./related-items-configuration.js";
+import { ensurePublicRobotsContent } from "./api/robots-txt/public-robots-content.js";
 import { ensureSitemapConfiguration } from "./sitemap-configuration.js";
 import { ensureRitualsPageConfiguration } from "./rituals-page-configuration.js";
 import { ensureChapterEyebrowsCleared } from "./chapter-eyebrow.js";
@@ -29,6 +30,7 @@ export default {
     await ensureHomeEditorialPalette(strapi);
     await ensureChapterEyebrowsCleared(strapi);
     await ensureSitemapConfiguration(strapi);
+    await ensurePublicRobotsContent(strapi);
     await repairNonAsciiArticleSlugs(strapi);
     await syncAdminContentManager(strapi, russianAdminTranslations);
     registerOrderStatusMiddleware(strapi);

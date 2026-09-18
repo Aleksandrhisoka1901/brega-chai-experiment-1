@@ -1,5 +1,8 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+import { urlsForIndexNowEvent } from "../../../lib/seo/indexnow.ts";
+import { siteOrigin } from "../../../lib/seo/metadata.ts";
+
 const SIGNATURE_HEADER = "x-revalidation-signature";
 const SIGNATURE_PREFIX = "sha256=";
 const MAX_DELIVERIES = 1_000;
@@ -18,6 +21,8 @@ export interface RevalidationDependencies {
   deliveries: DeliveryStore;
   revalidateTag(tag: string): void;
   revalidatePath(path: string, type?: PathType): void;
+  notifyIndexNow?(urls: string[]): void | Promise<void>;
+  origin?: string;
 }
 
 type RevalidationEvent =
@@ -204,6 +209,7 @@ function invalidate(
   }
   if (event.event === "global") {
     revalidateTag("global");
+    revalidateTag("robots");
     revalidatePath("/", "layout");
     return;
   }
@@ -328,6 +334,11 @@ export async function handleRevalidation(
     dependencies.deliveries.release(event.id);
     return safeError(503, "REVALIDATION_FAILED", "Cache revalidation failed.");
   }
+  void Promise.resolve(
+    dependencies.notifyIndexNow?.(
+      urlsForIndexNowEvent(event, dependencies.origin ?? siteOrigin()),
+    ),
+  ).catch(() => undefined);
   return Response.json(
     { ok: true, eventId: event.id, duplicate: false },
     { headers: { "Cache-Control": "no-store" } },
