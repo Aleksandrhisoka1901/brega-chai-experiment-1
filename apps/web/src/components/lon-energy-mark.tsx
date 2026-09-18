@@ -9,9 +9,13 @@ export function LonEnergyMark({ className }: { className?: string }) {
     >
       <rect fill="currentColor" height="32" rx="8" width="32" />
       <path
-        d="M18.05 6.4 10.2 16.85h5.35L12.7 25.6l9.15-11.35h-5.2Z"
-        fill="#ff8a00"
+        d="M10.8 10.7c2.6-4.2 7.8-4.2 10.4 0"
+        stroke="#ff9c0d"
+        strokeLinecap="round"
+        strokeWidth="1.8"
       />
+      <circle cx="16" cy="12.7" fill="#ff9c0d" r="2.55" />
+      <path d="M17.7 14.6 10.8 22.3h5.2L12.2 28.3 22.8 18.9h-5.5Z" fill="#ff9c0d" />
     </svg>
   );
 }
