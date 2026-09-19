@@ -138,9 +138,6 @@ export function publicRobotsContent(
   siteUrl = process.env.SITE_URL ?? "http://localhost:3001",
 ) {
   const origin = new URL(siteUrl).origin.toLowerCase();
-  const blocked = PUBLIC_ROBOTS_BLOCKED_USER_AGENTS.map(
-    (name) => `User-agent: ${name}\nDisallow: /`,
-  ).join("\n\n");
   const pathRules = `Allow: /
 
 Disallow: /api/
@@ -158,17 +155,18 @@ Allow: /*?page=`;
   const cleanParam =
     "utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&ysclid&ymclid&gclid&fbclid&erid&etext&from&openstat&_ym_debug";
 
-  return `User-agent: *
-${pathRules}
-
-Sitemap: ${origin}/sitemap.xml
-
-User-agent: Yandex
+  return `User-agent: Yandex
 ${pathRules}
 
 Clean-param: ${cleanParam}
 
 Sitemap: ${origin}/sitemap.xml
+
+User-agent: YandexBot
+${pathRules}
+
+User-agent: YandexWebmaster
+Allow: /
 
 User-agent: YandexAdditionalBot
 Allow: /
@@ -176,7 +174,10 @@ Allow: /
 User-agent: YandexAdditional
 Allow: /
 
-${blocked}
+User-agent: *
+${pathRules}
+
+Sitemap: ${origin}/sitemap.xml
 `;
 }
 

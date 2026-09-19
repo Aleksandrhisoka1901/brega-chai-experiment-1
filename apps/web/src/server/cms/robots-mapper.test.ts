@@ -19,7 +19,7 @@ test("normalizes an editable robots.txt document", () => {
   );
 });
 
-test("fails closed when the CMS document is absent or malformed", () => {
+test("falls back to an open Yandex-safe policy when the CMS document is absent or malformed", () => {
   for (const payload of [
     { data: null },
     {},
@@ -28,6 +28,8 @@ test("fails closed when the CMS document is absent or malformed", () => {
     { data: { content: "User-agent: *\u0000\nAllow: /" } },
   ]) {
     assert.equal(mapRobotsPayload(payload), DEFAULT_ROBOTS_CONTENT);
+    assert.match(DEFAULT_ROBOTS_CONTENT, /User-agent: Yandex\nAllow: \//);
+    assert.doesNotMatch(DEFAULT_ROBOTS_CONTENT, /^Disallow: \/\s*$/m);
   }
 });
 

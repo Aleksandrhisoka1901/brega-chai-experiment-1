@@ -13,11 +13,13 @@ test("public robots.txt stays within the CMS field limit and keeps search crawle
   const content = publicRobotsContent("https://lon-energy.ru");
 
   assert.equal(content.length <= 20_000, true);
-  assert.match(content, /^User-agent: \*\nAllow: \//);
+  assert.match(content, /^User-agent: Yandex\nAllow: \//);
+  assert.match(content, /User-agent: YandexBot\nAllow: \//);
+  assert.match(content, /User-agent: YandexWebmaster\nAllow: \//);
+  assert.match(content, /User-agent: \*\nAllow: \//);
   assert.match(content, /Allow: \/\*\?page=/);
   assert.match(content, /Disallow: \/api\//);
   assert.match(content, /Disallow: \/legal\/privacy\.pdf/);
-  assert.match(content, /User-agent: Yandex\nAllow: \//);
   assert.match(content, /User-agent: YandexAdditionalBot\nAllow: \//);
   assert.match(content, /User-agent: YandexAdditional\nAllow: \//);
   assert.match(
@@ -26,18 +28,15 @@ test("public robots.txt stays within the CMS field limit and keeps search crawle
   );
   assert.match(content, /Sitemap: https:\/\/lon-energy\.ru\/sitemap\.xml/);
   assert.doesNotMatch(content, /^Host:/m);
+  assert.doesNotMatch(content, /^Disallow: \/\s*$/m);
   assert.doesNotMatch(content, /Disallow: \/\*\?\*\n/);
   assert.doesNotMatch(content, /Disallow: \/\?utm_/);
   assert.doesNotMatch(content, /Clean-param:.*minPrice/);
-  assert.doesNotMatch(content, /User-agent: YandexBot\n/);
+  assert.doesNotMatch(content, /User-agent: AhrefsBot/);
+  assert.doesNotMatch(content, /User-agent: YaK\n/);
   assert.doesNotMatch(content, /Disallow: \/\*%/);
   assert.doesNotMatch(content, /User-agent: Bot\n/);
   assert.doesNotMatch(content, /Disallow: \/legal\/\n/);
-  assert.equal(
-    content.indexOf("User-agent: YandexAdditionalBot") <
-      content.indexOf("User-agent: AhrefsBot"),
-    true,
-  );
 
   for (const crawler of PUBLIC_ROBOTS_SEARCH_CRAWLER_USER_AGENTS) {
     const lowerCrawler = crawler.toLowerCase();

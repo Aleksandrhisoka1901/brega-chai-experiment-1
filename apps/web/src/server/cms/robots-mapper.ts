@@ -1,7 +1,10 @@
 import { z } from "zod";
 
-export const DEFAULT_ROBOTS_CONTENT = `User-agent: *
-Disallow: /
+export const DEFAULT_ROBOTS_CONTENT = `User-agent: Yandex
+Allow: /
+
+User-agent: *
+Allow: /
 `;
 
 const MAX_ROBOTS_LENGTH = 20_000;
