@@ -10,6 +10,9 @@ import {
   getEditableLineMaximum,
   getOrderEditErrorMessage,
   getOrderTransitionErrorMessage,
+  getInquiryStatusActionLabel,
+  getInquiryStatusConfirmation,
+  getInquiryStatusPresentation,
   getStatusActionLabel,
   getStatusConfirmation,
   getStatusPresentation,
@@ -150,4 +153,24 @@ test("every status action requires an explicit confirmation", () => {
     getStatusConfirmation("cancelled").description,
     /остатки будут возвращены/,
   );
+});
+
+test("inquiry statuses use feminine operational labels", () => {
+  assert.deepEqual(getInquiryStatusPresentation("new"), {
+    label: "Новая",
+    variant: "secondary",
+  });
+  assert.deepEqual(getInquiryStatusPresentation("processed"), {
+    label: "Обработана",
+    variant: "success",
+  });
+  assert.equal(
+    getInquiryStatusActionLabel("processed"),
+    "Отметить обработанной",
+  );
+  assert.deepEqual(getInquiryStatusConfirmation("processed"), {
+    title: "Отметить обработанной?",
+    description: "Статус заявки изменится на «Обработана».",
+    confirmLabel: "Отметить обработанной",
+  });
 });

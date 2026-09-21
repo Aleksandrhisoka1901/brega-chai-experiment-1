@@ -1,8 +1,11 @@
 import { Badge, Box, Flex, Modal, Typography } from "@strapi/design-system";
 import styled from "styled-components";
 
-import type { OrderStatus } from "./view-model";
-import { getStatusPresentation } from "./view-model";
+import type { InquiryStatus, OrderStatus } from "./view-model";
+import {
+  getInquiryStatusPresentation,
+  getStatusPresentation,
+} from "./view-model";
 
 const DataValue = styled(Box)`
   min-width: 0;
@@ -16,6 +19,11 @@ export const ConfirmationModalContent = styled(Modal.Content)`
 
 export function StatusBadge({ status }: { status: OrderStatus }) {
   const presentation = getStatusPresentation(status);
+  return <Badge variant={presentation.variant}>{presentation.label}</Badge>;
+}
+
+export function InquiryStatusBadge({ status }: { status: InquiryStatus }) {
+  const presentation = getInquiryStatusPresentation(status);
   return <Badge variant={presentation.variant}>{presentation.label}</Badge>;
 }
 

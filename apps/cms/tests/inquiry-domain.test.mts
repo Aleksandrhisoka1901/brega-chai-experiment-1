@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   InquiryServiceError,
   parseInquiryInput,
+  parseInquiryStatus,
 } from "../src/api/inquiry/services/inquiry-domain.ts";
 
 const valid = {
@@ -46,4 +47,9 @@ test("accepts a storefront inquiry and rejects junk", () => {
     () => parseInquiryInput({ ...valid, customerPhone: "89991234567" }),
     InquiryServiceError,
   );
+});
+
+test("inquiry status accepts only new and processed", () => {
+  assert.equal(parseInquiryStatus("processed"), "processed");
+  assert.throws(() => parseInquiryStatus("confirmed"), InquiryServiceError);
 });

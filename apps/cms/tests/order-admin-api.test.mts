@@ -56,14 +56,16 @@ test("local plugin exposes the manifest required by the Strapi loader", async ()
     kind: "plugin",
     name: "order-admin",
     displayName: "Заказы",
-    description: "Рабочее пространство для обработки заказов",
+    description: "Рабочее пространство для обработки заказов и заявок",
   });
   assert.equal(manifest.exports["./strapi-admin"].import, "./strapi-admin.ts");
   const adminEntry = await readFile(
     new URL("../src/plugins/order-admin/strapi-admin.ts", import.meta.url),
     "utf8",
   );
-  assert.match(adminEntry, /import \{ Archive \} from "@strapi\/icons"/);
+  assert.match(adminEntry, /import \{ Archive, Message \} from "@strapi\/icons"/);
+  assert.match(adminEntry, /defaultMessage: "Заявки"/);
+  assert.match(adminEntry, /module.InquiriesApp/);
   assert.doesNotMatch(adminEntry, /ShoppingCart/);
 });
 
@@ -104,6 +106,26 @@ test("admin routes require exact read and transition scopes", () => {
       {
         method: "DELETE",
         path: "/orders/:documentId",
+        scope: ["plugin::order-admin.delete"],
+      },
+      {
+        method: "GET",
+        path: "/inquiries",
+        scope: ["plugin::order-admin.read"],
+      },
+      {
+        method: "GET",
+        path: "/inquiries/:documentId",
+        scope: ["plugin::order-admin.read"],
+      },
+      {
+        method: "POST",
+        path: "/inquiries/:documentId/status",
+        scope: ["plugin::order-admin.transition"],
+      },
+      {
+        method: "DELETE",
+        path: "/inquiries/:documentId",
         scope: ["plugin::order-admin.delete"],
       },
     ],
@@ -481,3 +503,129 @@ test("status controller explains a deleted product without exposing internals", 
   ]);
   assert.equal(JSON.stringify(warnings).includes("product-1"), false);
 });
+
+const rawInquiry = {
+  documentId: "inquiry-1",
+  customerName: "Анна",
+  customerPhone: "+79991234567",
+  customerEmail: "anna@example.com",
+  comment: "Нужна FP115KWH",
+  source: "/tipovye-resheniya",
+  modelInterest: "FP115KWH",
+  inquiryStatus: "new",
+  createdAt: "2026-07-30T12:00:00.000Z",
+  updatedAt: "2026-07-30T12:00:00.000Z",
+};
+
+test("inquiry service lists contacts and filters by name, phone and model", async () => {
+  const calls: Array<[string, unknown]> = [];
+  const inquiryRepository = {
+    findMany: async (query: unknown) => {
+      calls.push(["findMany", query]);
+      return [rawInquiry];
+    },
+    count: async (query: unknown) => {
+      calls.push(["count", query]);
+      return 1;
+    },
+    findOne: async () => rawInquiry,
+  };
+  const service = serviceModule.createOrderAdminService({
+    strapi: {
+      db: {
+        query: (uid: string) =>
+          uid === "api::inquiry.inquiry" ? inquiryRepository : {},
+      },
+      service: () => ({}),
+    },
+  });
+
+  const result = await service.listInquiries({
+    page: 1,
+    pageSize: 25,
+    search: "FP115",
+    status: "new",
+  });
+
+  assert.deepEqual(result.data[0], {
+    documentId: "inquiry-1",
+    createdAt: "2026-07-30T12:00:00.000Z",
+    customerName: "Анна",
+    customerPhone: "+79991234567",
+    customerEmail: "anna@example.com",
+    modelInterest: "FP115KWH",
+    source: "/tipovye-resheniya",
+    status: "new",
+  });
+  assert.deepEqual((calls[0]?.[1] as any).where, {
+    $or: [
+      { customerName: { $containsi: "FP115" } },
+      { customerPhone: { $containsi: "FP115" } },
+      { customerEmail: { $containsi: "FP115" } },
+      { modelInterest: { $containsi: "FP115" } },
+    ],
+    inquiryStatus: "new",
+  });
+});
+
+test("inquiry status service delegates to domain before re-reading detail", async () => {
+  const transitions: unknown[][] = [];
+  const service = serviceModule.createOrderAdminService({
+    strapi: {
+      db: {
+        query: (uid: string) =>
+          uid === "api::inquiry.inquiry"
+            ? {
+                findOne: async () => ({
+                  ...rawInquiry,
+                  inquiryStatus: "processed",
+                }),
+              }
+            : {},
+      },
+      service: (uid: string) =>
+        uid === "api::inquiry.inquiry"
+          ? {
+              transitionStatus: async (...args: unknown[]) =>
+                transitions.push(args),
+            }
+          : {},
+    },
+  });
+
+  const result = await service.transitionInquiry("inquiry-1", "processed");
+  assert.deepEqual(transitions, [["inquiry-1", "processed"]]);
+  assert.equal(result?.status, "processed");
+  assert.deepEqual(result?.availableStatusTransitions, ["new"]);
+});
+
+test("inquiry controller rejects invalid input and maps missing inquiries", async () => {
+  const controller = controllerModule.createOrderAdminController({
+    strapi: {
+      plugin: () => ({
+        service: () => ({
+          listInquiries: async () => ({ data: [], meta: {} }),
+          findInquiry: async () => null,
+          transitionInquiry: async () => null,
+        }),
+      }),
+    },
+  });
+  const badRequests: string[] = [];
+  const notFound: string[] = [];
+  const context: any = {
+    query: { pageSize: "1000" },
+    params: { documentId: "missing" },
+    request: { body: { status: "paid" } },
+    badRequest: (message: string) => badRequests.push(message),
+    notFound: (message: string) => notFound.push(message),
+  };
+
+  await controller.listInquiries(context);
+  await controller.findInquiry(context);
+  await controller.transitionInquiry(context);
+
+  assert.deepEqual(badRequests, ["Некорректный запрос", "Некорректный статус"]);
+  assert.deepEqual(notFound, ["Заявка не найдена"]);
+});
+

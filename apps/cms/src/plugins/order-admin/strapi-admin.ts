@@ -1,6 +1,16 @@
-import { Archive } from "@strapi/icons";
+import { Archive, Message } from "@strapi/icons";
 
 const pluginId = "order-admin";
+
+const pluginApp = () =>
+  import("./admin/src/App").then((module) => ({
+    default: module.App,
+  }));
+
+const inquiriesApp = () =>
+  import("./admin/src/App").then((module) => ({
+    default: module.InquiriesApp,
+  }));
 
 export default {
   register(app: any) {
@@ -12,10 +22,18 @@ export default {
         defaultMessage: "Заказы",
       },
       permissions: [{ action: `plugin::${pluginId}.read`, subject: null }],
-      Component: () =>
-        import("./admin/src/App").then((module) => ({
-          default: module.App,
-        })),
+      Component: pluginApp,
+    });
+
+    app.addMenuLink({
+      to: `plugins/${pluginId}/inquiries`,
+      icon: Message,
+      intlLabel: {
+        id: `${pluginId}.plugin.inquiries`,
+        defaultMessage: "Заявки",
+      },
+      permissions: [{ action: `plugin::${pluginId}.read`, subject: null }],
+      Component: inquiriesApp,
     });
 
     app.registerPlugin({

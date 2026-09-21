@@ -73,28 +73,50 @@ const storedOrderSchema = z
   })
   .passthrough();
 
-const listQuerySchema = z
-  .object({
-    page: z.coerce.number().int().min(1).default(1),
-    pageSize: z.coerce.number().int().min(1).max(100).default(25),
-    search: z.string().trim().max(100).optional(),
+const inquiryStatusSchema = z.enum(["new", "processed"]);
+
+const listPaginationSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(25),
+  search: z.string().trim().max(100).optional(),
+  createdFrom: z.string().datetime({ offset: true }).optional(),
+  createdTo: z.string().datetime({ offset: true }).optional(),
+});
+
+const listDateRangeRefine = (value) =>
+  !value.createdFrom ||
+  !value.createdTo ||
+  value.createdFrom <= value.createdTo;
+
+const listQuerySchema = listPaginationSchema
+  .extend({
     status: orderStatusSchema.optional(),
-    createdFrom: z.string().datetime({ offset: true }).optional(),
-    createdTo: z.string().datetime({ offset: true }).optional(),
   })
   .strict()
-  .refine(
-    ({ createdFrom, createdTo }) =>
-      !createdFrom || !createdTo || createdFrom <= createdTo,
-    {
-      message: "createdFrom must not be after createdTo",
-      path: ["createdFrom"],
-    },
-  );
+  .refine(listDateRangeRefine, {
+    message: "createdFrom must not be after createdTo",
+    path: ["createdFrom"],
+  });
+
+const inquiryListQuerySchema = listPaginationSchema
+  .extend({
+    status: inquiryStatusSchema.optional(),
+  })
+  .strict()
+  .refine(listDateRangeRefine, {
+    message: "createdFrom must not be after createdTo",
+    path: ["createdFrom"],
+  });
 
 const statusCommandSchema = z
   .object({
     status: orderStatusSchema,
+  })
+  .strict();
+
+const inquiryStatusCommandSchema = z
+  .object({
+    status: inquiryStatusSchema,
   })
   .strict();
 
@@ -161,6 +183,26 @@ const allowedStatusTargets = {
   cancelled: [],
 };
 
+const allowedInquiryStatusTargets = {
+  new: ["processed"],
+  processed: ["new"],
+};
+
+const storedInquirySchema = z
+  .object({
+    documentId: z.string().min(1),
+    customerName: z.string().min(1),
+    customerPhone: z.string().min(1),
+    customerEmail: z.string().email(),
+    comment: z.string().nullable().optional(),
+    source: z.string().min(1),
+    modelInterest: z.string().nullable().optional(),
+    inquiryStatus: inquiryStatusSchema,
+    createdAt: z.string().datetime({ offset: true }),
+    updatedAt: z.string().datetime({ offset: true }),
+  })
+  .passthrough();
+
 function lineDto(line) {
   return {
     productId: line.productId,
@@ -220,6 +262,31 @@ function mapOrderDetail(rawOrder) {
   };
 }
 
+function mapInquiryListItem(rawInquiry) {
+  const inquiry = storedInquirySchema.parse(rawInquiry);
+  return {
+    documentId: inquiry.documentId,
+    createdAt: inquiry.createdAt,
+    customerName: inquiry.customerName,
+    customerPhone: inquiry.customerPhone,
+    customerEmail: inquiry.customerEmail,
+    modelInterest: inquiry.modelInterest ?? null,
+    source: inquiry.source,
+    status: inquiry.inquiryStatus,
+  };
+}
+
+function mapInquiryDetail(rawInquiry) {
+  const inquiry = storedInquirySchema.parse(rawInquiry);
+  return {
+    ...mapInquiryListItem(inquiry),
+    updatedAt: inquiry.updatedAt,
+    comment: inquiry.comment ?? null,
+    availableStatusTransitions:
+      allowedInquiryStatusTargets[inquiry.inquiryStatus],
+  };
+}
+
 function mapProductOption(rawProduct) {
   const product = productOptionSchema.parse(rawProduct);
   return {
@@ -236,8 +303,16 @@ function parseListQuery(value) {
   return listQuerySchema.parse(value);
 }
 
+function parseInquiryListQuery(value) {
+  return inquiryListQuerySchema.parse(value);
+}
+
 function parseStatusCommand(value) {
   return statusCommandSchema.parse(value);
+}
+
+function parseInquiryStatusCommand(value) {
+  return inquiryStatusCommandSchema.parse(value);
 }
 
 function parseEditCommand(value) {
@@ -253,11 +328,15 @@ function parseDocumentId(value) {
 }
 
 module.exports = {
+  mapInquiryDetail,
+  mapInquiryListItem,
   mapOrderDetail,
   mapOrderListItem,
   mapProductOption,
   orderStatusSchema,
   parseDocumentId,
+  parseInquiryListQuery,
+  parseInquiryStatusCommand,
   parseListQuery,
   parseEditCommand,
   parseProductQuery,

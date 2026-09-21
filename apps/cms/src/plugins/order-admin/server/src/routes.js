@@ -58,6 +58,42 @@ module.exports = {
           policies: ["admin::isAuthenticatedAdmin"],
         },
       },
+      {
+        method: "GET",
+        path: "/inquiries",
+        handler: "orders.listInquiries",
+        config: {
+          auth: { scope: ["plugin::order-admin.read"] },
+          policies: ["admin::isAuthenticatedAdmin"],
+        },
+      },
+      {
+        method: "GET",
+        path: "/inquiries/:documentId",
+        handler: "orders.findInquiry",
+        config: {
+          auth: { scope: ["plugin::order-admin.read"] },
+          policies: ["admin::isAuthenticatedAdmin"],
+        },
+      },
+      {
+        method: "POST",
+        path: "/inquiries/:documentId/status",
+        handler: "orders.transitionInquiry",
+        config: {
+          auth: { scope: ["plugin::order-admin.transition"] },
+          policies: ["admin::isAuthenticatedAdmin"],
+        },
+      },
+      {
+        method: "DELETE",
+        path: "/inquiries/:documentId",
+        handler: "orders.deleteInquiry",
+        config: {
+          auth: { scope: ["plugin::order-admin.delete"] },
+          policies: ["admin::isAuthenticatedAdmin"],
+        },
+      },
     ],
   },
 };

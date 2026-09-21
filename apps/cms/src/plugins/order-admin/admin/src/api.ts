@@ -3,6 +3,8 @@ import { useMemo } from "react";
 
 import type {
   EditOrderCommand,
+  InquiryDetail,
+  InquiryListResponse,
   OrderDetail,
   OrderListResponse,
   OrderProductOption,
@@ -60,6 +62,34 @@ export function useOrderAdminApi() {
           `/order-admin/orders/${encodeURIComponent(documentId)}`,
         );
         invalidateProductCache();
+        return response.data.data;
+      },
+      async listInquiries(search: string) {
+        const response = await get<InquiryListResponse>(
+          `/order-admin/inquiries${search}`,
+        );
+        return response.data;
+      },
+      async findInquiry(documentId: string) {
+        const response = await get<{ data: InquiryDetail }>(
+          `/order-admin/inquiries/${encodeURIComponent(documentId)}`,
+        );
+        return unwrapDetailResponse(response.data);
+      },
+      async transitionInquiry(
+        documentId: string,
+        status: InquiryDetail["status"],
+      ) {
+        const response = await post<{ data: InquiryDetail }>(
+          `/order-admin/inquiries/${encodeURIComponent(documentId)}/status`,
+          { status },
+        );
+        return unwrapDetailResponse(response.data);
+      },
+      async deleteInquiry(documentId: string) {
+        const response = await del<{ data: { documentId: string } }>(
+          `/order-admin/inquiries/${encodeURIComponent(documentId)}`,
+        );
         return response.data.data;
       },
     }),

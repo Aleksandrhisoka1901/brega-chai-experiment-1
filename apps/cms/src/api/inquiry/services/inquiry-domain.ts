@@ -29,13 +29,33 @@ export const inquiryInputSchema = z
 
 export type InquiryInput = z.infer<typeof inquiryInputSchema>;
 
+export const inquiryStatusSchema = z.enum(["new", "processed"]);
+export type InquiryStatus = z.infer<typeof inquiryStatusSchema>;
+
+export const allowedInquiryStatusTargets: Record<
+  InquiryStatus,
+  InquiryStatus[]
+> = {
+  new: ["processed"],
+  processed: ["new"],
+};
+
 export class InquiryServiceError extends Error {
+  readonly code:
+    | "INVALID_INPUT"
+    | "INQUIRY_NOT_FOUND"
+    | "INVALID_STATUS_TRANSITION";
+
   constructor(
-    readonly code: "INVALID_INPUT",
+    code:
+      | "INVALID_INPUT"
+      | "INQUIRY_NOT_FOUND"
+      | "INVALID_STATUS_TRANSITION",
     message: string,
   ) {
     super(message);
     this.name = "InquiryServiceError";
+    this.code = code;
   }
 }
 
@@ -43,6 +63,14 @@ export function parseInquiryInput(value: unknown): InquiryInput {
   const parsed = inquiryInputSchema.safeParse(value);
   if (!parsed.success) {
     throw new InquiryServiceError("INVALID_INPUT", "Проверьте данные формы.");
+  }
+  return parsed.data;
+}
+
+export function parseInquiryStatus(value: unknown): InquiryStatus {
+  const parsed = inquiryStatusSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new InquiryServiceError("INVALID_INPUT", "Некорректный статус заявки");
   }
   return parsed.data;
 }

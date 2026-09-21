@@ -1,4 +1,5 @@
 export type OrderStatus = "new" | "confirmed" | "completed" | "cancelled";
+export type InquiryStatus = "new" | "processed";
 export type DeliveryMethod = "pickup" | "courier";
 
 const STATUS_PRESENTATION = {
@@ -15,6 +16,31 @@ const DELIVERY_METHOD_PRESENTATION = {
 
 export function getStatusPresentation(status: OrderStatus) {
   return STATUS_PRESENTATION[status];
+}
+
+const INQUIRY_STATUS_PRESENTATION = {
+  new: { label: "Новая", variant: "secondary" },
+  processed: { label: "Обработана", variant: "success" },
+} as const;
+
+export function getInquiryStatusPresentation(status: InquiryStatus) {
+  return INQUIRY_STATUS_PRESENTATION[status];
+}
+
+export function getInquiryStatusActionLabel(status: InquiryStatus): string {
+  return {
+    new: "Вернуть в новые",
+    processed: "Отметить обработанной",
+  }[status];
+}
+
+export function getInquiryStatusConfirmation(status: InquiryStatus) {
+  const label = getInquiryStatusActionLabel(status);
+  return {
+    title: `${label}?`,
+    description: `Статус заявки изменится на «${getInquiryStatusPresentation(status).label}».`,
+    confirmLabel: label,
+  };
 }
 
 export function getStatusActionLabel(status: OrderStatus): string {
@@ -146,5 +172,9 @@ export function getOrderEditErrorMessage(error: unknown) {
 }
 
 export function getOrderTransitionErrorMessage(error: unknown) {
+  return getApiErrorMessage(error, "Обновите страницу и повторите действие.");
+}
+
+export function getInquiryTransitionErrorMessage(error: unknown) {
   return getApiErrorMessage(error, "Обновите страницу и повторите действие.");
 }

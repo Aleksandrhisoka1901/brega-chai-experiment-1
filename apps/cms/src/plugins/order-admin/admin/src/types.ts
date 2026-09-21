@@ -1,4 +1,8 @@
-import type { DeliveryMethod, OrderStatus } from "./view-model";
+import type {
+  DeliveryMethod,
+  InquiryStatus,
+  OrderStatus,
+} from "./view-model";
 
 export type OrderListItem = {
   documentId: string;
@@ -69,6 +73,33 @@ export type OrderDetail = {
   }>;
   availableStatusTransitions: OrderStatus[];
   editable: boolean;
+};
+
+export type InquiryListItem = {
+  documentId: string;
+  createdAt: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  modelInterest: string | null;
+  source: string;
+  status: InquiryStatus;
+};
+
+export type InquiryListResponse = {
+  data: InquiryListItem[];
+  meta: {
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
+};
+
+export type InquiryDetail = InquiryListItem & {
+  updatedAt: string;
+  comment: string | null;
+  availableStatusTransitions: InquiryStatus[];
 };
 
 export type OrderProductOption = {

@@ -151,6 +151,7 @@ const CONTENT_MANAGER_PRESETS: Record<string, ContentManagerPreset> = {
         "id",
         "customerName",
         "customerPhone",
+        "customerEmail",
         "source",
         "modelInterest",
         "inquiryStatus",

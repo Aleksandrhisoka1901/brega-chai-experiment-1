@@ -208,3 +208,55 @@ test("admin document id rejects empty and structural input", () => {
   assert.throws(() => domain.parseDocumentId(""));
   assert.throws(() => domain.parseDocumentId("../orders"));
 });
+
+const inquiry = {
+  documentId: "inquiry-document",
+  customerName: "Анна",
+  customerPhone: "+79991234567",
+  customerEmail: "anna@example.com",
+  comment: "Нужна FP115KWH",
+  source: "/tipovye-resheniya",
+  modelInterest: "FP115KWH",
+  inquiryStatus: "new",
+  createdAt: "2026-07-30T12:00:00.000Z",
+  updatedAt: "2026-07-30T12:00:00.000Z",
+};
+
+test("inquiry list DTO keeps contacts needed to call the customer back", () => {
+  assert.deepEqual(domain.mapInquiryListItem(inquiry), {
+    documentId: "inquiry-document",
+    createdAt: "2026-07-30T12:00:00.000Z",
+    customerName: "Анна",
+    customerPhone: "+79991234567",
+    customerEmail: "anna@example.com",
+    modelInterest: "FP115KWH",
+    source: "/tipovye-resheniya",
+    status: "new",
+  });
+});
+
+test("inquiry detail exposes comment and the allowed status transition", () => {
+  const result = domain.mapInquiryDetail(inquiry);
+  assert.equal(result.comment, "Нужна FP115KWH");
+  assert.deepEqual(result.availableStatusTransitions, ["processed"]);
+  assert.deepEqual(
+    domain.mapInquiryDetail({ ...inquiry, inquiryStatus: "processed" })
+      .availableStatusTransitions,
+    ["new"],
+  );
+});
+
+test("inquiry list query accepts processed status and rejects order statuses", () => {
+  assert.deepEqual(domain.parseInquiryListQuery({ status: "processed" }), {
+    page: 1,
+    pageSize: 25,
+    status: "processed",
+  });
+  assert.throws(() => domain.parseInquiryListQuery({ status: "confirmed" }));
+  assert.deepEqual(domain.parseInquiryStatusCommand({ status: "new" }), {
+    status: "new",
+  });
+  assert.throws(() =>
+    domain.parseInquiryStatusCommand({ status: "confirmed" }),
+  );
+});

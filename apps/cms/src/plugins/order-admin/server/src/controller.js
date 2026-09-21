@@ -5,6 +5,8 @@ const { ZodError } = require("zod");
 const {
   parseEditCommand,
   parseDocumentId,
+  parseInquiryListQuery,
+  parseInquiryStatusCommand,
   parseListQuery,
   parseProductQuery,
   parseStatusCommand,
@@ -216,6 +218,126 @@ function createOrderAdminController({ strapi }) {
           return ctx.notFound("Заказ не найден");
         }
         strapi.log?.warn?.("Order admin delete", {
+          documentId,
+          administratorId: actor?.id ?? null,
+          result: "rejected",
+          errorCode: code,
+        });
+        throw error;
+      }
+    },
+
+    async listInquiries(ctx) {
+      try {
+        ctx.body = await service().listInquiries(
+          parseInquiryListQuery(ctx.query),
+        );
+      } catch (error) {
+        if (error instanceof ZodError)
+          return ctx.badRequest("Некорректный запрос");
+        throw error;
+      }
+    },
+
+    async findInquiry(ctx) {
+      let documentId;
+      try {
+        documentId = parseDocumentId(ctx.params.documentId);
+      } catch (error) {
+        if (error instanceof ZodError)
+          return ctx.badRequest("Некорректный идентификатор заявки");
+        throw error;
+      }
+
+      const inquiry = await service().findInquiry(documentId);
+      if (!inquiry) return ctx.notFound("Заявка не найдена");
+      ctx.body = { data: inquiry };
+    },
+
+    async transitionInquiry(ctx) {
+      let command;
+      let documentId;
+      try {
+        command = parseInquiryStatusCommand(ctx.request.body);
+        documentId = parseDocumentId(ctx.params.documentId);
+      } catch (error) {
+        if (error instanceof ZodError)
+          return ctx.badRequest("Некорректный статус");
+        throw error;
+      }
+
+      const currentInquiry = await service().findInquiry(documentId);
+      if (!currentInquiry) return ctx.notFound("Заявка не найдена");
+
+      try {
+        const actor = actorFromUser(ctx.state?.user);
+        const inquiry = await service().transitionInquiry(
+          documentId,
+          command.status,
+        );
+        if (!inquiry) return ctx.notFound("Заявка не найдена");
+        strapi.log?.info("Inquiry admin status transition", {
+          documentId,
+          from: currentInquiry.status,
+          to: command.status,
+          administratorId: actor?.id ?? null,
+          result: "success",
+        });
+        ctx.body = { data: inquiry };
+      } catch (error) {
+        const errorCode =
+          error && typeof error === "object" && "code" in error
+            ? error.code
+            : null;
+        if (
+          errorCode === "INVALID_STATUS_TRANSITION" ||
+          errorCode === "INQUIRY_NOT_FOUND"
+        ) {
+          strapi.log?.warn?.("Inquiry admin status transition", {
+            documentId,
+            from: currentInquiry.status,
+            to: command.status,
+            administratorId: actorFromUser(ctx.state?.user)?.id ?? null,
+            result: "rejected",
+            errorCode,
+          });
+          if (errorCode === "INQUIRY_NOT_FOUND") {
+            return ctx.notFound("Заявка не найдена");
+          }
+          return ctx.conflict("Статус заявки уже изменился");
+        }
+        throw error;
+      }
+    },
+
+    async deleteInquiry(ctx) {
+      let documentId;
+      try {
+        documentId = parseDocumentId(ctx.params.documentId);
+      } catch (error) {
+        if (error instanceof ZodError)
+          return ctx.badRequest("Некорректный идентификатор заявки");
+        throw error;
+      }
+
+      const actor = actorFromUser(ctx.state?.user);
+      try {
+        const result = await service().deleteInquiry(documentId);
+        strapi.log?.info("Inquiry admin delete", {
+          documentId,
+          administratorId: actor?.id ?? null,
+          result: "success",
+        });
+        ctx.body = { data: result };
+      } catch (error) {
+        const code =
+          error && typeof error === "object" && "code" in error
+            ? error.code
+            : null;
+        if (code === "INQUIRY_NOT_FOUND") {
+          return ctx.notFound("Заявка не найдена");
+        }
+        strapi.log?.warn?.("Inquiry admin delete", {
           documentId,
           administratorId: actor?.id ?? null,
           result: "rejected",

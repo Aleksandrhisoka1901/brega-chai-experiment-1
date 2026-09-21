@@ -81,6 +81,8 @@ const adminApp = {
           "Интересующая модель",
         "content-manager.content-types.api::inquiry.inquiry.source":
           "Страница заявки",
+        "order-admin.plugin.name": "Заказы",
+        "order-admin.plugin.inquiries": "Заявки",
 
         "content-manager.content-types.api::order.order.comment": "Комментарий",
         "content-manager.content-types.api::order.order.managerComment":

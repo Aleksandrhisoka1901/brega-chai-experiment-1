@@ -1,6 +1,8 @@
 "use strict";
 
 const {
+  mapInquiryDetail,
+  mapInquiryListItem,
   mapOrderDetail,
   mapOrderListItem,
   mapProductOption,
@@ -8,6 +10,7 @@ const {
 
 const ORDER_UID = "api::order.order";
 const PRODUCT_UID = "api::product.product";
+const INQUIRY_UID = "api::inquiry.inquiry";
 
 function buildWhere(query) {
   const where = {};
@@ -29,9 +32,32 @@ function buildWhere(query) {
   return where;
 }
 
+function buildInquiryWhere(query) {
+  const where = {};
+
+  if (query.search) {
+    where.$or = [
+      { customerName: { $containsi: query.search } },
+      { customerPhone: { $containsi: query.search } },
+      { customerEmail: { $containsi: query.search } },
+      { modelInterest: { $containsi: query.search } },
+    ];
+  }
+  if (query.status) where.inquiryStatus = query.status;
+  if (query.createdFrom || query.createdTo) {
+    where.createdAt = {
+      ...(query.createdFrom ? { $gte: query.createdFrom } : {}),
+      ...(query.createdTo ? { $lte: query.createdTo } : {}),
+    };
+  }
+
+  return where;
+}
+
 function createOrderAdminService({ strapi }) {
   const repository = strapi.db.query(ORDER_UID);
   const productRepository = strapi.db.query(PRODUCT_UID);
+  const inquiryRepository = strapi.db.query(INQUIRY_UID);
 
   async function findRawOrder(documentId) {
     return repository.findOne({ where: { documentId } });
@@ -102,7 +128,47 @@ function createOrderAdminService({ strapi }) {
       await strapi.service(ORDER_UID).deleteFromAdmin(documentId);
       return { documentId };
     },
+
+    async listInquiries(query) {
+      const where = buildInquiryWhere(query);
+      const [rows, total] = await Promise.all([
+        inquiryRepository.findMany({
+          where,
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          offset: (query.page - 1) * query.pageSize,
+          limit: query.pageSize,
+        }),
+        inquiryRepository.count({ where }),
+      ]);
+
+      return {
+        data: rows.map(mapInquiryListItem),
+        meta: {
+          page: query.page,
+          pageSize: query.pageSize,
+          pageCount: Math.ceil(total / query.pageSize),
+          total,
+        },
+      };
+    },
+
+    async findInquiry(documentId) {
+      const inquiry = await inquiryRepository.findOne({
+        where: { documentId },
+      });
+      return inquiry ? mapInquiryDetail(inquiry) : null;
+    },
+
+    async transitionInquiry(documentId, status) {
+      await strapi.service(INQUIRY_UID).transitionStatus(documentId, status);
+      return this.findInquiry(documentId);
+    },
+
+    async deleteInquiry(documentId) {
+      await strapi.service(INQUIRY_UID).deleteFromAdmin(documentId);
+      return { documentId };
+    },
   };
 }
 
-module.exports = { buildWhere, createOrderAdminService };
+module.exports = { buildWhere, buildInquiryWhere, createOrderAdminService };
