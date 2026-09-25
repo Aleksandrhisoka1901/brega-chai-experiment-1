@@ -11,6 +11,7 @@ services:
         NEXT_PUBLIC_MEDIA_URL: ${NEXT_PUBLIC_MEDIA_URL:-https://media.lon-energy.ru}
     environment:
       NODE_ENV: production
+    restart: unless-stopped
     ports: !reset []
     volumes: !reset []
     depends_on: !override
@@ -28,12 +29,15 @@ services:
       start_period: 30s
 
   cms:
+    restart: unless-stopped
     ports: !reset []
 
   postgres:
+    restart: unless-stopped
     ports: !reset []
 
   rustfs:
+    restart: unless-stopped
     ports: !reset []
 
   nginx:
