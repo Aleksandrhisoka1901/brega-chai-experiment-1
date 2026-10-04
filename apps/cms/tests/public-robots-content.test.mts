@@ -22,6 +22,8 @@ test("public robots.txt stays within the CMS field limit and keeps search crawle
   assert.match(content, /Disallow: \/legal\/privacy\.pdf/);
   assert.match(content, /User-agent: YandexAdditionalBot\nAllow: \//);
   assert.match(content, /User-agent: YandexAdditional\nAllow: \//);
+  assert.match(content, /User-agent: Googlebot\nAllow: \//);
+  assert.match(content, /User-agent: Google-InspectionTool\nAllow: \//);
   assert.match(
     content,
     /User-agent: Yandex[\s\S]*Clean-param: utm_source&utm_medium/,

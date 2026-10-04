@@ -7,7 +7,6 @@ import { SystemState } from "@/components/system-state";
 
 export const metadata: Metadata = {
   title: `Сервис временно недоступен — ${BRAND_NAME}`,
-  robots: { index: false, follow: false },
 };
 
 export default async function ServiceUnavailablePage() {

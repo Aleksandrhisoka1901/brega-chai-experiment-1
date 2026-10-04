@@ -31,7 +31,7 @@ test("rewrites public pages to an honest 503 when CMS is unavailable", async () 
     assert.equal(response.status, 503);
     assert.equal(response.headers.get("retry-after"), "60");
     assert.equal(response.headers.get("cache-control"), "no-store");
-    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    assert.equal(response.headers.get("x-robots-tag"), null);
     assert.match(
       response.headers.get("x-middleware-rewrite") ?? "",
       new RegExp(`${SERVICE_UNAVAILABLE_PATH}$`),
@@ -184,7 +184,7 @@ test("returns 503 for legal PDFs when CMS cannot be reached", async () => {
     assert.equal(response.status, 503);
     assert.equal(response.headers.get("cache-control"), "no-store");
     assert.equal(response.headers.get("retry-after"), "60");
-    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    assert.equal(response.headers.get("x-robots-tag"), null);
   } finally {
     globalThis.fetch = originalFetch;
   }

@@ -174,6 +174,18 @@ Allow: /
 User-agent: YandexAdditional
 Allow: /
 
+User-agent: Googlebot
+${pathRules}
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Google-InspectionTool
+Allow: /
+
+User-agent: Storebot-Google
+${pathRules}
+
 User-agent: *
 ${pathRules}
 

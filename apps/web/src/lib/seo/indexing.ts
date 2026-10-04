@@ -32,7 +32,7 @@ export function applyIndexingHeaders(
     return;
   }
 
-  if (status >= 400) {
+  if (status >= 400 && status < 500) {
     headers.set("X-Robots-Tag", NOINDEX_ROBOTS_HEADER);
     return;
   }
