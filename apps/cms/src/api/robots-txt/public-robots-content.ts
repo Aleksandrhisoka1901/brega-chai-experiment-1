@@ -126,9 +126,8 @@ function uniqueUserAgents(names: readonly string[]) {
   return [...new Set(names)];
 }
 
-export const PUBLIC_ROBOTS_BLOCKED_USER_AGENTS = uniqueUserAgents(
-  BLOCKED_USER_AGENTS,
-);
+export const PUBLIC_ROBOTS_BLOCKED_USER_AGENTS =
+  uniqueUserAgents(BLOCKED_USER_AGENTS);
 
 export const PUBLIC_ROBOTS_SEARCH_CRAWLER_USER_AGENTS = [
   ...SEARCH_CRAWLER_USER_AGENTS,
@@ -176,6 +175,8 @@ Allow: /
 
 User-agent: Googlebot
 ${pathRules}
+
+Sitemap: ${origin}/sitemap.xml
 
 User-agent: Googlebot-Image
 Allow: /
@@ -240,4 +241,3 @@ export async function ensurePublicRobotsContent(
     data: { content },
   });
 }
-

@@ -38,6 +38,7 @@ export const DEFAULT_SITEMAP_URLS = [
   { slug: "/stati", priority: 0.9, frequency: "weekly" },
   { slug: "/dlya-optovikov", priority: 0.8, frequency: "weekly" },
   { slug: "/tipovye-resheniya", priority: 0.8, frequency: "weekly" },
+  { slug: "/karta-sajta", priority: 0.4, frequency: "weekly" },
   {
     slug: "/legal/deklaraciya-sootvetstviya",
     priority: 0.6,
@@ -118,9 +119,7 @@ type SitemapCollectionEntry = { id: number; type?: string; pattern?: string };
 async function ensureProductCollection(strapi: any) {
   const query = strapi.db.query(COLLECTION_UID);
   const existing = (await query.findMany()) as SitemapCollectionEntry[];
-  const byType = new Map(
-    existing.map((entry) => [entry.type, entry] as const),
-  );
+  const byType = new Map(existing.map((entry) => [entry.type, entry] as const));
 
   const productEntry = byType.get("product");
   if (!productEntry) {

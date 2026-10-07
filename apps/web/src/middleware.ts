@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from "next/server.js";
 import { applyIndexingHeaders } from "./lib/seo/indexing.ts";
 
 export const SERVICE_UNAVAILABLE_PATH = "/service-unavailable-internal";
-export const SITEMAP_PLUGIN_PATH = "/api/strapi-5-sitemap-plugin/sitemap.xml";
 
 const CMS_READINESS_TIMEOUT_MS = 2_000;
 const CMS_READINESS_CACHE_MS = 5_000;
@@ -139,15 +138,6 @@ const serviceUnavailableResponse = (request: NextRequest) => {
   );
 };
 
-const sitemapResponse = (request: NextRequest) => {
-  if (request.nextUrl.pathname !== "/sitemap.xml") return null;
-
-  const cmsUrl = process.env.CMS_INTERNAL_URL ?? "http://127.0.0.1:1337";
-  const target = new URL(SITEMAP_PLUGIN_PATH, cmsUrl);
-  target.search = request.nextUrl.search;
-  return withIndexingHeaders(NextResponse.rewrite(target), request);
-};
-
 const legalDocumentResponse = async (request: NextRequest) => {
   const field =
     LEGAL_DOCUMENT_PATHS[
@@ -197,12 +187,18 @@ const legalDocumentResponse = async (request: NextRequest) => {
     };
     const document = payload.data?.legalDocuments?.[field];
     if (!document?.url || document.mime !== "application/pdf") {
-      return withIndexingHeaders(new NextResponse(null, { status: 404 }), request);
+      return withIndexingHeaders(
+        new NextResponse(null, { status: 404 }),
+        request,
+      );
     }
 
     const target = new URL(document.url, publicMediaUrl);
     if (target.protocol !== "http:" && target.protocol !== "https:") {
-      return withIndexingHeaders(new NextResponse(null, { status: 404 }), request);
+      return withIndexingHeaders(
+        new NextResponse(null, { status: 404 }),
+        request,
+      );
     }
     return withIndexingHeaders(NextResponse.rewrite(target), request);
   } catch {
@@ -224,9 +220,6 @@ export async function middleware(request: NextRequest) {
     return withIndexingHeaders(NextResponse.next(), request);
   }
 
-  const sitemap = sitemapResponse(request);
-  if (sitemap) return sitemap;
-
   const legalDocument = await legalDocumentResponse(request);
   if (legalDocument) return legalDocument;
 
@@ -238,7 +231,10 @@ export async function middleware(request: NextRequest) {
     return serviceUnavailableResponse(request);
   }
 
-  return canonicalRedirect(request) ?? withIndexingHeaders(NextResponse.next(), request);
+  return (
+    canonicalRedirect(request) ??
+    withIndexingHeaders(NextResponse.next(), request)
+  );
 }
 
 export const config = {

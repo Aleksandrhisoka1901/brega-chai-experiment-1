@@ -779,6 +779,44 @@ a {
   margin-top: auto;
 }
 
+.site-map h1 {
+  margin: 0 0 0.75rem;
+}
+
+.site-map > p {
+  max-width: 40rem;
+  margin: 0 0 2.5rem;
+  color: var(--text-muted);
+}
+
+.site-map__groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2rem 3rem;
+}
+
+.site-map__group h2 {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: var(--type-heading-3);
+  font-weight: 400;
+}
+
+.site-map__group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-map__group li + li {
+  margin-top: 0.45rem;
+}
+
+.site-map__group a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .legal-page {
   max-width: 42rem;
   padding: clamp(2rem, 4vw, 4rem) var(--page-gutter) clamp(4rem, 8vw, 8rem);

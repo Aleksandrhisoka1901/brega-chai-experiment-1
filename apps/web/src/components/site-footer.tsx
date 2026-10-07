@@ -60,6 +60,7 @@ export function SiteFooter({ settings }: { settings: GlobalSettings }) {
         <div className="site-footer__legal">
           <h2>Правовая информация</h2>
           <nav aria-label="Юридические документы">
+            <a href="/karta-sajta">{bindShortRussianWords("Карта сайта")}</a>
             <a href="/legal/deklaraciya-sootvetstviya">
               {bindShortRussianWords("Декларация соответствия")}
             </a>

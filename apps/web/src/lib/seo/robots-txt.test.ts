@@ -10,6 +10,10 @@ test("storefront robots.txt opens Yandex and never uses a site-wide Disallow", (
   assert.match(content, /User-agent: YandexWebmaster\nAllow: \//);
   assert.match(content, /User-agent: Googlebot\nAllow: \//);
   assert.match(content, /User-agent: Google-InspectionTool\nAllow: \//);
+  assert.match(
+    content,
+    /User-agent: Googlebot\nAllow: \/[\s\S]*?Sitemap: https:\/\/lon-energy.ru\/sitemap.xml\n\nUser-agent: Googlebot-Image/,
+  );
   assert.match(content, /Clean-param: utm_source&utm_medium/);
   assert.doesNotMatch(content, /^Disallow: \/\s*$/m);
   assert.doesNotMatch(content, /User-agent: AhrefsBot/);

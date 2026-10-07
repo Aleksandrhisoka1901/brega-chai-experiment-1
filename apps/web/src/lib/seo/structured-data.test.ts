@@ -7,6 +7,7 @@ import {
   organizationStructuredData,
   productStructuredData,
   serializeJsonLd,
+  siteMapStructuredData,
   streetAddressFromPickup,
   websiteStructuredData,
 } from "./structured-data.ts";
@@ -115,11 +116,15 @@ test("uses the CMS brand name for organization and website identity", () => {
 });
 
 test("puts a Moscow postal address into organization JSON-LD", () => {
-  const data = organizationStructuredData("https://lon-energy.ru", "LonEnergy", {
-    streetAddress: streetAddressFromPickup(
-      "Самовывоз осуществляется по адресу: г. Москва, проезд Серебрякова, д. 14, стр. 6.",
-    ),
-  });
+  const data = organizationStructuredData(
+    "https://lon-energy.ru",
+    "LonEnergy",
+    {
+      streetAddress: streetAddressFromPickup(
+        "Самовывоз осуществляется по адресу: г. Москва, проезд Серебрякова, д. 14, стр. 6.",
+      ),
+    },
+  );
 
   assert.equal(data.address["@type"], "PostalAddress");
   assert.equal(data.address.addressLocality, "Москва");
@@ -151,4 +156,33 @@ test("marks articles as Russian organization-authored content", () => {
   assert.equal(data.author["@type"], "Organization");
   assert.equal(data.author.name, "LonEnergy");
   assert.equal(data.publisher.url, "https://lon-energy.ru");
+});
+
+test("lists every sitemap URL in ItemList JSON-LD", () => {
+  const data = siteMapStructuredData(
+    [
+      {
+        path: "/",
+        title: "Главная",
+        group: "sections",
+        priority: 1,
+        changeFrequency: "weekly",
+      },
+      {
+        path: "/paneli/ctechi-sp-200",
+        title: "CTECHi SP-200",
+        group: "paneli",
+        priority: 0.8,
+        changeFrequency: "weekly",
+      },
+    ],
+    "https://lon-energy.ru",
+  );
+
+  assert.equal(data["@type"], "ItemList");
+  assert.equal(data.numberOfItems, 2);
+  assert.equal(
+    data.itemListElement[1]?.url,
+    "https://lon-energy.ru/paneli/ctechi-sp-200",
+  );
 });

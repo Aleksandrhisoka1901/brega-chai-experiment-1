@@ -1,5 +1,7 @@
 import type { ProductDetail } from "../../server/cms/product-detail-mapper.ts";
 import { BRAND_EMAIL, BRAND_NAME, BRAND_TELEGRAM_URL } from "../brand.ts";
+import { canonicalUrl, siteOrigin } from "./metadata.ts";
+import type { SitemapEntry } from "./sitemap.ts";
 
 export function serializeJsonLd(data: unknown) {
   return JSON.stringify(data).replace(/</g, "\\u003c");
@@ -102,6 +104,24 @@ export function websiteStructuredData(origin: string, brandName: string) {
       name: brandName,
       url: origin,
     },
+  };
+}
+
+export function siteMapStructuredData(
+  entries: SitemapEntry[],
+  origin = siteOrigin(),
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Карта сайта",
+    numberOfItems: entries.length,
+    itemListElement: entries.map((entry, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: entry.title,
+      url: canonicalUrl(entry.path, origin),
+    })),
   };
 }
 

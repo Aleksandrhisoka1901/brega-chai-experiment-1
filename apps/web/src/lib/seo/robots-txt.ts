@@ -41,6 +41,8 @@ Allow: /
 User-agent: Googlebot
 ${pathRules}
 
+Sitemap: ${origin}/sitemap.xml
+
 User-agent: Googlebot-Image
 Allow: /
 

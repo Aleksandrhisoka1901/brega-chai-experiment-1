@@ -7,7 +7,6 @@ import {
   middleware,
   resetCmsReadinessCache,
   SERVICE_UNAVAILABLE_PATH,
-  SITEMAP_PLUGIN_PATH,
 } from "./middleware.ts";
 
 const withCmsReadiness = async (status: number, run: () => Promise<void>) => {
@@ -66,32 +65,25 @@ test("does not run readiness checks for internal and non-page routes", async () 
   }
 });
 
-test("proxies the public sitemap to the Strapi plugin at runtime", async () => {
+test("lets Next.js serve /sitemap.xml without proxying to CMS", async () => {
   resetCmsReadinessCache();
   const originalFetch = globalThis.fetch;
-  const originalCmsUrl = process.env.CMS_INTERNAL_URL;
   let requests = 0;
   globalThis.fetch = async () => {
     requests += 1;
     return new Response(null, { status: 503 });
   };
-  process.env.CMS_INTERNAL_URL = "http://cms.internal:1337";
 
   try {
     const response = await middleware(
-      new NextRequest("https://brega.example/sitemap.xml?preview=1"),
+      new NextRequest("https://brega.example/sitemap.xml"),
     );
 
     assert.equal(response.status, 200);
-    assert.equal(
-      response.headers.get("x-middleware-rewrite"),
-      `http://cms.internal:1337${SITEMAP_PLUGIN_PATH}?preview=1`,
-    );
+    assert.equal(response.headers.get("x-middleware-rewrite"), null);
     assert.equal(requests, 0);
   } finally {
     globalThis.fetch = originalFetch;
-    if (originalCmsUrl === undefined) delete process.env.CMS_INTERNAL_URL;
-    else process.env.CMS_INTERNAL_URL = originalCmsUrl;
   }
 });
 
@@ -282,8 +274,7 @@ test("redirects supported dirty URLs to their canonical URL in one 301", async (
 });
 
 test("does not 301-loop when a storefront slug still contains Cyrillic", async () => {
-  const path =
-    "/stati/rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества";
+  const path = "/stati/rezervnoe-pitanie-doma-pri-otklyuchenii-elektrychества";
 
   await withCmsReadiness(204, async () => {
     const response = await middleware(

@@ -17,11 +17,17 @@ test("replaces only empty, localhost, or IP sitemap origins", () => {
     true,
   );
   assert.equal(
-    shouldReplaceSitemapOrigin("http://201.24.49.82:3000", "https://lon-energy.ru"),
+    shouldReplaceSitemapOrigin(
+      "http://201.24.49.82:3000",
+      "https://lon-energy.ru",
+    ),
     true,
   );
   assert.equal(
-    shouldReplaceSitemapOrigin("https://editor.example", "https://lon-energy.ru"),
+    shouldReplaceSitemapOrigin(
+      "https://editor.example",
+      "https://lon-energy.ru",
+    ),
     false,
   );
 });
@@ -44,7 +50,16 @@ test("normalizes the public sitemap origin", () => {
 test("creates the minimal sitemap configuration and public permission", async () => {
   assert.deepEqual(
     DEFAULT_SITEMAP_URLS.map(({ slug }) => slug),
-    ["/", "/stantsii", "/paneli", "/stati", "/dlya-optovikov", "/tipovye-resheniya", "/legal/deklaraciya-sootvetstviya"],
+    [
+      "/",
+      "/stantsii",
+      "/paneli",
+      "/stati",
+      "/dlya-optovikov",
+      "/tipovye-resheniya",
+      "/karta-sajta",
+      "/legal/deklaraciya-sootvetstviya",
+    ],
   );
   assert.equal(
     DEFAULT_SITEMAP_URLS.some(({ slug }) => /[?&]page=/.test(slug)),

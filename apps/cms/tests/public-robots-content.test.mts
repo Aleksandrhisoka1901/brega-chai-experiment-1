@@ -29,6 +29,10 @@ test("public robots.txt stays within the CMS field limit and keeps search crawle
     /User-agent: Yandex[\s\S]*Clean-param: utm_source&utm_medium/,
   );
   assert.match(content, /Sitemap: https:\/\/lon-energy\.ru\/sitemap\.xml/);
+  assert.match(
+    content,
+    /User-agent: Googlebot\nAllow: \/[\s\S]*?Sitemap: https:\/\/lon-energy\.ru\/sitemap\.xml\n\nUser-agent: Googlebot-Image/,
+  );
   assert.doesNotMatch(content, /^Host:/m);
   assert.doesNotMatch(content, /^Disallow: \/\s*$/m);
   assert.doesNotMatch(content, /Disallow: \/\*\?\*\n/);
@@ -67,7 +71,10 @@ test("writes generated robots.txt when the CMS document is stale", async () => {
       documents() {
         return {
           async findFirst() {
-            return { documentId: "robots-1", content: "User-agent: *\nDisallow: /\n" };
+            return {
+              documentId: "robots-1",
+              content: "User-agent: *\nDisallow: /\n",
+            };
           },
           async create() {
             throw new Error("unexpected create");

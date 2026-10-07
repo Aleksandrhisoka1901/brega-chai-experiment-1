@@ -68,6 +68,12 @@ export default async function RootLayout({
     <html lang="ru">
       <head>
         <Script src="/runtime-config.js" strategy="beforeInteractive" />
+        <link
+          rel="sitemap"
+          type="application/xml"
+          title="Sitemap"
+          href={`${siteOrigin()}/sitemap.xml`}
+        />
       </head>
       <body>
         <NavigationProgress />
